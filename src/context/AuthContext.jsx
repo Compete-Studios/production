@@ -1,10 +1,8 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { auth } from '../firebase/firebase';
+import { REACT_API_BASE_URL } from '../constants';
 
 const UserContext = createContext();
-
-const API_BASE_URL = 'http://localhost:3333/api';
-// const API_BASE_URL = 'https://amazing-dubinsky.209-59-154-172.plesk.page/api'
 
 export default function AuthContextProvider({ children }) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -19,6 +17,10 @@ export default function AuthContextProvider({ children }) {
     const [prospectPipelineSteps, setProspectPipelineSteps] = useState([]);
     const [marketingSources, setMarketingSources] = useState([]);
     const [searchedStudentsAndProspects, setSearchedStudentsAndProspects] = useState([]);
+    const [showLoading, setShowLoading] = useState(true);
+    const [studentIntros, setStudentIntros] = useState([]);
+    const [prospectIntros, setProspectIntros] = useState([]);
+    const [dailySchedule, setDailySchedule] = useState([]);
 
     const [update, setUpdate] = useState(false);
 
@@ -26,88 +28,12 @@ export default function AuthContextProvider({ children }) {
         console.log('getStuff');
     };
 
-    const getClassesByStudioID = async (studioId) => {
+    const fetchData = async (url, setter) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/studio-access/getClassesByStudioId/${studioId}`);
+            const response = await fetch(url);
             const data = await response.json();
-            setClasses(data.recordset);
-
-            return data;
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const getStaffByStudioID = async (studioId) => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/staff-access/getStaffByStudioId/${studioId}/1`);
-            const data = await response.json();
-            setStaff(data.recordset);
-            return data;
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const getActiveStudentsByStudioId = async (studioId) => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/studio-access/getStudentsByStudioId/${studioId}/1`);
-            const data = await response.json();
-            setStudents(data.recordset);
-            return data;
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const getAllProspectsByStudioId = async (studioId) => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/marketing-access/getProspectsByStudioId/${studioId}`);
-            const data = await response.json();
-            setProspects(data.recordset);
-            return data;
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const getStudentPipelineStepsByStudioId = async (studioId) => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/marketing-access/getStudentPipelineStepsByStudioId/${studioId}`);
-            const data = await response.json();
-            setPipelineSteps(data.recordset);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const getProgramsByStudioID = async (studioId) => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/class-access/getProgramsByStudioId/${studioId}`);
-            const data = await response.json();
-            setPrograms(data.result.recordset);
-            return data;
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const getWaitingListsByStudioID = async (studioId) => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/marketing-access/getWaitingListsByStudioId/${studioId}`);
-            const data = await response.json();
-            setWaitingLists(data.recordset);
-            return data;
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const getProspectPipelineStepsByStudioId = async (studioId) => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/marketing-access/getPipelineStepsByStudioId/${studioId}`);
-            const data = await response.json();
-            setProspectPipelineSteps(data.recordset);
+            console.log(data)
+            setter(data.recordset);
             return data;
         } catch (error) {
             console.error(error);
@@ -115,19 +41,28 @@ export default function AuthContextProvider({ children }) {
     };
 
     useEffect(() => {
+        setShowLoading(true);
+        const year = new Date().getFullYear();
+        const month = new Date().getMonth() + 1;
         getStuff();
-        getClassesByStudioID(suid);
-        getStaffByStudioID(suid);
-        getActiveStudentsByStudioId(suid);
-        getAllProspectsByStudioId(suid);
-        getStudentPipelineStepsByStudioId(suid);
-        getProgramsByStudioID(suid);
-        getWaitingListsByStudioID(suid);
-        getProspectPipelineStepsByStudioId(suid);
+        Promise.all([
+            fetchData(`${REACT_API_BASE_URL}/studio-access/getClassesByStudioId/${suid}`, setClasses),
+            fetchData(`${REACT_API_BASE_URL}/staff-access/getStaffByStudioId/${suid}/1`, setStaff),
+            fetchData(`${REACT_API_BASE_URL}/studio-access/getStudentsByStudioId/${suid}/1`, setStudents),
+            fetchData(`${REACT_API_BASE_URL}/marketing-access/getStudentPipelineStepsByStudioId/${suid}`, setPipelineSteps),
+            fetchData(`${REACT_API_BASE_URL}/class-access/getProgramsByStudioId/${suid}`, setPrograms),
+            fetchData(`${REACT_API_BASE_URL}/marketing-access/getWaitingListsByStudioId/${suid}`, setWaitingLists),
+            fetchData(`${REACT_API_BASE_URL}/marketing-access/getPipelineStepsByStudioId/${suid}`, setProspectPipelineSteps),
+            fetchData(`${REACT_API_BASE_URL}/marketing-access/getMarketingMethodsByStudioId/${suid}`, setMarketingSources),
+            fetchData(`${REACT_API_BASE_URL}/student-access/getStudentIntros/${suid}/${month}/${year}`, setStudentIntros),
+            fetchData(`${REACT_API_BASE_URL}/student-access/getProspectIntros/${suid}/${month}/${year}`, setProspectIntros),
+            fetchData(`${REACT_API_BASE_URL}/daily-schedule-tools/getStudentsByNextContactDate/${suid}`, setDailySchedule),
+        ]).then(() => {
+            setShowLoading(false);
+        });
     }, [suid, update]);
 
     useEffect(() => {
-        // Check if user is logged in from browser storage
         const storedLoggedIn = localStorage.getItem('isLoggedIn');
         const storedSuid = localStorage.getItem('suid');
         if (storedLoggedIn) {
@@ -137,7 +72,6 @@ export default function AuthContextProvider({ children }) {
             setSuid(storedSuid);
         }
 
-        // Listen for authentication state changes
         const unsubscribe = auth.onAuthStateChanged((currentUser) => {
             if (currentUser) {
                 setIsLoggedIn(true);
@@ -153,7 +87,7 @@ export default function AuthContextProvider({ children }) {
         });
 
         return () => {
-            unsubscribe(); // Clean up the onAuthStateChanged listener
+            unsubscribe();
         };
     }, []);
 
@@ -176,6 +110,10 @@ export default function AuthContextProvider({ children }) {
                 marketingSources,
                 searchedStudentsAndProspects,
                 setSearchedStudentsAndProspects,
+                showLoading,
+                studentIntros,
+                prospectIntros,
+                dailySchedule
             }}
         >
             {children}

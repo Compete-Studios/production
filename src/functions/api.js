@@ -76,7 +76,7 @@ export const addStudentToWaitingLists = async (studentId, waitingListIds) => {
 export const getStudentInfo = async (studentId) => {
     try {
         const response = await fetchData(`student-access/getStudentInfo/${studentId}`, 'get');
-        return response;
+        return response.recordset[0];
     } catch (error) {
         console.error(error);
         throw error;
@@ -489,10 +489,20 @@ export const addAClass = async (data) => {
     }
 };
 
+export const addClassAndSchedule = async (data) => {
+    try {
+        const response = await fetchData(`class-access/addClassAndSchedule`, 'post', data);
+        return { response, status: 200 };
+    } catch (error) {
+        console.error(error);
+        return { status: 400 };
+    }
+};
+
 export const getTheClassScheduleByClassId = async (classId) => {
     try {
         const response = await fetchData(`class-access/getClassScheduleByClassId/${classId}`, 'get');
-        return response;
+        return response.recordset[0]
     } catch (error) {
         console.error(error);
         throw error;
@@ -808,6 +818,37 @@ export const getProspectsByPipelineStep = async (pipelineStepId, studioId) => {
     try {
         const response = await fetchData(`marketing-access/getProspectsByPipelineStep/${pipelineStepId}/${studioId}`, 'get');
         return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+
+export const updateStudentNotes = async (studentId, notes) => {
+    try {
+        const response = await fetchData(`student-access/updateStudentNotes/${studentId}`, 'post', { notes });
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const dropClassByClassID = async (classId) => {
+    try {
+        const response = await fetchData(`class-access/dropClass/${classId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getStaffByClassId = async (classId) => {
+    try {
+        const response = await fetchData(`staff-access/getStaffByClassId/${classId}`, 'get');
+        return response.recordset;
     } catch (error) {
         console.error(error);
         throw error;

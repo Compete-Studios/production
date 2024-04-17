@@ -409,7 +409,7 @@ const Overview = () => {
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
                 <li>
-                    <Link to="/" className="text-primary hover:underline">
+                    <Link to="/dashboard" className="text-primary hover:underline">
                         Dashboard
                     </Link>
                 </li>
@@ -746,7 +746,7 @@ const Overview = () => {
                             </div>
                         </PerfectScrollbar>
                         <div className="border-t border-white-light dark:border-white/10">
-                            <Link to="/" className=" font-semibold group hover:text-primary p-4 flex items-center justify-center group">
+                            <Link to="/dashboard" className=" font-semibold group hover:text-primary p-4 flex items-center justify-center group">
                                 View All
                                 <IconArrowLeft className="rtl:rotate-180 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition duration-300 ltr:ml-1 rtl:mr-1" />
                             </Link>

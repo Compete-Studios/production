@@ -4,6 +4,7 @@ import ProtectedRoute from './ProtectedRoutes';
 const LoginBoxed = lazy(() => import('../pages/Authentication/LoginBoxed'));
 const RegisterBoxed = lazy(() => import('../pages/Authentication/RegisterBoxed'));
 const Error = lazy(() => import('../components/Error'));
+const HomeMain = lazy(() => import('../pages/Home/HomeMain'));
 
 const Overview = lazy(() => import('../pages/Overview'));
 const SearchPayments = lazy(() => import('../pages/Payments/SearchPayments'));
@@ -20,10 +21,19 @@ const WaitingLists = lazy(() => import('../pages/Classes/WaitingLists'));
 const Programs = lazy(() => import('../pages/Classes/Programs'));
 const Ranks = lazy(() => import('../pages/Classes/Ranks'));
 const AddStudent = lazy(() => import('../pages/Students/AddStudent'));
+const ViewStudent = lazy(() => import('../pages/Students/ViewStudent'));
 const ViewStudents = lazy(() => import('../pages/Students/ViewStudents'));
 const SearchStudents = lazy(() => import('../pages/Students/SearchStudents'));
 const StudentPipeline = lazy(() => import('../pages/Students/StudentPipeline'));
 const Methods = lazy(() => import('../pages/Marketing/Methods'));
+const FacebookAddCreator = lazy(() => import('../pages/Marketing/FacebookAddCreator'));
+
+const TodoList = lazy(() => import('../pages/Tools/TodoList'));
+const Notes = lazy(() => import('../pages/Tools/Notes'));
+const PerformancePlanner = lazy(() => import('../pages/Tools/PerformancePlanner'));
+const Calendar = lazy(() => import('../pages/Tools/Calendar'));
+const Chat = lazy(() => import('../pages/Tools/Chat'));
+const Mailbox = lazy(() => import('../pages/Tools/Mailbox'));
 
 const ViewProspects = lazy(() => import('../pages/Prospects/ViewProspects'));
 const AddProspect = lazy(() => import('../pages/Prospects/AddProspect'));
@@ -33,8 +43,13 @@ const ProspectPipeline = lazy(() => import('../pages/Prospects/ProspectPipeline'
 const routes = [
     //Authentication
     {
-        path: '/auth/boxed-signin',
+        path: '/auth/signin',
         element: <LoginBoxed />,
+        layout: 'blank',
+    },
+    {
+        path: '/',
+        element: <HomeMain />,
         layout: 'blank',
     },
     {
@@ -109,6 +124,10 @@ const routes = [
         element: <AddStudent />,
     },
     {
+        path: '/students/view-student/:uid/:studioid',
+        element: <ViewStudent />,
+    },
+    {
         path: '/students/search-students',
         element: <SearchStudents />,
     },
@@ -131,8 +150,13 @@ const routes = [
     },
     //dashboard
     {
-        path: '/',
+        path: '/dashboard',
         element: <Overview />,
+    },
+    //facebook
+    {
+        path: '/facebook-add-creator',
+        element: <FacebookAddCreator />,
     },
     //marketing
     {
@@ -143,6 +167,28 @@ const routes = [
     {
         path: '/search',
         element: <SearchDisplay />,
+    },
+    //tools
+    {
+        path: '/apps/todolist',
+        element: <TodoList />,
+    },
+
+    {
+        path: '/apps/performance-planner',
+        element: <PerformancePlanner />,
+    },
+    {
+        path: '/apps/calendar',
+        element: <Calendar />,
+    },
+    {
+        path: '/apps/chat',
+        element: <Chat />,
+    },
+    {
+        path: '/apps/mailbox',
+        element: <Mailbox />,
     },
 
     //errors

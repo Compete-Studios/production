@@ -3,27 +3,25 @@ import { Dialog, Transition } from '@headlessui/react';
 import Swal from 'sweetalert2';
 import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../store/themeConfigSlice';
-import IconUserPlus from '../../components/Icon/IconUserPlus';
-import IconListCheck from '../../components/Icon/IconListCheck';
-import IconLayoutGrid from '../../components/Icon/IconLayoutGrid';
 import IconSearch from '../../components/Icon/IconSearch';
-import IconUser from '../../components/Icon/IconUser';
-import IconFacebook from '../../components/Icon/IconFacebook';
-import IconInstagram from '../../components/Icon/IconInstagram';
-import IconLinkedin from '../../components/Icon/IconLinkedin';
-import IconTwitter from '../../components/Icon/IconTwitter';
-import IconX from '../../components/Icon/IconX';
 import { UserAuth } from '../../context/AuthContext';
 import AddStudentModal from './AddStudentModal';
-
+import { Link } from 'react-router-dom';
 
 const ViewStudents = () => {
-    const { students } = UserAuth();
+    const { students, suid } = UserAuth();
+    const [activeOnly, setActiveOnly] = useState(true);
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Contacts'));
     });
     const [addContactModal, setAddContactModal] = useState<any>(false);
+
+    const hashTheID = (id: any) => {
+        return parseInt(id) * 123456789;
+    };
+
+    
 
     const [value, setValue] = useState<any>('list');
     const [defaultParams] = useState({
@@ -49,60 +47,60 @@ const ViewStudents = () => {
     useEffect(() => {
         setFilteredItems(() => {
             return students.filter((item: any) => {
-                return item.Name.toLowerCase().includes(search.toLowerCase());
+                return item.Name.toLowerCase().includes(search.toLowerCase()) || item.email.toLowerCase().includes(search.toLowerCase()) || item.Phone.toLowerCase().includes(search.toLowerCase());
             });
         });
     }, [search, students]);
 
-    const saveUser = () => {
-        if (!params.Name) {
-            showMessage('Name is required.', 'error');
-            return true;
-        }
-        if (!params.email) {
-            showMessage('Email is required.', 'error');
-            return true;
-        }
-        if (!params.Phone) {
-            showMessage('Phone is required.', 'error');
-            return true;
-        }
-        if (!params.role) {
-            showMessage('Occupation is required.', 'error');
-            return true;
-        }
+    // const saveUser = () => {
+    //     if (!params.Name) {
+    //         showMessage('Name is required.', 'error');
+    //         return true;
+    //     }
+    //     if (!params.email) {
+    //         showMessage('Email is required.', 'error');
+    //         return true;
+    //     }
+    //     if (!params.Phone) {
+    //         showMessage('Phone is required.', 'error');
+    //         return true;
+    //     }
+    //     if (!params.role) {
+    //         showMessage('Occupation is required.', 'error');
+    //         return true;
+    //     }
 
-        if (params.id) {
-            //update user
-            let user: any = filteredItems.find((d: any) => d.id === params.Student_ID);
-            user.Name = params.Name;
-            user.email = params.email;
-            user.Phone = params.Phone;
-            user.role = params.role;
-            user.location = params.location;
-        } else {
-            //add user
-            let maxUserId = filteredItems.length ? filteredItems.reduce((max: any, character: any) => (character.id > max ? character.id : max), filteredItems[0].id) : 0;
+    //     if (params.id) {
+    //         //update user
+    //         let user: any = filteredItems.find((d: any) => d.id === params.Student_ID);
+    //         user.Name = params.Name;
+    //         user.email = params.email;
+    //         user.Phone = params.Phone;
+    //         user.role = params.role;
+    //         user.location = params.location;
+    //     } else {
+    //         //add user
+    //         let maxUserId = filteredItems.length ? filteredItems.reduce((max: any, character: any) => (character.id > max ? character.id : max), filteredItems[0].id) : 0;
 
-            let user = {
-                Student_ID: maxUserId + 1,
-                path: 'profile-35.png',
-                Name: params.Name,
-                email: params.email,
-                Phone: params.Phone,
-                role: params.role,
-                location: params.location,
-                posts: 20,
-                followers: '5K',
-                following: 500,
-            };
-            filteredItems.splice(0, 0, user);
-            //   searchContacts();
-        }
+    //         let user = {
+    //             Student_ID: maxUserId + 1,
+    //             path: 'profile-35.png',
+    //             Name: params.Name,
+    //             email: params.email,
+    //             Phone: params.Phone,
+    //             role: params.role,
+    //             location: params.location,
+    //             posts: 20,
+    //             followers: '5K',
+    //             following: 500,
+    //         };
+    //         filteredItems.splice(0, 0, user);
+    //         //   searchContacts();
+    //     }
 
-        showMessage('User has been saved successfully.');
-        setAddContactModal(false);
-    };
+    //     showMessage('User has been saved successfully.');
+    //     setAddContactModal(false);
+    // };
 
     const editUser = (user: any = null) => {
         const json = JSON.parse(JSON.stringify(defaultParams));
@@ -137,11 +135,13 @@ const ViewStudents = () => {
     return (
         <div>
             <div className="flex items-center justify-between flex-wrap gap-4">
-                <h2 className="text-xl">Students</h2>
+                <div>
+                    <h2 className="text-xl">Students</h2>
+          
+                </div>
                 <div className="flex sm:flex-row flex-col sm:items-center sm:gap-3 gap-4 w-full sm:w-auto">
                     <div className="flex gap-3">
                         <AddStudentModal />
-               
                     </div>
                     <div className="relative">
                         <input type="text" placeholder="Search Students" className="form-input py-2 ltr:pr-11 rtl:pl-11 peer" value={search} onChange={(e) => setSearch(e.target.value)} />
@@ -175,6 +175,9 @@ const ViewStudents = () => {
                                         <td className="whitespace-nowrap">{contact.Phone}</td>
                                         <td>
                                             <div className="flex gap-4 items-center justify-center">
+                                            <Link to={`/students/view-student/${hashTheID(contact.Student_ID)}/${hashTheID(suid)}`} type="button" className="btn btn-sm btn-outline-warning" onClick={() => editUser(contact)}>
+                                                    View
+                                                </Link>
                                                 <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => editUser(contact)}>
                                                     Edit
                                                 </button>
@@ -190,8 +193,6 @@ const ViewStudents = () => {
                     </table>
                 </div>
             </div>
-
-           
         </div>
     );
 };

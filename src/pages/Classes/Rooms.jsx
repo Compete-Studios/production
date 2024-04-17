@@ -5,57 +5,8 @@ import IconPlus from '../../components/Icon/IconPlus';
 import { UserAuth } from '../../context/AuthContext';
 import { useEffect, useState } from 'react';
 import { loadStudioRooms } from '../../functions/api';
+import IconEdit from '../../components/Icon/IconEdit';
 
-const tableData = [
-    {
-        id: 1,
-        name: 'John Doe',
-        email: 'johndoe@yahoo.com',
-        date: '10/08/2020',
-        sale: 120,
-        status: 'Complete',
-        register: '5 min ago',
-        progress: '40%',
-        position: 'Developer',
-        office: 'London',
-    },
-    {
-        id: 2,
-        name: 'Shaun Park',
-        email: 'shaunpark@gmail.com',
-        date: '11/08/2020',
-        sale: 400,
-        status: 'Pending',
-        register: '11 min ago',
-        progress: '23%',
-        position: 'Designer',
-        office: 'New York',
-    },
-    {
-        id: 3,
-        name: 'Alma Clarke',
-        email: 'alma@gmail.com',
-        date: '12/02/2020',
-        sale: 310,
-        status: 'In Progress',
-        register: '1 hour ago',
-        progress: '80%',
-        position: 'Accountant',
-        office: 'Amazon',
-    },
-    {
-        id: 4,
-        name: 'Vincent Carpenter',
-        email: 'vincent@gmail.com',
-        date: '13/08/2020',
-        sale: 100,
-        status: 'Canceled',
-        register: '1 day ago',
-        progress: '60%',
-        position: 'Data Scientist',
-        office: 'Canada',
-    },
-];
 
 export default function Rooms() {
     const { suid } = UserAuth();
@@ -106,9 +57,14 @@ export default function Rooms() {
                                         <div className="whitespace-nowrap">{data.Name}</div>
                                     </td>
                                
-                                    <td className="text-center">
+                                    <td className="text-center ">
+                                    <Tippy content="Edit">
+                                            <button type="button" className='p-2 text-primary hover:text-emerald-800'>
+                                                <IconEdit />
+                                            </button>
+                                        </Tippy>
                                         <Tippy content="Delete">
-                                            <button type="button">
+                                            <button type="button" className='p-2 text-danger hover:text-red-700'>
                                                 <IconTrash />
                                             </button>
                                         </Tippy>

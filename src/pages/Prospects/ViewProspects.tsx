@@ -1,273 +1,425 @@
-import { useState, Fragment, useEffect } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import Swal from 'sweetalert2';
-import { useDispatch } from 'react-redux';
-import { setPageTitle } from '../../store/themeConfigSlice';
-import IconUserPlus from '../../components/Icon/IconUserPlus';
-import IconListCheck from '../../components/Icon/IconListCheck';
-import IconLayoutGrid from '../../components/Icon/IconLayoutGrid';
-import IconSearch from '../../components/Icon/IconSearch';
-import IconUser from '../../components/Icon/IconUser';
-import IconFacebook from '../../components/Icon/IconFacebook';
-import IconInstagram from '../../components/Icon/IconInstagram';
-import IconLinkedin from '../../components/Icon/IconLinkedin';
-import IconTwitter from '../../components/Icon/IconTwitter';
-import IconX from '../../components/Icon/IconX';
-import { UserAuth } from '../../context/AuthContext';
 
-const ViewStudents = () => {
-    const { students } = UserAuth();
-    const dispatch = useDispatch();
-    useEffect(() => {
-        dispatch(setPageTitle('Contacts'));
-    });
-    const [addContactModal, setAddContactModal] = useState<any>(false);
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { UserAuth } from "../../context/AuthContext";
+import { searchProspects } from "../../functions/api";
+import { convertPhone } from "../../functions/shared";
 
-    const [value, setValue] = useState<any>('list');
-    const [defaultParams] = useState({
-        id: null,
-        Name: '',
-        email: '',
-        Phone: '',
-        role: '',
-        location: '',
-    });
-
-    const [params, setParams] = useState<any>(JSON.parse(JSON.stringify(defaultParams)));
-
-    const changeValue = (e: any) => {
-        const { value, Student_ID } = e.target;
-        setParams({ ...params, [Student_ID]: value });
-    };
-
-    const [search, setSearch] = useState<any>('');
-
-    const [filteredItems, setFilteredItems] = useState<any>(students);
-
-    useEffect(() => {
-        setFilteredItems(() => {
-            return students.filter((item: any) => {
-                return item.Name.toLowerCase().includes(search.toLowerCase());
-            });
-        });
-    }, [search, students]);
-
-    const saveUser = () => {
-        if (!params.Name) {
-            showMessage('Name is required.', 'error');
-            return true;
-        }
-        if (!params.email) {
-            showMessage('Email is required.', 'error');
-            return true;
-        }
-        if (!params.Phone) {
-            showMessage('Phone is required.', 'error');
-            return true;
-        }
-        if (!params.role) {
-            showMessage('Occupation is required.', 'error');
-            return true;
-        }
-
-        if (params.id) {
-            //update user
-            let user: any = filteredItems.find((d: any) => d.id === params.Student_ID);
-            user.Name = params.Name;
-            user.email = params.email;
-            user.Phone = params.Phone;
-            user.role = params.role;
-            user.location = params.location;
-        } else {
-            //add user
-            let maxUserId = filteredItems.length ? filteredItems.reduce((max: any, character: any) => (character.id > max ? character.id : max), filteredItems[0].id) : 0;
-
-            let user = {
-                Student_ID: maxUserId + 1,
-                path: 'profile-35.png',
-                Name: params.Name,
-                email: params.email,
-                Phone: params.Phone,
-                role: params.role,
-                location: params.location,
-                posts: 20,
-                followers: '5K',
-                following: 500,
-            };
-            filteredItems.splice(0, 0, user);
-            //   searchContacts();
-        }
-
-        showMessage('User has been saved successfully.');
-        setAddContactModal(false);
-    };
-
-    const editUser = (user: any = null) => {
-        const json = JSON.parse(JSON.stringify(defaultParams));
-        setParams(json);
-        if (user) {
-            let json1 = JSON.parse(JSON.stringify(user));
-            setParams(json1);
-        }
-        setAddContactModal(true);
-    };
-
-    const deleteUser = (user: any = null) => {
-        setFilteredItems(filteredItems.filter((d: any) => d.id !== user.id));
-        showMessage('User has been deleted successfully.');
-    };
-
-    const showMessage = (msg = '', type = 'success') => {
-        const toast: any = Swal.mixin({
-            toast: true,
-            position: 'top',
-            showConfirmButton: false,
-            timer: 3000,
-            customClass: { container: 'toast' },
-        });
-        toast.fire({
-            icon: type,
-            title: msg,
-            padding: '10px 20px',
-        });
-    };
-
-    return (
-        <div>
-            <div className="flex items-center justify-between flex-wrap gap-4">
-                <h2 className="text-xl">Students</h2>
-                <div className="flex sm:flex-row flex-col sm:items-center sm:gap-3 gap-4 w-full sm:w-auto">
-                    <div className="flex gap-3">
-                        <div>
-                            <button type="button" className="btn btn-primary" onClick={() => editUser()}>
-                                <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
-                                Add Student
-                            </button>
-                        </div>
-               
-                    </div>
-                    <div className="relative">
-                        <input type="text" placeholder="Search Students" className="form-input py-2 ltr:pr-11 rtl:pl-11 peer" value={search} onChange={(e) => setSearch(e.target.value)} />
-                        <button type="button" className="absolute ltr:right-[11px] rtl:left-[11px] top-1/2 -translate-y-1/2 peer-focus:text-primary">
-                            <IconSearch className="mx-auto" />
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div className="mt-5 panel p-0 border-0 overflow-hidden">
-                <div className="table-responsive">
-                    <table className="table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th className="!text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredItems.map((contact: any) => {
-                                return (
-                                    <tr key={contact.Student_ID}>
-                                        <td>
-                                            <div className="flex items-center w-max">
-                                                <div>{contact.Name}</div>
-                                            </div>
-                                        </td>
-                                        <td>{contact.email}</td>
-                                        <td className="whitespace-nowrap">{contact.Phone}</td>
-                                        <td>
-                                            <div className="flex gap-4 items-center justify-center">
-                                                <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => editUser(contact)}>
-                                                    Edit
-                                                </button>
-                                                <button type="button" className="btn btn-sm btn-outline-danger" onClick={() => deleteUser(contact)}>
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <Transition appear show={addContactModal} as={Fragment}>
-                <Dialog as="div" open={addContactModal} onClose={() => setAddContactModal(false)} className="relative z-[51]">
-                    <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
-                        <div className="fixed inset-0 bg-[black]/60" />
-                    </Transition.Child>
-                    <div className="fixed inset-0 overflow-y-auto">
-                        <div className="flex min-h-full items-center justify-center px-4 py-8">
-                            <Transition.Child
-                                as={Fragment}
-                                enter="ease-out duration-300"
-                                enterFrom="opacity-0 scale-95"
-                                enterTo="opacity-100 scale-100"
-                                leave="ease-in duration-200"
-                                leaveFrom="opacity-100 scale-100"
-                                leaveTo="opacity-0 scale-95"
-                            >
-                                <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
-                                    <button
-                                        type="button"
-                                        onClick={() => setAddContactModal(false)}
-                                        className="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
-                                    >
-                                        <IconX />
-                                    </button>
-                                    <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                                        {params.id ? 'Edit Contact' : 'Add Contact'}
-                                    </div>
-                                    <div className="p-5">
-                                        <form>
-                                            <div className="mb-5">
-                                                <label htmlFor="name">Name</label>
-                                                <input id="name" type="text" placeholder="Enter Name" className="form-input" value={params.Name} onChange={(e) => changeValue(e)} />
-                                            </div>
-                                            <div className="mb-5">
-                                                <label htmlFor="email">Email</label>
-                                                <input id="email" type="email" placeholder="Enter Email" className="form-input" value={params.email} onChange={(e) => changeValue(e)} />
-                                            </div>
-                                            <div className="mb-5">
-                                                <label htmlFor="number">Phone Number</label>
-                                                <input id="Phone" type="text" placeholder="Enter Phone Number" className="form-input" value={params.Phone} onChange={(e) => changeValue(e)} />
-                                            </div>
-                                            <div className="mb-5">
-                                                <label htmlFor="occupation">Occupation</label>
-                                                <input id="role" type="text" placeholder="Enter Occupation" className="form-input" value={params.role} onChange={(e) => changeValue(e)} />
-                                            </div>
-                                            <div className="mb-5">
-                                                <label htmlFor="address">Address</label>
-                                                <textarea
-                                                    id="location"
-                                                    rows={3}
-                                                    placeholder="Enter Address"
-                                                    className="form-textarea resize-none min-h-[130px]"
-                                                    value={params.location}
-                                                    onChange={(e) => changeValue(e)}
-                                                ></textarea>
-                                            </div>
-                                            <div className="flex justify-end items-center mt-8">
-                                                <button type="button" className="btn btn-outline-danger" onClick={() => setAddContactModal(false)}>
-                                                    Cancel
-                                                </button>
-                                                <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={saveUser}>
-                                                    {params.id ? 'Update' : 'Add'}
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </Dialog.Panel>
-                            </Transition.Child>
-                        </div>
-                    </div>
-                </Dialog>
-            </Transition>
-        </div>
-    );
+const initDisplay = {
+  FName: false,
+  LName: false,
+  Email: false,
+  marketingSource: false,
+  Phone: false,
+  Active: false,
+  Address: false,
+  Notes: false,
+  City: false,
+  Zip: false,
+  Program: false,
+  StartDate: false,
+  CancellationDate: false,
 };
 
-export default ViewStudents;
+const initValues = {
+  First_Name: "",
+  Last_Name: "",
+  activity: "",
+  Email: "",
+  Phone: "",
+  MailingAddr: "",
+  City: "",
+  State: "",
+  Zip: "",
+  NotesContain: "",
+  MarketingMethod: "",
+  EntryDate: "",
+  OriginalContactDate: "",
+  FirstClassDate: "",
+  CancellationDate: "",
+};
+
+export default function ViewProspects() {
+  const { suid, setStudentToEdit } = UserAuth();
+
+  const [displayedStudents, setDisplayedStudents] = useState([]);
+  const [display, setDisplay] = useState(initDisplay);
+  const [values, setValues] = useState(initValues);
+
+  const searchParams = {
+    studioId: suid,
+    first_name: display.FName ? values.First_Name : undefined,
+    last_name: display.LName ? values.Last_Name : undefined,
+    email: display.Email ? values.Email : undefined,
+
+    phone: display.Phone ? values.Phone : undefined,
+
+    city: display.City ? values.City : undefined,
+    zip: display.Zip ? values.Zip : undefined,
+  };
+
+  // Filter out the properties with undefined values
+  const filteredSearchParams = Object.fromEntries(
+    Object.entries(searchParams).filter(([_, value]) => value !== undefined)
+  );
+
+  const handleSearch = (e: any) => {
+    e.preventDefault();
+    try {
+      searchProspects(filteredSearchParams).then((response) => {
+        setDisplayedStudents(response.recordset);
+       
+      });
+    } catch (error) {
+      console.error(error);
+      setDisplayedStudents([]);
+    }
+  };
+  const navigate = useNavigate();
+
+  const handleStudentToEdit = (id: any) => {
+    setStudentToEdit(id);
+    navigate("/students/view-student");
+  };
+
+  return (
+    <div className="px-4 sm:px-6 lg:px-8 panel">
+      <div className="sm:flex sm:items-center ">
+        <div className="sm:flex-auto">
+          <h1 className="text-base font-semibold leading-6 text-gray-900">
+            Search Prospects
+          </h1>
+          <p className="mt-2 text-sm text-gray-700">
+            Select the checkbox next to the criteria you wish to use to search
+            for a student. To narrow a search, select more criteria. Not
+            selecting any criteria will result in a list of all students for
+            your studio stored in the database.
+          </p>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+        <div className="flex items-center gap-x-2">
+          <div className="flex h-6 items-center">
+            <input
+              id="fname"
+              aria-describedby="comments-description"
+              className="form-checkbox"
+              name="fname"
+              type="checkbox"
+              onClick={() =>
+                setDisplay({
+                  ...display,
+                  FName: !display.FName,
+                })
+              }
+            />
+          </div>
+          <label
+            htmlFor="first-name"
+            
+          >
+            First name
+          </label>
+          {display.FName && (
+            <input
+              type="text"
+              name="first-name"
+              id="first-name"
+              className="form-input"
+              onChange={(e) =>
+                setValues({ ...values, First_Name: e.target.value })
+              }
+            />
+          )}
+        </div>
+        <div className="flex items-center gap-x-2">
+          <div className="flex h-6 items-center">
+            <input
+              id="comments"
+              aria-describedby="comments-description"
+              name="comments"
+              type="checkbox"
+              className="form-checkbox"
+              onClick={() =>
+                setDisplay({
+                  ...display,
+                  LName: !display.LName,
+                })
+              }
+            />
+          </div>
+          <label
+            htmlFor="last-name"
+          >
+            Last name
+          </label>
+          {display.LName && (
+            <input
+              type="text"
+              name="last-name"
+              id="last-name"
+              className="form-input"
+              onChange={(e) =>
+                setValues({ ...values, Last_Name: e.target.value })
+              }
+            />
+          )}
+        </div>
+        <div className="flex items-center gap-x-2">
+          <div className="flex h-6 items-center">
+            <input
+              id="comments"
+              aria-describedby="comments-description"
+              name="comments"
+              type="checkbox"
+              className="form-checkbox"
+              onClick={() =>
+                setDisplay({
+                  ...display,
+                  Email: !display.Email,
+                })
+              }
+            />
+          </div>
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium leading-6 text-gray-900 whitespace-nowrap"
+          >
+            Email
+          </label>
+          {display.Email && (
+            <input
+              type="text"
+              name="email"
+              id="email"
+              className="form-input"
+              onChange={(e) => setValues({ ...values, Email: e.target.value })}
+            />
+          )}
+        </div>
+        <div className="flex items-center gap-x-2">
+          <div className="flex h-6 items-center">
+            <input
+              id="comments"
+              aria-describedby="comments-description"
+              name="comments"
+              type="checkbox"
+              className="form-checkbox"
+              onClick={() =>
+                setDisplay({
+                  ...display,
+                  Phone: !display.Phone,
+                })
+              }
+            />
+          </div>
+          <label
+            htmlFor="phone"
+          >
+            Phone
+          </label>
+          {display.Phone && (
+            <input
+              type="text"
+              name="phone"
+              className="form-input"
+              id="phone"
+              onChange={(e) => setValues({ ...values, Phone: e.target.value })}
+            />
+          )}
+        </div>
+        <div className="flex items-center gap-x-2">
+          <div className="flex h-6 items-center">
+            <input
+              id="comments"
+              aria-describedby="comments-description"
+              name="comments"
+              type="checkbox"
+              className="form-checkbox"
+              onClick={() =>
+                setDisplay({
+                  ...display,
+                  City: !display.City,
+                })
+              }
+            />
+          </div>
+          <label
+            htmlFor="city"
+          >
+            City
+          </label>
+          {display.City && (
+            <input
+              type="text"
+              name="city"
+              id="city"
+              className="form-input"
+              onChange={(e) => setValues({ ...values, City: e.target.value })}
+            />
+          )}
+        </div>
+        <div className="flex items-center gap-x-2">
+          <div className="flex h-6 items-center">
+            <input
+              id="comments"
+              aria-describedby="comments-description"
+              name="comments"
+              type="checkbox"
+              className="form-checkbox"
+              onClick={() =>
+                setDisplay({
+                  ...display,
+                  Zip: !display.Zip,
+                })
+              }
+            />
+          </div>
+          <label
+            htmlFor="zip"
+          >
+            Zip
+          </label>
+          {display.Zip && (
+            <input
+              type="text"
+              name="zip"
+              id="zip"
+              className="form-input"
+              onChange={(e) => setValues({ ...values, Zip: e.target.value })}
+            />
+          )}
+        </div>
+      </div>
+      <div className="mt-6 ">
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={handleSearch}
+        >
+          Search
+        </button>
+      </div>
+      <div className="mt-8 flow-root">
+        <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+          <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+              <table className="min-w-full divide-y divide-gray-300">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th
+                      scope="col"
+                      className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 "
+                    >
+                      Name
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 hidden sm:table-cell"
+                    >
+                      Email
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 hidden sm:table-cell"
+                    >
+                      Phone
+                    </th>
+
+                    <th
+                      scope="col"
+                      className="relative py-3.5 pl-3 pr-4 sm:pr-6"
+                    >
+                      <span className="sr-only">Edit</span>
+                    </th>
+                    <th
+                      scope="col"
+                      className="relative py-3.5 pl-3 pr-4 sm:pr-6"
+                    >
+                      <span className="sr-only">Edit</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 bg-white">
+                  {displayedStudents?.length > 0 ?
+                    displayedStudents?.map((person: any) => (
+                      <tr key={person.ProspectId}>
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                          {person.FName} {person.LName}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 hidden sm:table-cell">
+                          {person.Email}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 hidden sm:table-cell">
+                          {convertPhone(person.Phone)}
+                        </td>
+
+                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                          <button
+                            className="text-com hover:text-indigo-900"
+                            onClick={() =>
+                              handleStudentToEdit(person.Student_id)
+                            }
+                          >
+                            View<span className="sr-only">, {person.name}</span>
+                          </button>
+                        </td>
+                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                          <a
+                            href="#"
+                            className="text-alert hover:text-alerthover"
+                          >
+                            Delete
+                            <span className="sr-only">, {person.name}</span>
+                          </a>
+                        </td>
+                      </tr>
+                    )) : (
+                    <tr>
+                      <td
+                        colSpan="5"
+                        className="text-center py-4 text-sm font-medium text-gray-900"
+                      >
+                        No prospects found
+                      </td>
+                    </tr>
+                    )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {/* <nav
+            className="flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6"
+            aria-label="Pagination"
+          >
+            <div className="hidden sm:block">
+              <p className="text-sm text-gray-700">
+                Showing <span className="font-medium">{startIndex + 1}</span> to{" "}
+                <span className="font-medium">
+                  {endIndex > students?.length ? students?.length : endIndex}
+                </span>{" "}
+                of <span className="font-medium">{students?.length}</span>{" "}
+                results
+              </p>
+            </div>
+            <div className="flex flex-1 justify-between sm:justify-end">
+              <button
+                className="relative inline-flex items-center rounded-md  px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0 bg-white"
+                onClick={() => handlePageChange(currentPage - 1)}
+              >
+                Previous
+              </button>
+              <button
+                href="#"
+                className="relative ml-3 inline-flex items-center rounded-md  px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0 bg-white"
+                onClick={() => handlePageChange(currentPage + 1)}
+              >
+                Next
+              </button>
+            </div>
+          </nav> */}
+        </div>
+      </div>
+    </div>
+  );
+}

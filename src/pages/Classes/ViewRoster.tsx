@@ -18,10 +18,6 @@ import { getProspectsByClassId, getStudentsByClassId } from '../../functions/api
 import { UserAuth } from '../../context/AuthContext';
 import IconSend from '../../components/Icon/IconSend';
 import IconPrinter from '../../components/Icon/IconPrinter';
-import IconDownload from '../../components/Icon/IconDownload';
-import IconPlus from '../../components/Icon/IconPlus';
-import IconEdit from '../../components/Icon/IconEdit';
-import IconPhone from '../../components/Icon/IconPhone';
 import IconMessage from '../../components/Icon/IconMessage';
 import IconDollarSignCircle from '../../components/Icon/IconDollarSignCircle';
 

@@ -8,15 +8,16 @@ import IconEdit from '../../components/Icon/IconEdit';
 
 
 export default function ProspectPipeline() {
-    const {pipelineSteps} = UserAuth();
+    const {prospectPipelineSteps} = UserAuth();
     return (
         <div className="panel px-0 border-white-light dark:border-[#1b2e4b]">
             <div className="mb-4.5 px-5 flex md:items-center md:flex-row flex-col gap-5">
-                <div className="flex items-center gap-2">
+                {/* <div className="flex items-center gap-2">
                     <div className="">
                         <input type="text" className="form-input w-auto" placeholder="Search..." />
                     </div>
-                </div>
+                </div> */}
+                 <h2 className="text-xl">Prospect Pipline</h2>
 
                 <div className="gap-2 ltr:ml-auto rtl:mr-auto">
                     <button type="button" className="btn btn-primary gap-2 ltr:ml-auto rtl:mr-auto">
@@ -36,16 +37,16 @@ export default function ProspectPipeline() {
                         </tr>
                     </thead>
                     <tbody>
-                        {pipelineSteps?.map((data: any) => {
+                        {prospectPipelineSteps?.map((data: any) => {
                             return (
                                 <tr key={data.PlacementOrdinal} className={`${
-                                    data?.thisStudentPipelineStepNeedsContact &&
+                                    data?.thisPipelineStepNeedsContact &&
                                     "bg-cs"
                                   }`}>
                                     <td>
                                         <div className="whitespace-nowrap">{data.StepName}</div>
                                     </td>
-                                    <td>{data.numberOfStudentsInStep}</td>
+                                    <td>{data.numberOfProspectsInStep}</td>
 
                                     <td className="text-center gap-x-4 flex items-center justify-center">
                                         <Tippy content="View Roster">

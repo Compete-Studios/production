@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { UserAuth } from '../../context/AuthContext';
+import Swal from 'sweetalert2';
+import 'swiper/css';
 import Select from 'react-select';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import { addProspect, addProspectToClasses, addProspectToPrograms, addProspectToWaitingLists } from '../../functions/api';
+import { useNavigate } from 'react-router-dom';
 
 const prospectInfoInit = {
-    studioId: "",
+    studioId: '',
     fName: '',
     lName: '',
     phone: '',
@@ -35,10 +38,10 @@ export default function AddProspect() {
     const [waitingListIDs, setWaitingListIDs] = useState([]);
     const [programIds, setProgramIds] = useState([]);
 
-    console.log(programIds)
+    const navigate = useNavigate();
 
     useEffect(() => {
-        const newPrograms = programs.map((program) => {
+        const newPrograms = programs?.map((program) => {
             return { value: program.ProgramId, label: program.Name };
         });
         setOptions(newPrograms);
@@ -65,21 +68,39 @@ export default function AddProspect() {
 
     const handleAddProspect = async (e) => {
         e.preventDefault();
-        console.log('Prospect Info:', prospectInfo);
         const prospectData = {
             ...prospectInfo,
             studioId: parseInt(suid),
+            introDate: handleConvertDateToYYYYMMDD(prospectInfo.introDate),
         };
-        console.log('Prospect Data:', prospectData);
-        const classIDS = selectedClasses.map((item) => item.ClassId);
-        console.log('List IDS:', waitingListIDs);
+        const classIDS = selectedClasses?.map((item) => item.ClassId);
         await addProspect(prospectData).then((res) => {
             console.log('Prospect added:', res.output.NewProspectId);
             addProspectToClasses(res.output.NewProspectId, classIDS);
             addProspectToWaitingLists(res.output.NewProspectId, waitingListIDs);
             addProspectToPrograms(res.output.NewProspectId, programIds);
         });
+        showMessage('Prospect added successfully', 'success');
+        navigate('/prospects/view-prospects');
+
     };
+
+    
+    const showMessage = (msg = '', type = 'success') => {
+        const toast = Swal.mixin({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: 3000,
+            customClass: { container: 'toast' },
+        });
+        toast.fire({
+            icon: type,
+            title: msg,
+            padding: '10px 20px',
+        });
+    };
+
 
     useEffect(() => {
         const prospectAge = new Date().getFullYear() - new Date(prospectInfo.birthdate).getFullYear();
@@ -91,8 +112,6 @@ export default function AddProspect() {
         const formattedDate = newDate.toISOString().substr(0, 10);
         return formattedDate;
     };
-
-   
 
     const handleToggleWaitingList = (id) => {
         if (waitingListIDs.includes(id)) {
@@ -179,7 +198,7 @@ export default function AddProspect() {
                                     value={prospectInfo.introDate}
                                     options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
                                     className="form-input"
-                                    onChange={(date) => setProspectInfo({ ...prospectInfo, introDate: handleConvertDateToYYYYMMDD(date) })}
+                                    onChange={(date) => setProspectInfo({ ...prospectInfo, introDate: date })}
                                 />
                             </div>
                             <div className="sm:col-span-2">
@@ -216,12 +235,13 @@ export default function AddProspect() {
                             <div className="sm:col-span-2 sm:row-span-2">
                                 <label htmlFor="waitingList">Waiting List</label>
                                 {waitingLists?.map((list) => (
-                                    <label key={list.WaitingListId} className="flex items-center cursor-pointer"                                       
-                                    >
-                                        <input type="checkbox" className="form-checkbox"
-    onClick={() => handleToggleWaitingList(list.WaitingListId)}   
-    checked={waitingListIDs.includes(list.WaitingListId)}                                      
-/>
+                                    <label key={list.WaitingListId} className="flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            className="form-checkbox"
+                                            onClick={() => handleToggleWaitingList(list.WaitingListId)}
+                                            checked={waitingListIDs.includes(list.WaitingListId)}
+                                        />
                                         <span className=" text-white-dark">{list.Title}</span>
                                     </label>
                                 ))}
@@ -238,11 +258,15 @@ export default function AddProspect() {
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="pipelineStatus">Programs</label>
-                                <Select placeholder="Select programs" options={options} isMulti isSearchable={false}
+                                <Select
+                                    placeholder="Select programs"
+                                    options={options}
+                                    isMulti
+                                    isSearchable={false}
                                     onChange={(e) => {
-                                        const programIds = e.map((item) => item.value);
+                                        const programIds = e?.map((item) => item.value);
                                         setProgramIds(programIds);
-                                    }} 
+                                    }}
                                 />
                             </div>
                             <div className="sm:col-span-full">

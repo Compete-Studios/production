@@ -32,7 +32,7 @@ export default function AddStudent() {
     const [options, setOptions] = useState([]);
 
     useEffect(() => {
-        const newPrograms = programs.map((program) => {
+        const newPrograms = programs?.map((program: any) => {
             return { value: program.ProgramId, label: program.Name };
         });
         setOptions(newPrograms);

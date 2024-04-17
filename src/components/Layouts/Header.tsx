@@ -894,7 +894,7 @@ const Header = () => {
                                         </NavLink>
                                     </li>
                                     <li>
-                                        <NavLink to="/auth/boxed-signin" target="_blank">
+                                        <NavLink to="/auth/signin" target="_blank">
                                             {t('login_boxed')}
                                         </NavLink>
                                     </li>

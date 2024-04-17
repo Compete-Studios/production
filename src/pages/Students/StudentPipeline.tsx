@@ -12,11 +12,12 @@ export default function StudentPipeline() {
     return (
         <div className="panel px-0 border-white-light dark:border-[#1b2e4b]">
             <div className="mb-4.5 px-5 flex md:items-center md:flex-row flex-col gap-5">
-                <div className="flex items-center gap-2">
+                {/* <div className="flex items-center gap-2">
                     <div className="">
                         <input type="text" className="form-input w-auto" placeholder="Search..." />
                     </div>
-                </div>
+                </div> */}
+                 <h2 className="text-xl">Student Pipeline</h2>
 
                 <div className="gap-2 ltr:ml-auto rtl:mr-auto">
                     <button type="button" className="btn btn-primary gap-2 ltr:ml-auto rtl:mr-auto">

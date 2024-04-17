@@ -6,62 +6,41 @@ import 'swiper/css/navigation';
 import Select from 'react-select';
 import 'swiper/css/pagination';
 import IconPlus from '../../components/Icon/IconPlus';
-import { addAClass } from '../../functions/api';
+import { addAClass, addClassAndSchedule, getTheClassScheduleByClassId, loadStudioRooms } from '../../functions/api';
 import { UserAuth } from '../../context/AuthContext';
 import IconEdit from '../../components/Icon/IconEdit';
 import IconX from '../../components/Icon/IconX';
-
-const classDataInit = {
-    studioId: 1000,
-    name: '',
-    description: '',
-    notes: '',
-    enrollmentLimit: '',
-};
+import Flatpickr from 'react-flatpickr';
+import 'flatpickr/dist/flatpickr.css';
 
 export default function AddEditClass({ editClass = false, classId = null }) {
     const { suid, setUpdate, update, classes, staff } = UserAuth();
     const [modal21, setModal21] = useState(false);
-    const [classToAdd, setClassToAdd] = useState(classDataInit);
+    const setNewDateTo12PM = () => {
+        const newDate = new Date();
+        newDate.setHours(12, 0, 0, 0);
+        return newDate;
+    };
+    const [classToAdd, setClassToAdd] = useState({
+        studioId: suid || 1000,
+        name: '',
+        description: '',
+        notes: '',
+        enrollmentLimit: '',
+        dayOfWeek: '',
+        dayIndex: '',
+        startTime: '',
+        endTime: '',
+        roomId: '',
+    });
     const [isLoading, setIsLoading] = useState(false);
     const [options, setOptions] = useState([
         { value: 'orange', label: 'Orange' },
         { value: 'white', label: 'White' },
         { value: 'purple', label: 'Purple' },
     ]);
-    const [days, setDays] = useState([
-        { value: 'monday', label: 'Monday' },
-        { value: 'tuesday', label: 'Tuesday' },
-        { value: 'wednesday', label: 'Wednesday' },
-        { value: 'thursday', label: 'Thursday' },
-        { value: 'friday', label: 'Friday' },
-        { value: 'saturday', label: 'Saturday' },
-        { value: 'sunday', label: 'Sunday' },
-    ]);
-    const [hours, setHours] = useState([
-        { value: '12', label: '12' },
-        { value: '1', label: '1' },
-        { value: '2', label: '2' },
-        { value: '3', label: '3' },
-        { value: '4', label: '4' },
-        { value: '5', label: '5' },
-        { value: '6', label: '6' },
-        { value: '7', label: '7' },
-        { value: '8', label: '8' },
-        { value: '9', label: '9' },
-        { value: '10', label: '10' },
-        { value: '11', label: '11' },
-    ]);
-    const [minutes, setMinutes] = useState([
-        { value: '00', label: '00' },
-        { value: '15', label: '15' },
-        { value: '30', label: '30' },
-        { value: '45', label: '45' },
-    ]);
-    const [ampm, setAmPm] = useState([
-        { value: 'am', label: 'AM' },
-        { value: 'pm', label: 'PM' },
-    ]);
+
+    const daysOfTheWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
     //edit class
     useEffect(() => {
@@ -75,10 +54,50 @@ export default function AddEditClass({ editClass = false, classId = null }) {
                 classId: classForEditing.ClassId,
             });
         }
-        // getTheClassScheduleByClassId(idValue).then((response) => {
-        //   console.log(response);
-        // });
     }, [classId, classes, modal21]);
+
+    const [rooms, setRooms] = useState([]);
+
+    const getTimeOnlyfromZulueStamp = (date) => {
+        const timeString = date.split('T')[1];
+        return timeString.slice(0, 5);
+    };
+
+    const getTheSchedule = async (cuid) => {
+        getTheClassScheduleByClassId(cuid).then((response) => {
+            setClassToAdd({
+                ...classToAdd,
+                dayOfWeek: response.DayOfWeek,
+                dayIndex: response.DayIndex,
+                startTime: getTimeOnlyfromZulueStamp(response.StartTime),
+                endTime: getTimeOnlyfromZulueStamp(response.EndTime),
+                roomId: response.RoomId,
+            });
+            console.log(response);
+        });
+    };
+
+    const handleAddEditAClass = (cuid) => {
+        // Add your code here to add a class
+        getTheSchedule(cuid);
+
+        setModal21(true);
+    };
+
+    const getStudioRooms = async () => {
+        try {
+            const response = loadStudioRooms(suid);
+            const data = await response;
+            setRooms(data.recordset);
+            return data;
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        getStudioRooms();
+    }, [suid]);
 
     useEffect(() => {
         setClassToAdd({ ...classToAdd, studioId: suid });
@@ -97,11 +116,11 @@ export default function AddEditClass({ editClass = false, classId = null }) {
             setClassToAdd({ ...classToAdd, enrollmentLimit: 0 });
         }
     };
+
     const handleAddAClass = () => {
         // Add your code here to add a class
         setIsLoading(true);
-
-        addAClass(classToAdd).then((response) => {
+        addClassAndSchedule(classToAdd).then((response) => {
             try {
                 if (response.status === 200) {
                     setIsLoading(false);
@@ -158,7 +177,7 @@ export default function AddEditClass({ editClass = false, classId = null }) {
     return (
         <div>
             {editClass ? (
-                <button className="flex hover:text-info" onClick={() => setModal21(true)}>
+                <button className="flex text-primary hover:text-primary-light" onClick={() => handleAddEditAClass(classId)}>
                     <IconEdit className="w-4.5 h-4.5" />
                 </button>
             ) : (
@@ -190,9 +209,9 @@ export default function AddEditClass({ editClass = false, classId = null }) {
                                 leaveFrom="opacity-100 scale-100"
                                 leaveTo="opacity-0 scale-95"
                             >
-                                <Dialog.Panel className="panel border-0 py-1 px-4 rounded-lg overflow-hidden w-auto max-w-md my-8 text-black dark:text-white-dark">
-                                <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
-                                    <h5 className="font-bold text-lg">Add a Class {classId}</h5>
+                                <Dialog.Panel className="panel border-0 py-1 px-4 rounded-lg overflow-hidden w-auto max-w-lg my-8 text-black dark:text-white-dark">
+                                    <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
+                                        <h5 className="font-bold text-lg">Add a Class</h5>
                                         <button onClick={() => setModal21(false)} type="button" className="text-white-dark hover:text-dark">
                                             <IconX className="w-5 h-5" />
                                         </button>
@@ -226,19 +245,47 @@ export default function AddEditClass({ editClass = false, classId = null }) {
                                                 />
                                             </div>
                                             <div className="relative mb-4">
+                                                <label htmlFor="time" className="text-sm text-gray-500 dark:text-gray-400">
+                                                    Staff
+                                                </label>
                                                 <Select placeholder="Select staff" options={options} isMulti />
                                             </div>
                                             <div className="relative mb-4">
-                                                <Select defaultValue={days[0]} options={days} isSearchable={false} />
+                                                <label htmlFor="time" className="text-sm text-gray-500 dark:text-gray-400">
+                                                    Day of the Week
+                                                </label>
+                                                <select
+                                                    className="form-select"
+                                                    value={classToAdd.dayOfWeek}
+                                                    onChange={(e) => setClassToAdd({ ...classToAdd, dayIndex: e.target.selectedIndex - 1, dayOfWeek: e.target.value })}
+                                                >
+                                                    <option value="">Select Day</option>
+                                                    {daysOfTheWeek.map((day, index) => (
+                                                        <option key={index} value={day}>
+                                                            {day}
+                                                        </option>
+                                                    ))}
+                                                </select>
                                             </div>
+
                                             <div className="relative mb-4">
                                                 <label htmlFor="time" className="text-sm text-gray-500 dark:text-gray-400">
                                                     Start Time
                                                 </label>
                                                 <div className=" flex items-center gap-x-2">
-                                                    <Select className="w-full" defaultValue={hours[1]} options={hours} isSearchable={false} />
-                                                    <Select className="w-full" defaultValue={minutes[0]} options={minutes} isSearchable={false} />
-                                                    <Select className="w-full" defaultValue={ampm[0]} options={ampm} isSearchable={false} />
+                                                    <Flatpickr
+                                                        options={{
+                                                            noCalendar: true,
+                                                            enableTime: true,
+                                                            dateFormat: 'H:i',
+                                                            position: 'auto right',
+                                                        }}
+                                                        value={classToAdd.startTime}
+                                                        className="form-input"
+                                                        onChange={(date4) => {
+                                                            setClassToAdd({ ...classToAdd, startTime: new Date(date4).toISOString() });
+                                                        }}
+                                                    />
                                                 </div>
                                             </div>
                                             <div className="relative mb-4">
@@ -246,16 +293,38 @@ export default function AddEditClass({ editClass = false, classId = null }) {
                                                     End Time
                                                 </label>
                                                 <div className=" flex items-center gap-x-2">
-                                                    <Select className="w-full" defaultValue={hours[1]} options={hours} isSearchable={false} />
-                                                    <Select className="w-full" defaultValue={minutes[0]} options={minutes} isSearchable={false} />
-                                                    <Select className="w-full" defaultValue={ampm[0]} options={ampm} isSearchable={false} />
+                                                    <Flatpickr
+                                                        options={{
+                                                            noCalendar: true,
+                                                            enableTime: true,
+                                                            dateFormat: 'H:i',
+                                                            position: 'auto right',
+                                                        }}
+                                                        value={classToAdd.endTime}
+                                                        className="form-input"
+                                                        onChange={(date4) => {
+                                                            setClassToAdd({ ...classToAdd, endTime: new Date(date4).toISOString() });
+                                                        }}
+                                                    />
                                                 </div>
                                             </div>
                                             <div className="relative mb-4">
                                                 <label htmlFor="time" className="text-sm text-gray-500 dark:text-gray-400">
                                                     Room
                                                 </label>
-                                                <Select defaultValue={days[0]} options={days} isSearchable={false} />
+                                                <select
+                                                    className="form-select"
+                                                    onChange={(e) => {
+                                                        setClassToAdd({ ...classToAdd, roomId: e.target.value });
+                                                    }}
+                                                >
+                                                    <option value="">Select Room</option>
+                                                    {rooms.map((room) => (
+                                                        <option key={room.RoomId} value={room.RoomId}>
+                                                            {room.Name}
+                                                        </option>
+                                                    ))}
+                                                </select>
                                             </div>
                                             <div className="relative mb-4">
                                                 <textarea
@@ -267,10 +336,15 @@ export default function AddEditClass({ editClass = false, classId = null }) {
                                                     onChange={(e) => setClassToAdd({ ...classToAdd, description: e.target.value })}
                                                 ></textarea>
                                             </div>
-
-                                            <button type="button" className="btn btn-primary w-full" onClick={handleAddAClass} disabled={isLoading}>
-                                                Add Class
-                                            </button>
+                                            {editClass ? (
+                                                <button type="button" className="btn btn-primary w-full" onClick={() => setModal21(false)} disabled={isLoading}>
+                                                    Update Class
+                                                </button>
+                                            ) : (
+                                                <button type="button" className="btn btn-primary w-full" onClick={handleAddAClass} disabled={isLoading}>
+                                                    Add Class
+                                                </button>
+                                            )}
                                         </form>
                                     </div>
                                 </Dialog.Panel>

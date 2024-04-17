@@ -9,7 +9,7 @@ const ProtectedRoute = ({ path, element }) => {
             <Route path={path} element={element} />{' '}
         </Routes>
     ) : (
-        <Navigate to="/auth/boxed-signin" />
+        <Navigate to="/auth/signin" />
     );
 };
 

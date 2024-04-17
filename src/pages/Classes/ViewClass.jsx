@@ -1,13 +1,58 @@
 import { Dialog, Transition, Tab } from '@headlessui/react';
-import { useState, Fragment } from 'react';
+import { useState, Fragment, useEffect } from 'react';
 import IconX from '../../components/Icon/IconX';
 import IconEye from '../../components/Icon/IconEye';
+import { UserAuth } from '../../context/AuthContext';
+import { getProspectsByClassId, getStaffByClassId, getStudentsByClassId, getTheClassScheduleByClassId } from '../../functions/api';
 
-export default function ViewClass() {
+export default function ViewClass({ classId }) {
+    const { classes } = UserAuth();
     const [modal18, setModal18] = useState(false);
+    const [classInfo, setClassInfo] = useState({});
+    const [staffInfo, setStaffInfo] = useState({});
+    const [scheduleInfo, setScheduleInfo] = useState({});
+    const [studentRoster, setStudentRoster] = useState({});
+    const [prospectRoster, setProspectRoster] = useState({});
+
+    const handleGetClassInfo = async () => {
+        const classForEditing = classes.find((c) => c.ClassId === classId);
+        setClassInfo(classForEditing);
+        try {
+            getStaffByClassId(classId).then((res) => {
+                setStaffInfo(res);
+            });
+        } catch (error) {
+            console.log(error);
+        }
+        try {
+            getTheClassScheduleByClassId(classId).then((response) => {
+                setScheduleInfo(response);
+            });
+        } catch (error) {
+            console.log(error);
+        }
+        try {
+            getStudentsByClassId(classId).then((res) => {
+                setStudentRoster(res);
+            });
+            getProspectsByClassId(classId).then((res) => {
+                setProspectRoster(res);
+            });
+        } catch (error) {
+            console.log(error);
+        }
+        setModal18(true);
+    };
+
+    const getTimeOnlyfromZulueStamp = (date) => {
+        const timeString = date?.split('T')[1];
+        return timeString?.slice(0, 5);
+    };
+    console.log(scheduleInfo);
+
     return (
         <div>
-            <button onClick={() => setModal18(true)} type="button" className="flex hover:text-primary">
+            <button onClick={() => handleGetClassInfo()} type="button" className="flex text-info hover:text-primary">
                 <IconEye />
             </button>
             <Transition appear show={modal18} as={Fragment}>
@@ -28,7 +73,7 @@ export default function ViewClass() {
                             >
                                 <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg my-8 text-black dark:text-white-dark">
                                     <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
-                                        <h5 className="font-bold text-lg">Tabs</h5>
+                                        <h5 className="font-bold text-lg">View Class {classId}</h5>
                                         <button onClick={() => setModal18(false)} type="button" className="text-white-dark hover:text-dark">
                                             <IconX className="w-5 h-5" />
                                         </button>
@@ -80,7 +125,19 @@ export default function ViewClass() {
                                                                 selected ? '!border-white-light !border-b-white  text-primary dark:!border-[#191e3a] dark:!border-b-black !outline-none ' : ''
                                                             } p-3.5 py-2 -mb-[1px] block border border-transparent hover:text-primary dark:hover:border-b-black`}
                                                         >
-                                                            Roster
+                                                            Students
+                                                        </button>
+                                                    )}
+                                                </Tab>
+                                                <Tab as={Fragment}>
+                                                    {({ selected }) => (
+                                                        <button
+                                                            type="button"
+                                                            className={`${
+                                                                selected ? '!border-white-light !border-b-white  text-primary dark:!border-[#191e3a] dark:!border-b-black !outline-none ' : ''
+                                                            } p-3.5 py-2 -mb-[1px] block border border-transparent hover:text-primary dark:hover:border-b-black`}
+                                                        >
+                                                            Prospects
                                                         </button>
                                                     )}
                                                 </Tab>
@@ -88,33 +145,40 @@ export default function ViewClass() {
                                             <Tab.Panels>
                                                 <Tab.Panel>
                                                     <div className="active pt-5">
-                                                        <h4 className="font-semibold text-2xl mb-4">We move your world!</h4>
-                                                        <p className="mb-4">
-                                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-                                                            minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                                        <h4 className="font-semibold text-2xl mb-4">{classInfo?.Name}</h4>
+                                                        <p className="mb-4">{classInfo?.Description}</p>
+                                                        <p>
+                                                            <span className="font-bold">Enrollment</span> {classInfo?.enrollment}
                                                         </p>
                                                         <p>
-                                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-                                                            minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                                            <span className="font-bold">Prospects Enrolled</span> {classInfo?.prospectEnrollment}
+                                                        </p>
+                                                        <p>
+                                                            <span className="font-bold">Enrollment Limit</span> {classInfo?.EnrollmentLimit}
                                                         </p>
                                                     </div>
                                                 </Tab.Panel>
                                                 <Tab.Panel>
                                                     <div>
                                                         <div className="flex items-start pt-5">
-                                                            <div className="w-20 h-20 ltr:mr-4 rtl:ml-4 flex-none">
-                                                                <img
-                                                                    src="/assets/images/profile-34.jpeg"
-                                                                    alt="img"
-                                                                    className="w-20 h-20 m-0 rounded-full ring-2 ring-[#ebedf2] dark:ring-white-dark object-cover"
-                                                                />
-                                                            </div>
                                                             <div className="flex-auto">
-                                                                <h5 className="text-xl font-medium mb-4">Media heading</h5>
-                                                                <p className="text-white-dark">
-                                                                    Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate
-                                                                    at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-                                                                </p>
+                                                                {staffInfo && staffInfo?.length > 0 ? (
+                                                                    staffInfo?.map((staff) => (
+                                                                        <div key={staff.StaffId} className="flex items-center justify-between mb-4">
+                                                                            <div className="flex items-center">
+                                                                                <div className="ltr:ml-4 rtl:mr-4">
+                                                                                    <h5 className="font-semibold text-lg">
+                                                                                        {staff.FirstName}
+                                                                                        {staff.LastName}
+                                                                                    </h5>
+                                                                                    <p className="text-gray-500">{staff.Role}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    ))
+                                                                ) : (
+                                                                    <p>No staff assigned</p>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -122,22 +186,67 @@ export default function ViewClass() {
                                                 <Tab.Panel>
                                                     <div className="pt-5">
                                                         <p>
-                                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-                                                            minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-                                                            voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
-                                                            deserunt mollit anim id est laborum.
+                                                            <span className="font-bold">Day of the Week:</span> {scheduleInfo?.DayOfWeek}
+                                                        </p>
+                                                        <p>
+                                                            <span className="font-bold">Start Time:</span> {getTimeOnlyfromZulueStamp(scheduleInfo?.StartTime)}
+                                                        </p>
+                                                        <p>
+                                                            <span className="font-bold">End Time:</span> {getTimeOnlyfromZulueStamp(scheduleInfo?.EndTime)}
                                                         </p>
                                                     </div>
                                                 </Tab.Panel>
-                                                <Tab.Panel>Roster</Tab.Panel>
+                                                <Tab.Panel>
+                                                    <div className="pt-5">
+                                                        <h4 className="font-semibold text-2xl mb-4">Students</h4>
+                                                        <div className="flex items-start">
+                                                            <div className="flex-auto">
+                                                                {studentRoster && studentRoster?.length > 0 ? (
+                                                                    studentRoster?.map((student) => (
+                                                                        <div key={student.StudentId} className="flex items-center justify-between mb-4">
+                                                                            <div className="flex items-center">
+                                                                                <div className="ltr:ml-4 rtl:mr-4">
+                                                                                    <h5 className="font-semibold text-lg">{student.Name}</h5>
+                                                                                    <p className="text-gray-500">{student.email}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    ))
+                                                                ) : (
+                                                                    <p>No students enrolled</p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </Tab.Panel>
+                                                <Tab.Panel>
+                                                    <div className="pt-5">
+                                                        <h4 className="font-semibold text-2xl mb-4">Prospects</h4>
+                                                        <div className="flex items-start">
+                                                            <div className="flex-auto">
+                                                                {prospectRoster && prospectRoster?.length > 0 ? (
+                                                                    prospectRoster?.map((student) => (
+                                                                        <div key={student.ProspectId} className="flex items-center justify-between mb-4">
+                                                                            <div className="flex items-center">
+                                                                                <div className="ltr:ml-4 rtl:mr-4">
+                                                                                    <h5 className="font-semibold text-lg">{student.Name}</h5>
+                                                                                    <p className="text-gray-500">{student.email}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    ))
+                                                                ) : (
+                                                                    <p>No students enrolled</p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </Tab.Panel>
                                             </Tab.Panels>
                                         </Tab.Group>
                                         <div className="flex justify-end items-center mt-8">
                                             <button onClick={() => setModal18(false)} type="button" className="btn btn-outline-danger">
-                                                Discard
-                                            </button>
-                                            <button onClick={() => setModal18(false)} type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4">
-                                                Save
+                                                Close
                                             </button>
                                         </div>
                                     </div>

@@ -16,7 +16,7 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
     const themeConfig = useSelector((state: IRootState) => state.themeConfig);
     const dispatch = useDispatch();
 
-    const [showLoader, setShowLoader] = useState(true);
+    const [showLoader, setShowLoader] = useState(false);
     const [showTopButton, setShowTopButton] = useState(false);
 
     const goToTop = () => {
@@ -35,12 +35,12 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
     useEffect(() => {
         window.addEventListener('scroll', onScrollHandler);
         const screenLoader = document.getElementsByClassName('screen_loader');
-        if (screenLoader?.length) {
-            screenLoader[0].classList.add('animate__fadeOut');
-            setTimeout(() => {
-                setShowLoader(false);
-            }, 200);
-        }
+        // if (screenLoader?.length) {
+        //     screenLoader[0].classList.add('animate__fadeOut');
+        //     setTimeout(() => {
+        //         setShowLoader(false);
+        //     }, 200);
+        // }
         return () => {
             window.removeEventListener('onscroll', onScrollHandler);
         };
@@ -61,7 +61,7 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
                 {/* sidebar menu overlay */}
                 <div className={`${(!themeConfig.sidebar && 'hidden') || ''} fixed inset-0 bg-[black]/60 z-50 lg:hidden`} onClick={() => dispatch(toggleSidebar())}></div>
                 {/* screen loader */}
-                {(showLoader || showLoading) && (
+                {showLoading && (
                     <div className="screen_loader fixed inset-0 bg-[#fafafa] dark:bg-[#060818] z-[60] grid place-content-center animate__animated">
                         <svg width="64" height="64" viewBox="0 0 135 135" xmlns="http://www.w3.org/2000/svg" fill="#4361ee">
                             <path d="M67.447 58c5.523 0 10-4.477 10-10s-4.477-10-10-10-10 4.477-10 10 4.477 10 10 10zm9.448 9.447c0 5.523 4.477 10 10 10 5.522 0 10-4.477 10-10s-4.478-10-10-10c-5.523 0-10 4.477-10 10zm-9.448 9.448c-5.523 0-10 4.477-10 10 0 5.522 4.477 10 10 10s10-4.478 10-10c0-5.523-4.477-10-10-10zM58 67.447c0-5.523-4.477-10-10-10s-10 4.477-10 10 4.477 10 10 10 10-4.477 10-10z">

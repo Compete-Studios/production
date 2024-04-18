@@ -9,8 +9,10 @@ import { UserAuth } from '../../context/AuthContext';
 import AnimateHeight from 'react-animate-height';
 import IconPlus from '../../components/Icon/IconPlus';
 import IconMinus from '../../components/Icon/IconMinus';
+import { constFormateDateMMDDYYYY } from '../../functions/shared';
 
-const studentDataInit = {
+const studentInfoInit = {
+    studioId: '',
     fName: '',
     lName: '',
     contact1: '',
@@ -23,25 +25,25 @@ const studentDataInit = {
     city: '',
     state: '',
     zip: '',
-    birthdate: '2022-07-05',
+    birthdate: '01-01-2022',
     marketingMethod: '',
     notes: '',
-    nextContactDate: new Date().toISOString().split('T')[0],
+    nextContactDate: constFormateDateMMDDYYYY(new Date()),
     currentPipelineStatus: '',
-    firstClassDate: new Date().toISOString().split('T')[0],
-    originalContactDate: new Date().toISOString().split('T')[0],
-    introDate: new Date().toISOString().split('T')[0],
+    firstClassDate: constFormateDateMMDDYYYY(new Date()),
+    originalContactDate: constFormateDateMMDDYYYY(new Date()),
+    introDate: constFormateDateMMDDYYYY(new Date()),
 };
 
 export default function AddStudentModal() {
     const { pipelineSteps, classes, programs, waitingLists } = UserAuth();
-    const [studentData, setStudentData] = useState(studentDataInit);
+    const [studentData, setStudentData] = useState(studentInfoInit);
     const [addContactModal, setAddContactModal] = useState(false);
     const [selectedClasses, setSelectedClasses] = useState([]);
     const [selectedPrograms, setSelectedPrograms] = useState([]);
     const [selectedWaitingLists, setSelectedWaitingLists] = useState([]);
     const [active, setActive] = useState(null);
-    const togglePara = (value) => {
+    const togglePara = (value: any) => {
         setActive((oldValue) => {
             return oldValue === value ? '' : value;
         });
@@ -92,7 +94,6 @@ export default function AddStudentModal() {
     };
 
     const saveUser = () => {
-        console.log(studentData);
         setAddContactModal(false);
     };
 

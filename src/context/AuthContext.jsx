@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { auth } from '../firebase/firebase';
+import { auth, db } from '../firebase/firebase';
 import { REACT_API_BASE_URL } from '../constants';
+import { doc, getDoc } from 'firebase/firestore';
 
 const UserContext = createContext();
 
@@ -21,20 +22,46 @@ export default function AuthContextProvider({ children }) {
     const [studentIntros, setStudentIntros] = useState([]);
     const [prospectIntros, setProspectIntros] = useState([]);
     const [dailySchedule, setDailySchedule] = useState([]);
+    const [studioInfo, setStudioInfo] = useState({});
 
     const [update, setUpdate] = useState(false);
 
-    const getStuff = async () => {
-        console.log('getStuff');
+    const getData = async () => {
+        fetchData(`${REACT_API_BASE_URL}/studio-access/getClassesByStudioId/${suid}`, setClasses);
+        fetchData(`${REACT_API_BASE_URL}/staff-access/getStaffByStudioId/${suid}/1`, setStaff);
+        fetchData(`${REACT_API_BASE_URL}/marketing-access/getStudentPipelineStepsByStudioId/${suid}`, setPipelineSteps);
+        fetchData(`${REACT_API_BASE_URL}/class-access/getProgramsByStudioId/${suid}`, setPrograms);
+        fetchData(`${REACT_API_BASE_URL}/marketing-access/getWaitingListsByStudioId/${suid}`, setWaitingLists);
+        fetchData(`${REACT_API_BASE_URL}/marketing-access/getPipelineStepsByStudioId/${suid}`, setProspectPipelineSteps)
+            fetchData(`${REACT_API_BASE_URL}/marketing-access/getMarketingMethodsByStudioId/${suid}`, setMarketingSources);
+        fetchData(`${REACT_API_BASE_URL}/student-access/getStudentIntros/${suid}/${month}/${year}`, setStudentIntros);
+        fetchData(`${REACT_API_BASE_URL}/student-access/getProspectIntros/${suid}/${month}/${year}`, setProspectIntros);
+        fetchData(`${REACT_API_BASE_URL}/daily-schedule-tools/getStudentsByNextContactDate/${suid}`, setDailySchedule);
     };
 
     const fetchData = async (url, setter) => {
         try {
             const response = await fetch(url);
             const data = await response.json();
-            console.log(data)
+            console.log(data);
             setter(data.recordset);
             return data;
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const getStudioInfo = async (suid) => {
+        try {
+            const docRef = doc(db, 'studios', suid);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                console.log('Document data:', docSnap.data());
+                setStudioInfo(docSnap.data());
+            } else {
+                // doc.data() will be undefined in this case
+                console.log('No such document!');
+            }
         } catch (error) {
             console.error(error);
         }
@@ -44,22 +71,9 @@ export default function AuthContextProvider({ children }) {
         setShowLoading(true);
         const year = new Date().getFullYear();
         const month = new Date().getMonth() + 1;
-        getStuff();
-        Promise.all([
-            fetchData(`${REACT_API_BASE_URL}/studio-access/getClassesByStudioId/${suid}`, setClasses),
-            fetchData(`${REACT_API_BASE_URL}/staff-access/getStaffByStudioId/${suid}/1`, setStaff),
-            fetchData(`${REACT_API_BASE_URL}/studio-access/getStudentsByStudioId/${suid}/1`, setStudents),
-            fetchData(`${REACT_API_BASE_URL}/marketing-access/getStudentPipelineStepsByStudioId/${suid}`, setPipelineSteps),
-            fetchData(`${REACT_API_BASE_URL}/class-access/getProgramsByStudioId/${suid}`, setPrograms),
-            fetchData(`${REACT_API_BASE_URL}/marketing-access/getWaitingListsByStudioId/${suid}`, setWaitingLists),
-            fetchData(`${REACT_API_BASE_URL}/marketing-access/getPipelineStepsByStudioId/${suid}`, setProspectPipelineSteps),
-            fetchData(`${REACT_API_BASE_URL}/marketing-access/getMarketingMethodsByStudioId/${suid}`, setMarketingSources),
-            fetchData(`${REACT_API_BASE_URL}/student-access/getStudentIntros/${suid}/${month}/${year}`, setStudentIntros),
-            fetchData(`${REACT_API_BASE_URL}/student-access/getProspectIntros/${suid}/${month}/${year}`, setProspectIntros),
-            fetchData(`${REACT_API_BASE_URL}/daily-schedule-tools/getStudentsByNextContactDate/${suid}`, setDailySchedule),
-        ]).then(() => {
-            setShowLoading(false);
-        });
+        getData();
+
+        setShowLoading(false);
     }, [suid, update]);
 
     useEffect(() => {
@@ -79,6 +93,7 @@ export default function AuthContextProvider({ children }) {
                 setSuid(currentUser.photoURL);
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('suid', currentUser.photoURL);
+                getStudioInfo(currentUser.photoURL);
             } else {
                 setIsLoggedIn(false);
                 localStorage.removeItem('isLoggedIn');
@@ -113,7 +128,8 @@ export default function AuthContextProvider({ children }) {
                 showLoading,
                 studentIntros,
                 prospectIntros,
-                dailySchedule
+                dailySchedule,
+                studioInfo,
             }}
         >
             {children}

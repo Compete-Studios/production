@@ -464,12 +464,7 @@ export const getTextMessageThread = async (studioId, toNumber, fromNumber) => {
     }
 };
 
-export const sendAText = async (to, message, studioId) => {
-    const data = {
-        to,
-        message,
-        studioId,
-    };
+export const sendAText = async (data) => {   
     try {
         const response = await fetchData(`text-helper/sendSMS`, 'post', data);
         return response;
@@ -502,7 +497,7 @@ export const addClassAndSchedule = async (data) => {
 export const getTheClassScheduleByClassId = async (classId) => {
     try {
         const response = await fetchData(`class-access/getClassScheduleByClassId/${classId}`, 'get');
-        return response.recordset[0]
+        return response.recordset[0];
     } catch (error) {
         console.error(error);
         throw error;
@@ -824,7 +819,6 @@ export const getProspectsByPipelineStep = async (pipelineStepId, studioId) => {
     }
 };
 
-
 export const updateStudentNotes = async (studentId, notes) => {
     try {
         const response = await fetchData(`student-access/updateStudentNotes/${studentId}`, 'post', { notes });
@@ -849,6 +843,26 @@ export const getStaffByClassId = async (classId) => {
     try {
         const response = await fetchData(`staff-access/getStaffByClassId/${classId}`, 'get');
         return response.recordset;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getStudentCustomBarcodeId = async (studentId, studioId) => {
+    try {
+        const response = await fetchData(`student-access/getStudentCustomBarcodeId/${studentId}/${studioId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const createNewInvoice = async (data) => {
+    try {
+        const response = await fetchData(`invoice-access/addInvoice`, 'post', data);
+        return response;
     } catch (error) {
         console.error(error);
         throw error;

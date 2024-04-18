@@ -169,16 +169,16 @@ const Sidebar = () => {
                                 <AnimateHeight duration={300} height={currentMenu === 'payments' ? 'auto' : 0}>
                                     <ul className="sub-menu text-gray-500">
                                         <li>
-                                            <NavLink to="/search-payments">Search Payments</NavLink>
+                                            <NavLink to="/payments/search-payments">Search Payments</NavLink>
                                         </li>
                                         <li>
-                                            <NavLink to="/quick-pay">Quick Pay</NavLink>
+                                            <NavLink to="/payments/quick-pay">Quick Pay</NavLink>
                                         </li>
                                         <li>
-                                            <NavLink to="/late-payment-pipeline">Late Payment Pipeline</NavLink>
+                                            <NavLink to="/payments/late-payment-pipeline">Late Payment Pipeline</NavLink>
                                         </li>
                                         <li>
-                                            <NavLink to="/view-invoices">View Invoices</NavLink>
+                                            <NavLink to="/payments/view-invoices">View Invoices</NavLink>
                                         </li>
                                     </ul>
                                 </AnimateHeight>
@@ -239,7 +239,7 @@ const Sidebar = () => {
                                         </NavLink>
                                     </li> */}
                                     <li className="nav-item">
-                                        <NavLink to="/marketing-methods" className="group">
+                                        <NavLink to="/marketing/marketing-methods" className="group">
                                             <div className="flex items-center">
                                                 <IconMenuTables className="group-hover:!text-primary shrink-0" />
                                                 <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Marketing Methods</span>

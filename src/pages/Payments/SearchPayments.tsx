@@ -592,7 +592,7 @@ const SearchPayments = () => {
         return '';
     };
 
-    const handleConvertDateToYYYYMMDD = (date) => {
+    const handleConvertDateToYYYYMMDD = (date: any) => {
         const newDate = new Date(date);
         const formattedDate = newDate.toISOString().substr(0, 10);
         return formattedDate;

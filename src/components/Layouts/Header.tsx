@@ -167,7 +167,6 @@ const Header = () => {
         });
         setSearchedStudentsAndProspects({ students, prospects });
         setSearch(false);
-        console.log(students, prospects);
         navigate('/search');
     };
 

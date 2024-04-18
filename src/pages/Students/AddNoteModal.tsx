@@ -29,8 +29,7 @@ export default function AddNoteModal({ student, setStudent }: any) {
         updateStudentNotes(student?.Student_id, newNote)
         setModal2(false)
     };
-
-    console.log(student);
+    
 
     const [modal2, setModal2] = useState(false);
 

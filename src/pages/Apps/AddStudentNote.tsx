@@ -1,13 +1,32 @@
 import { Dialog, Transition } from '@headlessui/react';
-import { useState, Fragment } from 'react';
+import { useState, Fragment, useEffect } from 'react';
 import IconEdit from '../../components/Icon/IconEdit';
 import IconX from '../../components/Icon/IconX';
 import { UserAuth } from '../../context/AuthContext';
 import Swal from 'sweetalert2';
+import { showMessage } from '../../functions/shared';
+import { REACT_API_BASE_URL } from '../../constants';
+import { updateStudentNotes } from '../../functions/api';
+import Select from 'react-select';
 
 export default function AddStudentNote() {
-    const { students } = UserAuth();
+    const { suid } = UserAuth();
+    const [students, setStudents] = useState<any>([]);
+    const [selectedStudent, setSelectedStudent] = useState<any>(null);
+    const [newNotes, setNewNotes] = useState<string>('');
+    const [initials, setInitials] = useState<string>('');
+    const currentDate = new Date();
+    const noteDate = `${currentDate.getMonth() + 1}/${currentDate.getDate()}/${currentDate.getFullYear() % 100}`;
     const [modal2, setModal2] = useState(false);
+    const [studentOptions, setStudentOptions] = useState<any>([
+        { value: '1', label: 'Student 1' },
+        { value: '2', label: 'Student 2' },
+        { value: '3', label: 'Student 3' },
+    ]);
+
+    useEffect(() => {
+        setStudentOptions(students.map((student: any) => ({ value: student.Student_ID, label: student.Name })));
+    }, [students]);
 
     const handleAddNote = (e: any) => {
         e.preventDefault();
@@ -15,19 +34,24 @@ export default function AddStudentNote() {
         showMessage('Note Added Successfully');
     };
 
-    const showMessage = (msg = '', type = 'success') => {
-        const toast = Swal.mixin({
-            toast: true,
-            position: 'top',
-            showConfirmButton: false,
-            timer: 3000,
-            customClass: { container: 'toast' },
-        });
-        toast.fire({
-            icon: type,
-            title: msg,
-            padding: '10px 20px',
-        });
+    useEffect(() => {
+        fetch(`${REACT_API_BASE_URL}/studio-access/getStudentsByStudioId/${suid}/1`)
+            .then((response) => response.json())
+            .then((json) => setStudents(json.recordset));
+    }, []);
+
+    const handleAddNoteToTopOfNotes = async (e: any) => {
+        e.preventDefault();
+        // Concatenate the new note with the existing notes, with the new note on top
+        const newNote = noteDate + ' ' + initials + ' ' + newNotes + '\n' + selectedStudent.Notes;
+        updateStudentNotes(selectedStudent?.Student_ID, newNote);
+        showMessage('Note Added Successfully');
+        setModal2(false);
+    };
+
+    const handlePlaceSelectedStudent = (e: any) => {
+        const student = students.find((student: any) => student.Student_ID === e.value);
+        setSelectedStudent(student);
     };
 
     return (
@@ -69,28 +93,22 @@ export default function AddStudentNote() {
                                             <div className="grid gap-5">
                                                 <div>
                                                     <label htmlFor="taskTitle">Student</label>
-                                                    <select id="title" className="form-select">
-                                                        {students?.map((student: any) => (
-                                                            <option key={student.Student_ID} value={student.Student_ID}>
-                                                                {student.Name}
-                                                            </option>
-                                                        ))}
-                                                    </select>
+                                                    <Select placeholder="Select an option" options={studentOptions} onChange={(e: any) => handlePlaceSelectedStudent(e)} />
                                                 </div>
                                                 <div>
                                                     <label htmlFor="taskTag">Staff Initials</label>
-                                                    <input id="tags" type="text" className="form-input" placeholder="Enter Initials" autoComplete="off" />
+                                                    <input id="tags" type="text" className="form-input" placeholder="Enter Initials" autoComplete="off" onChange={(e) => setInitials(e.target.value)} />
                                                 </div>
                                                 <div>
                                                     <label htmlFor="taskdesc">Note</label>
-                                                    <textarea id="description" className="form-textarea min-h-[130px]" placeholder="Enter Note"></textarea>
+                                                    <textarea id="description" className="form-textarea min-h-[130px]" placeholder="Enter Note" onChange={(e) => setNewNotes(e.target.value)} />
                                                 </div>
                                             </div>
                                             <div className="flex justify-end items-center mt-8">
                                                 <button onClick={() => setModal2(false)} type="button" className="btn btn-outline-danger">
                                                     Cancel
                                                 </button>
-                                                <button type="submit" className="btn btn-primary ltr:ml-4 rtl:mr-4">
+                                                <button type="submit" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={handleAddNoteToTopOfNotes}>
                                                     Add
                                                 </button>
                                             </div>

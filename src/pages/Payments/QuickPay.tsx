@@ -1,6 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
+
+interface PayDetails {
+    studioId: number;
+    paymentAccountId: number;
+    amount: number;
+    emailForReceipt: string;
+    cvv: string;
+    isResubmission: boolean;
+}
 
 export default function QuickPay() {
+    
+    const [payDetails, setPayDetails] = useState<PayDetails>({
+        studioId: 0,
+        paymentAccountId: 0,
+        amount: 0,
+        emailForReceipt: '',
+        cvv: '',
+        isResubmission: false,
+    });
+
+
+
+
+
     return (
         <div>
             <div className="panel max-w-5xl mx-auto">
@@ -72,7 +95,7 @@ export default function QuickPay() {
                             </div>
                             <div>
                                 <label htmlFor="ctnTextarea">Notes</label>
-                                <textarea id="ctnTextarea" rows={3} className="form-textarea" ></textarea>
+                                <textarea id="ctnTextarea" rows={3} className="form-textarea"></textarea>
                             </div>
                             <div>
                                 <label htmlFor="zip">Amount</label>

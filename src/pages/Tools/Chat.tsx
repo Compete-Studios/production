@@ -627,12 +627,12 @@ const Chat = () => {
                                                         <div className={`flex items-start gap-3 ${selectedUser.userId === message.fromUserId ? 'justify-end' : ''}`}>
                                                             <div className={`flex-none ${selectedUser.userId === message.fromUserId ? 'order-2' : ''}`}>
                                                                 {selectedUser.userId === message.fromUserId ? (
-                                                                    <img src={`/assets/images/${loginUser.path}`} className="rounded-full h-10 w-10 object-cover" alt="" />
+                                                                 <p>m</p>
                                                                 ) : (
                                                                     ''
                                                                 )}
                                                                 {selectedUser.userId !== message.fromUserId ? (
-                                                                    <img src={`/assets/images/${selectedUser.path}`} className="rounded-full h-10 w-10 object-cover" alt="" />
+                                                                     <p>s</p>
                                                                 ) : (
                                                                     ''
                                                                 )}

@@ -9,6 +9,7 @@ import { getAllCustomerCreditCards, getStudentBillingAccounts } from '../../func
 import { addInternalPayment, runPaymentForCustomer } from '../../functions/payments';
 import Swal from 'sweetalert2';
 import { formatDate } from '../../functions/shared';
+import { useNavigate } from 'react-router-dom';
 
 interface CreditCard {
     Id: number;
@@ -120,11 +121,17 @@ export default function StudentsQuickPay({ student, suid }: any) {
         }
     };
 
+    const navigate = useNavigate();
+
+    const handleGoToPayments = () => {
+        const newID = parseInt(student?.Student_id) * parseInt(suid);
+        navigate(`/students/${newID}/finish-billing-setup-options`);
+    };
 
     return (
         <div>
             <div>
-                <button type="button" className="btn btn-primary" onClick={() => setShowQuickPayModal(true)}>
+                <button type="button" className="btn btn-primary w-full" onClick={() => setShowQuickPayModal(true)}>
                     <IconDollarSignCircle className="ltr:mr-2 rtl:ml-2" />
                     Quick Pay
                 </button>
@@ -184,6 +191,14 @@ export default function StudentsQuickPay({ student, suid }: any) {
                                             <Tab.Panels>
                                                 <Tab.Panel>
                                                     <div className="pt-8">
+                                                        {!billingInfo && (
+                                                            <div>
+                                                                <div className="text-center text-gray-400">No billing information found</div>
+                                                                <button type="button" className="btn btn-info mx-auto mt-4" onClick={handleGoToPayments}>
+                                                                    Add Billing Account
+                                                                </button>
+                                                            </div>
+                                                        )}
                                                         {cardToUse ? (
                                                             <div>
                                                                 <div className="flex items-center justify-between border-b border-white-light dark:border-[#191e3a] py-3">

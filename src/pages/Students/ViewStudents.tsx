@@ -1,4 +1,4 @@
-import { useState,  useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../store/themeConfigSlice';
@@ -6,7 +6,7 @@ import IconSearch from '../../components/Icon/IconSearch';
 import { UserAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { REACT_API_BASE_URL } from '../../constants';
-import { convertPhone } from '../../functions/shared';
+import { convertPhone, hashTheID } from '../../functions/shared';
 import IconUserPlus from '../../components/Icon/IconUserPlus';
 
 const ViewStudents = () => {
@@ -28,10 +28,6 @@ const ViewStudents = () => {
         dispatch(setPageTitle('Students'));
     });
     const [addContactModal, setAddContactModal] = useState<any>(false);
-
-    const hashTheID = (id: any) => {
-        return parseInt(id) * 123456789;
-    };
 
     const [value, setValue] = useState<any>('list');
     const [defaultParams] = useState({
@@ -61,56 +57,6 @@ const ViewStudents = () => {
             });
         });
     }, [search, students]);
-
-    // const saveUser = () => {
-    //     if (!params.Name) {
-    //         showMessage('Name is required.', 'error');
-    //         return true;
-    //     }
-    //     if (!params.email) {
-    //         showMessage('Email is required.', 'error');
-    //         return true;
-    //     }
-    //     if (!params.Phone) {
-    //         showMessage('Phone is required.', 'error');
-    //         return true;
-    //     }
-    //     if (!params.role) {
-    //         showMessage('Occupation is required.', 'error');
-    //         return true;
-    //     }
-
-    //     if (params.id) {
-    //         //update user
-    //         let user: any = filteredItems.find((d: any) => d.id === params.Student_ID);
-    //         user.Name = params.Name;
-    //         user.email = params.email;
-    //         user.Phone = params.Phone;
-    //         user.role = params.role;
-    //         user.location = params.location;
-    //     } else {
-    //         //add user
-    //         let maxUserId = filteredItems.length ? filteredItems.reduce((max: any, character: any) => (character.id > max ? character.id : max), filteredItems[0].id) : 0;
-
-    //         let user = {
-    //             Student_ID: maxUserId + 1,
-    //             path: 'profile-35.png',
-    //             Name: params.Name,
-    //             email: params.email,
-    //             Phone: params.Phone,
-    //             role: params.role,
-    //             location: params.location,
-    //             posts: 20,
-    //             followers: '5K',
-    //             following: 500,
-    //         };
-    //         filteredItems.splice(0, 0, user);
-    //         //   searchContacts();
-    //     }
-
-    //     showMessage('User has been saved successfully.');
-    //     setAddContactModal(false);
-    // };
 
     const editUser = (user: any = null) => {
         const json = JSON.parse(JSON.stringify(defaultParams));
@@ -162,7 +108,7 @@ const ViewStudents = () => {
                 </div>
                 <div className="flex sm:flex-row flex-col sm:items-center sm:gap-3 gap-4 w-full sm:w-auto">
                     <div className="flex gap-3">
-                        <Link to="/students/add-student" type="button" className="btn btn-primary" >
+                        <Link to="/students/add-student" type="button" className="btn btn-primary">
                             <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
                             Add Student
                         </Link>
@@ -202,14 +148,14 @@ const ViewStudents = () => {
                                                 <Link
                                                     to={`/students/view-student/${hashTheID(contact.Student_ID)}/${hashTheID(suid)}`}
                                                     type="button"
-                                                    className="btn btn-sm btn-outline-warning"
-                                                    onClick={() => editUser(contact)}
+                                                    className="btn btn-sm btn-outline-info"
+                                                   
                                                 >
                                                     View
                                                 </Link>
-                                                <Link to="/students/edit-student" type="button" className="btn btn-sm btn-outline-primary" onClick={() => editUser(contact)}>
+                                                {/* <Link to="/students/edit-student" type="button" className="btn btn-sm btn-outline-primary" onClick={() => editUser(contact)}>
                                                     Edit
-                                                </Link>
+                                                </Link> */}
                                                 <Link to="/students/delete-student" type="button" className="btn btn-sm btn-outline-danger" onClick={() => deleteUser(contact)}>
                                                     Delete
                                                 </Link>

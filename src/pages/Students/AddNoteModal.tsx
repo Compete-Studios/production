@@ -9,6 +9,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import IconX from '../../components/Icon/IconX';
 import { updateStudentNotes } from '../../functions/api';
+import Swal from 'sweetalert2';
 
 export default function AddNoteModal({ student, setStudent }: any) {
     const dispatch = useDispatch();
@@ -21,15 +22,30 @@ export default function AddNoteModal({ student, setStudent }: any) {
     const currentDate = new Date();
     const noteDate = `${currentDate.getMonth() + 1}/${currentDate.getDate()}/${currentDate.getFullYear() % 100}`;
 
-    const handleAddNoteToTopOfNotes = (e) => {
+    const showMessage = (msg = '', type = 'success') => {
+        const toast: any = Swal.mixin({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: 3000,
+            customClass: { container: 'toast' },
+        });
+        toast.fire({
+            icon: type,
+            title: msg,
+            padding: '10px 20px',
+        });
+    };
+    
+    const handleAddNoteToTopOfNotes = async (e: any) => {
         e.preventDefault();
         // Concatenate the new note with the existing notes, with the new note on top
         const newNote = noteDate + ' ' + initials + ' ' + newNotes + '\n' + student.notes;
         setStudent({ ...student, notes: newNote });
-        updateStudentNotes(student?.Student_id, newNote)
-        setModal2(false)
+        updateStudentNotes(student?.Student_id, newNote);
+        showMessage('Note Added Successfully');
+        setModal2(false);
     };
-    
 
     const [modal2, setModal2] = useState(false);
 

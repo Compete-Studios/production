@@ -1,186 +1,127 @@
-import React from "react";
-import { UserAuth } from "../context/AuthContext";
+import React from 'react';
+import { UserAuth } from '../context/AuthContext';
+import IconInfoCircle from '../components/Icon/IconInfoCircle';
+import IconEye from '../components/Icon/IconEye';
+import { hashTheID } from '../functions/shared';
+import { useNavigate } from 'react-router-dom';
 
 export default function SearchDisplay() {
-  const { searchedStudentsAndProspects } = UserAuth();
+    const { searchedStudentsAndProspects, suid } = UserAuth();
 
-  return (
-    <div className="grid md:grid-cols-2 gap-x-2 grid-cols-1">
-      <div className="overflow-hidden rounded-lg bg-white shadow">
+    const navigate = useNavigate();
 
-        <div className="px-4 py-5 sm:p-6">
-          {" "}
-          <div>
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="sm:flex sm:items-center">
-                <div className="sm:flex-auto">
-                  <h1 className="text-base font-semibold leading-6 text-gray-900">
-                    Students
-                  </h1>
-                  <p className="mt-2 text-sm text-gray-700">
-                    A list of all the students that matche the criteria
-                  </p>
+    const handleViewStudent = (id) => {
+        const hashedStudentId = hashTheID(id);
+        const hashedSUID = hashTheID(suid);
+        navigate(`/students/view-student/${hashedStudentId}/${hashedSUID}`);
+    };
+
+    console.log(searchedStudentsAndProspects);
+
+    return (
+        <div className="grid 2xl:grid-cols-2 grid-cols-12 gap-x-2">
+            <div className='2xl:col-span-1 col-span-7'>
+                <div>
+                    <h2 className="text-xl">Students</h2>
+                    <p className="text-sm text-gray-700">A list of all the students that match the criteria</p>
                 </div>
-              </div>
-            </div>
-            <div className="mt-8 flow-root overflow-hidden">
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <table className="w-full text-left">
-                  <thead className="bg-white">
-                    <tr>
-                      <th
-                        scope="col"
-                        className="relative isolate py-3.5 pr-3 text-left text-sm font-semibold text-gray-900"
-                      >
-                        Name
-                        <div className="absolute inset-y-0 right-full -z-10 w-screen border-b border-b-gray-200" />
-                        <div className="absolute inset-y-0 left-0 -z-10 w-screen border-b border-b-gray-200" />
-                      </th>
-                      <th
-                        scope="col"
-                        className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:table-cell"
-                      >
-                        Status
-                      </th>
-                      <th
-                        scope="col"
-                        className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 md:table-cell"
-                      >
-                        Info
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-3 py-3.5 text-sm font-semibold text-gray-900 text-right "
-                      >
-                        Contact
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {searchedStudentsAndProspects?.students?.length > 0 ? (
-                      searchedStudentsAndProspects?.students?.map((person) => (
-                        <tr key={person.email}>
-                          <td className="relative py-4 pr-3 text-sm font-medium text-gray-900">
-                            {person.First_Name} {person.Last_Name}
-                            <div className="absolute bottom-0 right-full h-px w-screen bg-gray-100" />
-                            <div className="absolute bottom-0 left-0 h-px w-screen bg-gray-100" />
-                          </td>
-                          <td className="hidden px-3 py-4 text-sm text-gray-500 sm:table-cell">
-                            {person.activity === 1 ? "Active" : "Inactive"}
-                          </td>
-                          <td className="hidden px-3 py-4 text-sm text-gray-500 md:table-cell">
-                            {/* <Info
-                              size={24}
-                              className=" bg-com rounded-full text-white hover:bg-comhover"
-                            /> */}!
-                          </td>
-                          <td className="px-3 py-4 text-sm text-gray-500 text-right ">
-                            <div>{person.email}</div>
-                            <div>{person.Phone}</div>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td
-                          colSpan="5"
-                          className="px-3 py-4 text-sm text-center text-red-500"
-                        >
-                          This search returned no students.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="overflow-hidden rounded-lg bg-white shadow">
-        <div className="px-4 py-5 sm:p-6">
-          {" "}
-          <div>
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="sm:flex sm:items-center">
-                <div className="sm:flex-auto">
-                  <h1 className="text-base font-semibold leading-6 text-gray-900">
-                    Prospects
-                  </h1>
-                  <p className="mt-2 text-sm text-gray-700">
-                    A list of all the prospects that matche the criteria
-                  </p>
+
+                <div className="mt-4 panel p-0 border-0 overflow-hidden">
+                    <div className="table-responsive">
+                        <table className="table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Status</th>
+                                    <th>Info</th>
+                                    <th>Contact</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {searchedStudentsAndProspects?.students?.length > 0 ? (
+                                    searchedStudentsAndProspects?.students?.map((person) => (
+                                        <tr key={person.email}>
+                                            <td>
+                                                <div className="flex flex-wrap">
+                                                    {person.First_Name} {person.Last_Name}
+                                                </div>
+                                            </td>
+                                            <td>{person.activity === 1 ? 'Active' : 'Inactive'}</td>
+                                            <td>
+                                                <button onClick={() => handleViewStudent(person.Student_id)}>
+                                                    <IconEye className="text-info hover:text-blue-900" />
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <div>{person.email}</div>
+                                                <div>{person.Phone}</div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="5" className="px-3 py-4 text-sm text-center text-red-500">
+                                            This search returned no students.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-              </div>
             </div>
-            <div className="mt-8 flow-root overflow-hidden">
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <table className="w-full text-left">
-                  <thead className="bg-white">
-                    <tr>
-                      <th
-                        scope="col"
-                        className="relative isolate py-3.5 pr-3 text-left text-sm font-semibold text-gray-900"
-                      >
-                        Name
-                        <div className="absolute inset-y-0 right-full -z-10 w-screen border-b border-b-gray-200" />
-                        <div className="absolute inset-y-0 left-0 -z-10 w-screen border-b border-b-gray-200" />
-                      </th>
 
-                      <th
-                        scope="col"
-                        className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 md:table-cell"
-                      >
-                        Info
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-3 py-3.5 text-sm font-semibold text-gray-900 text-right "
-                      >
-                        Contact
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {searchedStudentsAndProspects?.prospects?.length > 0 ? (
-                      searchedStudentsAndProspects?.prospects?.map((person) => (
-                        <tr key={person.email}>
-                          <td className="relative py-4 pr-3 text-sm font-medium text-gray-900">
-                            {person.FName} {person.LName}
-                            <div className="absolute bottom-0 right-full h-px w-screen bg-gray-100" />
-                            <div className="absolute bottom-0 left-0 h-px w-screen bg-gray-100" />
-                          </td>
+            <div className='2xl:col-span-1 col-span-5'>
+                {' '}
+                <div>
+                    <div>
+                        <h2 className="text-xl">Prospects</h2>
+                        <p className="text-sm text-gray-700">A list of all the prospects that match the criteria</p>
+                    </div>
+                    <div className="mt-4 panel p-0 border-0 overflow-hidden">
+                        <div className="table-responsive">
+                            <table className="table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Info</th>
+                                        <th>Contact</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {searchedStudentsAndProspects?.prospects?.length > 0 ? (
+                                        searchedStudentsAndProspects?.prospects?.map((person) => (
+                                            <tr key={person.email}>
+                                                <td>
+                                                    <div className="flex flex-wrap">
+                                                        {person.FName} {person.LName}
+                                                    </div>
+                                                </td>
 
-                          <td className="hidden px-3 py-4 text-sm text-gray-500 md:table-cell">
-                            {/* <Info
-                              size={24}
-                              className=" bg-com rounded-full text-white hover:bg-comhover"
-                            /> */}
-                            !
-                          </td>
-                          <td className="px-3 py-4 text-sm text-gray-500 text-right ">
-                            <div>{person.email}</div>
-                            <div>{person.Phone}</div>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td
-                          colSpan="5"
-                          className="px-3 py-4 text-sm text-center text-red-500"
-                        >
-                          This search returned no prospects.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                                                <td>
+                                                    <button onClick={() => handleViewStudent(person.ProspectId)}>
+                                                        <IconEye className="text-info hover:text-blue-900" />
+                                                    </button>
+                                                </td>
+                                                <td>
+                                                <div>{person.email}</div>
+                                                <div>{person.Phone}</div>
+                                            </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="5" className="px-3 py-4 text-sm text-center text-red-500">
+                                                This search returned no prospects.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }

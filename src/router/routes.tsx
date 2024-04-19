@@ -20,6 +20,7 @@ const AddNewPipelineStep = lazy(() => import('../pages/Payments/AddNewPipelineSt
 const ViewInvoices = lazy(() => import('../pages/Payments/ViewInvoices'));
 const ViewInvoice = lazy(() => import('../pages/Payments/ViewInvoice'));
 const PayInvoice = lazy(() => import('../pages/Payments/PayInvoice'));
+const ExisitingBillingAccounts = lazy(() => import('../pages/Payments/ExisitingBillingAccounts'));
 
 const ViewClasses = lazy(() => import('../pages/Classes/ViewClasses'));
 const ViewRoster = lazy(() => import('../pages/Classes/ViewRoster'));
@@ -79,6 +80,7 @@ const EditPipelineStep = lazy(() => import('../pages/Students/EditPipelineStep')
 const AddPipelineStep = lazy(() => import('../pages/Students/AddPipelineStep'));
 const AddPaymentSchedule = lazy(() => import('../pages/Students/AddPaymentSchedule'));
 const AddABillingAccount = lazy(() => import('../pages/Students/AddABillingAccount'));
+const FinishedAddingAccountOptions = lazy(() => import('../pages/Students/FinishedAddingAccountOptions'));
 
 
 
@@ -163,6 +165,10 @@ const routes = [
     {
         path: '/payments/view-invoices',
         element: <ViewInvoices />,
+    },
+    {
+        path: '/payments/:id/:suid/billing-accounts',
+        element: <ExisitingBillingAccounts />,
     },
     {
         path: '/payments/view-payment-info',
@@ -351,6 +357,10 @@ const routes = [
         element: <SearchStudents />,
     },
     {
+        path: '/students/:id/finish-billing-setup-options',
+        element: <FinishedAddingAccountOptions />,
+    },
+    {
         path: '/students/student-pipeline',
         element: <StudentPipeline />,
     },
@@ -379,7 +389,7 @@ const routes = [
         element: <ViewActivePaymentSchedules />,
     },
     {
-        path: '/students/add-payment-schedules',
+        path: '/students/:id/add-payment-schedules',
         element: <AddPaymentSchedule />,
     },
     {
@@ -427,11 +437,11 @@ const routes = [
         element: <AddToEmailList />,
     },
     {
-        path: '/students/view-students-in-pipeline',
+        path: '/students/view-students-in-pipeline/:id/:stud',
         element: <ViewStudentsInPipeline />,
     },
     {
-        path: '/students/edit-pipeline-step',
+        path: '/students/edit-pipeline-step/:id/:stud',
         element: <EditPipelineStep />,
     },
     {

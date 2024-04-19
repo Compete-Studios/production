@@ -72,7 +72,6 @@ export default function AuthContextProvider({ children }) {
         const year = new Date().getFullYear();
         const month = new Date().getMonth() + 1;
         getData();
-
         setShowLoading(false);
     }, [suid, update]);
 

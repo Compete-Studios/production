@@ -5,10 +5,12 @@ import { UserAuth } from '../../context/AuthContext';
 import IconPlus from '../../components/Icon/IconPlus';
 import IconUsers from '../../components/Icon/IconUsers';
 import IconEdit from '../../components/Icon/IconEdit';
+import { Link } from 'react-router-dom';
 
 
 export default function StudentPipeline() {
-    const {pipelineSteps} = UserAuth();
+    const {pipelineSteps, suid} = UserAuth();
+    console.log(pipelineSteps, suid)
     return (
         <div className="panel px-0 border-white-light dark:border-[#1b2e4b]">
             <div className="mb-4.5 px-5 flex md:items-center md:flex-row flex-col gap-5">
@@ -20,10 +22,10 @@ export default function StudentPipeline() {
                  <h2 className="text-xl">Student Pipeline</h2>
 
                 <div className="gap-2 ltr:ml-auto rtl:mr-auto">
-                    <button type="button" className="btn btn-primary gap-2 ltr:ml-auto rtl:mr-auto">
+                    <Link to="/students/add-pipeline-step" type="button" className="btn btn-primary gap-2 ltr:ml-auto rtl:mr-auto">
                         <IconPlus />
                         Add a Pipeline Step
-                    </button>
+                    </Link>
                 </div>
             </div>
             <div className="table-responsive">
@@ -50,14 +52,14 @@ export default function StudentPipeline() {
 
                                     <td className="text-center gap-x-4 flex items-center justify-center">
                                         <Tippy content="View Roster">
-                                            <button type="button">
+                                            <Link to={`/students/view-students-in-pipeline/${data.PipelineStepId}/${suid}`} type="button">
                                                 <IconUsers className="w-5 h-5 text-orange-500 hover:text-orange-800" />
-                                            </button>
+                                            </Link>
                                         </Tippy>
                                         <Tippy content="Edit Step">
-                                            <button type="button">
-                                                <IconEdit className="w-5 h-5" />
-                                            </button>
+                                            <Link to={`/students/edit-pipeline-step/${data.PipelineStepId}/${suid}`} type="button">
+                                                <IconEdit className="w-5 h-5 text-primary hover:text-emerald-700" />
+                                            </Link>
                                         </Tippy>
                                         <Tippy content="Delete Step">
                                             <button type="button">

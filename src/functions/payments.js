@@ -19,3 +19,54 @@ export const addInternalPayment = async (paymentData) => {
         throw error;
     }
 };
+
+export const createNewPaySimpleCustomer = async (customerData) => {
+    try {
+        const response = await fetchData(`paysimple-helper/createNewCustomer`, 'post',  customerData);
+        console.log(response, 'response');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const addCreditCardToCustomer = async (customerData) => {
+    try {
+        const response = await fetchData(`paysimple-helper/addCreditCardToCustomer`, 'post',  customerData);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const addBankAccountToCustomer = async (customerData) => {
+    try {
+        const response = await fetchData(`paysimple-helper/addBankAccountToCustomer`, 'post',  customerData);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getAllCustomerPaymentAccounts = async (customerId, studioId) => {
+    try {
+        const response = await fetchData(`paysimple-helper/getAllCustomerPaymentAccounts/${customerId}/${studioId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const createPaymentSchedule = async (paymentData) => {
+    try {
+        const response = await fetchData(`paysimple-helper/createPaymentSchedule`, 'post',  paymentData);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};

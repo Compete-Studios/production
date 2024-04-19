@@ -3,10 +3,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import IconX from '../../components/Icon/IconX';
-import IconDownload from '../../components/Icon/IconDownload';
-import IconEye from '../../components/Icon/IconEye';
 import IconSend from '../../components/Icon/IconSend';
-import IconSave from '../../components/Icon/IconSave';
 import { UserAuth } from '../../context/AuthContext';
 import { convertPhone, formatDate } from '../../functions/shared';
 import { createNewInvoice, getStudentInfo, getStudioOptions, sendAText } from '../../functions/api';
@@ -36,8 +33,7 @@ const Invoice = () => {
     const [sending, setSending] = useState(false);
 
     const [studioOptions, setStudioOptions] = useState<any>([]);
-
-    console.log(studioInfo);
+ 
 
     const dispatch = useDispatch();
     useEffect(() => {

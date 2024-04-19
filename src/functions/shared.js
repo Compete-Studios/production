@@ -1,5 +1,6 @@
 import { arrayUnion, doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebase';
+import Swal from 'sweetalert2';
 
 export async function fetchFromAPI(endpointURL, opts) {
     const { method, body } = { method: 'POST', body: null, ...opts };
@@ -38,12 +39,54 @@ export const formatDate = (date) => {
     return formattedDate;
 };
 
+export const hashTheID = (id) => {
+    return parseInt(id) * 123456789;
+};
+
 export const constFormateDateMMDDYYYY = (date) => {
     const newDate = new Date(date);
     const formattedDate = newDate.toISOString().substr(0, 10);
     const [year, month, day] = formattedDate.split('-');
     return `${month}-${day}-${year}`;
 };
+
+export const constFormateDateForPaySimple = (date) => {
+    const newDate = new Date(date);
+    const formattedDate = newDate.toISOString().substr(0, 10);
+    const [year, month, day] = formattedDate.split('-');
+    return `${month}/${day}/${year}`;
+};
+
+export const showMessage = (msg = '', type = 'success') => {
+    const toast = Swal.mixin({
+        toast: true,
+        position: 'top',
+        showConfirmButton: false,
+        timer: 3000,
+        customClass: { container: 'toast' },
+    });
+    toast.fire({
+        icon: type,
+        title: msg,
+        padding: '10px 20px',
+    });
+};
+
+export const showErrorMessage = (msg = '') => {
+    const toast = Swal.mixin({
+        toast: true,
+        position: 'top',
+        showConfirmButton: false,
+        timer: 3000,
+        customClass: { container: 'toast' },
+    });
+    toast.fire({
+        icon: 'error',
+        title: msg,
+        padding: '10px 20px',
+    });
+};
+
 
 // export const createUsersFromLargeJSON = (json) => {
 //   try {

@@ -9,7 +9,6 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 import { getTextLogsByStudioIdAndPhoneNumber } from '../../../functions/emails';
 import { UserAuth } from '../../../context/AuthContext';
 import { sendAText } from '../../../functions/api';
-import { text } from 'stream/consumers';
 
 const textInit = {
     to: '',
@@ -82,9 +81,9 @@ export default function SendText({ defaultText, studioOptions, student, setShowA
     };
 
     const sendMessage = () => {
-        sendAText(text).then((res) => {
-            console.log(res);
-        });
+        // sendAText(text).then((res) => {
+        //     console.log(res);
+        // });
         setTextMessage(textInit);
     };
 

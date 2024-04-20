@@ -4,13 +4,11 @@ import Swal from 'sweetalert2';
 
 export async function fetchFromAPI(endpointURL, opts) {
     const { method, body } = { method: 'POST', body: null, ...opts };
-    // const API = 'https://quirky-curie.209-59-154-172.plesk.page/api'
-    const API = 'http://localhost:3333/api';
 
     const user = auth.currentUser;
     const token = user && (await user.getIdToken());
 
-    const res = await fetch(`${API}/${endpointURL}`, {
+    const res = await fetch(`${REACT_API_BASE_URL}/${endpointURL}`, {
         method,
         ...(body && { body: JSON.stringify(body) }),
         headers: {

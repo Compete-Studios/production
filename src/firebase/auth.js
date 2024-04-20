@@ -51,114 +51,114 @@ export const logout = async () => {
     }
 };
 
-export const seedDatabase = async () => {
-    const tables = [
-        'StudioFiles',
-        'StudioOptions',
-        'StudioPasswordUpdateRequest',
-        'StudioPayment',
-        'StudioPaymentCards',
-        'StudioPaymentSchedules',
-        'Studios',
-        'Tickets',
-        'TextLogs',
-        'TicketResponses',
-        'Triggers',
-        'UploadedStudioImages',
-        'LatePayments',
-        'UserForms',
-        'WaitingListMembers',
-        'LatePaymentPipelineSteps',
-        'WaitingLists',
-        'Ranks',
-        'PasswordResetRequests',
-        'StudentRanks',
-        'MasterStudioRoster',
-        'ProspectBillingAccounts',
-        'Attendance',
-        'Waivers',
-        'BillingAccounts',
-        'SignedWaivers',
-        'Invoices',
-        'Class',
-        'ClassRoll',
-        'ClassSchedules',
-        'CustomBarcode',
-        'DelinquentAccountsHistory',
-        'StudentsInNumber',
-        'Performances',
-        'EmailAttachments',
-        'Numbers',
-        'EmailingListMembers',
-        'EmailingLists',
-        'EmailLogs',
-        'EventAttendee',
-        'Events',
-        'InternalPayments',
-        'LateFees',
-        'MarketingMethods',
-        'Logs',
-        'Newsletter',
-        'NewsletterLogs',
-        'Notifications',
-        'DailySchedule',
-        'NPSCampaigns',
-        'NPSResponses',
-        'DailyScheduleStudentPipeline',
-        'PaymentCards',
-        'DailyScheduleProspectPipeline',
-        'PaymentSchedules',
-        'StudentPasswordResetRequests',
-        'PipelineSteps',
-        'ProgramRoll',
-        'Programs',
-        'ProspectClassRoll',
-        'ProspectPipelineStatus',
-        'FormsPageLoad',
-        'ProspectProgramRoll',
-        'FormSubmitHistory',
-        'Prospects',
-        'PaymentNotes',
-        'WaitingListStudents',
-        'ProspectAttendance',
-        'Rooms',
-        'Staff',
-        'StaffClasses',
-        'StaffPermissions',
-        'StudentPipelineStatus',
-        'ExceptionLogs',
-        'StudentPipelineSteps',
-        'StudentProgramRoll',
-        'Students',
-        'StudioBillingInfo',
-        'PaymentScheduleNotes',
-    ];
+// export const seedDatabase = async () => {
+//     const tables = [
+//         'StudioFiles',
+//         'StudioOptions',
+//         'StudioPasswordUpdateRequest',
+//         'StudioPayment',
+//         'StudioPaymentCards',
+//         'StudioPaymentSchedules',
+//         'Studios',
+//         'Tickets',
+//         'TextLogs',
+//         'TicketResponses',
+//         'Triggers',
+//         'UploadedStudioImages',
+//         'LatePayments',
+//         'UserForms',
+//         'WaitingListMembers',
+//         'LatePaymentPipelineSteps',
+//         'WaitingLists',
+//         'Ranks',
+//         'PasswordResetRequests',
+//         'StudentRanks',
+//         'MasterStudioRoster',
+//         'ProspectBillingAccounts',
+//         'Attendance',
+//         'Waivers',
+//         'BillingAccounts',
+//         'SignedWaivers',
+//         'Invoices',
+//         'Class',
+//         'ClassRoll',
+//         'ClassSchedules',
+//         'CustomBarcode',
+//         'DelinquentAccountsHistory',
+//         'StudentsInNumber',
+//         'Performances',
+//         'EmailAttachments',
+//         'Numbers',
+//         'EmailingListMembers',
+//         'EmailingLists',
+//         'EmailLogs',
+//         'EventAttendee',
+//         'Events',
+//         'InternalPayments',
+//         'LateFees',
+//         'MarketingMethods',
+//         'Logs',
+//         'Newsletter',
+//         'NewsletterLogs',
+//         'Notifications',
+//         'DailySchedule',
+//         'NPSCampaigns',
+//         'NPSResponses',
+//         'DailyScheduleStudentPipeline',
+//         'PaymentCards',
+//         'DailyScheduleProspectPipeline',
+//         'PaymentSchedules',
+//         'StudentPasswordResetRequests',
+//         'PipelineSteps',
+//         'ProgramRoll',
+//         'Programs',
+//         'ProspectClassRoll',
+//         'ProspectPipelineStatus',
+//         'FormsPageLoad',
+//         'ProspectProgramRoll',
+//         'FormSubmitHistory',
+//         'Prospects',
+//         'PaymentNotes',
+//         'WaitingListStudents',
+//         'ProspectAttendance',
+//         'Rooms',
+//         'Staff',
+//         'StaffClasses',
+//         'StaffPermissions',
+//         'StudentPipelineStatus',
+//         'ExceptionLogs',
+//         'StudentPipelineSteps',
+//         'StudentProgramRoll',
+//         'Students',
+//         'StudioBillingInfo',
+//         'PaymentScheduleNotes',
+//     ];
 
-    try {
-        for (let i = 0; i < tables.length; i++) {
+//     try {
+//         for (let i = 0; i < tables.length; i++) {
         
-            const res = await fetch(`http://localhost:3333/api/crud/getAllFromTable/${tables[i]}`);
-            const data = await res.json();
-            console.log(tables[i], data);
+//             const res = await fetch(`http://localhost:3333/api/crud/getAllFromTable/${tables[i]}`);
+//             const data = await res.json();
+//             console.log(tables[i], data);
     
-        }
-        return true;
-    } catch (error) {
-        console.log(error);
-        return error.message;
-    }
-};
+//         }
+//         return true;
+//     } catch (error) {
+//         console.log(error);
+//         return error.message;
+//     }
+// };
 
 
-export const getAllFromTable = async (route, table, parameter) => {
-    try {
-        const res = await fetch(`http://localhost:3333/api/crud/${route}/${table}/${parameter}`);
-        const data = await res.json();
-        return data.recordset;
-    } catch (error) {
-        return error.message;
-    }
-};
+// export const getAllFromTable = async (route, table, parameter) => {
+//     try {
+//         const res = await fetch(`http://localhost:3333/api/crud/${route}/${table}/${parameter}`);
+//         const data = await res.json();
+//         return data.recordset;
+//     } catch (error) {
+//         return error.message;
+//     }
+// };
 
 export const seedStudioInfo = async (studioID, data) => {
     try {        

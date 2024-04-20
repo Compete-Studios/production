@@ -1,11 +1,11 @@
 import axios from 'axios';
 import { auth } from "../firebase/firebase";
+import { REACT_API_BASE_URL } from '../constants';
 
-const API_BASE_URL = "http://localhost:3333/api";
-// const API_BASE_URL = 'https://amazing-dubinsky.209-59-154-172.plesk.page/api'
+
 
 const axiosInstance = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: REACT_API_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
   }

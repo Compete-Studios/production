@@ -50,7 +50,7 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
 
     useEffect(() => {
         if (!isLoggedIn) {
-            navigate('/auth/boxed-signin');
+            navigate('/auth/signin');
         }
     }, [isLoggedIn]);
 

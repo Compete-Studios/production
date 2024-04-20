@@ -32,6 +32,8 @@ import StudentsQuickPay from './StudentsQuickPay';
 import { convertPhone, showMessage } from '../../functions/shared';
 import { formatDate } from '@fullcalendar/core';
 import { getAllCustomerPaymentAccounts } from '../../functions/payments';
+import UpdateContactPopUp from './UpdateContactPopUp';
+import UpdateAdditionalPopUp from './UpdateAdditionalPopUp';
 
 const ViewStudent = () => {
     const { suid, marketingSources } = UserAuth();
@@ -297,9 +299,7 @@ const ViewStudent = () => {
                             <h5 className="font-semibold text-lg dark:text-white-light">Contact Info</h5>
 
                             <Tippy content="Update Contact Info">
-                                <Link to="/students/update-contact-info" className="ltr:ml-auto rtl:mr-auto text-info hover:text-blue-700 p-2 rounded-full">
-                                    <IconPencilPaper />
-                                </Link>
+                                <UpdateContactPopUp student={student} />
                             </Tippy>
                         </div>
                         <div className="mb-5 space-y-4 ">
@@ -444,10 +444,13 @@ const ViewStudent = () => {
                             {paymentSchedules?.length > 0 && (
                                 <div>
                                     <button className="btn btn-info gap-x-1 w-full" onClick={handleGoToPaymentSchedules}>
-                                        <IconDollarSignCircle />  Create a new Payment Schedule
+                                        <IconDollarSignCircle /> Create a new Payment Schedule
                                     </button>
-                                    <button className="flex mt-4 gap-x-1 text-primary hover:text-emerald-800 justify-center items-center" onClick={() => navigate('/students/view-active-payment-schedules')} >
-                                    View All Schedules
+                                    <button
+                                        className="flex mt-4 gap-x-1 text-primary hover:text-emerald-800 justify-center items-center"
+                                        onClick={() => navigate('/students/view-active-payment-schedules')}
+                                    >
+                                        View All Schedules
                                     </button>
                                 </div>
                             )}
@@ -521,10 +524,8 @@ const ViewStudent = () => {
                     <div className="panel">
                         <div className="flex items-center justify-between mb-5">
                             <h5 className="font-semibold text-lg dark:text-white-light">Additional Info</h5>
-                            <Tippy content="Update Billing Info">
-                                <Link to="/students/update-additional-info" className="ltr:ml-auto rtl:mr-auto text-info hover:text-blue-700 p-2 rounded-full">
-                                    <IconPencilPaper />
-                                </Link>
+                            <Tippy content="Update Additional Info">
+                                <UpdateAdditionalPopUp student={student} />
                             </Tippy>
                         </div>
                         <div className="mb-5 space-y-4 ">

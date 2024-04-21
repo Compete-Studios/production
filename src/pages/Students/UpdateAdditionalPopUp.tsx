@@ -2,10 +2,10 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
-import IconUserPlus from '../../components/Icon/IconUserPlus';
 import IconX from '../../components/Icon/IconX';
 import IconPencilPaper from '../../components/Icon/IconPencilPaper';
-import { updateStudent } from '../../functions/api';
+import { getRankIDStudentId, getRanksByStudioId, updateStudent, updateStudentRank } from '../../functions/api';
+import { UserAuth } from '../../context/AuthContext';
 
 interface StudentInfo {
     studentId: string;
@@ -35,7 +35,11 @@ interface StudentInfo {
 }
 
 export default function UpdateAdditionalPopUp({ student }: any) {
+    const { marketingSources, suid } = UserAuth();
     const [showUpdateModal, setUpdateModal] = useState(false);
+    const [originalRank, setOriginalRank] = useState<any>('');
+    const [allRanks, setAllRanks] = useState<any>([]);
+    const [rank, setRank] = useState<any>('');
     const [studentToUpdate, setStudentToUpdate] = useState<StudentInfo>({
         studentId: student.studentId,
         fName: student.First_Name,
@@ -90,15 +94,41 @@ export default function UpdateAdditionalPopUp({ student }: any) {
             originalContactDate: student.OriginalContactDate,
             introDate: student.IntroDate,
         });
+        handleGetStudentRank(student.Student_id);
+        handleGetAllRanks();
     }, [student]);
 
-    const handleUpdateStudent = () => {
-        console.log('Updating Student');
-        updateStudent(studentToUpdate);
-        setUpdateModal(false);
+    const handleGetStudentRank = async (studentId: any) => {
+        console.log('Getting Student Rank');
+        const studentsRank = await getRankIDStudentId(studentId);
+        if (studentsRank.length === 0) {
+            setRank('');
+            console.log('No Rank Found');
+        } else {
+            setRank(studentsRank[0]);
+            setOriginalRank(studentsRank[0]);
+        }
     };
 
-    console.log(student)
+    const handleGetAllRanks = () => {
+        getRanksByStudioId(suid).then((res) => {
+            setAllRanks(res);
+        });
+    };
+
+    const handleUpdateStudent = async (e: any) => {
+        e.preventDefault();
+        const rankData = {
+            studentId: student.Student_id,
+            rankId: rank,
+        };
+        console.log(studentToUpdate);
+        updateStudent(studentToUpdate);
+        if (rank !== originalRank) {
+            await updateStudentRank(rankData);
+        }
+        setUpdateModal(false);
+    };
 
     return (
         <div>
@@ -139,133 +169,98 @@ export default function UpdateAdditionalPopUp({ student }: any) {
                                     </div>
                                     <div className="p-5">
                                         <form>
-                                            <div className="grid grid-cols-6 gap-4">
-                                                <div className="col-span-3">
-                                                    <label htmlFor="first-name">First name</label>
-                                                    <div>
-                                                        <input type="text" name="first-name" id="first-name" autoComplete="given-name" className="form-input" value={studentToUpdate.fName} 
-                                                        onChange={(e) => setStudentToUpdate({...studentToUpdate, fName: e.target.value})}
-                                                        />
-                                                    </div>
+                                            <div className="mb-5 grid grid-cols-1 sm:grid-cols-4 gap-4">
+                                                <div className="sm:col-span-2">
+                                                    <label htmlFor="birthdate">Birthdate</label>
+                                                    <Flatpickr
+                                                        value={studentToUpdate.birthdate}
+                                                        className="form-input"
+                                                        options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                                        onChange={(date: any) => setStudentToUpdate({ ...studentToUpdate, birthdate: date })}
+                                                    />
+                                                </div>
+                                                <div className="sm:col-span-2">
+                                                    <label htmlFor="marketingMethod">Marketing Source</label>
+                                                    <select
+                                                        id="marketingMethod"
+                                                        value={studentToUpdate.marketingMethod}
+                                                        className="form-select text-white-dark"
+                                                        onChange={(e) => setStudentToUpdate({ ...studentToUpdate, marketingMethod: e.target.value })}
+                                                    >
+                                                        {marketingSources?.map((source: any) => (
+                                                            <option key={source.MethodId} value={source.MethodId}>
+                                                                {source.Name}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                                <div className="sm:col-span-2">
+                                                    <label htmlFor="entryDate">Entry Date</label>
+                                                    <Flatpickr
+                                                        value={studentToUpdate.originalContactDate}
+                                                        className="form-input"
+                                                        options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                                        onChange={(date: any) => setStudentToUpdate({ ...studentToUpdate, originalContactDate: date })}
+                                                    />
+                                                </div>
+                                                <div className="sm:col-span-2">
+                                                    <label htmlFor="introDate">Intro Date</label>
+                                                    <Flatpickr
+                                                        value={studentToUpdate.introDate}
+                                                        className="form-input"
+                                                        options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                                        onChange={(date: any) => setStudentToUpdate({ ...studentToUpdate, introDate: date })}
+                                                    />
+                                                </div>
+                                                <div className="sm:col-span-2">
+                                                    <label htmlFor="firstClassDate">First Class Date</label>
+                                                    <Flatpickr
+                                                        value={studentToUpdate.firstClassDate}
+                                                        className="form-input"
+                                                        options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                                        onChange={(date: any) => setStudentToUpdate({ ...studentToUpdate, firstClassDate: date })}
+                                                    />
+                                                </div>
+                                                <div className="sm:col-span-2">
+                                                    <label htmlFor="entryDate">Next Contact Date</label>
+                                                    <Flatpickr
+                                                        value={studentToUpdate.nextContactDate}
+                                                        className="form-input"
+                                                        options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                                        onChange={(date: any) => setStudentToUpdate({ ...studentToUpdate, nextContactDate: date })}
+                                                    />
                                                 </div>
 
-                                                <div className="col-span-3">
-                                                    <label htmlFor="last-name">Last name</label>
-                                                    <div>
-                                                        <input type="text" name="last-name" id="last-name" autoComplete="family-name" className="form-input" value={studentToUpdate.lName} 
-                                                        onChange={(e) => setStudentToUpdate({...studentToUpdate, lName: e.target.value})}
-                                                        />
-                                                    </div>
+                                                <div className="sm:col-span-full">
+                                                    <label htmlFor="notes">Notes</label>
+                                                    <textarea
+                                                        id="notes"
+                                                        rows={4}
+                                                        value={studentToUpdate.notes}
+                                                        placeholder="Notes"
+                                                        className="form-textarea"
+                                                        onChange={(e) => setStudentToUpdate({ ...studentToUpdate, notes: e.target.value })}
+                                                    />
                                                 </div>
-                                                <div className="col-span-3">
-                                                    <label htmlFor="first-name">Contact 1</label>
-                                                    <div>
-                                                        <input type="text" name="first-name" id="first-name" autoComplete="given-name" className="form-input" value={studentToUpdate.contact1} 
-                                                        onChange={(e) => setStudentToUpdate({...studentToUpdate, contact1: e.target.value})}
-                                                        />
-                                                    </div>
+                                                <div>
+                                                    <label htmlFor="rank">Rank</label>
+                                                    <select value={rank} className="form-select" onChange={(e) => setRank(e.target.value)}>
+                                                        {allRanks.map((rank: any) => (
+                                                            <option key={rank.RankId} value={rank.RankId}>
+                                                                {rank.Name}
+                                                            </option>
+                                                        ))}
+                                                    </select>
                                                 </div>
-
-                                                <div className="col-span-3">
-                                                    <label htmlFor="contact2">Contact 2</label>
-                                                    <div>
-                                                        <input type="text" name="contact2" id="contact2" autoComplete="off" className="form-input" value={studentToUpdate.contact2} 
-                                                        onChange={(e) => setStudentToUpdate({...studentToUpdate, contact2: e.target.value})}
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                <div className="col-span-5">
-                                                    <label htmlFor="street-address">Street address</label>
-                                                    <div>
-                                                        <input
-                                                            type="text"
-                                                            name="street-address"
-                                                            id="street-address"
-                                                            autoComplete="street-address"
-                                                            className="form-input"
-                                                            value={studentToUpdate.address}
-                                                            onChange={(e) => setStudentToUpdate({...studentToUpdate, address: e.target.value})}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="col-span-1">
-                                                    <label htmlFor="street-address">Ste / Apt</label>
-                                                    <div>
-                                                        <input
-                                                            type="text"
-                                                            name="street-address"
-                                                            id="street-address"
-                                                            autoComplete="street-address"
-                                                            className="form-input"
-                                                            value={studentToUpdate.address2}
-                                                            onChange={(e) => setStudentToUpdate({...studentToUpdate, address2: e.target.value})}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="col-span-2 col-start-1">
-                                                    <label htmlFor="city">City</label>
-                                                    <div>
-                                                        <input type="text" name="city" id="city" autoComplete="address-level2" className="form-input" value={studentToUpdate.city} 
-                                                        onChange={(e) => setStudentToUpdate({...studentToUpdate, city: e.target.value})}
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                <div className="col-span-2">
-                                                    <label htmlFor="region">State / Province</label>
-                                                    <div>
-                                                        <input type="text" name="region" id="region" autoComplete="address-level1" className="form-input" value={studentToUpdate.state} 
-                                                        onChange={(e) => setStudentToUpdate({...studentToUpdate, state: e.target.value})}
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                <div className="col-span-2">
-                                                    <label htmlFor="postal-code">ZIP / Postal code</label>
-                                                    <div>
-                                                        <input type="text" name="postal-code" id="postal-code" autoComplete="postal-code" className="form-input" value={studentToUpdate.zip} 
-                                                        onChange={(e) => setStudentToUpdate({...studentToUpdate, zip: e.target.value})}
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                <div className="col-span-3">
-                                                    <label htmlFor="phone">Cell Phone</label>
-                                                    <div>
-                                                        <input id="phone" name="phone" type="tel" autoComplete="phone" className="form-input" value={studentToUpdate.phone} 
-                                                        onChange={(e) => setStudentToUpdate({...studentToUpdate, phone: e.target.value})}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="col-span-3">
-                                                    <label htmlFor="phone2">Home Phone</label>
-                                                    <div>
-                                                        <input id="phone2" name="phone" type="tel" autoComplete="phone2" className="form-input" value={studentToUpdate.phone2} 
-                                                        onChange={(e) => setStudentToUpdate({...studentToUpdate, phone2: e.target.value})}
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                <div className="col-span-4">
-                                                    <label htmlFor="email">Email address</label>
-                                                    <div>
-                                                        <input id="email" name="email" type="email" autoComplete="email" className="form-input" value={studentToUpdate.email} 
-                                                        onChange={(e) => setStudentToUpdate({...studentToUpdate, email: e.target.value})}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="col-span-full flex">
-                                                    <div className="ml-auto flex items-center gap-4">
-                                                        <button type="button" className="btn btn-outline-danger" onClick={() => setUpdateModal(false)}>
-                                                            Cancel
-                                                        </button>
-                                                        <button type="submit" className="btn btn-primary"
-                                                        onClick={handleUpdateStudent}
-                                                        >
-                                                            Update Student
-                                                        </button>
-                                                    </div>
+                                            </div>
+                                            <div className="col-span-full flex">
+                                                <div className="ml-auto flex items-center gap-4">
+                                                    <button type="button" className="btn btn-outline-danger" onClick={() => setUpdateModal(false)}>
+                                                        Cancel
+                                                    </button>
+                                                    <button type="submit" className="btn btn-primary" onClick={handleUpdateStudent}>
+                                                        Update Student
+                                                    </button>
                                                 </div>
                                             </div>
                                         </form>

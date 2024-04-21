@@ -70,3 +70,24 @@ export const createPaymentSchedule = async (paymentData) => {
         throw error;
     }
 };
+
+export const getPaymentByID = async (paymentId, suid) => {
+    try {
+        const response = await fetchData(`paysimple-helper/getPayment/${paymentId}/${suid}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+
+export const voidAPayment = async (paymentData) => {
+    try {
+        const response = await fetchData(`paysimple-helper/voidPayment`, 'post',  paymentData);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};

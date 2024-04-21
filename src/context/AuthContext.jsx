@@ -21,10 +21,21 @@ export default function AuthContextProvider({ children }) {
     const [showLoading, setShowLoading] = useState(true);
     const [studentIntros, setStudentIntros] = useState([]);
     const [prospectIntros, setProspectIntros] = useState([]);
-    const [dailySchedule, setDailySchedule] = useState([]);
+    const [scheduleID, setScheduleID] = useState('');
     const [studioInfo, setStudioInfo] = useState({});
 
     const [update, setUpdate] = useState(false);
+
+    const fetchData = async (url, setter) => {
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            setter(data.recordset);
+            return data;
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     const getData = async () => {
         fetchData(`${REACT_API_BASE_URL}/studio-access/getClassesByStudioId/${suid}`, setClasses);
@@ -32,22 +43,19 @@ export default function AuthContextProvider({ children }) {
         fetchData(`${REACT_API_BASE_URL}/marketing-access/getStudentPipelineStepsByStudioId/${suid}`, setPipelineSteps);
         fetchData(`${REACT_API_BASE_URL}/class-access/getProgramsByStudioId/${suid}`, setPrograms);
         fetchData(`${REACT_API_BASE_URL}/marketing-access/getWaitingListsByStudioId/${suid}`, setWaitingLists);
-        fetchData(`${REACT_API_BASE_URL}/marketing-access/getPipelineStepsByStudioId/${suid}`, setProspectPipelineSteps)
-            fetchData(`${REACT_API_BASE_URL}/marketing-access/getMarketingMethodsByStudioId/${suid}`, setMarketingSources);
+        fetchData(`${REACT_API_BASE_URL}/marketing-access/getPipelineStepsByStudioId/${suid}`, setProspectPipelineSteps);
+        fetchData(`${REACT_API_BASE_URL}/marketing-access/getMarketingMethodsByStudioId/${suid}`, setMarketingSources);
         fetchData(`${REACT_API_BASE_URL}/student-access/getStudentIntros/${suid}/${month}/${year}`, setStudentIntros);
         fetchData(`${REACT_API_BASE_URL}/student-access/getProspectIntros/${suid}/${month}/${year}`, setProspectIntros);
-        fetchData(`${REACT_API_BASE_URL}/daily-schedule-tools/getStudentsByNextContactDate/${suid}`, setDailySchedule);
     };
-
-    const fetchData = async (url, setter) => {
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-            console.log(data);
-            setter(data.recordset);
-            return data;
-        } catch (error) {
-            console.error(error);
+   
+    const getSCHDATA = async () => {
+        const response = await fetch(`${REACT_API_BASE_URL}/daily-schedule-tools/getDailyScheduleByStudioId/${suid}`);
+        const data = await response.json();
+        if (data) {
+            setScheduleID(data);
+        } else {
+            console.error('No response');
         }
     };
 
@@ -56,7 +64,6 @@ export default function AuthContextProvider({ children }) {
             const docRef = doc(db, 'studios', suid);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
-                console.log('Document data:', docSnap.data());
                 setStudioInfo(docSnap.data());
             } else {
                 // doc.data() will be undefined in this case
@@ -72,6 +79,7 @@ export default function AuthContextProvider({ children }) {
         const year = new Date().getFullYear();
         const month = new Date().getMonth() + 1;
         getData();
+        getSCHDATA();
         setShowLoading(false);
     }, [suid, update]);
 
@@ -88,7 +96,6 @@ export default function AuthContextProvider({ children }) {
         const unsubscribe = auth.onAuthStateChanged((currentUser) => {
             if (currentUser) {
                 setIsLoggedIn(true);
-                console.log(currentUser.photoURL);
                 setSuid(currentUser.photoURL);
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('suid', currentUser.photoURL);
@@ -127,8 +134,8 @@ export default function AuthContextProvider({ children }) {
                 showLoading,
                 studentIntros,
                 prospectIntros,
-                dailySchedule,
                 studioInfo,
+                scheduleID
             }}
         >
             {children}

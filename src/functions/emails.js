@@ -19,3 +19,23 @@ export const getTextLogsByStudioIdAndPhoneNumber = async (suid, phoneNumber) => 
         throw error;
     }
 };
+
+export const getNumberOfEmailsSentByStudio = async (data) => {
+    try {
+        const response = await fetchData(`email/getNumberOfEmailsSentByStudio`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getMonthlyLimit = async (studioId) => {
+    try {
+        const response = await fetchData(`email/getMonthlyLimit/${studioId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};

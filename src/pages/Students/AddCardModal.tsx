@@ -9,6 +9,8 @@ import IconX from '../../components/Icon/IconX';
 import { addCreditCardToCustomer } from '../../functions/payments';
 import IconInfoCircle from '../../components/Icon/IconInfoCircle';
 import Swal from 'sweetalert2';
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
 
 interface CreditCard {
     ccNumber: string;
@@ -18,7 +20,7 @@ interface CreditCard {
     isDefault: boolean;
 }
 
-export default function AddCardModal({ student, paySimpleID, cards }: any) {
+export default function AddCardModal({ student, paySimpleID, cards, update, setUpdate, inStudent = false }: any) {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Add Bank Card'));
@@ -37,6 +39,31 @@ export default function AddCardModal({ student, paySimpleID, cards }: any) {
 
     const convertToMMYYYY = (month: string, year: string) => {
         return `${month}/${year}`;
+    };
+
+    const handleCardChange = (event: any) => {
+        const { value } = event.target;
+
+        // Remove all non-digit characters
+        const digitsOnly = value.replace(/\D/g, '');
+
+        // Limit the number of digits to 16
+        const limitedDigits = digitsOnly.slice(0, 16);
+
+        // Add a space after every four digits
+        const formattedValue = limitedDigits.replace(/(\d{4})(?=\d)/g, '$1 ');
+
+        // Remove spaces from the formatted value
+        const cardNumber = formattedValue.replace(/\s/g, '');
+
+        if (cardNumber.length > 0) {
+            setCreditCardData({ ...creditCardData, ccNumber: cardNumber });
+        } else {
+            setCreditCardData({ ...creditCardData, ccNumber: '' });
+        }
+
+        // Update the input value
+        event.target.value = formattedValue;
     };
 
     useEffect(() => {
@@ -74,6 +101,7 @@ export default function AddCardModal({ student, paySimpleID, cards }: any) {
                     isDefault: false,
                 });
                 showMessage('Bank Card Added Successfully!', 'success');
+                setUpdate(!update);
                 setModal(false);
             }
         } catch (error: any) {
@@ -92,7 +120,16 @@ export default function AddCardModal({ student, paySimpleID, cards }: any) {
     return (
         <div>
             <div className="flex items-center justify-center">
-                {cards?.length === 0 || !cards ? (
+                {inStudent ? (
+                    <Tippy content="Add Credit Card">
+                        <button className="btn btn-dark flex items-center justify-center rounded-full w-10 h-10 p-0" onClick={() => setModal(true)}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-credit-card-2-front" viewBox="0 0 16 16">
+                                <path d="M14 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" />
+                                <path d="M2 5.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5" />
+                            </svg>
+                        </button>
+                    </Tippy>
+                ) : cards?.length === 0 || !cards ? (
                     <button
                         type="button"
                         className="relative block w-full rounded-lg  p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 bg-gradient-to-r from-secondary via-purple-700 to-secondary hover:from-purple-900 hover:via-purple-900 hover:to-purple-900"
@@ -193,13 +230,7 @@ export default function AddCardModal({ student, paySimpleID, cards }: any) {
 
                                             <div className="col-span-6">
                                                 <label htmlFor="ccNumber">Card Number</label>
-                                                <input
-                                                    type="text"
-                                                    id="ccNumber"
-                                                    className="form-input"
-                                                    placeholder="Enter Card Number"
-                                                    onChange={(e) => setCreditCardData({ ...creditCardData, ccNumber: e.target.value })}
-                                                />
+                                                <input type="text" id="ccNumber" className="form-input" placeholder="Enter Card Number" onChange={handleCardChange} />
                                             </div>
                                             <div className="col-span-2">
                                                 <label htmlFor="expMonth">Expiration Month</label>
@@ -251,17 +282,17 @@ export default function AddCardModal({ student, paySimpleID, cards }: any) {
                                                 />
                                             </div>
                                             <div className="col-span-full">
-                                                <div className="flex" >
-                                                <input
-                                                    type="checkbox"
-                                                    id="isDefault"
-                                                    className="form-checkbox bg-white dark:bg-[#1b2e4b] mr-2"
-                                                    checked={creditCardData.isDefault}
-                                                    onChange={(e) => setCreditCardData({ ...creditCardData, isDefault: e.target.checked })}
-                                                />
-                                                <label htmlFor="isDefault" className="flex items-center cursor-pointer">
-                                                    Make this the default payment method from now on
-                                                </label>
+                                                <div className="flex">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="isDefault"
+                                                        className="form-checkbox bg-white dark:bg-[#1b2e4b] mr-2"
+                                                        checked={creditCardData.isDefault}
+                                                        onChange={(e) => setCreditCardData({ ...creditCardData, isDefault: e.target.checked })}
+                                                    />
+                                                    <label htmlFor="isDefault" className="flex items-center cursor-pointer">
+                                                        Make this the default payment method from now on
+                                                    </label>
                                                 </div>
                                             </div>
                                             <div className="col-span-full">

@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 
 export default function StudentPipeline() {
     const {pipelineSteps, suid} = UserAuth();
-    console.log(pipelineSteps, suid)
+  
     return (
         <div className="panel px-0 border-white-light dark:border-[#1b2e4b]">
             <div className="mb-4.5 px-5 flex md:items-center md:flex-row flex-col gap-5">
@@ -43,7 +43,7 @@ export default function StudentPipeline() {
                             return (
                                 <tr key={data.PlacementOrdinal} className={`${
                                     data?.thisStudentPipelineStepNeedsContact &&
-                                    "bg-cs"
+                                    "bg-cs dark:bg-cs dark:text-gray-900"
                                   }`}>
                                     <td>
                                         <div className="whitespace-nowrap">{data.StepName}</div>

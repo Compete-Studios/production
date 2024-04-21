@@ -4,24 +4,29 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { sendIndividualEmail } from '../../../functions/emails';
 import { UserAuth } from '../../../context/AuthContext';
+import { showErrorMessage, showMessage } from '../../../functions/shared';
 
 const emailDataInit = {
     to: '',
     from: '',
     subject: '',
-    html: 'test',
+    html: '',
     deliverytime: null,
 };
 
-export default function SendMail({ defaultEMail, studioOptions, student, setShowActionModal }: any) {
+export default function SendMail({ pipeline, studioOptions, student, setShowActionModal, setDefaultTab, isPrpospect = false }: any) {
     const { suid } = UserAuth();
-    const [emailData, setEmailData] = useState(emailDataInit);
+    const [emailData, setEmailData] = useState<any>(emailDataInit);
+    const [emailHtml, setEmailHtml] = useState<any>('');
+
+    
 
     useEffect(() => {
-        if (defaultEMail) {
-            setEmailData({ ...emailData, html: defaultEMail?.DefaultEmailText, subject: defaultEMail?.DefaultEmailSubject, to: student?.email, from: studioOptions?.EmailFromAddress });
+        if (pipeline) {
+            setEmailData({ ...emailData, subject: pipeline?.DefaultEmailSubject, to: isPrpospect ? student?.Email : student?.email, from: studioOptions?.EmailFromAddress });
+            setEmailHtml(pipeline?.DefaultEmailText);
         }
-    }, [defaultEMail]);
+    }, [pipeline]);
 
     const changeValue = (e: any) => {
         const { value, id } = e.target;
@@ -32,11 +37,23 @@ export default function SendMail({ defaultEMail, studioOptions, student, setShow
         console.log(emailData);
         const data = {
             studioId: suid,
-            email: emailData,
-        };
-        // sendIndividualEmail(data).then((res) => {
-        //     console.log(res);
-        // });
+            email: {
+                to: emailData.to,
+                from: emailData.from,
+                subject: emailData.subject,
+                html: emailHtml,
+                deliverytime: null,
+            }
+        };    
+        sendIndividualEmail(data).then((res) => {
+            console.log(res);
+            if (res.status === 200) {
+                showMessage('Email Sent Successfully');
+                setDefaultTab(2);
+            } else {
+                showErrorMessage('Email Failed to Send, Please Try Again');
+            }
+        });
     };
 
     return (
@@ -63,7 +80,11 @@ export default function SendMail({ defaultEMail, studioOptions, student, setShow
                     </div>
 
                     <div className="h-fit">
-                        <ReactQuill theme="snow" value={emailData.html} style={{ minHeight: '200px' }} />
+                        <ReactQuill theme="snow" 
+                        value={emailHtml} 
+                        style={{ minHeight: '200px' }} 
+                        onChange={setEmailHtml}
+                        />
                     </div>
 
                     <div>

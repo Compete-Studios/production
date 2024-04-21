@@ -9,6 +9,7 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 import { getTextLogsByStudioIdAndPhoneNumber } from '../../../functions/emails';
 import { UserAuth } from '../../../context/AuthContext';
 import { sendAText } from '../../../functions/api';
+import { showMessage } from '../../../functions/shared';
 
 const textInit = {
     to: '',
@@ -16,7 +17,7 @@ const textInit = {
     message: '',
 };
 
-export default function SendText({ defaultText, studioOptions, student, setShowActionModal }: any) {
+export default function SendText({ defaultText, student, setDefaultTab }: any) {
     const { suid, studioInfo } = UserAuth();
     const [textMessage, setTextMessage] = useState<any>(textInit);
     const [selectedUser, setSelectedUser] = useState<any>({});
@@ -72,8 +73,6 @@ export default function SendText({ defaultText, studioOptions, student, setShowA
         });
     }, [defaultText]);
 
-    console.log(defaultText);
-
     const sendMessageHandle = (e: any) => {
         if (e.key === 'Enter') {
             sendMessage();
@@ -81,22 +80,32 @@ export default function SendText({ defaultText, studioOptions, student, setShowA
     };
 
     const sendMessage = () => {
-        // sendAText(text).then((res) => {
-        //     console.log(res);
-        // });
+        console.log(textMessage);
+        sendAText(textMessage).then((res) => {
+            if (res.status === 200) {
+                setDefaultTab(2);
+                showMessage('Text Sent Successfully');
+            } else {
+                showMessage('Text Failed to Send, Please Try Again');
+            }
+        });
         setTextMessage(textInit);
     };
 
     return (
-        <div>
-            <PerfectScrollbar className="relative h-full sm:h-[calc(100vh_-_300px)] chat-conversation-box">
-                <div className="space-y-5 px-6 pb-36 sm:min-h-[300px] min-h-[400px]">
-                    <div className="block m-6 mt-0">
-                        <h4 className="text-xs text-center border-b border-[#f4f4f4] dark:border-gray-800 relative">
-                            <span className="relative top-2 px-3 bg-white dark:bg-black">{'Today, ' + selectedUser.time}</span>
-                        </h4>
-                    </div>
+        <div className="h-96">
+            <div>
+                <label htmlFor="to">To Number:</label>
+                <input id="title" type="text" className="form-input" placeholder="Phone Number" value={textMessage.to} onChange={(e) => setTextMessage({ ...textMessage, to: e.target.value })} />
+            </div>
+            <div className="block m-6 mt-0">
+                <h4 className="text-xs text-center border-b border-[#f4f4f4] dark:border-gray-800 relative">
+                    <span className="relative top-2 px-3 bg-white dark:bg-black">{'This Week, ' + new Date().toLocaleDateString()}</span>
+                </h4>
+            </div>
 
+            <PerfectScrollbar className="relative h-full sm:h-[calc(100vh_-_200px)] chat-conversation-box">
+                <div className="space-y-5 px-6 pb-36 sm:min-h-[300px] min-h-[400px]">
                     <>
                         {texts?.map((message: any, index: any) => {
                             return (
@@ -150,16 +159,13 @@ export default function SendText({ defaultText, studioOptions, student, setShowA
             <div className="p-4 absolute bottom-0 left-0 w-full bg-white">
                 <div className="sm:flex w-full space-x-3 rtl:space-x-reverse items-center">
                     <div className="relative flex-1">
-                        <input
-                            className="form-input rounded-full border-0 bg-[#f4f4f4] px-12 focus:outline-none py-2"
+                        <textarea
+                            className="form-input rounded-md border-0 bg-[#f4f4f4] pr-12 focus:outline-none py-2"
                             placeholder="Type a message"
                             value={textMessage.message}
                             onChange={(e) => setTextMessage({ ...textMessage, message: e.target.value })}
                             onKeyUp={sendMessageHandle}
                         />
-                        <button type="button" className="absolute ltr:left-4 rtl:right-4 top-1/2 -translate-y-1/2 hover:text-primary">
-                            <IconMoodSmile />
-                        </button>
                         <button type="button" className="absolute ltr:right-4 rtl:left-4 top-1/2 -translate-y-1/2 hover:text-primary" onClick={() => sendMessage()}>
                             <IconSend />
                         </button>

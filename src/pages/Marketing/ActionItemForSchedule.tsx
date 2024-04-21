@@ -1,27 +1,42 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
+import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import { Tab } from '@headlessui/react';
 import IconX from '../../components/Icon/IconX';
 import IconBolt from '../../components/Icon/IconBolt';
 import IconMail from '../../components/Icon/IconMail';
 import IconMessage2 from '../../components/Icon/IconMessage2';
-import IconNotes from '../../components/Icon/IconNotes';
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
 import IconListCheck from '../../components/Icon/IconListCheck';
-import SendMail from './components/SendMail';
-import SendText from './components/SendText';
-import QuickUpdate from './components/QuickUpdate';
+import SendMail from '../Students/components/SendMail';
+import SendText from '../Students/components/SendText';
+import { UserAuth } from '../../context/AuthContext';
+import { getStudentInfo } from '../../functions/api';
+import QuickUpdateShared from '../Students/components/QuickUpdateShared';
 
-export default function ActionItem({ student, pipeline, studioOptions, update, setUpdate }: any) {
-    const [showActionModal, setShowActionModal] = useState(false);
-    const [expandedDescription, setExpandedDescription] = useState(false);
-    const [defaultTab, setDefaultTab] = useState(0);
+export default function ActionItemForSchedule({ student, isStudent = false, update, setUpdate, studioOptions }: any) {
+    const { pipelineSteps } = UserAuth();
+    const [showActionModal, setShowActionModal] = useState<boolean>(false);
+    const [expandedDescription, setExpandedDescription] = useState<boolean>(false);
+    const [defaultTab, setDefaultTab] = useState<number>(0);
+    const [studentToContact, setStudentToContact] = useState<any>(null);
+    const pipeline = pipelineSteps?.find((step: any) => step.PipelineStepId === student?.PipelineStepId);
 
     const description = pipeline?.Description || '';
 
     const toggleDescription = () => {
         setExpandedDescription(!expandedDescription);
     };
+
+    useEffect(() => {
+        getStudentInfo(student?.Student_id).then((res) => {
+            setStudentToContact(res);
+        });
+    }, [student, update]);
+
+    console.log(student, 'student');
 
     const renderDescription = () => {
         if (!description) return null;
@@ -57,9 +72,11 @@ export default function ActionItem({ student, pipeline, studioOptions, update, s
     return (
         <div>
             <div>
-                <button type="button" className=" text-info hover:text-blue-800" onClick={() => setShowActionModal(true)}>
-                    <IconBolt fill={true} />
-                </button>
+                <Tippy content="Action Items">
+                    <button type="button" className=" text-info hover:text-blue-800" onClick={() => setShowActionModal(true)}>
+                        <IconBolt fill={true} />
+                    </button>
+                </Tippy>
             </div>
             <Transition appear show={showActionModal} as={Fragment}>
                 <Dialog as="div" open={showActionModal} onClose={() => setShowActionModal(false)} className="relative z-[51]">
@@ -133,20 +150,28 @@ export default function ActionItem({ student, pipeline, studioOptions, update, s
                                             <Tab.Panels>
                                                 <Tab.Panel>
                                                     <div>
-                                                        <SendMail pipeline={pipeline} studioOptions={studioOptions} student={student} setShowActionModal={setShowActionModal} setDefaultTab={setDefaultTab}/>
+                                                        <SendMail
+                                                            pipeline={pipeline}
+                                                            studioOptions={studioOptions}
+                                                            student={studentToContact}
+                                                            setShowActionModal={setShowActionModal}
+                                                            setDefaultTab={setDefaultTab}
+                                                        />
                                                     </div>
                                                 </Tab.Panel>
                                                 <Tab.Panel>
                                                     <div className="pt-8">
-                                                        <SendText defaultText={pipeline} student={student} setDefaultTab={setDefaultTab}/>
+                                                        <SendText defaultText={pipeline} student={studentToContact} setDefaultTab={setDefaultTab} />
                                                     </div>
                                                 </Tab.Panel>
                                                 <Tab.Panel>
                                                     <div className="pt-8">
-                                                        <QuickUpdate 
-                                                        student={student} 
-                                                        setShowActionModal={setShowActionModal}
-                                                        setUpdate={setUpdate} update={update}
+                                                        <QuickUpdateShared
+                                                            student={studentToContact}
+                                                            setShowActionModal={setShowActionModal}
+                                                            setUpdate={setUpdate}
+                                                            update={update}
+                                                            pipelineSteps={pipelineSteps}
                                                         />
                                                     </div>
                                                 </Tab.Panel>

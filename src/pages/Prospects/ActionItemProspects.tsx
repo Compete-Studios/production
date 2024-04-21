@@ -8,16 +8,18 @@ import IconMail from '../../components/Icon/IconMail';
 import IconMessage2 from '../../components/Icon/IconMessage2';
 import IconNotes from '../../components/Icon/IconNotes';
 import IconListCheck from '../../components/Icon/IconListCheck';
-import SendMail from './components/SendMail';
-import SendText from './components/SendText';
-import QuickUpdate from './components/QuickUpdate';
+import SendMail from '../Students/components/SendMail';
+import SendText from '../Students/components/SendText';
+import QuickUpdate from '../Students/components/QuickUpdate';
+import QuickUpdateShared from '../Students/components/QuickUpdateShared';
 
-export default function ActionItem({ student, pipeline, studioOptions, update, setUpdate }: any) {
+export default function ActionItemProspect({ student, pipeline, studioOptions, update, setUpdate, prospectPipelineSteps }: any) {
     const [showActionModal, setShowActionModal] = useState(false);
     const [expandedDescription, setExpandedDescription] = useState(false);
     const [defaultTab, setDefaultTab] = useState(0);
 
     const description = pipeline?.Description || '';
+  
 
     const toggleDescription = () => {
         setExpandedDescription(!expandedDescription);
@@ -133,7 +135,9 @@ export default function ActionItem({ student, pipeline, studioOptions, update, s
                                             <Tab.Panels>
                                                 <Tab.Panel>
                                                     <div>
-                                                        <SendMail pipeline={pipeline} studioOptions={studioOptions} student={student} setShowActionModal={setShowActionModal} setDefaultTab={setDefaultTab}/>
+                                                        <SendMail pipeline={pipeline} studioOptions={studioOptions} student={student} setShowActionModal={setShowActionModal} setDefaultTab={setDefaultTab}
+                                                        isPrpospect={true}
+                                                        />
                                                     </div>
                                                 </Tab.Panel>
                                                 <Tab.Panel>
@@ -143,10 +147,13 @@ export default function ActionItem({ student, pipeline, studioOptions, update, s
                                                 </Tab.Panel>
                                                 <Tab.Panel>
                                                     <div className="pt-8">
-                                                        <QuickUpdate 
+                                                        <QuickUpdateShared 
                                                         student={student} 
                                                         setShowActionModal={setShowActionModal}
-                                                        setUpdate={setUpdate} update={update}
+                                                        setUpdate={setUpdate} 
+                                                        update={update}
+                                                        pipelineSteps={prospectPipelineSteps}
+                                                        isPrpospect={true}
                                                         />
                                                     </div>
                                                 </Tab.Panel>

@@ -61,7 +61,7 @@ const StudentPipeline = lazy(() => import('../pages/Students/StudentPipeline'));
 const StudentsQuickPay = lazy(() => import('../pages/Students/StudentsQuickPay'));
 const Invoice = lazy(() => import('../pages/Students/Invoice'));
 const DeleteStudent = lazy(() => import('../pages/Students/DeleteStudent'));
-const UpdateContactInfo = lazy(() => import('../pages/Students/UpdateContactInfo'));
+
 const UpdateBilling = lazy(() => import('../pages/Students/UpdateBilling'));
 const ViewActivePaymentSchedules = lazy(() => import('../pages/Students/ViewActivePaymentSchedules'));
 const UpdateAdditionalInfo = lazy(() => import('../pages/Students/UpdateAdditionalInfo'));
@@ -171,7 +171,7 @@ const routes = [
         element: <ExisitingBillingAccounts />,
     },
     {
-        path: '/payments/view-payment-info',
+        path: '/payments/view-payment-info/:payID/:amyID',
         element: <ViewPaymentInfo />,
     },
     {
@@ -377,10 +377,6 @@ const routes = [
         element: <DeleteStudent />,
     },
     {
-        path: '/students/update-contact-info',
-        element: <UpdateContactInfo />,
-    },
-    {
         path: '/students/update-billing',
         element: <UpdateBilling />,
     },
@@ -460,7 +456,7 @@ const routes = [
         element: <AddProspect />,
     },
     {
-        path: '/prospects/view-prospect',
+        path: '/prospects/view-prospect/:uid/:studioid',
         element: <ViewProspect />,
     },
     {
@@ -468,7 +464,7 @@ const routes = [
         element: <ProspectPipeline />,
     },
     {
-        path: '/prospects/view-prospects-in-pipeline',
+        path: '/prospects/view-prospects-in-pipeline/:id/:stud',
         element: <ViewProspectsInPipeline />,
     },
     {

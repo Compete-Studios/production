@@ -1,28 +1,44 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { IRootState } from '../../store';
 import { useEffect, useState } from 'react';
 import { setPageTitle, toggleRTL } from '../../store/themeConfigSlice';
-import IconMail from '../../components/Icon/IconMail';
 import { UserAuth } from '../../context/AuthContext';
 import { login } from '../../firebase/auth';
 import IconLockDots from '../../components/Icon/IconLockDots';
 import NavBar from '../Home/NavBar';
+import Error from './Error';
+
 
 const LoginBoxed = () => {
     const { isLoggedIn } = UserAuth();
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Login Boxed'));
     });
     const navigate = useNavigate();
 
-    const submitForm = (e) => {
+    const submitForm = async (e: any) => {
         e.preventDefault();
-        login(userName, password);
+        const response = await login(userName, password);
+        if (response.error) {
+            setError(true);
+            setErrorMessage(response.error);
+        } else {
+            setError(false);
+            setErrorMessage('');
+        }
     };
+
+    const handleClear = () => {
+        setError(false);
+        setErrorMessage('');
+        setUserName('');
+        setPassword('');
+    } 
 
     const scrollToBottom = () => {
         window.scrollTo({
@@ -58,6 +74,7 @@ const LoginBoxed = () => {
                                 <p className="text-base font-bold leading-normal text-white-dark">Enter your email and password to login</p>
                             </div>
                             <form className="space-y-5 dark:text-white" onSubmit={(e) => submitForm(e)}>
+                                {error && <Error message={errorMessage} handleClear={handleClear} />}
                                 <div>
                                     <label htmlFor="username">Username</label>
                                     <div className="relative text-white-dark">
@@ -65,6 +82,7 @@ const LoginBoxed = () => {
                                             id="username"
                                             type="text"
                                             placeholder="Enter Username"
+                                            value={userName}
                                             className="form-input ps-10 placeholder:text-white-dark"
                                             onChange={(e) => setUserName(e.target.value)}
                                         />
@@ -81,6 +99,7 @@ const LoginBoxed = () => {
                                         <input
                                             id="Password"
                                             type="password"
+                                            value={password}
                                             placeholder="Enter Password"
                                             className="form-input ps-10 placeholder:text-white-dark"
                                             onChange={(e) => setPassword(e.target.value)}

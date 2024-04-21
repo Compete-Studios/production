@@ -4,11 +4,9 @@ import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { IRootState } from '../../store';
 import { toggleRTL, toggleTheme, toggleSidebar } from '../../store/themeConfigSlice';
 import { useTranslation } from 'react-i18next';
-import i18next from 'i18next';
 import Dropdown from '../Dropdown';
 import IconMenu from '../Icon/IconMenu';
 import IconCalendar from '../Icon/IconCalendar';
-import IconEdit from '../Icon/IconEdit';
 import IconChatNotification from '../Icon/IconChatNotification';
 import IconSearch from '../Icon/IconSearch';
 import IconXCircle from '../Icon/IconXCircle';
@@ -38,8 +36,9 @@ import { UserAuth } from '../../context/AuthContext';
 import { searchByValue, searchProspectsByValue } from '../../functions/api';
 
 const Header = () => {
-    const { setSearchedStudentsAndProspects, suid } = UserAuth();
+    const { setSearchedStudentsAndProspects, suid, studioInfo } = UserAuth();
     const [searchItem, setSearchItem] = useState('');
+    const [studioInitials, setStudioInitials] = useState('');
     const location = useLocation();
     useEffect(() => {
         const selector = document.querySelector('ul.horizontal-menu a[href="' + window.location.pathname + '"]');
@@ -61,6 +60,12 @@ const Header = () => {
             }
         }
     }, [location]);
+
+    useEffect(() => {
+        if (studioInfo?.Contact_Name) {
+            setStudioInitials(studioInfo?.Contact_Name[0]);
+        }
+    }, [studioInfo]);
 
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
 
@@ -220,18 +225,14 @@ const Header = () => {
                                         value={searchItem}
                                         onChange={(e) => setSearchItem(e.target.value)}
                                     />
-                                     <button type="submit" className='hidden' onClick={handleSearchUsers}>
-                                    
-                                </button>
+                                    <button type="submit" className="hidden" onClick={handleSearchUsers}></button>
                                     <button type="button" className="absolute w-9 h-9 inset-0 ltr:right-auto rtl:left-auto appearance-none peer-focus:text-primary">
                                         <IconSearch className="mx-auto" />
                                     </button>
                                     <button type="button" className="hover:opacity-80 sm:hidden block absolute top-1/2 -translate-y-1/2 ltr:right-2 rtl:left-2" onClick={() => setSearch(false)}>
                                         <IconXCircle />
                                     </button>
-                                   
                                 </div>
-                                
                             </form>
                             <button
                                 type="button"
@@ -355,7 +356,10 @@ const Header = () => {
                                 btnClassName="relative block p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60"
                                 button={
                                     <span>
-                                        <IconBellBing />
+                                        <svg  width="20" height="20" fill="currentColor" className="text-primary bi bi-phone-vibrate" viewBox="0 0 16 16">
+                                            <path d="M10 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM6 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" />
+                                            <path d="M8 12a1 1 0 1 0 0-2 1 1 0 0 0 0 2M1.599 4.058a.5.5 0 0 1 .208.676A7 7 0 0 0 1 8c0 1.18.292 2.292.807 3.266a.5.5 0 0 1-.884.468A8 8 0 0 1 0 8c0-1.347.334-2.619.923-3.734a.5.5 0 0 1 .676-.208m12.802 0a.5.5 0 0 1 .676.208A8 8 0 0 1 16 8a8 8 0 0 1-.923 3.734.5.5 0 0 1-.884-.468A7 7 0 0 0 15 8c0-1.18-.292-2.292-.807-3.266a.5.5 0 0 1 .208-.676M3.057 5.534a.5.5 0 0 1 .284.648A5 5 0 0 0 3 8c0 .642.12 1.255.34 1.818a.5.5 0 1 1-.93.364A6 6 0 0 1 2 8c0-.769.145-1.505.41-2.182a.5.5 0 0 1 .647-.284m9.886 0a.5.5 0 0 1 .648.284C13.855 6.495 14 7.231 14 8s-.145 1.505-.41 2.182a.5.5 0 0 1-.93-.364C12.88 9.255 13 8.642 13 8s-.12-1.255-.34-1.818a.5.5 0 0 1 .283-.648" />
+                                        </svg>
                                         <span className="flex absolute w-3 h-3 ltr:right-0 rtl:left-0 top-0">
                                             <span className="animate-ping absolute ltr:-left-[3px] rtl:-right-[3px] -top-[3px] inline-flex h-full w-full rounded-full bg-success/50 opacity-75"></span>
                                             <span className="relative inline-flex rounded-full w-[6px] h-[6px] bg-success"></span>
@@ -427,19 +431,26 @@ const Header = () => {
                                 offset={[0, 8]}
                                 placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
                                 btnClassName="relative group block"
-                                button={<img className="w-9 h-9 rounded-full object-cover saturate-50 group-hover:saturate-100" src="/assets/images/user-profile.jpeg" alt="userProfile" />}
+                                button={
+                                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-info">
+                                        <span className="text-sm font-medium leading-none text-white">{studioInitials || 'S'}</span>
+                                    </span>
+                                }
                             >
                                 <ul className="text-dark dark:text-white-dark !py-0 w-[230px] font-semibold dark:text-white-light/90">
                                     <li>
                                         <div className="flex items-center px-4 py-4">
-                                            <img className="rounded-md w-10 h-10 object-cover" src="/assets/images/user-profile.jpeg" alt="userProfile" />
+                                            <span className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-primary">
+                                                <span className="text-white">{studioInitials || 'S'}</span>
+                                            </span>
+
                                             <div className="ltr:pl-4 rtl:pr-4 truncate">
                                                 <h4 className="text-base">
-                                                    John Doe
+                                                    {studioInfo?.Contact_Name}
                                                     <span className="text-xs bg-success-light rounded text-success px-1 ltr:ml-2 rtl:ml-2">Pro</span>
                                                 </h4>
                                                 <button type="button" className="text-black/60 hover:text-primary dark:text-dark-light/60 dark:hover:text-white">
-                                                    johndoe@gmail.com
+                                                    {studioInfo?.Contact_Email}
                                                 </button>
                                             </div>
                                         </div>

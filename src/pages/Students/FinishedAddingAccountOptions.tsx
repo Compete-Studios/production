@@ -11,6 +11,7 @@ import { getAllCustomerPaymentAccounts } from '../../functions/payments';
 export default function FinishedAddingAccountOptions() {
     const { suid } = UserAuth();
     const [studentID, setStudentID] = useState<number>(0);
+    const [update, setUpdate] = useState<boolean>(false);
     const [studentInfo, setStudentInfo] = useState<any>({});
     const [customerID, setCustomerID] = useState<number>(0);
     const [bankAccounts, setBankAccounts] = useState<any>([]);
@@ -89,8 +90,8 @@ export default function FinishedAddingAccountOptions() {
                     </span>{' '}
                 </p>
             </div>
-            <AddCardModal student={studentInfo} paySimpleID={customerID} cards={cards} />
-            <AddBankModal student={studentInfo} paySimpleID={customerID} bankAccounts={bankAccounts} />
+            <AddCardModal student={studentInfo} paySimpleID={customerID} cards={cards} update={update} setUpdate={setUpdate} />
+            <AddBankModal student={studentInfo} paySimpleID={customerID} bankAccounts={bankAccounts} update={update} setUpdate={setUpdate} />
             <Link to={`/students/view-student/${hashTheID(studentID)}/${hashTheID(suid)}`} className="block text-center text-primary font-semibold">
                 Go To Students Info
             </Link>

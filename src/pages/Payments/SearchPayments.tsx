@@ -8,6 +8,9 @@ import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import { getPayments } from '../../functions/api';
 import { UserAuth } from '../../context/AuthContext';
+import { formatDate, hashThePayID } from '../../functions/shared';
+import IconEye from '../../components/Icon/IconEye';
+import { Link } from 'react-router-dom';
 
 const rowData = [
     {
@@ -515,8 +518,9 @@ const SearchPayments = () => {
     const { suid } = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Range Search Table'));
+        dispatch(setPageTitle('Search Payments'));
     });
+    const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
@@ -526,9 +530,51 @@ const SearchPayments = () => {
     const [search, setSearch] = useState('');
     const [startDate, setStartDate] = useState<any>('04-01-2023');
     const [endDate, setEndDate] = useState('05-01-2023');
+    const [status, setStatus] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({ columnAccessor: 'id', direction: 'asc' });
 
     const [payments, setPayments] = useState<any>([]);
+    const [settledPayments, setSettledPayments] = useState<any>(0);
+
+    const statusCSS = (status: string) => {
+        switch (status) {
+            case 'Pending':
+                return 'text-blue-800';
+            case 'Chargeback':
+                return 'text-red-800';
+            case 'Posted':
+                return 'text-success';
+            case 'Authorized':
+                return 'text-success';
+            case 'Failed':
+                return 'text-red-800';
+            case 'RefundSettled':
+                return 'text-purple-800';
+            case 'Returned':
+                return ' text-orange-800';
+            case 'Reversed':
+                return ' text-red-800';
+            case 'Reversensf':
+                return ' text-red-800';
+            case 'Reverseposted':
+                return ' text-red-800';
+            case 'Settled':
+                return 'text-success';
+            case 'Voided':
+                return ' text-red-800';
+            default:
+                return 'text-gray-800';
+        }
+    };
+
+    const handleCountSettledPayments = (payments: any) => {
+        const totalSettledPayments = payments.filter((payment: any) => payment.Status === 'Settled');
+        setSettledPayments(totalSettledPayments.length);
+    };
+
+    useEffect(() => {
+        handleCountSettledPayments(payments);
+    }, [payments]);
 
     useEffect(() => {
         setPage(1);
@@ -582,65 +628,66 @@ const SearchPayments = () => {
         }
     }, [minAge, maxAge]);
 
-    const formatDate = (date: any) => {
-        if (date) {
-            const dt = new Date(date);
-            const month = dt.getMonth() + 1 < 10 ? '0' + (dt.getMonth() + 1) : dt.getMonth() + 1;
-            const day = dt.getDate() < 10 ? '0' + dt.getDate() : dt.getDate();
-            return day + '/' + month + '/' + dt.getFullYear();
-        }
-        return '';
-    };
-
     const handleConvertDateToYYYYMMDD = (date: any) => {
         const newDate = new Date(date);
         const formattedDate = newDate.toISOString().substr(0, 10);
         return formattedDate;
     };
 
-
     const handleSearch = async () => {
+        
+        const searchStartDate = handleConvertDateToYYYYMMDD(startDate)
+        const searchEndDate = handleConvertDateToYYYYMMDD(endDate)
+        const searchData = {
+            suid,
+            searchStartDate,
+            searchEndDate,
+            status,
+        };
+        console.log(searchData, 'searchData')
         try {
-          getPayments(suid, startDate, endDate, status).then((response) => {
-            if (response.Response && response.Response.length === 0) {
-              setPayments([]);
-              return;
-            } else if (!response.Response) {
-              setPayments([]);
-            } else {
-              setPayments(response.Response);
-            }
-          });
+            getPayments(suid, searchStartDate, searchEndDate, status).then((response) => {
+                if (response.Response && response.Response.length === 0) {
+                    setPayments([]);
+                    return;
+                } else if (!response.Response) {
+                    setPayments([]);
+                } else {
+                    setPayments(response.Response);
+                }
+            });
         } catch (error) {
-          console.error(error);
+            console.error(error);
         } finally {
-          // setLoading(false);
-          console.log('done');
+            // setLoading(false);
+            console.log('done');
         }
-      };
-    
-      useEffect(() => {
-        getPayments(suid, startDate, endDate, status)
-          .then((response) => {
-            if (!response || !response.Response || response.Response.length === 0) {
-              setPayments([]);
-            } else {
-              setPayments(response.Response);
-            }
-          })
-          .catch((error) => {
-            // Handle error if the request fails
-            console.error("Error fetching payments:", error);
-            
-            setPayments([]);
-          });
-      }, []);
+    };
 
-      console.log(payments);
+    useEffect(() => {
+        getPayments(suid, startDate, endDate, status)
+            .then((response) => {
+                if (!response || !response.Response || response.Response.length === 0) {
+                    setPayments([]);
+                    setLoading(false);
+                } else {
+                    setPayments(response.Response);
+                    setLoading(false);
+                }
+            })
+            .catch((error) => {
+                // Handle error if the request fails
+                console.error('Error fetching payments:', error);
+                setLoading(false);
+                setPayments([]);
+            });
+    }, []);
+
+    console.log(payments)
 
     return (
         <div>
-            <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
+            {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
                 <div className="rounded-full bg-primary p-1.5 text-white ring-2 ring-primary/30 ltr:mr-3 rtl:ml-3">
                     <IconBell />
                 </div>
@@ -648,8 +695,8 @@ const SearchPayments = () => {
                 <a href="https://www.npmjs.com/package/mantine-datatable" target="_blank" className="block hover:underline">
                     https://www.npmjs.com/package/mantine-datatable
                 </a>
-            </div>
-            <div className="panel mt-6">
+            </div> */}
+            <div className="panel ">
                 <div className="mb-4.5 flex md:items-center md:flex-row flex-col gap-5">
                     <div className="flex items-center gap-5">
                         <h2 className="text-xl">Studio Payment History</h2>
@@ -658,25 +705,18 @@ const SearchPayments = () => {
                         <div className="flex items-center gap-5">
                             <div className="md:flex-auto flex-1">
                                 <label className="form-label">Start Date</label>
-                                <Flatpickr
-                                    value={startDate}
-                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
-                                    className="form-input"
-                                    onChange={(date) => setStartDate(handleConvertDateToYYYYMMDD(date))}
-                                />
+                                <Flatpickr value={startDate} options={{ dateFormat: 'm-d-Y', position: 'auto right' }} className="form-input" onChange={(date: any) => setStartDate(date)} />
                             </div>
                             <div className="md:flex-auto flex-1">
                                 <label className="form-label">End Date</label>
-                                <Flatpickr
-                                    value={endDate}
-                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
-                                    className="form-input"
-                                    onChange={(date) => setEndDate(handleConvertDateToYYYYMMDD(date))}
-                                />
+                                <Flatpickr value={endDate} options={{ dateFormat: 'm-d-Y', position: 'auto right' }} className="form-input" onChange={(date: any) => setEndDate(date)} />
                             </div>
                             <div className="md:flex-auto flex-1">
                                 <label className="form-label">Status</label>
-                                <select className="form-select">
+                                <select className="form-select"
+                                    value={status}
+                                    onChange={(e) => setStatus(e.target.value)}
+                                >
                                     <option value="">All</option>
                                     <option value="pending">Pending</option>
                                     <option value="chargeback">Chargeback</option>
@@ -693,49 +733,97 @@ const SearchPayments = () => {
                                 </select>
                             </div>
                             <div className="md:flex-auto flex-1">
-                            <label className="form-label text-transparent ">search</label>
-                                <button type="button" className="btn btn-primary w-full">
+                                <label className="form-label text-transparent ">search</label>
+                                <button type="button" className="btn btn-primary w-full"
+                                    onClick={handleSearch}
+                                >
                                     Search
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="datatables">
-                    <DataTable
-                        highlightOnHover
-                        className="whitespace-nowrap table-hover"
-                        records={recordsData}
-                        columns={[
-                            {
-                                accessor: 'Amount',
-                                title: 'Amount',
-                                sortable: true,
-                                render: ({ firstName, lastName }) => <div>{firstName + ' ' + lastName}</div>,
-                            },
-                            { accessor: 'company', title: 'Date', sortable: true },
-                            { accessor: 'age', title: 'Age', sortable: true },
-                            {
-                                accessor: 'dob',
-                                title: 'Status',
-                                sortable: true,
-                                render: ({ dob }) => <div>{formatDate(dob)}</div>,
-                            },
-                            { accessor: 'email', title: 'Billing Name', sortable: true },
-                            { accessor: 'phone', title: 'Actions.' },
-                        ]}
-                        totalRecords={initialRecords.length}
-                        recordsPerPage={pageSize}
-                        page={page}
-                        onPageChange={(p) => setPage(p)}
-                        recordsPerPageOptions={PAGE_SIZES}
-                        onRecordsPerPageChange={setPageSize}
-                        sortStatus={sortStatus}
-                        onSortStatusChange={setSortStatus}
-                        minHeight={200}
-                        paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
-                    />
-                </div>
+                <p>
+                    Total Settled Payments: <span className="font-bold">{settledPayments}</span>
+                </p>
+                {loading ? (
+                    <div className="screen_loader flex items-center justify-center bg-[#fafafa] dark:bg-[#060818] z-[60] place-content-center animate__animated p-24">
+                        <svg width="64" height="64" viewBox="0 0 135 135" xmlns="http://www.w3.org/2000/svg" fill="#2A9D8F">
+                            <path d="M67.447 58c5.523 0 10-4.477 10-10s-4.477-10-10-10-10 4.477-10 10 4.477 10 10 10zm9.448 9.447c0 5.523 4.477 10 10 10 5.522 0 10-4.477 10-10s-4.478-10-10-10c-5.523 0-10 4.477-10 10zm-9.448 9.448c-5.523 0-10 4.477-10 10 0 5.522 4.477 10 10 10s10-4.478 10-10c0-5.523-4.477-10-10-10zM58 67.447c0-5.523-4.477-10-10-10s-10 4.477-10 10 4.477 10 10 10 10-4.477 10-10z">
+                                <animateTransform attributeName="transform" type="rotate" from="0 67 67" to="-360 67 67" dur="2.5s" repeatCount="indefinite" />
+                            </path>
+                            <path d="M28.19 40.31c6.627 0 12-5.374 12-12 0-6.628-5.373-12-12-12-6.628 0-12 5.372-12 12 0 6.626 5.372 12 12 12zm30.72-19.825c4.686 4.687 12.284 4.687 16.97 0 4.686-4.686 4.686-12.284 0-16.97-4.686-4.687-12.284-4.687-16.97 0-4.687 4.686-4.687 12.284 0 16.97zm35.74 7.705c0 6.627 5.37 12 12 12 6.626 0 12-5.373 12-12 0-6.628-5.374-12-12-12-6.63 0-12 5.372-12 12zm19.822 30.72c-4.686 4.686-4.686 12.284 0 16.97 4.687 4.686 12.285 4.686 16.97 0 4.687-4.686 4.687-12.284 0-16.97-4.685-4.687-12.283-4.687-16.97 0zm-7.704 35.74c-6.627 0-12 5.37-12 12 0 6.626 5.373 12 12 12s12-5.374 12-12c0-6.63-5.373-12-12-12zm-30.72 19.822c-4.686-4.686-12.284-4.686-16.97 0-4.686 4.687-4.686 12.285 0 16.97 4.686 4.687 12.284 4.687 16.97 0 4.687-4.685 4.687-12.283 0-16.97zm-35.74-7.704c0-6.627-5.372-12-12-12-6.626 0-12 5.373-12 12s5.374 12 12 12c6.628 0 12-5.373 12-12zm-19.823-30.72c4.687-4.686 4.687-12.284 0-16.97-4.686-4.686-12.284-4.686-16.97 0-4.687 4.686-4.687 12.284 0 16.97 4.686 4.687 12.284 4.687 16.97 0z">
+                                <animateTransform attributeName="transform" type="rotate" from="0 67 67" to="360 67 67" dur="8s" repeatCount="indefinite" />
+                            </path>
+                        </svg>
+                    </div>
+                ) : (
+                    <div className="datatables">
+                        <DataTable
+                            highlightOnHover
+                            className="whitespace-nowrap table-hover"
+                            records={payments}
+                            columns={[
+                                {
+                                    accessor: 'Amount',
+                                    title: 'Amount',
+                                    sortable: true,
+                                    render: ({ Amount }: any) => <div>${Amount?.toFixed(2)}</div>,
+                                },
+                                {
+                                    accessor: 'PaymentDate',
+                                    title: 'Date',
+                                    sortable: true,
+                                    render: ({ PaymentDate }: any) => <div>{formatDate(PaymentDate)}</div>,
+                                },
+                                {
+                                    accessor: 'Id',
+                                    title: 'Id',
+                                    sortable: true,
+                                    render: ({ Id }: any) => <div>{Id}</div>,
+                                },
+                                {
+                                    accessor: 'Status',
+                                    title: 'Status',
+                                    sortable: true,
+                                    render: ({ Status }: any) => <div className={`${statusCSS(Status)}`}>{Status}</div>,
+                                },
+                                {
+                                    accessor: 'CustomerFirstName',
+                                    title: 'Billing Name',
+                                    sortable: true,
+                                    render: ({ CustomerFirstName, CustomerLastName }: any) => (
+                                        <div>
+                                            {CustomerFirstName} {CustomerLastName}
+                                        </div>
+                                    ),
+                                },
+                                {
+                                    accessor: 'action',
+                                    title: 'Payment Info',
+                                    sortable: false,
+                                    render: ({ Id, Amount }: any) => (
+                                        <div className="flex items-center justify-center gap-2">
+                                            <Link to={`/payments/view-payment-info/${hashThePayID(Id, suid, Amount)}/${Math.floor(Amount) * 12}`}>
+                                                <IconEye className="text-info hover:text-blue-800" />
+                                            </Link>
+                                        </div>
+                                    ),
+                                },
+                            ]}
+                            totalRecords={initialRecords.length}
+                            recordsPerPage={pageSize}
+                            page={page}
+                            onPageChange={(p) => setPage(p)}
+                            recordsPerPageOptions={PAGE_SIZES}
+                            onRecordsPerPageChange={setPageSize}
+                            sortStatus={sortStatus}
+                            onSortStatusChange={setSortStatus}
+                            minHeight={200}
+                            paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
+                        />
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -41,11 +41,29 @@ export const hashTheID = (id) => {
     return parseInt(id) * 123456789;
 };
 
+export const hashThePayID = (id, stud, amt) => {
+    const floatedAmount = parseFloat(amt);
+    const floatedStudent = parseFloat(stud);
+    return (parseInt(id) + floatedStudent + floatedAmount) * 123456789;
+};
+
+export const unHashThePayID = (id, stud, amt) => 
+{
+    return (parseInt(id) / 123456789) - parseInt(stud) - parseInt(amt)
+};
+
 export const constFormateDateMMDDYYYY = (date) => {
     const newDate = new Date(date);
     const formattedDate = newDate.toISOString().substr(0, 10);
     const [year, month, day] = formattedDate.split('-');
     return `${month}-${day}-${year}`;
+};
+
+export const formatForEmails = (date) => {
+    const newDate = new Date(date);
+    const formattedDate = newDate.toISOString().substr(0, 10);
+    const [year, month, day] = formattedDate.split('-');
+    return `${year}-${month}-${day}`;
 };
 
 export const constFormateDateForPaySimple = (date) => {
@@ -85,6 +103,38 @@ export const showErrorMessage = (msg = '') => {
     });
 };
 
+export const showWarningMessage = (msg = '', text = '', confirmed = '', title = 'Removed!') => {
+    return new Promise((resolve, reject) => {
+        const toast = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-secondary',
+                cancelButton: 'btn btn-dark ltr:mr-3 rtl:ml-3',
+                popup: 'sweet-alerts',
+            },
+            buttonsStyling: false,
+        });
+        toast
+            .fire({
+                icon: 'warning',
+                title: msg,
+                text: text,
+                showCancelButton: true,
+                confirmButtonText: `Yes ${text}`,
+                cancelButtonText: 'No, cancel!',
+                reverseButtons: true,
+                padding: '2em',
+            })
+            .then((result) => {
+                if (result.value) {
+                    Swal.fire({ title: title, text: confirmed, icon: 'success', customClass: 'sweet-alerts' });
+                    resolve(true);
+                } 
+            })
+            .catch((error) => {
+                reject(error);
+            });
+    });
+};
 
 // export const createUsersFromLargeJSON = (json) => {
 //   try {

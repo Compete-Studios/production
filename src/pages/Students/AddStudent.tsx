@@ -41,7 +41,7 @@ const alertsInit = {
 };
 
 export default function AddStudent() {
-    const { waitingLists, prospectPipelineSteps, programs, classes, marketingSources, suid } = UserAuth();
+    const { waitingLists, pipelineSteps, programs, classes, marketingSources, suid } = UserAuth();
     const [alerts, setAlerts] = useState(alertsInit);
     const [studentInfo, setStudentInfo] = useState(studentInfoInit);
     const [programsForStudent, setProgramsForStudent] = useState([]);
@@ -335,7 +335,7 @@ export default function AddStudent() {
                             <div className="sm:col-span-2">
                                 <label htmlFor="pipelineStatus">Pipeline Status</label>
                                 <select id="pipelineStatus" className="form-select text-white-dark" onChange={(e) => setStudentInfo({ ...studentInfo, currentPipelineStatus: e.target.value })}>
-                                    {prospectPipelineSteps?.map((step: any) => (
+                                    {pipelineSteps?.map((step: any) => (
                                         <option key={step.PipelineStepId} value={step.PipelineStepId}>
                                             {step.StepName}
                                         </option>

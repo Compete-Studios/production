@@ -6,10 +6,41 @@ import IconPlus from '../../components/Icon/IconPlus';
 import IconUsers from '../../components/Icon/IconUsers';
 import IconEdit from '../../components/Icon/IconEdit';
 import { Link } from 'react-router-dom';
-
+import { useDispatch } from 'react-redux';
+import { useEffect } from 'react';
+import { setPageTitle } from '../../store/themeConfigSlice';
+import EditProspectPipelineStep from './EditProspectPipelineStep';
+import { deletePipelineStep } from '../../functions/api';
+import { showWarningMessage } from '../../functions/shared';
 
 export default function ProspectPipeline() {
-    const {prospectPipelineSteps, suid} = UserAuth();
+    const { prospectPipelineSteps, suid, update, setUpdate } = UserAuth();
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('Prospect Pipeline'));
+    });
+  
+
+    const handleDeleteStep = (prosid: any) => {
+        showWarningMessage('Are you sure you want to delete this pipeline step?', 'Remove Pipeline Step', 'Your Pipeline Step has been removed successfully')
+            .then((confirmed: boolean) => {
+                if (confirmed) {
+                    deletePipelineStep(prosid).then((response) => {
+                        if (response) {
+                            setUpdate(!update);
+                        }
+                    });
+                } else {
+                    // User canceled the action
+                    console.log('User canceled');
+                }
+            })
+            .catch((error) => {
+                // Handle error if any
+                console.error('Error:', error);
+            });
+    };
+
     return (
         <div className="panel px-0 border-white-light dark:border-[#1b2e4b]">
             <div className="mb-4.5 px-5 flex md:items-center md:flex-row flex-col gap-5">
@@ -18,13 +49,13 @@ export default function ProspectPipeline() {
                         <input type="text" className="form-input w-auto" placeholder="Search..." />
                     </div>
                 </div> */}
-                 <h2 className="text-xl">Prospect Pipline</h2>
+                <h2 className="text-xl">Prospect Pipline</h2>
 
                 <div className="gap-2 ltr:ml-auto rtl:mr-auto">
-                    <button type="button" className="btn btn-primary gap-2 ltr:ml-auto rtl:mr-auto">
+                    <Link to="/prospects/add-new-pipeline-step" type="button" className="btn btn-primary gap-2 ltr:ml-auto rtl:mr-auto">
                         <IconPlus />
                         Add a Pipeline Step
-                    </button>
+                    </Link>
                 </div>
             </div>
             <div className="table-responsive">
@@ -33,38 +64,37 @@ export default function ProspectPipeline() {
                         <tr>
                             <th>Pipeline Step</th>
                             <th>Prospects In Step</th>
-                            
+
                             <th className="text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         {prospectPipelineSteps?.map((data: any) => {
                             return (
-                                <tr key={data.PlacementOrdinal} className={`${
-                                    data?.thisPipelineStepNeedsContact &&
-                                    "bg-cs"
-                                  }`}>
+                                <tr key={data.PlacementOrdinal} className={`${data?.thisPipelineStepNeedsContact && 'bg-cs'}`}>
                                     <td>
                                         <div className="whitespace-nowrap">{data.StepName}</div>
                                     </td>
                                     <td>{data.numberOfProspectsInStep}</td>
 
                                     <td className="text-center gap-x-4 flex items-center justify-center">
-                                        <Tippy content="View Roster">
-                                            <Link to={`/prospects/view-prospects-in-pipeline/${data.PipelineStepId}/${suid}`}type="button">
-                                                <IconUsers className="w-5 h-5 text-orange-500 hover:text-orange-800" />
-                                            </Link>
-                                        </Tippy>
-                                        <Tippy content="Edit Step">
-                                            <button type="button">
-                                                <IconEdit className="w-5 h-5" />
-                                            </button>
-                                        </Tippy>
-                                        <Tippy content="Delete Step">
-                                            <button type="button">
-                                                <IconTrash className="w-5 h-5" />
-                                            </button>
-                                        </Tippy>
+                                        <div>
+                                            <Tippy content="View Roster">
+                                                <Link to={`/prospects/view-prospects-in-pipeline/${data.PipelineStepId}/${suid}`} type="button">
+                                                    <IconUsers className="w-5 h-5 text-orange-500 hover:text-orange-800" />
+                                                </Link>
+                                            </Tippy>
+                                        </div>
+                                        <div>
+                                            <EditProspectPipelineStep data={data} />
+                                        </div>
+                                        <div>
+                                            <Tippy content="Delete Step">
+                                                <button type="button" onClick={() => handleDeleteStep(data.PipelineStepId)}>
+                                                    <IconTrash className="w-5 h-5 text-danger hover:text-red-800" />
+                                                </button>
+                                            </Tippy>
+                                        </div>
                                     </td>
                                 </tr>
                             );

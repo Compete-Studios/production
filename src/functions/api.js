@@ -861,6 +861,16 @@ export const getProspectsByPipelineStep = async (pipelineStepId, studioId) => {
     }
 };
 
+export const updateProspectPipelineStatus = async (data) => {
+    try {
+        const response = await fetchData(`marketing-access/updateProspectPipelineStatus`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const updateStudentNotes = async (studentId, notes) => {
     try {
         const response = await fetchData(`student-access/updateStudentNotes/${studentId}`, 'post', { notes });
@@ -992,3 +1002,42 @@ export const getProspectsInScheduleByPipelineStep = async (data) => {
     }
 }
 
+export const getProspectById = async (prospectId) => {
+    try {
+        const response = await fetchData(`marketing-access/getProspect/${prospectId}`, 'get');
+        return response.recordset[0];
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const updateProspectPipelineStep = async (data) => {
+    try {
+        const response = await fetchData(`marketing-access/updatePipelineStep`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const deletePipelineStep = async (pipelineStepId) => {
+    try {
+        const response = await fetchData(`marketing-access/deletePipelineStep/${pipelineStepId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const deleteLatePaymentPipelineStep = async (pipelineStepId) => {
+    try {
+        const response = await fetchData(`late-payment-pipeline/deletePaymentPipelineStep/${pipelineStepId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};

@@ -143,7 +143,7 @@ export default function ViewStudentsInPipeline() {
 
                                                     <td className="relative whitespace-nowrap text-right text-sm font-medium ">
                                                         <Link
-                                                            to={`/prospects/view-prospect/${hashTheID(list.StudentId)}/${hashTheID(suid)}`}
+                                                            to={`/prospects/view-prospect/${hashTheID(list.ProspectId)}/${hashTheID(suid)}`}
                                                             type="button"
                                                             className={`btn btn-sm ${new Date(list.NextContactDate) <= new Date() ? 'btn-success' : 'btn-outline-success dark:bg-gray-800'}`}
                                                         >

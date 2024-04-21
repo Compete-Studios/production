@@ -2,13 +2,53 @@ import { arrayUnion, doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth';
 
-export const login = async (userName, password) => {
-    console.log(userName, password);
+// export const login = async (userName, password) => { 
+//     const docRef = doc(db, 'users', userName);
+//     const docSnap = await getDoc(docRef);
+//     if (!docSnap.exists()) {
+//         return { error: 'No user with that username' };
+//     }
+//     const email = docSnap.data().email;
+
+//     if (!email) {
+//         return { error: 'No user with that username' };
+//     } else {
+//         try {
+//             const userCredential = await signInWithEmailAndPassword(auth, email, password);
+//             // Check if the display name is not set
+//             if (!userCredential.user.displayName) {
+//                 // Set display name using updateProfile
+//                 await updateProfile(userCredential.user, {
+//                     displayName: userName,
+//                 });
+//             }
+
+//             if (!userCredential.user.photoURL) {
+//                 // Set display name using updateProfile
+//                 await updateProfile(userCredential.user, {
+//                     photoURL: docSnap.data().studioID[0],
+//                 });
+//             }
+
+//             // If the sign-in is successful, you can return the userCredential or user data here
+//             return docSnap.data().studioID[0];
+//         } catch (error) {
+//             // If an error occurs during sign-in, catch it and return the error message
+//             return {
+//                 error: error.message === 'Firebase: Error (auth/wrong-password).' ? 'Incorrect Password' : error.message,
+//             };
+//         }
+//     }
+// };
+
+export const login = async (userName, password) => { 
     const docRef = doc(db, 'users', userName);
     const docSnap = await getDoc(docRef);
+    
     if (!docSnap.exists()) {
         return { error: 'No user with that username' };
     }
+    
     const email = docSnap.data().email;
 
     if (!email) {
@@ -16,6 +56,7 @@ export const login = async (userName, password) => {
     } else {
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            
             // Check if the display name is not set
             if (!userCredential.user.displayName) {
                 // Set display name using updateProfile
@@ -31,8 +72,10 @@ export const login = async (userName, password) => {
                 });
             }
 
-            // If the sign-in is successful, you can return the userCredential or user data here
-            return docSnap.data().studioID[0];
+            // Generate JWT with expiration time 5 minutes from now (for testing)
+            const expirationTime = new Date().getTime() + (5 * 60 * 1000); // 5 minutes in milliseconds
+            const token = await userCredential.user.getIdToken(true); // Force refresh token
+            return { token, expirationTime, studioID: docSnap.data().studioID[0] };
         } catch (error) {
             // If an error occurs during sign-in, catch it and return the error message
             return {
@@ -41,6 +84,9 @@ export const login = async (userName, password) => {
         }
     }
 };
+
+
+
 
 export const logout = async () => {
     try {

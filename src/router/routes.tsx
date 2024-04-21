@@ -19,6 +19,7 @@ const ReorderPaymentSteps = lazy(() => import('../pages/Payments/ReorderPaymentS
 const AddNewPipelineStep = lazy(() => import('../pages/Payments/AddNewPipelineStep'));
 const ViewInvoices = lazy(() => import('../pages/Payments/ViewInvoices'));
 const ViewInvoice = lazy(() => import('../pages/Payments/ViewInvoice'));
+const ViewPayments = lazy(() => import('../pages/Payments/ViewPayments'));
 const PayInvoice = lazy(() => import('../pages/Payments/PayInvoice'));
 const ExisitingBillingAccounts = lazy(() => import('../pages/Payments/ExisitingBillingAccounts'));
 
@@ -122,7 +123,6 @@ const AddProspect = lazy(() => import('../pages/Prospects/AddProspect'));
 const SearchDisplay = lazy(() => import('../pages/SearchDisplay'));
 const ProspectPipeline = lazy(() => import('../pages/Prospects/ProspectPipeline'));
 const ViewProspectsInPipeline = lazy(() => import('../pages/Prospects/ViewProspectsInPipeline'));
-const EditProspectPipelineStep = lazy(() => import('../pages/Prospects/EditProspectPipelineStep'));
 const ReorderPipelineSteps = lazy(() => import('../pages/Prospects/ReorderPipelineSteps'));
 const AddNewProspectPipelineStep = lazy(() => import('../pages/Prospects/AddNewProspectPipelineStep'));
 const EmailPipelineStep = lazy(() => import('../pages/Prospects/EmailPipelineStep'));
@@ -187,8 +187,8 @@ const routes = [
         element: <RefundReciept />,
     },
     {
-        path: '/payments/late-payment-pipeline/view-payments',
-        element: <ViewPaymentInfo />,
+        path: '/payments/late-payment-pipeline/view-payments/:id/:stud',
+        element: <ViewPayments />,
     },
     {
         path: '/payments/late-payment-pipeline/edit-late-pipeline-step',
@@ -466,10 +466,6 @@ const routes = [
     {
         path: '/prospects/view-prospects-in-pipeline/:id/:stud',
         element: <ViewProspectsInPipeline />,
-    },
-    {
-        path: '/prospects/edit-pipeline-step',
-        element: <EditProspectPipelineStep />,
     },
     {
         path: '/prospects/reorder-pipeline-steps',

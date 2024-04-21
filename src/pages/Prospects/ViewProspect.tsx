@@ -19,6 +19,7 @@ import {
     getPaymentSchedulesForCustomer,
     getPaysimpleCustomerIdFromStudentId,
     getProgramsByStudentId,
+    getProspectById,
     getRankByStudentId,
     getStudentBillingAccounts,
     getStudentCustomBarcodeId,
@@ -240,7 +241,7 @@ const ViewProspect = () => {
         const studentID: any = unHashTheID(uid);
         if (parseInt(suid) === parseInt(studioID)) {
             // fetch student data
-            getStudentInfo(studentID).then((res) => {
+            getProspectById(studentID).then((res) => {
                 setStudent(res);
             });
             getPaySimpleInformation(studentID);
@@ -274,6 +275,8 @@ const ViewProspect = () => {
     useEffect(() => {
         scrollTop();
     }, []);
+
+    console.log(student, "prospect")
 
     const handleDeleteFromClass = (classID: any) => {
         showWarningMessage('Are you sure you want to remove this student from this class?', 'Remove Student From Class', 'Your student has been removed from the class')
@@ -360,27 +363,23 @@ const ViewProspect = () => {
             <div className="sm:flex sm:items-center sm:justify-between">
                 <ul className="flex space-x-2 rtl:space-x-reverse">
                     <li>
-                        <Link to="/students/view-students" className="text-primary hover:underline">
-                            Students
+                        <Link to="/prospects/prospect-pipeline" className="text-primary hover:underline">
+                            Prospect Pipeline
                         </Link>
                     </li>
                     <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
                         <span>
-                            {student?.First_Name} {student?.Last_Name}
+                            {student?.FName} {student?.LName}
                         </span>
                     </li>
                 </ul>
-                <div className="sm:flex sm:items-center space-y-4 mt-4 sm:space-y-0 sm:mt-0 gap-x-2">
-                    <StudentsQuickPay student={student} suid={suid} />
-                    <button className="btn btn-warning gap-x-1 w-full sm:w-auto" onClick={() => navigate(`/students/invoice/${hasedRefID}`)}>
+                <div className="sm:flex sm:items-center space-y-4 mt-4 sm:space-y-0 sm:mt-0 gap-x-2">               
+                    <button className="btn btn-warning gap-x-1 w-full sm:w-auto" onClick={() => navigate(`/students/add-student`)}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-receipt" viewBox="0 0 16 16">
                             <path d="M1.92.506a.5.5 0 0 1 .434.14L3 1.293l.646-.647a.5.5 0 0 1 .708 0L5 1.293l.646-.647a.5.5 0 0 1 .708 0L7 1.293l.646-.647a.5.5 0 0 1 .708 0L9 1.293l.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .801.13l.5 1A.5.5 0 0 1 15 2v12a.5.5 0 0 1-.053.224l-.5 1a.5.5 0 0 1-.8.13L13 14.707l-.646.647a.5.5 0 0 1-.708 0L11 14.707l-.646.647a.5.5 0 0 1-.708 0L9 14.707l-.646.647a.5.5 0 0 1-.708 0L7 14.707l-.646.647a.5.5 0 0 1-.708 0L5 14.707l-.646.647a.5.5 0 0 1-.708 0L3 14.707l-.646.647a.5.5 0 0 1-.801-.13l-.5-1A.5.5 0 0 1 1 14V2a.5.5 0 0 1 .053-.224l.5-1a.5.5 0 0 1 .367-.27m.217 1.338L2 2.118v11.764l.137.274.51-.51a.5.5 0 0 1 .707 0l.646.647.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.509.509.137-.274V2.118l-.137-.274-.51.51a.5.5 0 0 1-.707 0L12 1.707l-.646.647a.5.5 0 0 1-.708 0L10 1.707l-.646.647a.5.5 0 0 1-.708 0L8 1.707l-.646.647a.5.5 0 0 1-.708 0L6 1.707l-.646.647a.5.5 0 0 1-.708 0L4 1.707l-.646.647a.5.5 0 0 1-.708 0z" />
                             <path d="M3 4.5a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5m8-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5" />
                         </svg>{' '}
-                        Invoice
-                    </button>
-                    <button className="btn btn-danger gap-x-1 w-full sm:w-auto" onClick={() => navigate('/students/delete-student')}>
-                        <IconTrash /> Delete Student
+                        Activate As Student
                     </button>
                 </div>
             </div>
@@ -402,14 +401,14 @@ const ViewProspect = () => {
                             <p className="font-bold ">
                                 Name:{' '}
                                 <span className="font-semibold text-primary">
-                                    {student?.First_Name} {student?.Last_Name}
+                                    {student?.FName} {student?.LName}
                                 </span>
                             </p>
                             <p className="font-bold ">
-                                Address: <span className="font-normal"> {student?.mailingaddr}</span>
+                                Address: <span className="font-normal"> {student?.Address}</span>
                             </p>
                             <p className="font-bold">
-                                Email: <span className="text-primary truncate">{student?.email}</span>
+                                Email: <span className="text-primary truncate">{student?.Email}</span>
                             </p>
                             <p className="font-bold ">
                                 Cell Phone:{' '}
@@ -509,167 +508,10 @@ const ViewProspect = () => {
                             </p>
                         </div>
                     </div>
-                    {/* BILLING INFO */}
-                    <div className="panel xl:col-span-2 xl:relative xl:h-[480px]">
-                        <div className="flex items-center justify-between mb-5">
-                            <h5 className="font-semibold text-lg dark:text-white-light">Billing Info</h5>
-                            <Tippy content="Update Billing Info">
-                                <Link to="/students/update-billing" className="ltr:ml-auto rtl:mr-auto text-info hover:text-blue-700 p-2 rounded-full">
-                                    <IconPencilPaper />
-                                </Link>
-                            </Tippy>
-                        </div>
-                        {billingLoading ? (
-                            <div className="flex items-center justify-center h-56">
-                                <span className="animate-spin border-4 border-primary border-l-transparent rounded-full w-10 h-10 inline-block align-middle m-auto mb-10"></span>
-                            </div>
-                        ) : (
-                            <div>
-                                {!billingInfo || Object?.keys(billingInfo)?.length === 0 ? (
-                                    <div className="flex items-center justify-center h-56">
-                                        <div className="text-center">
-                                            <div className="text-center text-gray-400">No billing information found</div>
-                                            <button type="button" className="btn btn-info mx-auto mt-4" onClick={() => handleGoToPayments()}>
-                                                <IconPlus /> Add Billing Info
-                                            </button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="mb-5 space-y-4 ">
-                                        <p className="font-bold ">
-                                            Billing Name:{' '}
-                                            <span className="font-normal">
-                                                {billingInfo?.FirstName} {billingInfo?.LastName}
-                                            </span>
-                                        </p>
-                                        <p className="font-bold ">
-                                            Phone: <span className="font-normal">{convertPhone(billingInfo?.Phone)}</span>
-                                        </p>
-                                        <p className="font-bold ">
-                                            Email: <span className="font-normal">{billingInfo?.Email}</span>
-                                        </p>
-                                        <p className="font-bold ">
-                                            Address: <span className="font-normal">{billingInfo?.BillingAddress?.StreetAddress1}</span>
-                                        </p>
-                                        <p className="font-bold ">
-                                            City: <span className="font-normal">{billingInfo?.BillingAddress?.City}</span>
-                                        </p>
-                                        <p className="font-bold ">
-                                            State: <span className="font-normal">{billingInfo?.BillingAddress?.StateCode}</span>
-                                        </p>
-                                        <p className="font-bold ">
-                                            Zip: <span className="font-normal">{billingInfo?.BillingAddress?.ZipCode}</span>
-                                        </p>
-                                        <ul className="mt-7 flex items-center justify-center gap-2 xl:absolute xl:bottom-4 xl:right-4 xl:left-4">
-                                            <li>
-                                                <AddCardModal inStudent={true} />
-                                            </li>
-                                            <li>
-                                                <AddBankModal inStudent={true} />
-                                            </li>
-                                        </ul>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
+              
 
-                    {/* ACTIVE PAYMENT SCHEDULES */}
-                    {paymentsLoading ? (
-                        <div className="panel xl:col-span-2 ">
-                            <div className="flex items-center justify-center h-56">
-                                <span className="animate-spin border-4 border-primary border-l-transparent rounded-full w-10 h-10 inline-block align-middle m-auto mb-10"></span>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="panel xl:col-span-2">
-                            <div className="mb-5">
-                                <h5 className="font-semibold text-lg dark:text-white-light">Active Payment Schedules</h5>
-                                {paymentSchedules?.length > 0 && (
-                                    <div>
-                                        <button className="btn btn-info gap-x-1 w-full" onClick={handleGoToPaymentSchedules}>
-                                            <IconDollarSignCircle /> Create a new Payment Schedule
-                                        </button>
-                                        <div className="flex mt-4 items-center justify-center">
-                                            <button
-                                                className="gap-x-1 text-primary hover:text-emerald-800 justify-center items-center"
-                                                onClick={() => navigate('/students/view-active-payment-schedules')}
-                                            >
-                                                View All Schedules
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            {!hasCards ? (
-                                <div className="flex items-center justify-center h-56">
-                                    <div className="text-center">
-                                        <div className="text-center text-gray-400">No billing information found</div>
-                                        <button type="button" className="btn btn-info mx-auto mt-4" onClick={() => handleGoToPayments()}>
-                                            Add Billing Account First
-                                        </button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <>
-                                    <div className="h-56 overflow-y-auto p-4">
-                                        <div className="border-b border-[#ebedf2] dark:border-[#1b2e4b]">
-                                            {paymentSchedules?.map((schedule: any, index: any) => (
-                                                <div key={index} className="flex items-center justify-between py-2">
-                                                    <h6 className="text-[#515365] font-semibold dark:text-white-dark">
-                                                        {schedule?.ScheduleStatus === 'Active' ? (
-                                                            <span className="text-primary">Active</span>
-                                                        ) : (
-                                                            <span className="text-danger">{schedule?.ScheduleStatus}</span>
-                                                        )}
-
-                                                        <span className="block text-white-dark dark:text-white-light">{formatDate(schedule?.EndDate)}</span>
-                                                    </h6>
-                                                    <div className="flex items-start justify-between ltr:ml-auto rtl:mr-auto">
-                                                        <p className="font-semibold">${parseInt(schedule?.PaymentAmount)?.toFixed(2)}</p>
-                                                        <div className="dropdown ltr:ml-4 rtl:mr-4">
-                                                            <Dropdown
-                                                                offset={[0, 5]}
-                                                                placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
-                                                                btnClassName="hover:text-primary"
-                                                                button={<IconHorizontalDots className="opacity-80 hover:opacity-100" />}
-                                                            >
-                                                                <ul className="!min-w-[150px]">
-                                                                    <li>
-                                                                        <button type="button">View Details</button>
-                                                                    </li>
-                                                                </ul>
-                                                            </Dropdown>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                            {paymentSchedules?.length < 1 && <div className="text-center py-2">No active payment schedules</div>}
-                                        </div>
-                                    </div>
-
-                                    <div className="absolute bottom-4 left-4 right-4">
-                                        {paymentSchedules?.length < 1 ? (
-                                            <div className="text-center ml-as">
-                                                <button className="btn btn-primary btn-sm w-full" onClick={handleGoToPaymentSchedules}>
-                                                    <IconPlus /> Add Payment Schedule
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <div className="">
-                                                <Link to="/students/view-payment-history" className="btn btn-danger btn-sm gap-x-2">
-                                                    <IconCalendar /> View Payment History
-                                                </Link>
-                                            </div>
-                                        )}
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    )}
                     {/* SCHEDULE */}
-                    <div className="panel lg:col-span-1 xl:col-span-2 xl:row-start-3">
+                    <div className="panel lg:col-span-1 xl:col-span-2 ">
                         <div className="flex items-center justify-between mb-5">
                             <h5 className="font-semibold text-lg dark:text-white-light">Schedule and Classes</h5>
                         </div>
@@ -726,7 +568,7 @@ const ViewProspect = () => {
 
                     {/* NOTES */}
 
-                    <div className=" lg:row-start-1 xl:row-start-2  xl:col-span-4 lg:row-span-6">
+                    <div className="col-span-full">
                         <div className="flex items-center justify-between mb-5">
                             <h5 className="font-semibold text-lg dark:text-white-light">Notes</h5>
                             {updateNotes ? (

@@ -16,7 +16,6 @@ export default function AddPipelineStep() {
     const [pipelineStepName, setPipelineStepName] = useState<string>('');
     const [notes, setNotes] = useState<string>('');
     const [smsDefaultText, setSmsDefaultText] = useState<string>('');
-    const [emailDefaultText, setEmailDefaultText] = useState<string>('');
     const [emailSubject, setEmailSubject] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -40,15 +39,6 @@ export default function AddPipelineStep() {
 
     const handleSmsDefaultTextChange = (e: any) => {
         setSmsDefaultText(e.target.value);
-    };
-
-    const handleEmailDefaultTextChange = (e: any) => {
-        setEmailDefaultText(e.target.value);
-    };
-
-    const handleCopyImageURL = (url: any) => {
-        navigator.clipboard.writeText(url);
-        showMessage('URL Successfully Copied!');
     };
 
     const data = {
@@ -110,7 +100,7 @@ export default function AddPipelineStep() {
                                 </div>
                             </div>
                             <div className="flex">
-                                <button onClick={handleSubmit} disabled={isLoading} className='btn btn-primary ml-auto'>
+                                <button onClick={handleSubmit} disabled={isLoading} className="btn btn-primary ml-auto">
                                     {isLoading ? 'Submitting...' : 'Submit'}
                                 </button>
                             </div>

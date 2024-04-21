@@ -10,8 +10,6 @@ export default function AuthContextProvider({ children }) {
     const [suid, setSuid] = useState('');
     const [classes, setClasses] = useState([]);
     const [staff, setStaff] = useState([]);
-    const [students, setStudents] = useState([]);
-    const [prospects, setProspects] = useState([]);
     const [pipelineSteps, setPipelineSteps] = useState([]);
     const [programs, setPrograms] = useState([]);
     const [waitingLists, setWaitingLists] = useState([]);
@@ -19,10 +17,10 @@ export default function AuthContextProvider({ children }) {
     const [marketingSources, setMarketingSources] = useState([]);
     const [searchedStudentsAndProspects, setSearchedStudentsAndProspects] = useState([]);
     const [showLoading, setShowLoading] = useState(true);
-    const [studentIntros, setStudentIntros] = useState([]);
     const [prospectIntros, setProspectIntros] = useState([]);
     const [scheduleID, setScheduleID] = useState('');
     const [studioInfo, setStudioInfo] = useState({});
+    const [latePayementPipeline, setLatePayementPipeline] = useState([]);
 
     const [update, setUpdate] = useState(false);
 
@@ -38,6 +36,8 @@ export default function AuthContextProvider({ children }) {
     };
 
     const getData = async () => {
+        const year = new Date().getFullYear();
+        const month = new Date().getMonth() + 1;
         fetchData(`${REACT_API_BASE_URL}/studio-access/getClassesByStudioId/${suid}`, setClasses);
         fetchData(`${REACT_API_BASE_URL}/staff-access/getStaffByStudioId/${suid}/1`, setStaff);
         fetchData(`${REACT_API_BASE_URL}/marketing-access/getStudentPipelineStepsByStudioId/${suid}`, setPipelineSteps);
@@ -45,10 +45,10 @@ export default function AuthContextProvider({ children }) {
         fetchData(`${REACT_API_BASE_URL}/marketing-access/getWaitingListsByStudioId/${suid}`, setWaitingLists);
         fetchData(`${REACT_API_BASE_URL}/marketing-access/getPipelineStepsByStudioId/${suid}`, setProspectPipelineSteps);
         fetchData(`${REACT_API_BASE_URL}/marketing-access/getMarketingMethodsByStudioId/${suid}`, setMarketingSources);
-        fetchData(`${REACT_API_BASE_URL}/student-access/getStudentIntros/${suid}/${month}/${year}`, setStudentIntros);
         fetchData(`${REACT_API_BASE_URL}/student-access/getProspectIntros/${suid}/${month}/${year}`, setProspectIntros);
+        fetchData(`${REACT_API_BASE_URL}/student-access/getPaymentPipelineStepsByStudioId/${suid}`, setLatePayementPipeline);
     };
-   
+
     const getSCHDATA = async () => {
         const response = await fetch(`${REACT_API_BASE_URL}/daily-schedule-tools/getDailyScheduleByStudioId/${suid}`);
         const data = await response.json();
@@ -76,8 +76,6 @@ export default function AuthContextProvider({ children }) {
 
     useEffect(() => {
         setShowLoading(true);
-        const year = new Date().getFullYear();
-        const month = new Date().getMonth() + 1;
         getData();
         getSCHDATA();
         setShowLoading(false);
@@ -122,8 +120,6 @@ export default function AuthContextProvider({ children }) {
                 update,
                 setUpdate,
                 staff,
-                students,
-                prospects,
                 pipelineSteps,
                 programs,
                 waitingLists,
@@ -132,10 +128,10 @@ export default function AuthContextProvider({ children }) {
                 searchedStudentsAndProspects,
                 setSearchedStudentsAndProspects,
                 showLoading,
-                studentIntros,
                 prospectIntros,
                 studioInfo,
-                scheduleID
+                scheduleID,
+                latePayementPipeline
             }}
         >
             {children}

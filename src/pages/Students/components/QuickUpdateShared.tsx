@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { updateStudentPipelineStatus } from '../../../functions/api';
+import { updateProspectPipelineStatus, updateStudentPipelineStatus } from '../../../functions/api';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import { constFormateDateMMDDYYYY, formatDate, showErrorMessage, showMessage } from '../../../functions/shared';
@@ -43,7 +43,29 @@ export default function QuickUpdateShared({ student, setShowActionModal, update,
             showErrorMessage('Error updating student');
         }
     };
-    
+
+    const handleUpdateProspect = async (e: any) => {
+        e.preventDefault();
+        const newNote = noteDate + ' ' + staffInitials + ' ' + newNotes + '\n' + student.notes;
+        const formatedDate = formatDate(newContactDate);
+        const data = {
+            prospectId: student.ProspectId,
+            pipelineStatus: currentPipeline,
+            nextContactDate: formatedDate,
+            notes: newNote,
+        };
+        const updatePipelineStatus = await updateProspectPipelineStatus(data);
+
+        if (updatePipelineStatus.status === 200) {
+            showMessage('Student Updated Successfully');
+            setShowActionModal(false);
+            setUpdate(!update);
+        } else {
+            console.log('Error updating student');
+            showErrorMessage('Error updating student');
+        }
+    };
+
     return (
         <div className="space-y-4">
             <div className="grid grid-cols-2">
@@ -70,7 +92,11 @@ export default function QuickUpdateShared({ student, setShowActionModal, update,
             </div>
             <div>
                 <label htmlFor="contactDate">Next Contact Date</label>
-                <Flatpickr value={newContactDate} className="form-input" options={{ dateFormat: 'm-d-Y', position: 'auto right' }} onChange={(date: any) => setNewContactDate(date)} />
+                <Flatpickr 
+                value={newContactDate} 
+                className="form-input" 
+                options={{ dateFormat: 'm-d-Y', position: 'auto right' }} 
+                onChange={(date: any) => setNewContactDate(date)} />
             </div>
             <div>
                 <input type="text" className="form-input w-full" placeholder="Staff Initials" value={staffInitials} onChange={(e) => setStaffInitials(e.target.value)} />
@@ -79,7 +105,7 @@ export default function QuickUpdateShared({ student, setShowActionModal, update,
                 <textarea className="form-textarea w-full" placeholder="Add a note" rows={4} value={newNotes} onChange={(e) => setNewNotes(e.target.value)} />
             </div>
             <div className="w-full">
-                <button className="btn btn-info ml-auto" onClick={handleUpdateStudent}>
+                <button className="btn btn-info ml-auto" onClick={isPrpospect ? handleUpdateProspect : handleUpdateStudent}>
                     Update Student
                 </button>
             </div>

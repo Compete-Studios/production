@@ -61,14 +61,14 @@ export default function ViewStudentsInPipeline() {
                     </Link>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2 dark:text-white">
-                    <span>{pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id))?.StepName}</span>
+                    <span>{pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))?.StepName}</span>
                 </li>
             </ul>
             <div className="px-4 sm:px-6 lg:px-8 mt-4">
                 <div className="lg:flex lg:items-center">
                     <div className="sm:flex-auto w-full sm:gap-x-4">
                         <h1 className="uppercase font-semibold text-lg dark:text-white">
-                            Students in Pipeline Step <span className="font-bold text-primary">{pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id))?.StepName}</span>
+                            Students in Pipeline Step <span className="font-bold text-primary">{pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))?.StepName}</span>
                         </h1>
                         <p className='dark:text-white'>*Students with a highlighted background should be contacted.</p>
                     </div>
@@ -129,7 +129,7 @@ export default function ViewStudentsInPipeline() {
                                                     </td>
                                                     <td className="relative whitespace-nowrap text-right text-sm font-medium">
                                                         {new Date(list.NextContactDate) <= new Date() && (
-                                                            <ActionItem student={list} pipeline={pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id))} studioOptions={studioOptions} 
+                                                            <ActionItem student={list} pipeline={pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))} studioOptions={studioOptions} 
                                                             setUpdate={setUpdate} update={update}
                                                             />
                                                         )}

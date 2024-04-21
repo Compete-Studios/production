@@ -7,9 +7,10 @@ import IconBolt from '../../components/Icon/IconBolt';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { REACT_API_BASE_URL } from '../../constants';
-import { getProspectsInScheduleByPipelineStep, getStudentsByNextContactDate, getStudentsInScheduleByPipelineStep, getStudioOptions } from '../../functions/api';
+import { getProspectsInScheduleByPipelineStep, getStudentsInScheduleByPipelineStep, getStudioOptions } from '../../functions/api';
 import ActionItemForSchedule from './ActionItemForSchedule';
 import { hashTheID } from '../../functions/shared';
+
 
 export default function Schedules() {
     const { suid, scheduleID, update, setUpdate } = UserAuth();
@@ -50,11 +51,16 @@ export default function Schedules() {
 
     const getStudents = async () => {
         const studentsArray: any = [];
+        // Get today's date
+        const today = new Date();
+        // Format today's date as 'YYYY-MM-DD'
+        const formattedDate = today.toISOString().split('T')[0];
+
         for (let i = 0; i < dailyScheduleStudentSteps.length; i++) {
             const data = {
                 studioId: suid,
                 pipelineStepId: dailyScheduleStudentSteps[i].PipelineStepId,
-                nextContactDate: '2024-04-13',
+                nextContactDate: formattedDate, // Set to today's date
             };
             const newStudData = await getStudentsInScheduleByPipelineStep(data);
             if (newStudData.recordset.length > 0) {
@@ -111,14 +117,17 @@ export default function Schedules() {
         window.print();
     };
 
-    console.log(dailyScheduleStudents);
     return (
         <div className="grid 2xl:grid-cols-2 grid-cols-1 gap-6 mb-6">
             <div className="panel h-full w-full">
                 <div className="flex items-center justify-between mb-5">
                     <h5 className="font-semibold text-lg dark:text-white-light">Prospects Schedule</h5>
                     <div className="">
-                        <IconPrinter className="w-5 h-5 text-black/70 dark:text-white/70 hover:!text-primary" />
+                        <Tippy content="Print Schedule">
+                            <button onClick={handlePrintSchedule}>
+                                <IconPrinter className="w-5 h-5 text-black/70 dark:text-white/70 hover:!text-primary" />
+                            </button>
+                        </Tippy>
                     </div>
                 </div>
                 <div className="table-responsive">
@@ -172,7 +181,11 @@ export default function Schedules() {
                 <div className="flex items-center justify-between mb-5">
                     <h5 className="font-semibold text-lg dark:text-white-light">Students Schedule</h5>
                     <div className="">
-                        <IconPrinter className="w-5 h-5 text-black/70 dark:text-white/70 hover:!text-primary" />
+                        <Tippy content="Print Schedule">
+                            <button onClick={handlePrintSchedule}>
+                                <IconPrinter className="w-5 h-5 text-black/70 dark:text-white/70 hover:!text-primary" />
+                            </button>
+                        </Tippy>
                     </div>
                 </div>
                 <div className="table-responsive">
@@ -190,18 +203,14 @@ export default function Schedules() {
                             {dailyScheduleStudents?.map((student: any) => (
                                 <tr className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
                                     <td className="text-black dark:text-white flex-wra">
-                                        <div >
-                                            {student?.StepName}
-                                        </div>
+                                        <div>{student?.StepName}</div>
                                     </td>
                                     <td className="">
                                         <Link to={`/students/view-student/${hashTheID(student.Student_id)}/${hashTheID(suid)}`} className="flex hover:text-green-800 text-primary font-bold">
                                             {student?.StudentName}
                                         </Link>
                                     </td>
-                                    <td>
-                                        {student?.Contact1}
-                                    </td>
+                                    <td>{student?.Contact1}</td>
                                     <td>
                                         {student?.Classes?.map((className: string) => (
                                             <div key={className}>{className}</div>

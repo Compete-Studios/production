@@ -5,10 +5,43 @@ import { UserAuth } from '../../context/AuthContext';
 import IconUsers from '../../components/Icon/IconUsers';
 import IconEdit from '../../components/Icon/IconEdit';
 import IconPlus from '../../components/Icon/IconPlus';
-
+import IconDollarSignCircle from '../../components/Icon/IconDollarSignCircle';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { setPageTitle } from '../../store/themeConfigSlice';
+import { Link } from 'react-router-dom';
+import { showWarningMessage } from '../../functions/shared';
+import { deleteLatePaymentPipelineStep } from '../../functions/api';
 
 export default function LatePaymentPipeline() {
-    const {pipelineSteps} = UserAuth();
+    const { latePayementPipeline, update, setUpdate, suid } = UserAuth();
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('Late Payment Pipeline'));
+    });
+
+    const handleDeleteStep = (prosid: any) => {
+        showWarningMessage('Are you sure you want to delete this late pipeline step?', 'Remove Pipeline Step', 'Your Pipeline Step has been removed successfully')
+            .then(async (confirmed: boolean) => {
+                if (confirmed) {
+                    const response = await deleteLatePaymentPipelineStep(prosid);
+                    console.log(response);
+                    if (response.status === 200) {
+                        setUpdate(!update);
+                    }
+                } else {
+                    // User canceled the action
+                    console.log('User canceled');
+                }
+            })
+            .catch((error) => {
+                // Handle error if any
+                console.error('Error:', error);
+            });
+    };
+
+    console.log(latePayementPipeline);
+
     return (
         <div className="panel px-0 border-white-light dark:border-[#1b2e4b]">
             <div className="mb-4.5 px-5 flex md:items-center md:flex-row flex-col gap-5">
@@ -17,13 +50,13 @@ export default function LatePaymentPipeline() {
                         <input type="text" className="form-input w-auto" placeholder="Search..." />
                     </div>
                 </div> */}
-                 <h2 className="text-xl">Student Pipeline</h2>
+                <h2 className="text-xl">Late Payment Pipeline</h2>
 
                 <div className="gap-2 ltr:ml-auto rtl:mr-auto">
-                    <button type="button" className="btn btn-primary gap-2 ltr:ml-auto rtl:mr-auto">
+                    <Link to="/payments/late-payment-pipeline/add-new-pipeline-step" type="button" className="btn btn-primary gap-2 ltr:ml-auto rtl:mr-auto">
                         <IconPlus />
                         Add a Pipeline Step
-                    </button>
+                    </Link>
                 </div>
             </div>
             <div className="table-responsive">
@@ -31,28 +64,25 @@ export default function LatePaymentPipeline() {
                     <thead>
                         <tr>
                             <th>Pipeline Step</th>
-                            <th>Students In Step</th>
-                            
+                            <th>Payments In Step</th>
+
                             <th className="text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {pipelineSteps?.map((data: any) => {
+                        {latePayementPipeline?.map((data: any) => {
                             return (
-                                <tr key={data.PlacementOrdinal} className={`${
-                                    data?.thisStudentPipelineStepNeedsContact &&
-                                    "bg-cs"
-                                  }`}>
+                                <tr key={data.PlacementOrdinal} className={`${data?.thisPipelineStepNeedsContact && 'bg-cs'}`}>
                                     <td>
-                                        <div className="whitespace-nowrap">{data.StepName}</div>
+                                        <div className="whitespace-nowrap">{data.PipelineStepName}</div>
                                     </td>
-                                    <td>{data.numberOfStudentsInStep}</td>
+                                    <td>{data.numberOfPaymentsInStep}</td>
 
                                     <td className="text-center gap-x-4 flex items-center justify-center">
-                                        <Tippy content="View Roster">
-                                            <button type="button">
-                                                <IconUsers className="w-5 h-5 text-orange-500 hover:text-orange-800" />
-                                            </button>
+                                        <Tippy content="View Payments">
+                                            <Link to={`/payments/late-payment-pipeline/view-payments/${data.PaymentPipelineStepId}/${suid}`} type="button">
+                                                <IconDollarSignCircle className="w-5 h-5 text-success hover:text-green-900" />
+                                            </Link>
                                         </Tippy>
                                         <Tippy content="Edit Step">
                                             <button type="button">
@@ -60,8 +90,8 @@ export default function LatePaymentPipeline() {
                                             </button>
                                         </Tippy>
                                         <Tippy content="Delete Step">
-                                            <button type="button">
-                                                <IconTrash className="w-5 h-5" />
+                                            <button type="button" onClick={() => handleDeleteStep(data.PaymentPipelineStepId)}>
+                                                <IconTrash className="w-5 h-5 text-danger hover:text-red-800" />
                                             </button>
                                         </Tippy>
                                     </td>

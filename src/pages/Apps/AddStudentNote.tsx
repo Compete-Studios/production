@@ -25,7 +25,11 @@ export default function AddStudentNote() {
     ]);
 
     useEffect(() => {
-        setStudentOptions(students.map((student: any) => ({ value: student.Student_ID, label: student.Name })));
+        if (students) {
+            setStudentOptions(students?.map((student: any) => ({ value: student.Student_ID, label: student.Name })));
+        } else {
+            setStudentOptions([]);
+        }
     }, [students]);
 
     const handleAddNote = (e: any) => {
@@ -83,7 +87,7 @@ export default function AddStudentNote() {
                             >
                                 <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg my-8 text-black dark:text-white-dark">
                                     <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
-                                        <h5 className="font-bold text-lg">Add Note</h5>
+                                        <h5 className="font-bold text-lg">Add Student Note</h5>
                                         <button type="button" className="text-white-dark hover:text-dark" onClick={() => setModal2(false)}>
                                             <IconX />
                                         </button>

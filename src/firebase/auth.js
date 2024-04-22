@@ -2,61 +2,20 @@ import { arrayUnion, doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth';
 
-// export const login = async (userName, password) => { 
-//     const docRef = doc(db, 'users', userName);
-//     const docSnap = await getDoc(docRef);
-//     if (!docSnap.exists()) {
-//         return { error: 'No user with that username' };
-//     }
-//     const email = docSnap.data().email;
-
-//     if (!email) {
-//         return { error: 'No user with that username' };
-//     } else {
-//         try {
-//             const userCredential = await signInWithEmailAndPassword(auth, email, password);
-//             // Check if the display name is not set
-//             if (!userCredential.user.displayName) {
-//                 // Set display name using updateProfile
-//                 await updateProfile(userCredential.user, {
-//                     displayName: userName,
-//                 });
-//             }
-
-//             if (!userCredential.user.photoURL) {
-//                 // Set display name using updateProfile
-//                 await updateProfile(userCredential.user, {
-//                     photoURL: docSnap.data().studioID[0],
-//                 });
-//             }
-
-//             // If the sign-in is successful, you can return the userCredential or user data here
-//             return docSnap.data().studioID[0];
-//         } catch (error) {
-//             // If an error occurs during sign-in, catch it and return the error message
-//             return {
-//                 error: error.message === 'Firebase: Error (auth/wrong-password).' ? 'Incorrect Password' : error.message,
-//             };
-//         }
-//     }
-// };
-
-export const login = async (userName, password) => { 
+export const login = async (userName, password) => {
     const docRef = doc(db, 'users', userName);
     const docSnap = await getDoc(docRef);
-    
     if (!docSnap.exists()) {
         return { error: 'No user with that username' };
     }
-    
     const email = docSnap.data().email;
 
     if (!email) {
         return { error: 'No user with that username' };
     } else {
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);         
+            localStorage.setItem('isMaster', 'false');
             // Check if the display name is not set
             if (!userCredential.user.displayName) {
                 // Set display name using updateProfile
@@ -72,10 +31,8 @@ export const login = async (userName, password) => {
                 });
             }
 
-            // Generate JWT with expiration time 5 minutes from now (for testing)
-            const expirationTime = new Date().getTime() + (5 * 60 * 1000); // 5 minutes in milliseconds
-            const token = await userCredential.user.getIdToken(true); // Force refresh token
-            return { token, expirationTime, studioID: docSnap.data().studioID[0] };
+            // If the sign-in is successful, you can return the userCredential or user data here
+            return docSnap.data().studioID[0];
         } catch (error) {
             // If an error occurs during sign-in, catch it and return the error message
             return {
@@ -86,11 +43,10 @@ export const login = async (userName, password) => {
 };
 
 
-
-
 export const logout = async () => {
     try {
         await signOut(auth);
+        window.location.reload();
         return true;
     } catch (error) {
         return error.message;
@@ -182,11 +138,11 @@ export const logout = async () => {
 
 //     try {
 //         for (let i = 0; i < tables.length; i++) {
-        
+
 //             const res = await fetch(`http://localhost:3333/api/crud/getAllFromTable/${tables[i]}`);
 //             const data = await res.json();
 //             console.log(tables[i], data);
-    
+
 //         }
 //         return true;
 //     } catch (error) {
@@ -194,7 +150,6 @@ export const logout = async () => {
 //         return error.message;
 //     }
 // };
-
 
 // export const getAllFromTable = async (route, table, parameter) => {
 //     try {
@@ -207,7 +162,7 @@ export const logout = async () => {
 // };
 
 export const seedStudioInfo = async (studioID, data) => {
-    try {        
+    try {
         const docRef = doc(db, 'studios', studioID);
         await setDoc(docRef, data);
         return true;
@@ -218,7 +173,7 @@ export const seedStudioInfo = async (studioID, data) => {
 
 export const addTable = async (table, data) => {
     try {
-        const docRef = doc(db, "studios", "tables", table);
+        const docRef = doc(db, 'studios', 'tables', table);
         await setDoc(docRef, data);
         return true;
     } catch (error) {

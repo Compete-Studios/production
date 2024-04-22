@@ -22,8 +22,11 @@ import IconMenuWidgets from '../Icon/Menu/IconMenuWidgets';
 import IconMenuTables from '../Icon/Menu/IconMenuTables';
 import IconMenuUsers from '../Icon/Menu/IconMenuUsers';
 import IconUserPlus from '../Icon/IconUserPlus';
+import { UserAuth } from '../../context/AuthContext';
+import IconMenuAuthentication from '../Icon/Menu/IconMenuAuthentication';
 
 const Sidebar = () => {
+    const { studioInfo, isMaster, masters, suid }: any = UserAuth();
     const [currentMenu, setCurrentMenu] = useState<string>('');
     const themeConfig = useSelector((state: IRootState) => state.themeConfig);
     const semidark = useSelector((state: IRootState) => state.themeConfig.semidark);
@@ -35,6 +38,16 @@ const Sidebar = () => {
             return oldValue === value ? '' : value;
         });
     };
+
+    console.log(studioInfo, 'studioInfo');
+
+    const handleSetNewStudio = async (studioID: any) => {
+        const idString = studioID.toString();
+        const masterStudioString = suid.toString();
+        localStorage.setItem('suid', idString);
+        localStorage.setItem('isMaster', "true");  
+        window.location.reload();          
+    }   
 
     useEffect(() => {
         const selector = document.querySelector('.sidebar ul a[href="' + window.location.pathname + '"]');
@@ -60,6 +73,8 @@ const Sidebar = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location]);
 
+    console.log(masters)
+
     return (
         <div className={semidark ? 'dark' : ''}>
             <nav
@@ -84,7 +99,7 @@ const Sidebar = () => {
                             <li className="nav-item">
                                 <NavLink to="/dashboard" className="group">
                                     <div className="flex items-center">
-                                    <IconMenuDashboard className="group-hover:!text-primary shrink-0" />
+                                        <IconMenuDashboard className="group-hover:!text-primary shrink-0" />
                                         <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('dashboard')}</span>
                                     </div>
                                 </NavLink>
@@ -153,7 +168,7 @@ const Sidebar = () => {
                                     </ul>
                                 </AnimateHeight>
                             </li>
-                            
+
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'payments' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('payments')}>
                                     <div className="flex items-center">
@@ -312,6 +327,34 @@ const Sidebar = () => {
                                             </div>
                                         </NavLink>
                                     </li>
+                                    {isMaster && (
+                                        <li className="menu nav-item">
+                                            <button type="button" className={`${currentMenu === 'master' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('master')}>
+                                                <div className="flex items-center">
+                                                    <IconMenuAuthentication className="group-hover:!text-primary shrink-0" />
+                                                    <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Accounts</span>
+                                                </div>
+
+                                                <div className={currentMenu !== 'students' ? 'rtl:rotate-90 -rotate-90' : ''}>
+                                                    <IconCaretDown />
+                                                </div>
+                                            </button>
+
+                                            <AnimateHeight duration={300} height={currentMenu === 'master' ? 'auto' : 0}>
+                                                <ul className="sub-menu text-gray-500">
+                                                   {masters?.map((master: any) => (
+                                                        <li key={master.studioID}>
+                                                            <button 
+                                                                type="button" 
+                                                                onClick={() => handleSetNewStudio(master.studioID)}
+                                                                className="nav-link group w-full"
+                                                            >{master.studioName}</button>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </AnimateHeight>
+                                        </li>
+                                    )}
                                 </ul>
                             </li>
 

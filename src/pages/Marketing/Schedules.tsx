@@ -11,9 +11,8 @@ import { getProspectsInScheduleByPipelineStep, getStudentsInScheduleByPipelineSt
 import ActionItemForSchedule from './ActionItemForSchedule';
 import { hashTheID } from '../../functions/shared';
 
-
 export default function Schedules() {
-    const { suid, scheduleID, update, setUpdate } = UserAuth();
+    const { suid, scheduleID, update, setUpdate, studioInfo }: any = UserAuth();
     const [dailyScheduleStudentSteps, setDailyScheduleStudentSteps] = useState<any>([]);
     const [dailyScheduleProspectSteps, setDailyScheduleProspectSteps] = useState<any>([]);
     const [dailyScheduleStudents, setDailyScheduleStudents] = useState<any>([]);
@@ -119,19 +118,19 @@ export default function Schedules() {
 
     return (
         <div className="grid 2xl:grid-cols-2 grid-cols-1 gap-6 mb-6">
-            <div className="panel h-full w-full">
-                <div className="flex items-center justify-between mb-5">
-                    <h5 className="font-semibold text-lg dark:text-white-light">Prospects Schedule</h5>
-                    <div className="">
-                        <Tippy content="Print Schedule">
-                            <button onClick={handlePrintSchedule}>
+            <div className="panel px-0 pb-0">
+            <div className="flex items-center justify-between mb-5 px-5">
+                    <h5 className="font-semibold text-lg dark:text-white-light">Prospect Schedule</h5>
+                    <Tippy content="Print Schedule">
+                        <button type="button" onClick={handlePrintSchedule} className="font-semibold hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-600">
+                            <span className="flex items-center">
                                 <IconPrinter className="w-5 h-5 text-black/70 dark:text-white/70 hover:!text-primary" />
-                            </button>
-                        </Tippy>
-                    </div>
+                            </span>
+                        </button>
+                    </Tippy>
                 </div>
                 <div className="table-responsive">
-                    <table>
+                    <table className="">
                         <thead>
                             <tr>
                                 <th className="ltr:rounded-l-md rtl:rounded-r-md">Pipeline Step</th>
@@ -177,16 +176,17 @@ export default function Schedules() {
                 </div>
             </div>
 
-            <div className="panel h-full w-full">
-                <div className="flex items-center justify-between mb-5">
+            <div className="panel px-0 pb-0">               
+
+                <div className="flex items-center justify-between mb-5 px-5">
                     <h5 className="font-semibold text-lg dark:text-white-light">Students Schedule</h5>
-                    <div className="">
-                        <Tippy content="Print Schedule">
-                            <button onClick={handlePrintSchedule}>
+                    <Tippy content="Print Schedule">
+                        <button type="button" onClick={handlePrintSchedule} className="font-semibold hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-600">
+                            <span className="flex items-center">
                                 <IconPrinter className="w-5 h-5 text-black/70 dark:text-white/70 hover:!text-primary" />
-                            </button>
-                        </Tippy>
-                    </div>
+                            </span>
+                        </button>
+                    </Tippy>
                 </div>
                 <div className="table-responsive">
                     <table>
@@ -221,7 +221,7 @@ export default function Schedules() {
 
                                         <Tippy content="View">
                                             <Link to={`/students/view-student/${hashTheID(student.Student_id)}/${hashTheID(suid)}`} className="flex hover:text-green-800 text-primary">
-                                                <IconEye fill={true} />
+                                                <IconEye />
                                             </Link>
                                         </Tippy>
                                     </td>

@@ -242,6 +242,16 @@ export const getPaymentPipelineStepsByStudioId = async (studioId) => {
     }
 };
 
+export const getPaymentPipelineStepById = async (pipelineStepId) => {
+    try {
+        const response = await fetchData(`late-payment-pipeline/getPaymentPipelineStep/${pipelineStepId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
 export const getInvoicesByStudioId = async (studioId, startDate, endDate) => {
     try {
         const response = await fetchData(`invoice-access/getInvoicesByStudioId/${studioId}/${startDate}/${endDate}`, 'get');

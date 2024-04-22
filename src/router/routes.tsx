@@ -191,7 +191,7 @@ const routes = [
         element: <ViewPayments />,
     },
     {
-        path: '/payments/late-payment-pipeline/edit-late-pipeline-step',
+        path: '/payments/late-payment-pipeline/edit-late-pipeline-step/:id/:stud',
         element: <EditLatePayementPipelineStep />,
     },
     {

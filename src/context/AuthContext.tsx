@@ -3,9 +3,9 @@ import { auth, db } from '../firebase/firebase';
 import { REACT_API_BASE_URL } from '../constants';
 import { doc, getDoc } from 'firebase/firestore';
 
-const UserContext = createContext();
+const UserContext: any = createContext<any>(null);
 
-export default function AuthContextProvider({ children }) {
+export default function AuthContextProvider({ children }: any) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [suid, setSuid] = useState('');
     const [classes, setClasses] = useState([]);
@@ -21,10 +21,12 @@ export default function AuthContextProvider({ children }) {
     const [scheduleID, setScheduleID] = useState('');
     const [studioInfo, setStudioInfo] = useState({});
     const [latePayementPipeline, setLatePayementPipeline] = useState([]);
+    const [masters, setMasters] = useState([]);
+    const [isMaster, setIsMaster] = useState(false);
 
     const [update, setUpdate] = useState(false);
 
-    const fetchData = async (url, setter) => {
+    const fetchData = async (url: any, setter: any) => {
         try {
             const response = await fetch(url);
             const data = await response.json();
@@ -34,6 +36,25 @@ export default function AuthContextProvider({ children }) {
             console.error(error);
         }
     };
+
+    const  fetchFromAPI = async (endpointURL: any, opts: any) => {
+        const { method, body } :any = { method: 'POST', body: null, ...opts }
+        
+    
+        const user = auth.currentUser
+        const token = user && (await user.getIdToken())
+    
+        const res = await fetch(`${REACT_API_BASE_URL}/${endpointURL}`, {
+            method,
+            ...(body && { body: JSON.stringify(body) }),
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        })
+    
+        return res.json()
+    }
 
     const getData = async () => {
         const year = new Date().getFullYear();
@@ -59,16 +80,60 @@ export default function AuthContextProvider({ children }) {
         }
     };
 
-    const getStudioInfo = async (suid) => {
+    const getStudioInfo = async (suid: any) => {
+        const isMasterLocal = localStorage.getItem('isMaster');
+        const masterID = auth.currentUser?.photoURL;
         try {
             const docRef = doc(db, 'studios', suid);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
                 setStudioInfo(docSnap.data());
+                if (docSnap.data().MasterStudio === 1) {
+                    setIsMaster(true);
+                    getMasterStudioNumbers(docSnap.data().Studio_Id);
+                } else if (isMasterLocal === 'true') {
+                    setIsMaster(true);
+                    getMasterStudioNumbers(masterID);
+                } else {
+                    setIsMaster(false);
+                }
             } else {
                 // doc.data() will be undefined in this case
                 console.log('No such document!');
             }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const getStudioNameById = async (id: any) => {
+        try {
+            const response = await fetchFromAPI(`studio-access/getStudioInfo/${id}`, {
+                method: 'GET',
+            });
+            return response.recordset[0];
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const getMasterStudioNumbers = async (id: any) => {
+        try {
+            const response = await fetchFromAPI(`admin-tools/getMasterStudioRosterById/${id}`, {
+                method: 'GET',
+            });
+            const masters: any = [];
+
+            for (let i = 0; i < response.recordset.length; i++) {
+                const master = response.recordset[i];
+                const masterInfo = await getStudioNameById(master.StudioId);
+                masters.push({
+                    studioID: response.recordset[i].StudioId,
+                    studioName: masterInfo.Studio_Name,
+                    userName: masterInfo.Desired_UserName,
+                });
+            }
+            setMasters(masters);
         } catch (error) {
             console.error(error);
         }
@@ -84,31 +149,46 @@ export default function AuthContextProvider({ children }) {
     useEffect(() => {
         const storedLoggedIn = localStorage.getItem('isLoggedIn');
         const storedSuid = localStorage.getItem('suid');
+        const isMasterLocal = localStorage.getItem('isMaster');
+    
         if (storedLoggedIn) {
             setIsLoggedIn(true);
         }
+    
         if (storedSuid) {
             setSuid(storedSuid);
         }
-
+    
         const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-            if (currentUser) {
+            if (currentUser && isMasterLocal === 'true') {
                 setIsLoggedIn(true);
-                setSuid(currentUser.photoURL);
+                setIsMaster(true);
+                const selectedSuid: any = storedSuid;
+                setSuid(selectedSuid);
                 localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('suid', currentUser.photoURL);
-                getStudioInfo(currentUser.photoURL);
+                localStorage.setItem('suid', selectedSuid);
+                getStudioInfo(selectedSuid);
+            } else if (currentUser) {
+                setIsLoggedIn(true);
+                const selectedSuid: any = currentUser.photoURL;
+                setSuid(selectedSuid);
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('suid', selectedSuid);
+                getStudioInfo(selectedSuid);
             } else {
                 setIsLoggedIn(false);
                 localStorage.removeItem('isLoggedIn');
                 localStorage.removeItem('suid');
+                localStorage.removeItem('isMaster');
+                localStorage.removeItem('masterStudioID');
             }
         });
-
+    
         return () => {
             unsubscribe();
         };
     }, []);
+    
 
     return (
         <UserContext.Provider
@@ -131,7 +211,9 @@ export default function AuthContextProvider({ children }) {
                 prospectIntros,
                 studioInfo,
                 scheduleID,
-                latePayementPipeline
+                latePayementPipeline,
+                masters,
+                isMaster,
             }}
         >
             {children}

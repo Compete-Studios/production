@@ -515,7 +515,7 @@ const rowData = [
     },
 ];
 const SearchPayments = () => {
-    const { suid } = UserAuth();
+    const { suid }: any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Search Payments'));
@@ -682,8 +682,6 @@ const SearchPayments = () => {
                 setPayments([]);
             });
     }, []);
-
-    console.log(payments)
 
     return (
         <div>

@@ -10,7 +10,7 @@ import { hashTheID } from '../../functions/shared';
 import ActionItem from './ActionItem';
 
 export default function ViewStudentsInPipeline() {
-    const { suid, setStudentToEdit, pipelineSteps } = UserAuth();
+    const { suid, setStudentToEdit, pipelineSteps } :any = UserAuth();
     const [update, setUpdate] = useState(false);
     const dispatch = useDispatch();
     useEffect(() => {

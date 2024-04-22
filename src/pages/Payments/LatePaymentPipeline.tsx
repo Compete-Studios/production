@@ -14,7 +14,7 @@ import { showWarningMessage } from '../../functions/shared';
 import { deleteLatePaymentPipelineStep } from '../../functions/api';
 
 export default function LatePaymentPipeline() {
-    const { latePayementPipeline, update, setUpdate, suid } = UserAuth();
+    const { latePayementPipeline, update, setUpdate, suid } :any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Late Payment Pipeline'));
@@ -40,10 +40,10 @@ export default function LatePaymentPipeline() {
             });
     };
 
-    console.log(latePayementPipeline);
+    console.log(latePayementPipeline)
 
     return (
-        <div className="panel px-0 border-white-light dark:border-[#1b2e4b]">
+        <div className="panel px-0 pb-0 border-white-light dark:border-[#1b2e4b]">
             <div className="mb-4.5 px-5 flex md:items-center md:flex-row flex-col gap-5">
                 {/* <div className="flex items-center gap-2">
                     <div className="">
@@ -81,13 +81,13 @@ export default function LatePaymentPipeline() {
                                     <td className="text-center gap-x-4 flex items-center justify-center">
                                         <Tippy content="View Payments">
                                             <Link to={`/payments/late-payment-pipeline/view-payments/${data.PaymentPipelineStepId}/${suid}`} type="button">
-                                                <IconDollarSignCircle className="w-5 h-5 text-success hover:text-green-900" />
+                                                <IconDollarSignCircle className="w-5 h-5 text-info hover:text-blue-900" />
                                             </Link>
                                         </Tippy>
                                         <Tippy content="Edit Step">
-                                            <button type="button">
-                                                <IconEdit className="w-5 h-5" />
-                                            </button>
+                                            <Link to={`/payments/late-payment-pipeline/edit-late-pipeline-step/${data.PaymentPipelineStepId}/${suid}`} type="button">
+                                                <IconEdit className="w-5 h-5 text-primary" />
+                                            </Link>
                                         </Tippy>
                                         <Tippy content="Delete Step">
                                             <button type="button" onClick={() => handleDeleteStep(data.PaymentPipelineStepId)}>

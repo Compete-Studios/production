@@ -14,7 +14,7 @@ import { deletePipelineStep } from '../../functions/api';
 import { showWarningMessage } from '../../functions/shared';
 
 export default function ProspectPipeline() {
-    const { prospectPipelineSteps, suid, update, setUpdate } = UserAuth();
+    const { prospectPipelineSteps, suid, update, setUpdate }: any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Prospect Pipeline'));

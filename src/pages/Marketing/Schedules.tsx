@@ -4,6 +4,7 @@ import { UserAuth } from '../../context/AuthContext';
 import IconEye from '../../components/Icon/IconEye';
 import IconPrinter from '../../components/Icon/IconPrinter';
 import IconBolt from '../../components/Icon/IconBolt';
+import ActionItemProspects from '../Prospects/ActionItemProspects';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { REACT_API_BASE_URL } from '../../constants';
@@ -12,7 +13,7 @@ import ActionItemForSchedule from './ActionItemForSchedule';
 import { hashTheID } from '../../functions/shared';
 
 export default function Schedules() {
-    const { suid, scheduleID, update, setUpdate, studioInfo }: any = UserAuth();
+    const { suid, scheduleID, update, setUpdate, prospectPipelineSteps }: any = UserAuth();
     const [dailyScheduleStudentSteps, setDailyScheduleStudentSteps] = useState<any>([]);
     const [dailyScheduleProspectSteps, setDailyScheduleProspectSteps] = useState<any>([]);
     const [dailyScheduleStudents, setDailyScheduleStudents] = useState<any>([]);
@@ -81,11 +82,15 @@ export default function Schedules() {
     const getProspects = async () => {
         const prospectArray: any = [];
 
+        const today = new Date();
+        // Format today's date as 'YYYY-MM-DD'
+        const formattedDate = today.toISOString().split('T')[0];
+
         for (let i = 0; i < dailyScheduleProspectSteps.length; i++) {
             const data = {
                 studioId: suid,
                 pipelineStepId: dailyScheduleProspectSteps[i].PipelineStepId,
-                nextContactDate: '2024-04-13',
+                nextContactDate: formattedDate,
             };
             const newProsData = await getProspectsInScheduleByPipelineStep(data);
             if (newProsData.recordset.length > 0) {
@@ -116,10 +121,14 @@ export default function Schedules() {
         window.print();
     };
 
+    console.log(dailyScheduleProspects);
+
+
+
     return (
         <div className="grid 2xl:grid-cols-2 grid-cols-1 gap-6 mb-6">
             <div className="panel px-0 pb-0">
-            <div className="flex items-center justify-between mb-5 px-5">
+                <div className="flex items-center justify-between mb-5 px-5">
                     <h5 className="font-semibold text-lg dark:text-white-light">Prospect Schedule</h5>
                     <Tippy content="Print Schedule">
                         <button type="button" onClick={handlePrintSchedule} className="font-semibold hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-600">
@@ -159,9 +168,14 @@ export default function Schedules() {
                                     </td>
                                     <td className="flex gap-1 staff-center w-max mx-auto ">
                                         <Tippy content="Contact">
-                                            <NavLink to="/apps/invoice/preview" className="flex text-info hover:text-blue-900">
-                                                <IconBolt fill={true} />
-                                            </NavLink>
+                                            <ActionItemProspects
+                                                student={prospect}
+                                                pipeline={prospectPipelineSteps.find((step: any) => step.PipelineStepId === parseInt(prospect.CurrentPipelineStatus))}
+                                                studioOptions={studioOptions}
+                                                setUpdate={setUpdate}
+                                                update={update}
+                                                prospectPipelineSteps={prospectPipelineSteps}
+                                            />
                                         </Tippy>
                                         <Tippy content="View">
                                             <NavLink to="/apps/invoice/preview" className="flex hover:text-primary">
@@ -176,8 +190,7 @@ export default function Schedules() {
                 </div>
             </div>
 
-            <div className="panel px-0 pb-0">               
-
+            <div className="panel px-0 pb-0">
                 <div className="flex items-center justify-between mb-5 px-5">
                     <h5 className="font-semibold text-lg dark:text-white-light">Students Schedule</h5>
                     <Tippy content="Print Schedule">

@@ -6,12 +6,14 @@ import 'swiper/css/navigation';
 import Select from 'react-select';
 import 'swiper/css/pagination';
 import IconPlus from '../../components/Icon/IconPlus';
-import { addAClass, addClassAndSchedule, getTheClassScheduleByClassId, loadStudioRooms } from '../../functions/api';
+import { addClassAndSchedule, getTheClassScheduleByClassId, loadStudioRooms } from '../../functions/api';
 import { UserAuth } from '../../context/AuthContext';
 import IconEdit from '../../components/Icon/IconEdit';
 import IconX from '../../components/Icon/IconX';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
 
 export default function AddEditClass({ editClass = false, classId = null }) {
     const { suid, setUpdate, update, classes, staff } = UserAuth();
@@ -65,14 +67,14 @@ export default function AddEditClass({ editClass = false, classId = null }) {
 
     const getTheSchedule = async (cuid) => {
         getTheClassScheduleByClassId(cuid).then((response) => {
-            setClassToAdd({
-                ...classToAdd,
-                dayOfWeek: response.DayOfWeek,
-                dayIndex: response.DayIndex,
-                startTime: getTimeOnlyfromZulueStamp(response.StartTime),
-                endTime: getTimeOnlyfromZulueStamp(response.EndTime),
-                roomId: response.RoomId,
-            });
+            // setClassToAdd({
+            //     ...classToAdd,
+            //     dayOfWeek: response.DayOfWeek,
+            //     dayIndex: response.DayIndex,
+            //     startTime: getTimeOnlyfromZulueStamp(response.StartTime),
+            //     endTime: getTimeOnlyfromZulueStamp(response.EndTime),
+            //     roomId: response.RoomId,
+            // });
             console.log(response);
         });
     };
@@ -177,9 +179,11 @@ export default function AddEditClass({ editClass = false, classId = null }) {
     return (
         <div>
             {editClass ? (
-                <button className="flex text-primary hover:text-primary-light" onClick={() => handleAddEditAClass(classId)}>
-                    <IconEdit className="w-4.5 h-4.5" />
-                </button>
+                <Tippy content="Edit Class">
+                    <button className="flex text-primary hover:text-primary-light" onClick={() => handleAddEditAClass(classId)}>
+                        <IconEdit className="w-4.5 h-4.5" />
+                    </button>
+                </Tippy>
             ) : (
                 <button type="button" onClick={() => setModal21(true)} className="btn btn-primary gap-2 ltr:ml-auto rtl:mr-auto">
                     <IconPlus />

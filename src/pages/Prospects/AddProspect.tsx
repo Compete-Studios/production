@@ -7,6 +7,29 @@ import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import { addProspect, addProspectToClasses, addProspectToPrograms, addProspectToWaitingLists } from '../../functions/api';
 import { useNavigate } from 'react-router-dom';
+import { constFormateDateMMDDYYYY, formatDate, showMessage } from '../../functions/shared';
+
+interface ProspectData {
+    studioId: string;
+    fName: string;
+    lName: string;
+    phone: string;
+    email: string;
+    contactMethod: number;
+    address: string;
+    city: string;
+    state: string;
+    zip: string;
+    notes: string;
+    entryDate: string;
+    currentPipelineStatus: string;
+    firstClassDate: string;
+    nextContactDate: string;
+    age: string;
+    parentName: string;
+    introDate: string;
+    birthdate: string;
+}
 
 const prospectInfoInit = {
     studioId: '',
@@ -20,28 +43,28 @@ const prospectInfoInit = {
     state: '',
     zip: '',
     notes: '',
-    entryDate: '',
+    entryDate: constFormateDateMMDDYYYY(new Date()),
     currentPipelineStatus: '',
-    firstClassDate: '',
-    nextContactDate: '',
+    firstClassDate: constFormateDateMMDDYYYY(new Date()),
+    nextContactDate: constFormateDateMMDDYYYY(new Date()),
     age: '',
     parentName: '',
-    introDate: '',
-    birthdate: '',
+    introDate: constFormateDateMMDDYYYY(new Date()),
+    birthdate: '01-01-2022',
 };
 
 export default function AddProspect() {
-    const { waitingLists, prospectPipelineSteps, programs, classes, suid } = UserAuth();
-    const [prospectInfo, setProspectInfo] = useState(prospectInfoInit);
-    const [selectedClasses, setSelectedClasses] = useState([]);
-    const [options, setOptions] = useState([]);
-    const [waitingListIDs, setWaitingListIDs] = useState([]);
-    const [programIds, setProgramIds] = useState([]);
+    const { waitingLists, prospectPipelineSteps, programs, classes, suid, marketingSources }: any = UserAuth();
+    const [prospectInfo, setProspectInfo] = useState<ProspectData>(prospectInfoInit);
+    const [selectedClasses, setSelectedClasses] = useState<any>([]);
+    const [options, setOptions] = useState<any>([]);
+    const [waitingListIDs, setWaitingListIDs] = useState<any>([]);
+    const [programIds, setProgramIds] = useState<any>([]);
 
     const navigate = useNavigate();
-
+    
     useEffect(() => {
-        const newPrograms = programs?.map((program) => {
+        const newPrograms = programs?.map((program: any) => {
             return { value: program.ProgramId, label: program.Name };
         });
         setOptions(newPrograms);
@@ -52,29 +75,53 @@ export default function AddProspect() {
         console.log('SUID:', suid);
     }, [suid]);
 
-    const handleSelectClass = (e, item) => {
+    const handleSelectClass = (e: any, item: any) => {
         e.preventDefault();
         if (selectedClasses.includes(item)) {
-            setSelectedClasses(selectedClasses.filter((i) => i !== item));
+            setSelectedClasses(selectedClasses.filter((i: any) => i !== item));
         } else {
             setSelectedClasses([...selectedClasses, item]);
         }
     };
 
-    const handleDeselctClass = (e, item) => {
+    const handleDeselctClass = (e: any, item: any) => {
         e.preventDefault();
-        setSelectedClasses(selectedClasses.filter((i) => i !== item));
+        setSelectedClasses(selectedClasses.filter((i: any) => i !== item));
     };
 
-    const handleAddProspect = async (e) => {
+    const handleAddProspect = async (e: any) => {
         e.preventDefault();
-        const prospectData = {
-            ...prospectInfo,
-            studioId: parseInt(suid),
-            introDate: handleConvertDateToYYYYMMDD(prospectInfo.introDate),
+
+        const prospectInfoData = {
+            studioId: suid,
+            fName: prospectInfo.fName,
+            lName: prospectInfo.lName,
+            phone: prospectInfo.phone,
+            email: prospectInfo.email,
+            contactMethod: prospectInfo.contactMethod,
+            address: prospectInfo.address,
+            city: prospectInfo.city,
+            state: prospectInfo.state,
+            zip: prospectInfo.zip,
+            notes: prospectInfo.notes,
+            entryDate: formatDate(prospectInfo.entryDate),
+            currentPipelineStatus: prospectInfo.currentPipelineStatus,
+            firstClassDate: formatDate(prospectInfo.firstClassDate),
+            nextContactDate: formatDate(prospectInfo.nextContactDate),
+            age: prospectInfo.age,
+            parentName: prospectInfo.parentName,
+            introDate: formatDate(prospectInfo.introDate),
+            birthdate: formatDate(prospectInfo.birthdate),
         };
-        const classIDS = selectedClasses?.map((item) => item.ClassId);
-        await addProspect(prospectData).then((res) => {
+
+        const classIDS = selectedClasses?.map((item: any) => item.ClassId);
+
+        console.log('Class IDS:', classIDS);
+        console.log('Program IDS:', programIds);
+        console.log('Waiting List IDS:', waitingListIDs);
+
+        console.log('Prospect Info:', prospectInfoData);
+        await addProspect(prospectInfoData).then((res) => {
             console.log('Prospect added:', res.output.NewProspectId);
             addProspectToClasses(res.output.NewProspectId, classIDS);
             addProspectToWaitingLists(res.output.NewProspectId, waitingListIDs);
@@ -82,40 +129,22 @@ export default function AddProspect() {
         });
         showMessage('Prospect added successfully', 'success');
         navigate('/prospects/view-prospects');
-
     };
-
-    
-    const showMessage = (msg = '', type = 'success') => {
-        const toast = Swal.mixin({
-            toast: true,
-            position: 'top',
-            showConfirmButton: false,
-            timer: 3000,
-            customClass: { container: 'toast' },
-        });
-        toast.fire({
-            icon: type,
-            title: msg,
-            padding: '10px 20px',
-        });
-    };
-
 
     useEffect(() => {
-        const prospectAge = new Date().getFullYear() - new Date(prospectInfo.birthdate).getFullYear();
+        const prospectAge: any = new Date().getFullYear() - new Date(prospectInfo.birthdate).getFullYear();
         setProspectInfo({ ...prospectInfo, age: prospectAge });
     }, [prospectInfo.birthdate]);
 
-    const handleConvertDateToYYYYMMDD = (date) => {
+    const handleConvertDateToYYYYMMDD = (date: any) => {
         const newDate = new Date(date);
         const formattedDate = newDate.toISOString().substr(0, 10);
         return formattedDate;
     };
 
-    const handleToggleWaitingList = (id) => {
+    const handleToggleWaitingList = (id: any) => {
         if (waitingListIDs.includes(id)) {
-            setWaitingListIDs(waitingListIDs.filter((i) => i !== id));
+            setWaitingListIDs(waitingListIDs.filter((i: any) => i !== id));
         } else {
             setWaitingListIDs([...waitingListIDs, id]);
         }
@@ -123,7 +152,7 @@ export default function AddProspect() {
 
     return (
         <div>
-            <div className="panel max-w-5xl mx-auto">
+            <div className="panel max-w-5xl mx-auto bg-gray-100">
                 <div className="mb-5">
                     <h5 className="font-semibold text-lg mb-4">Prospect Info</h5>
                     <p>Use this option to add a new prospect to the system. </p>
@@ -175,21 +204,21 @@ export default function AddProspect() {
                             </div>
                             <div className="sm:col-span-full">
                                 <label htmlFor="contactMethod">Contact Method</label>
-                                <input
-                                    id="contactMethod"
-                                    type="text"
-                                    placeholder="Contact Method"
-                                    className="form-input"
-                                    onChange={(e) => setProspectInfo({ ...prospectInfo, contactMethod: e.target.value })}
-                                />
+                                <select id="marketingMethod" className="form-select " onChange={(e: any) => setProspectInfo({ ...prospectInfo, contactMethod: e.target.value })}>
+                                    {marketingSources?.map((source: any) => (
+                                        <option key={source.MethodId} value={source.MethodId}>
+                                            {source.Name}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="entryDate">Contact Date</label>
                                 <Flatpickr
-                                    value={prospectInfo.entryDate}
                                     options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
                                     className="form-input"
-                                    onChange={(date) => setProspectInfo({ ...prospectInfo, entryDate: handleConvertDateToYYYYMMDD(date) })}
+                                    value={prospectInfo.entryDate}
+                                    onChange={(date: any) => setProspectInfo({ ...prospectInfo, entryDate: date })}
                                 />
                             </div>
                             <div className="sm:col-span-2">
@@ -198,7 +227,7 @@ export default function AddProspect() {
                                     value={prospectInfo.introDate}
                                     options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
                                     className="form-input"
-                                    onChange={(date) => setProspectInfo({ ...prospectInfo, introDate: date })}
+                                    onChange={(date: any) => setProspectInfo({ ...prospectInfo, introDate: date })}
                                 />
                             </div>
                             <div className="sm:col-span-2">
@@ -207,7 +236,7 @@ export default function AddProspect() {
                                     value={prospectInfo.firstClassDate}
                                     options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
                                     className="form-input"
-                                    onChange={(date) => setProspectInfo({ ...prospectInfo, firstClassDate: handleConvertDateToYYYYMMDD(date) })}
+                                    onChange={(date: any) => setProspectInfo({ ...prospectInfo, firstClassDate: date })}
                                 />
                             </div>
                             <div className="sm:col-span-2">
@@ -216,7 +245,7 @@ export default function AddProspect() {
                                     value={prospectInfo.nextContactDate}
                                     options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
                                     className="form-input"
-                                    onChange={(date) => setProspectInfo({ ...prospectInfo, nextContactDate: handleConvertDateToYYYYMMDD(date) })}
+                                    onChange={(date: any) => setProspectInfo({ ...prospectInfo, nextContactDate: date })}
                                 />
                             </div>
                             <div className="sm:col-span-2">
@@ -225,7 +254,7 @@ export default function AddProspect() {
                                     value={prospectInfo.birthdate}
                                     options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
                                     className="form-input"
-                                    onChange={(date) => setProspectInfo({ ...prospectInfo, birthdate: handleConvertDateToYYYYMMDD(date) })}
+                                    onChange={(date: any) => setProspectInfo({ ...prospectInfo, birthdate: date })}
                                 />
                             </div>
                             <div className="sm:col-span-full">
@@ -234,13 +263,13 @@ export default function AddProspect() {
                             </div>
                             <div className="sm:col-span-2 sm:row-span-2">
                                 <label htmlFor="waitingList">Waiting List</label>
-                                {waitingLists?.map((list) => (
+                                {waitingLists?.map((list: any) => (
                                     <label key={list.WaitingListId} className="flex items-center cursor-pointer">
                                         <input
                                             type="checkbox"
-                                            className="form-checkbox"
-                                            onClick={() => handleToggleWaitingList(list.WaitingListId)}
                                             checked={waitingListIDs.includes(list.WaitingListId)}
+                                            className="form-checkbox bg-white dark:bg-[#1b2e4b]"
+                                            onClick={() => handleToggleWaitingList(list.WaitingListId)}
                                         />
                                         <span className=" text-white-dark">{list.Title}</span>
                                     </label>
@@ -248,8 +277,8 @@ export default function AddProspect() {
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="pipelineStatus">Pipeline Status</label>
-                                <select id="pipelineStatus" className="form-select text-white-dark" onChange={(e) => setProspectInfo({ ...prospectInfo, currentPipelineStatus: e.target.value })}>
-                                    {prospectPipelineSteps?.map((step) => (
+                                <select id="pipelineStatus" className="form-select" onChange={(e) => setProspectInfo({ ...prospectInfo, currentPipelineStatus: e.target.value })}>
+                                    {prospectPipelineSteps?.map((step: any) => (
                                         <option key={step.PipelineStepId} value={step.PipelineStepId}>
                                             {step.StepName}
                                         </option>
@@ -264,7 +293,7 @@ export default function AddProspect() {
                                     isMulti
                                     isSearchable={false}
                                     onChange={(e) => {
-                                        const programIds = e?.map((item) => item.value);
+                                        const programIds: any = e?.map((item: any) => item.value);
                                         setProgramIds(programIds);
                                     }}
                                 />
@@ -274,7 +303,7 @@ export default function AddProspect() {
                                 <div className="col-span-full flex items-center border p-4 bg-primary/20 rounded-md border-com">
                                     <div className="p-4 w-full h-72 overflow-y-auto  grow rounded-md border border-com mt-1 bg-white">
                                         {classes &&
-                                            classes?.map((item) => (
+                                            classes?.map((item: any) => (
                                                 <>
                                                     {!selectedClasses?.includes(item) && (
                                                         <>
@@ -287,7 +316,7 @@ export default function AddProspect() {
                                             ))}
                                     </div>
                                     <div className="text-center grow-0 flex items-center justify-center w-auto px-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-right" viewBox="0 0 16 16">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-left-right" viewBox="0 0 16 16">
                                             <path
                                                 fill-rule="evenodd"
                                                 d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5m14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5"
@@ -295,7 +324,7 @@ export default function AddProspect() {
                                         </svg>
                                     </div>
                                     <div className="p-4 w-full h-72 overflow-y-auto grow rounded-md border border-com mt-1 bg-white">
-                                        {selectedClasses?.map((item) => (
+                                        {selectedClasses?.map((item: any) => (
                                             <>
                                                 <div
                                                     key={item.ClassId}
@@ -305,7 +334,7 @@ export default function AddProspect() {
                                                     }}
                                                 >
                                                     <div className="mr-1 inline-block shrink-0">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-check-circle" viewBox="0 0 16 16">
                                                             <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
                                                             <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05" />
                                                         </svg>

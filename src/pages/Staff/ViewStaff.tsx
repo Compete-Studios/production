@@ -11,7 +11,7 @@ import { setPageTitle } from '../../store/themeConfigSlice';
 import { UserAuth } from '../../context/AuthContext';
 
 const ViewStaff = () => {
-    const { staff } = UserAuth();
+    const { staff }: any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('View Staff'));
@@ -23,7 +23,6 @@ const ViewStaff = () => {
             if (id) {
                 setRecords(staff.filter((user) => user.StaffId !== id));
                 setInitialRecords(staff.filter((user) => user.StaffId !== id));
-                setstaff(staff.filter((user) => user.StaffId !== id));
                 setSearch('');
                 setSelectedRecords([]);
             } else {
@@ -34,7 +33,6 @@ const ViewStaff = () => {
                 const result = staff.filter((d) => !ids.includes(d.StaffId as never));
                 setRecords(result);
                 setInitialRecords(result);
-                setstaff(result);
                 setSearch('');
                 setSelectedRecords([]);
                 setPage(1);
@@ -44,7 +42,7 @@ const ViewStaff = () => {
 
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
+    const [pageSize, setPageSize] = useState(PAGE_SIZES[1]);
     const [initialRecords, setInitialRecords] = useState(sortBy(staff, 'invoice'));
     const [records, setRecords] = useState(initialRecords);
     const [selectedRecords, setSelectedRecords] = useState<any>([]);
@@ -93,7 +91,7 @@ const ViewStaff = () => {
                     </div>
                     <div className="flex staff-center gap-2 ltr:ml-auto rtl:mr-auto">
                 
-                        <Link to="/apps/invoice/add" className="btn btn-primary gap-1">
+                        <Link to="/staff/add-staff" className="btn btn-primary gap-1">
                             <IconPlus />
                             Add Staff
                         </Link>

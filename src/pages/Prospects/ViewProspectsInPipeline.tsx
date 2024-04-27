@@ -11,7 +11,7 @@ import ActionItemForSchedule from '../Marketing/ActionItemForSchedule';
 import ActionItemProspects from './ActionItemProspects';
 
 export default function ViewStudentsInPipeline() {
-    const { suid, setProspectToEdit, prospectPipelineSteps } = UserAuth();
+    const { suid, setProspectToEdit, prospectPipelineSteps }: any = UserAuth();
     const [update, setUpdate] = useState(false);
     const dispatch = useDispatch();
     useEffect(() => {

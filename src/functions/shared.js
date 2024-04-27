@@ -41,6 +41,11 @@ export const hashTheID = (id) => {
     return parseInt(id) * 123456789;
 };
 
+export const unHashTheID = (id) => {
+    return parseInt(id) / 123456789;
+}
+
+
 export const hashThePayID = (id, stud, amt) => {
     const floatedAmount = parseFloat(amt);
     const floatedStudent = parseFloat(stud);

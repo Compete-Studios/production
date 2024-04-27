@@ -1,7 +1,8 @@
 import { Link, NavLink } from 'react-router-dom';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useState, useEffect } from 'react';
-import sortBy from 'lodash/sortBy';
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import IconTrashLines from '../../components/Icon/IconTrashLines';
@@ -12,7 +13,7 @@ import IconUsers from '../../components/Icon/IconUsers';
 import { dropClassByClassID } from '../../functions/api';
 
 export default function ViewClasses() {
-    const { classes, suid, update, setUpdate } = UserAuth();
+    const { classes, suid, update, setUpdate }: any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Search Prospects'));
@@ -151,14 +152,19 @@ export default function ViewClasses() {
                                     render: ({ ClassId }: { ClassId: any }) => (
                                         <div className="flex gap-4 items-center w-max mx-auto ">
                                             <ViewClass classId={ClassId} />
+
                                             <AddEditClass classId={ClassId} editClass={true} />
-                                            <NavLink to={`/classes/view-roster/${ClassId}/${suid}`} className="flex hover:text-orange-800 text-orange-600">
-                                                <IconUsers />
-                                            </NavLink>
+                                            <Tippy content="View Roster">
+                                                <NavLink to={`/classes/view-roster/${ClassId}/${suid}`} className="flex hover:text-orange-800 text-orange-600">
+                                                    <IconUsers />
+                                                </NavLink>
+                                            </Tippy>
                                             {/* <NavLink to="" className="flex"> */}
-                                            <button type="button" className="flex text-danger hover:text-danger" onClick={(e) => deleteRow(ClassId)}>
-                                                <IconTrashLines />
-                                            </button>
+                                            <Tippy content="Delete Class">
+                                                <button type="button" className="flex text-danger hover:text-danger" onClick={(e) => deleteRow(ClassId)}>
+                                                    <IconTrashLines />
+                                                </button>
+                                            </Tippy>
                                             {/* </NavLink> */}
                                         </div>
                                     ),

@@ -22,7 +22,6 @@ const ViewInvoice = lazy(() => import('../pages/Payments/ViewInvoice'));
 const ViewPayments = lazy(() => import('../pages/Payments/ViewPayments'));
 const PayInvoice = lazy(() => import('../pages/Payments/PayInvoice'));
 const ExisitingBillingAccounts = lazy(() => import('../pages/Payments/ExisitingBillingAccounts'));
-
 const ViewClasses = lazy(() => import('../pages/Classes/ViewClasses'));
 const ViewRoster = lazy(() => import('../pages/Classes/ViewRoster'));
 const ViewStaff = lazy(() => import('../pages/Staff/ViewStaff'));
@@ -41,13 +40,11 @@ const WaitingLists = lazy(() => import('../pages/Classes/WaitingLists'));
 const Programs = lazy(() => import('../pages/Classes/Programs'));
 const Ranks = lazy(() => import('../pages/Classes/Ranks'));
 const BarcodeAttendance = lazy(() => import('../pages/Classes/BarcodeAttendance'));
-const PrintableRoll = lazy(() => import('../pages/Classes/PrintableRoll'));
 const StealthAttendance = lazy(() => import('../pages/Classes/StealthAttendance'));
 const AddRoom = lazy(() => import('../pages/Classes/AddRoom'));
 const EditRoom = lazy(() => import('../pages/Classes/EditRoom'));
 const WaitingListRoster = lazy(() => import('../pages/Classes/WaitingListRoster'));
 const EditWaitingList = lazy(() => import('../pages/Classes/EditWaitingList'));
-const AddWaitingList = lazy(() => import('../pages/Classes/AddWaitingList'));
 const AddPrograms = lazy(() => import('../pages/Classes/AddPrograms'));
 const ViewProgramRoster = lazy(() => import('../pages/Classes/ViewProgramRoster'));
 const EditProgram = lazy(() => import('../pages/Classes/EditProgram'));
@@ -203,7 +200,7 @@ const routes = [
         element: <AddNewPipelineStep />,
     },
     {
-        path: '/payments/view-invoice/:id/:suid',
+        path: '/payments/view-invoice/:id/:stud',
         element: <ViewInvoice />,
     },
 
@@ -240,10 +237,7 @@ const routes = [
         path: '/classes/barcode-attendance',
         element: <BarcodeAttendance />,
     },
-    {
-        path: '/classes/printable-roll',
-        element: <PrintableRoll />,
-    },
+
     {
         path: '/classes/stealth-attendance',
         element: <StealthAttendance />,
@@ -265,15 +259,11 @@ const routes = [
         element: <EditWaitingList />,
     },
     {
-        path: '/classes/add-waiting-list',
-        element: <AddWaitingList />,
-    },
-    {
         path: '/classes/add-program',
         element: <AddPrograms />,
     },
     {
-        path: '/classes/view-program-roster',
+        path: '/classes/view-program-roster/:prID/:uid',
         element: <ViewProgramRoster />,
     },
     {
@@ -285,7 +275,7 @@ const routes = [
         element: <AddNewRank />,
     },
     {
-        path: '/classes/students-in-rank',
+        path: '/classes/students-in-rank/:rkID/:uid/:name',
         element: <StudentsInRank />,
     },
     {

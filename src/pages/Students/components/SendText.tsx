@@ -18,11 +18,10 @@ const textInit = {
 };
 
 export default function SendText({ defaultText, student, setDefaultTab }: any) {
-    const { suid, studioInfo } = UserAuth();
+    const { suid, studioInfo }: any = UserAuth();
     const [textMessage, setTextMessage] = useState<any>(textInit);
     const [selectedUser, setSelectedUser] = useState<any>({});
     const [texts, setTexts] = useState<any>([]);
-    const [loginUser, setLoginUser] = useState<any>({});
 
     const generateTimeAgoWithDateTimeStamp = (dateString: any) => {
         const date = new Date(dateString);

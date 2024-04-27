@@ -10,7 +10,7 @@ import { hashTheID } from '../../functions/shared';
 import ActionItem from './ActionItem';
 
 export default function ViewStudentsInPipeline() {
-    const { suid, setStudentToEdit, pipelineSteps } :any = UserAuth();
+    const { suid, setStudentToEdit, pipelineSteps, studioOptions }: any = UserAuth();
     const [update, setUpdate] = useState(false);
     const dispatch = useDispatch();
     useEffect(() => {
@@ -19,19 +19,10 @@ export default function ViewStudentsInPipeline() {
 
     const [loading, setLoading] = useState(true);
     const [studentsInPipeline, setStudentsInPipeline] = useState([]);
-    const [studioOptions, setStudioOptions] = useState<any>([]);
 
     const { id } = useParams();
 
-    useEffect(() => {
-      try {
-          getStudioOptions(suid).then((res) => {
-              setStudioOptions(res.recordset[0]);
-          });
-      } catch (error) {
-          console.log(error);
-      }
-  }, [suid]);
+    console.log(studioOptions);
 
     useEffect(() => {
         try {
@@ -70,10 +61,9 @@ export default function ViewStudentsInPipeline() {
                         <h1 className="uppercase font-semibold text-lg dark:text-white">
                             Students in Pipeline Step <span className="font-bold text-primary">{pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))?.StepName}</span>
                         </h1>
-                        <p className='dark:text-white'>*Students with a highlighted background should be contacted.</p>
+                        <p className="dark:text-white">*Students with a highlighted background should be contacted.</p>
                     </div>
                     <div className="sm:flex sm:items-center sm:gap-x-4 w-full space-y-4 sm:space-y-0 lg:mt-0 mt-4 ">
-                      
                         <button className="btn btn-primary gap-x-1 w-full sm:w-auto shrink-0 ml-auto " onClick={() => navigate('/students/delete-student')}>
                             <IconPlus /> Email This List
                         </button>
@@ -129,8 +119,12 @@ export default function ViewStudentsInPipeline() {
                                                     </td>
                                                     <td className="relative whitespace-nowrap text-right text-sm font-medium">
                                                         {new Date(list.NextContactDate) <= new Date() && (
-                                                            <ActionItem student={list} pipeline={pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))} studioOptions={studioOptions} 
-                                                            setUpdate={setUpdate} update={update}
+                                                            <ActionItem
+                                                                student={list}
+                                                                pipeline={pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
+                                                                studioOptions={studioOptions}
+                                                                setUpdate={setUpdate}
+                                                                update={update}
                                                             />
                                                         )}
                                                     </td>

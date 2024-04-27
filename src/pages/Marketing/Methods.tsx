@@ -1,29 +1,23 @@
-import { Link, NavLink } from 'react-router-dom';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useState, useEffect } from 'react';
-import sortBy from 'lodash/sortBy';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import IconTrashLines from '../../components/Icon/IconTrashLines';
 import { UserAuth } from '../../context/AuthContext';
-import IconUsers from '../../components/Icon/IconUsers';
 import AddEditClass from '../Classes/AddEditClass';
-import ViewClass from '../Classes/ViewClass';
-
+import AddNewMethod from './AddNewMethod';
 export default function ViewClasses() {
-    const { marketingSources, suid } = UserAuth();
+    const { marketingSources }: any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Search Prospects'));
     });
 
-    console.log(marketingSources);
-
     const deleteRow = (id: any = null) => {
         if (window.confirm('Are you sure want to delete selected row ?')) {
             if (id) {
-                setRecords(marketingSources?.filter((user) => user.MethodId !== id));
-                setInitialRecords(marketingSources?.filter((user) => user.MethodId !== id));
+                setRecords(marketingSources?.filter((user: any) => user.MethodId !== id));
+                setInitialRecords(marketingSources?.filter((user: any) => user.MethodId !== id));
                 setSearch('');
                 setSelectedRecords([]);
             } else {
@@ -31,7 +25,7 @@ export default function ViewClasses() {
                 const ids = selectedRows.map((d: any) => {
                     return d.MethodId;
                 });
-                const result = marketingSources?.filter((d) => !ids.includes(d.MethodId as never));
+                const result = marketingSources?.filter((d: any) => !ids.includes(d.MethodId as never));
                 setRecords(result);
                 setInitialRecords(result);
                 setSearch('');
@@ -91,7 +85,7 @@ export default function ViewClasses() {
                         </div>
 
                         <div className="gap-2 ltr:ml-auto rtl:mr-auto">
-                            <AddEditClass />
+                            <AddNewMethod />
                         </div>
                     </div>
 
@@ -103,7 +97,7 @@ export default function ViewClasses() {
                                 {
                                     accessor: 'name',
                                     sortable: true,
-                                    render: ({ Name }) => (
+                                    render: ({ Name }: any) => (
                                         <div className="flex items-center font-semibold">
                                             <div>{Name}</div>
                                         </div>

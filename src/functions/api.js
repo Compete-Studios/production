@@ -73,7 +73,7 @@ export const addStudentToWaitingLists = async (studentId, waitingListIds) => {
     }
 };
 
-export const addStudentToAWaitingList = async (listData) => { 
+export const addStudentToAWaitingList = async (listData) => {
     try {
         const response = await fetchData('marketing-access/addStudentToWaitingList', 'post', listData);
         return { response, status: 200 };
@@ -92,7 +92,15 @@ export const dropStudentFromWaitingList = async (studentId, waitingListId) => {
         throw error;
     }
 };
-
+export const deleteWaitingList = async (waitingListId) => {
+    try {
+        const response = await fetchData(`marketing-access/deleteWaitingList/${waitingListId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
 
 export const getStudentInfo = async (studentId) => {
     try {
@@ -114,9 +122,90 @@ export const getProgramsByStudentId = async (studentId) => {
     }
 };
 
+export const getStudentsByProgramId = async (programId) => {
+    try {
+        const response = await fetchData(`class-access/getStudentsByProgramId/${programId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getProspectsByProgramId = async (programId) => {
+    try {
+        const response = await fetchData(`class-access/getProspectsByProgramId/${programId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const getClassesByStudentId = async (studentId) => {
     try {
         const response = await fetchData(`student-access/getClassesByStudentId/${studentId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const dropProspectFromWaitingList = async (prospectId, waitingListId) => {
+    console.log(prospectId, waitingListId);
+    try {
+        const response = await fetchData(`marketing-access/dropProspectFromWaitingList/${prospectId}/${waitingListId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const dropProspectFromProgram = async (prospectId, programId) => {
+    try {
+        const response = await fetchData(`class-access/dropProspectFromProgram/${programId}/${prospectId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const dropProspectFromClass = async (prospectId, classId) => {
+    try {
+        const response = await fetchData(`class-access/dropProspectFromClass/${classId}/${prospectId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getClassesByProspectId = async (prospectId) => {
+    try {
+        const response = await fetchData(`class-access/getClassesByProspectId/${prospectId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getWaitingListByProspectId = async (prospectId) => {
+    try {
+        const response = await fetchData(`class-access/getWaitingListByProspectId/${prospectId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getProgramsByProspectId = async (prospectId) => {
+    try {
+        const response = await fetchData(`class-access/getProgramsByProspectId/${prospectId}`, 'get');
         return response;
     } catch (error) {
         console.error(error);
@@ -250,11 +339,31 @@ export const getPaymentPipelineStepById = async (pipelineStepId) => {
         console.error(error);
         throw error;
     }
-}
+};
 
 export const getInvoicesByStudioId = async (studioId, startDate, endDate) => {
     try {
         const response = await fetchData(`invoice-access/getInvoicesByStudioId/${studioId}/${startDate}/${endDate}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getInvoiceById = async (invoiceId) => {
+    try {
+        const response = await fetchData(`invoice-access/getInvoice/${invoiceId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const deleteInvoice = async (invoiceId) => {
+    try {
+        const response = await fetchData(`invoice-access/deleteInvoice/${invoiceId}`, 'get');
         return response;
     } catch (error) {
         console.error(error);
@@ -328,6 +437,16 @@ export const getRanksByStudioId = async (id) => {
     try {
         const response = await fetchData(`ranks/getRanksByStudioId/${id}`, 'get');
         return response.recordset;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const dropRank = async (rankId) => {
+    try {
+        const response = await fetchData(`ranks/dropRank/${rankId}`, 'get');
+        return response;
     } catch (error) {
         console.error(error);
         throw error;
@@ -490,7 +609,6 @@ export const getUploadedStudioImages = async (studioId) => {
 };
 
 export const getStudentsByClassId = async (classId) => {
-    console.log(classId);
     try {
         const response = await fetchData(`class-access/getStudentsByClassId/${classId}`, 'get');
         console.log(response);
@@ -549,7 +667,17 @@ export const addClassAndSchedule = async (data) => {
 export const getTheClassScheduleByClassId = async (classId) => {
     try {
         const response = await fetchData(`class-access/getClassScheduleByClassId/${classId}`, 'get');
-        return response.recordset[0];
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const updateAttendance = async (data) => {
+    try {
+        const response = await fetchData(`class-access/updateAttendance`, 'post', data);
+        return response;
     } catch (error) {
         console.error(error);
         throw error;
@@ -589,7 +717,7 @@ export const editRoom = async (data) => {
 
 export const dropRoom = async (roomId) => {
     try {
-        const response = await fetchData(`class-access/dropRoom/${roomId}`, 'delete');
+        const response = await fetchData(`class-access/dropRoom/${roomId}`, 'get');
         return response;
     } catch (error) {
         console.error(error);
@@ -611,6 +739,16 @@ export const addProgram = async (data) => {
     try {
         const response = await fetchData(`class-access/addProgram`, 'post', data);
         return { response, status: 200 };
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const dropProgram = async (programId) => {
+    try {
+        const response = await fetchData(`class-access/dropProgram/${programId}`, 'get');
+        return response;
     } catch (error) {
         console.error(error);
         throw error;
@@ -807,6 +945,16 @@ export const addProspectToWaitingLists = async (prospectId, waitingListIds) => {
     }
 };
 
+export const addProspectToWaitingList = async (listData) => {
+        try {
+            const response = await fetchData('marketing-access/addProspectToWaitingList', 'post', listData);
+            return { response, status: 200 };
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+};
+
 export const addAStudentToProgram = async (programData) => {
     try {
         const response = await fetchData(`student-access/addStudentToProgram`, 'post', programData);
@@ -829,8 +977,8 @@ export const dropStudentFromProgram = async (programId, studentId) => {
 
 export const addProspectToClass = async (classId, prospectId) => {
     try {
-        const response = await fetchData(`class-access/addProspectToClass/${classId}/${prospectId}`, 'post');
-        return response;
+        const response = await fetchData(`class-access/addProspectToClass/${classId}/${prospectId}`, 'get');
+        return { response, status: 200 };
     } catch (error) {
         console.error(error);
         throw error;
@@ -839,8 +987,8 @@ export const addProspectToClass = async (classId, prospectId) => {
 
 export const addProspectToProgram = async (programId, prospectId) => {
     try {
-        const response = await fetchData(`class-access/addProspectToProgram/${programId}/${prospectId}`, 'post');
-        return response;
+        const response = await fetchData(`class-access/addProspectToProgram/${programId}/${prospectId}`, 'get');
+        return { response, status: 200 };
     } catch (error) {
         console.error(error);
         throw error;
@@ -884,6 +1032,16 @@ export const updateProspectPipelineStatus = async (data) => {
 export const updateStudentNotes = async (studentId, notes) => {
     try {
         const response = await fetchData(`student-access/updateStudentNotes/${studentId}`, 'post', { notes });
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const updateProspectNotes = async (noteData) => {
+    try {
+        const response = await fetchData(`marketing-access/updateProspectNotes`, 'post', noteData);
         return response;
     } catch (error) {
         console.error(error);
@@ -951,7 +1109,6 @@ export const updateStudentPipelineStatus = async (data) => {
     }
 };
 
-
 export const getStudentIdFromPaysimpleCustomerId = async (customerId) => {
     try {
         const response = await fetchData(`billing-account-access/getStudentIdFromPaysimpleCustomerId/${customerId}`, 'get');
@@ -985,7 +1142,7 @@ export const getCountOfInactiveOrInactive = async (studioId, activity) => {
 export const getStudentsByNextContactDate = async (dateData) => {
     try {
         const response = await fetchData(`daily-schedule-tools/getStudentsByNextContactDate`, 'post', dateData);
-        return response
+        return response;
     } catch (error) {
         console.error(error);
         throw error;
@@ -995,7 +1152,7 @@ export const getStudentsByNextContactDate = async (dateData) => {
 export const getProspectsByNextContactDate = async (dateData) => {
     try {
         const response = await fetchData(`daily-schedule-tools/getProspectsByNextContactDate`, 'post', dateData);
-        return response.recordset
+        return response.recordset;
     } catch (error) {
         console.error(error);
         throw error;
@@ -1010,7 +1167,7 @@ export const getProspectsInScheduleByPipelineStep = async (data) => {
         console.error(error);
         throw error;
     }
-}
+};
 
 export const getProspectById = async (prospectId) => {
     try {
@@ -1045,6 +1202,26 @@ export const deletePipelineStep = async (pipelineStepId) => {
 export const deleteLatePaymentPipelineStep = async (pipelineStepId) => {
     try {
         const response = await fetchData(`late-payment-pipeline/deletePaymentPipelineStep/${pipelineStepId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getAttendanceByClassIdDate = async (classId, date, type) => {
+    try {
+        const response = await fetchData(`studio-access/getAttendanceByClassIdDate/${classId}/${date}/${type}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getProspectAttendanceByClassIdDate = async (classId, date, type) => {
+    try {
+        const response = await fetchData(`studio-access/getProspectAttendanceByClassIdDate/${classId}/${date}/${type}`, 'get');
         return response;
     } catch (error) {
         console.error(error);

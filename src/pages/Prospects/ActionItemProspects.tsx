@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import 'flatpickr/dist/flatpickr.css';
 import { Tab } from '@headlessui/react';
@@ -12,14 +12,21 @@ import SendMail from '../Students/components/SendMail';
 import SendText from '../Students/components/SendText';
 import QuickUpdate from '../Students/components/QuickUpdate';
 import QuickUpdateShared from '../Students/components/QuickUpdateShared';
+import { getProspectById } from '../../functions/api';
 
 export default function ActionItemProspect({ student, pipeline, studioOptions, update, setUpdate, prospectPipelineSteps }: any) {
     const [showActionModal, setShowActionModal] = useState(false);
     const [expandedDescription, setExpandedDescription] = useState(false);
     const [defaultTab, setDefaultTab] = useState(0);
+    const [prospect, setProspect] = useState({});
 
     const description = pipeline?.Description || '';
-  
+
+    useEffect(() => {
+        getProspectById(student.ProspectId).then((res) => {
+            setProspect(res);
+        });
+    }, [student]);
 
     const toggleDescription = () => {
         setExpandedDescription(!expandedDescription);
@@ -135,25 +142,30 @@ export default function ActionItemProspect({ student, pipeline, studioOptions, u
                                             <Tab.Panels>
                                                 <Tab.Panel>
                                                     <div>
-                                                        <SendMail pipeline={pipeline} studioOptions={studioOptions} student={student} setShowActionModal={setShowActionModal} setDefaultTab={setDefaultTab}
-                                                        isPrpospect={true}
+                                                        <SendMail
+                                                            pipeline={pipeline}
+                                                            studioOptions={studioOptions}
+                                                            student={prospect}
+                                                            setShowActionModal={setShowActionModal}
+                                                            setDefaultTab={setDefaultTab}
+                                                            isPrpospect={true}
                                                         />
                                                     </div>
                                                 </Tab.Panel>
                                                 <Tab.Panel>
                                                     <div className="pt-8">
-                                                        <SendText defaultText={pipeline} student={student} setDefaultTab={setDefaultTab}/>
+                                                        <SendText defaultText={pipeline} student={prospect} setDefaultTab={setDefaultTab} />
                                                     </div>
                                                 </Tab.Panel>
                                                 <Tab.Panel>
                                                     <div className="pt-8">
-                                                        <QuickUpdateShared 
-                                                        student={student} 
-                                                        setShowActionModal={setShowActionModal}
-                                                        setUpdate={setUpdate} 
-                                                        update={update}
-                                                        pipelineSteps={prospectPipelineSteps}
-                                                        isPrpospect={true}
+                                                        <QuickUpdateShared
+                                                            student={prospect}
+                                                            setShowActionModal={setShowActionModal}
+                                                            setUpdate={setUpdate}
+                                                            update={update}
+                                                            pipelineSteps={prospectPipelineSteps}
+                                                            isPrpospect={true}
                                                         />
                                                     </div>
                                                 </Tab.Panel>

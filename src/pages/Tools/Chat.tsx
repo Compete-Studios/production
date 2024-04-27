@@ -25,235 +25,239 @@ import IconSend from '../../components/Icon/IconSend';
 import IconMicrophoneOff from '../../components/Icon/IconMicrophoneOff';
 import IconDownload from '../../components/Icon/IconDownload';
 import IconCamera from '../../components/Icon/IconCamera';
+import { UserAuth } from '../../context/AuthContext';
+import { getTextLogsByStudioId } from '../../functions/texts';
+import IconLoader from '../../components/Icon/IconLoader';
 
-const contactList = [
-    {
-        userId: 1,
-        name: 'Nia Hillyer',
-        path: 'profile-16.jpeg',
-        time: '2:09 PM',
-        preview: 'How do you do?',
-        messages: [
-            {
-                fromUserId: 0,
-                toUserId: 1,
-                text: 'Hi, I am back from vacation',
-            },
-            {
-                fromUserId: 0,
-                toUserId: 1,
-                text: 'How are you?',
-            },
-            {
-                fromUserId: 1,
-                toUserId: 0,
-                text: 'Welcom Back',
-            },
-            {
-                fromUserId: 1,
-                toUserId: 0,
-                text: 'I am all well',
-            },
-            {
-                fromUserId: 0,
-                toUserId: 1,
-                text: 'Coffee?',
-            },
-        ],
-        active: true,
-    },
-    {
-        userId: 2,
-        name: 'Sean Freeman',
-        path: 'profile-1.jpeg',
-        time: '12:09 PM',
-        preview: 'I was wondering...',
-        messages: [
-            {
-                fromUserId: 0,
-                toUserId: 2,
-                text: 'Hello',
-            },
-            {
-                fromUserId: 0,
-                toUserId: 2,
-                text: "It's me",
-            },
-            {
-                fromUserId: 0,
-                toUserId: 2,
-                text: 'I have a question regarding project.',
-            },
-        ],
-        active: false,
-    },
-    {
-        userId: 3,
-        name: 'Alma Clarke',
-        path: 'profile-2.jpeg',
-        time: '1:44 PM',
-        preview: 'I’ve forgotten how it felt before',
-        messages: [
-            {
-                fromUserId: 0,
-                toUserId: 3,
-                text: 'Hey Buddy.',
-            },
-            {
-                fromUserId: 0,
-                toUserId: 3,
-                text: "What's up",
-            },
-            {
-                fromUserId: 3,
-                toUserId: 0,
-                text: 'I am sick',
-            },
-            {
-                fromUserId: 0,
-                toUserId: 3,
-                text: 'Not comming to office today.',
-            },
-        ],
-        active: true,
-    },
-    {
-        userId: 4,
-        name: 'Alan Green',
-        path: 'profile-3.jpeg',
-        time: '2:06 PM',
-        preview: 'But we’re probably gonna need a new carpet.',
-        messages: [
-            {
-                fromUserId: 0,
-                toUserId: 4,
-                text: 'Hi, collect your check',
-            },
-            {
-                fromUserId: 4,
-                toUserId: 0,
-                text: 'Ok, I will be there in 10 mins',
-            },
-        ],
-        active: true,
-    },
-    {
-        userId: 5,
-        name: 'Shaun Park',
-        path: 'profile-4.jpeg',
-        time: '2:05 PM',
-        preview: 'It’s not that bad...',
-        messages: [
-            {
-                fromUserId: 0,
-                toUserId: 3,
-                text: 'Hi, I am back from vacation',
-            },
-            {
-                fromUserId: 0,
-                toUserId: 3,
-                text: 'How are you?',
-            },
-            {
-                fromUserId: 0,
-                toUserId: 5,
-                text: 'Welcom Back',
-            },
-            {
-                fromUserId: 0,
-                toUserId: 5,
-                text: 'I am all well',
-            },
-            {
-                fromUserId: 5,
-                toUserId: 0,
-                text: 'Coffee?',
-            },
-        ],
-        active: false,
-    },
-    {
-        userId: 6,
-        name: 'Roxanne',
-        path: 'profile-5.jpeg',
-        time: '2:00 PM',
-        preview: 'Wasup for the third time like is you bling bitch',
-        messages: [
-            {
-                fromUserId: 0,
-                toUserId: 6,
-                text: 'Hi',
-            },
-            {
-                fromUserId: 0,
-                toUserId: 6,
-                text: 'Uploaded files to server.',
-            },
-        ],
-        active: false,
-    },
-    {
-        userId: 7,
-        name: 'Ernest Reeves',
-        path: 'profile-6.jpeg',
-        time: '2:09 PM',
-        preview: 'Wasup for the third time like is you bling bitch',
-        messages: [],
-        active: true,
-    },
-    {
-        userId: 8,
-        name: 'Laurie Fox',
-        path: 'profile-7.jpeg',
-        time: '12:09 PM',
-        preview: 'Wasup for the third time like is you bling bitch',
-        messages: [],
-        active: true,
-    },
-    {
-        userId: 9,
-        name: 'Xavier',
-        path: 'profile-8.jpeg',
-        time: '4:09 PM',
-        preview: 'Wasup for the third time like is you bling bitch',
-        messages: [],
-        active: false,
-    },
-    {
-        userId: 10,
-        name: 'Susan Phillips',
-        path: 'profile-9.jpeg',
-        time: '9:00 PM',
-        preview: 'Wasup for the third time like is you bling bitch',
-        messages: [],
-        active: true,
-    },
-    {
-        userId: 11,
-        name: 'Dale Butler',
-        path: 'profile-10.jpeg',
-        time: '5:09 PM',
-        preview: 'Wasup for the third time like is you bling bitch',
-        messages: [],
-        active: false,
-    },
-    {
-        userId: 12,
-        name: 'Grace Roberts',
-        path: 'user-profile.jpeg',
-        time: '8:01 PM',
-        preview: 'Wasup for the third time like is you bling bitch',
-        messages: [],
-        active: true,
-    },
-];
+// const contactList = [
+//     {
+//         userId: 1,
+//         name: 'Nia Hillyer',
+//         path: 'profile-16.jpeg',
+//         time: '2:09 PM',
+//         preview: 'How do you do?',
+//         messages: [
+//             {
+//                 fromUserId: 0,
+//                 toUserId: 1,
+//                 text: 'Hi, I am back from vacation',
+//             },
+//             {
+//                 fromUserId: 0,
+//                 toUserId: 1,
+//                 text: 'How are you?',
+//             },
+//             {
+//                 fromUserId: 1,
+//                 toUserId: 0,
+//                 text: 'Welcom Back',
+//             },
+//             {
+//                 fromUserId: 1,
+//                 toUserId: 0,
+//                 text: 'I am all well',
+//             },
+//             {
+//                 fromUserId: 0,
+//                 toUserId: 1,
+//                 text: 'Coffee?',
+//             },
+//         ],
+//         active: true,
+//     },
+//     {
+//         userId: 2,
+//         name: 'Sean Freeman',
+//         path: 'profile-1.jpeg',
+//         time: '12:09 PM',
+//         preview: 'I was wondering...',
+//         messages: [
+//             {
+//                 fromUserId: 0,
+//                 toUserId: 2,
+//                 text: 'Hello',
+//             },
+//             {
+//                 fromUserId: 0,
+//                 toUserId: 2,
+//                 text: "It's me",
+//             },
+//             {
+//                 fromUserId: 0,
+//                 toUserId: 2,
+//                 text: 'I have a question regarding project.',
+//             },
+//         ],
+//         active: false,
+//     },
+//     {
+//         userId: 3,
+//         name: 'Alma Clarke',
+//         path: 'profile-2.jpeg',
+//         time: '1:44 PM',
+//         preview: 'I’ve forgotten how it felt before',
+//         messages: [
+//             {
+//                 fromUserId: 0,
+//                 toUserId: 3,
+//                 text: 'Hey Buddy.',
+//             },
+//             {
+//                 fromUserId: 0,
+//                 toUserId: 3,
+//                 text: "What's up",
+//             },
+//             {
+//                 fromUserId: 3,
+//                 toUserId: 0,
+//                 text: 'I am sick',
+//             },
+//             {
+//                 fromUserId: 0,
+//                 toUserId: 3,
+//                 text: 'Not comming to office today.',
+//             },
+//         ],
+//         active: true,
+//     },
+//     {
+//         userId: 4,
+//         name: 'Alan Green',
+//         path: 'profile-3.jpeg',
+//         time: '2:06 PM',
+//         preview: 'But we’re probably gonna need a new carpet.',
+//         messages: [
+//             {
+//                 fromUserId: 0,
+//                 toUserId: 4,
+//                 text: 'Hi, collect your check',
+//             },
+//             {
+//                 fromUserId: 4,
+//                 toUserId: 0,
+//                 text: 'Ok, I will be there in 10 mins',
+//             },
+//         ],
+//         active: true,
+//     },
+//     {
+//         userId: 5,
+//         name: 'Shaun Park',
+//         path: 'profile-4.jpeg',
+//         time: '2:05 PM',
+//         preview: 'It’s not that bad...',
+//         messages: [
+//             {
+//                 fromUserId: 0,
+//                 toUserId: 3,
+//                 text: 'Hi, I am back from vacation',
+//             },
+//             {
+//                 fromUserId: 0,
+//                 toUserId: 3,
+//                 text: 'How are you?',
+//             },
+//             {
+//                 fromUserId: 0,
+//                 toUserId: 5,
+//                 text: 'Welcom Back',
+//             },
+//             {
+//                 fromUserId: 0,
+//                 toUserId: 5,
+//                 text: 'I am all well',
+//             },
+//             {
+//                 fromUserId: 5,
+//                 toUserId: 0,
+//                 text: 'Coffee?',
+//             },
+//         ],
+//         active: false,
+//     },
+//     {
+//         userId: 6,
+//         name: 'Roxanne',
+//         path: 'profile-5.jpeg',
+//         time: '2:00 PM',
+//         preview: 'Wasup for the third time like is you bling bitch',
+//         messages: [
+//             {
+//                 fromUserId: 0,
+//                 toUserId: 6,
+//                 text: 'Hi',
+//             },
+//             {
+//                 fromUserId: 0,
+//                 toUserId: 6,
+//                 text: 'Uploaded files to server.',
+//             },
+//         ],
+//         active: false,
+//     },
+//     {
+//         userId: 7,
+//         name: 'Ernest Reeves',
+//         path: 'profile-6.jpeg',
+//         time: '2:09 PM',
+//         preview: 'Wasup for the third time like is you bling bitch',
+//         messages: [],
+//         active: true,
+//     },
+//     {
+//         userId: 8,
+//         name: 'Laurie Fox',
+//         path: 'profile-7.jpeg',
+//         time: '12:09 PM',
+//         preview: 'Wasup for the third time like is you bling bitch',
+//         messages: [],
+//         active: true,
+//     },
+//     {
+//         userId: 9,
+//         name: 'Xavier',
+//         path: 'profile-8.jpeg',
+//         time: '4:09 PM',
+//         preview: 'Wasup for the third time like is you bling bitch',
+//         messages: [],
+//         active: false,
+//     },
+//     {
+//         userId: 10,
+//         name: 'Susan Phillips',
+//         path: 'profile-9.jpeg',
+//         time: '9:00 PM',
+//         preview: 'Wasup for the third time like is you bling bitch',
+//         messages: [],
+//         active: true,
+//     },
+//     {
+//         userId: 11,
+//         name: 'Dale Butler',
+//         path: 'profile-10.jpeg',
+//         time: '5:09 PM',
+//         preview: 'Wasup for the third time like is you bling bitch',
+//         messages: [],
+//         active: false,
+//     },
+//     {
+//         userId: 12,
+//         name: 'Grace Roberts',
+//         path: 'user-profile.jpeg',
+//         time: '8:01 PM',
+//         preview: 'Wasup for the third time like is you bling bitch',
+//         messages: [],
+//         active: true,
+//     },
+// ];
 const loginUser = {
     id: 0,
-    name: 'Bret Johnson',
+    name: 'Alon Smith',
     path: 'profile-34.jpeg',
     designation: 'Software Developer',
 };
 const Chat = () => {
+    const { suid, studioOptions, studioInfo }: any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Chat'));
@@ -266,15 +270,105 @@ const Chat = () => {
     const [isShowUserChat, setIsShowUserChat] = useState(false);
     const [selectedUser, setSelectedUser] = useState<any>(null);
     const [textMessage, setTextMessage] = useState('');
-    const [filteredItems, setFilteredItems] = useState<any>(contactList);
+    const [filteredItems, setFilteredItems] = useState<any>([]);
+
+    const [textLog, setTextLog] = useState<any[]>([]);
+    const [page, setPage] = useState<number>(1);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [limitOfMessages, setLimitOfMessages] = useState<number>(100);
+
+    const getCreatedTimeFromTimeStamp = (timeStamp: any) => {
+        const date = new Date(timeStamp);
+        let hours = date.getHours();
+        const minutes = date.getMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+
+        // Convert hours to 12-hour format
+        if (hours > 12) {
+            hours -= 12;
+        } else if (hours === 0) {
+            hours = 12;
+        }
+
+        // Add leading zeros to minutes if necessary
+        const paddedMinutes = minutes < 10 ? '0' + minutes : minutes;
+
+        return `${hours}:${paddedMinutes} ${ampm}`;
+    };
+
+    const getTextLog = async () => {
+        const dataToSend = {
+            studioId: suid,
+            startDate: '04-01-2024',
+            endDate: '04-07-2024',
+        };
+
+        try {
+            setLoading(true);
+            const response = await getTextLogsByStudioId(dataToSend);
+            const rawChatList = response.recordset;
+
+            if (response.recordset?.length === 0) {
+                return;
+            }
+
+            // Initialize an object to store messages by phone number
+            const messageThreads: any = {};
+
+            // Helper function to remove "+1" prefix from phone number
+            // Helper function to remove "+1" prefix and leading whitespace from phone number
+            const removePlusOne = (phoneNumber: string) => phoneNumber.replace(/^(\+?1|\+1|\b1)/, '').trim();
+
+            // Iterate through each chat message
+            rawChatList.forEach((chat: any) => {
+                let phoneNumber: any = chat.FromNumber === studioOptions?.TextFromNumber ? chat.ToNumber : chat.FromNumber;
+
+                // Remove "+1" prefix from the phone number
+                phoneNumber = removePlusOne(phoneNumber);
+
+                // If this phone number is not yet in the messageThreads object, create an entry for it
+                if (!messageThreads[phoneNumber]) {
+                    messageThreads[phoneNumber] = {
+                        userId: phoneNumber,
+                        name: phoneNumber, // You might want to fetch the name from somewhere
+                        path: 'profile-16.jpeg',
+                        time: getCreatedTimeFromTimeStamp(chat.CreationDate),
+                        preview: chat.Body,
+                        messages: [], // Initialize messages array for this phone number
+                        active: false,
+                    };
+                }
+
+                // Push the current message into the messages array for this phone number
+                messageThreads[phoneNumber].messages.push({
+                    fromUserId: removePlusOne(chat.FromNumber),
+                    toUserId: removePlusOne(chat.ToNumber),
+                    text: chat.Body,
+                });
+            });
+
+            // Convert the messageThreads object into an array of message threads
+            const newOrganizedChatList = Object.values(messageThreads);
+
+            setTextLog((prevLogs) => [...prevLogs, ...newOrganizedChatList]);
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        getTextLog();
+    }, [suid]);
 
     useEffect(() => {
         setFilteredItems(() => {
-            return contactList.filter((d) => {
+            return textLog.filter((d) => {
                 return d.name.toLowerCase().includes(searchUser.toLowerCase());
             });
         });
-    }, [searchUser]);
+    }, [searchUser, textLog]);
 
     const scrollToBottom = () => {
         if (isShowUserChat) {
@@ -293,11 +387,11 @@ const Chat = () => {
     };
     const sendMessage = () => {
         if (textMessage.trim()) {
-            let list = contactList;
+            let list = textLog;
             let user: any = list.find((d) => d.userId === selectedUser.userId);
             user.messages.push({
-                fromUserId: selectedUser.userId,
-                toUserId: 0,
+                fromUserId: 0,
+                toUserId: selectedUser.userId,
                 text: textMessage,
                 time: 'Just now',
             });
@@ -311,21 +405,20 @@ const Chat = () => {
             sendMessage();
         }
     };
+
     return (
         <div>
             <div className={`flex gap-5 relative sm:h-[calc(100vh_-_150px)] h-full sm:min-h-0 ${isShowChatMenu ? 'min-h-[999px]' : ''}`}>
                 <div className={`panel p-4 flex-none max-w-xs w-full absolute xl:relative z-10 space-y-4 xl:h-full hidden xl:block overflow-hidden ${isShowChatMenu ? '!block' : ''}`}>
                     <div className="flex justify-between items-center">
                         <div className="flex items-center">
-                            <div className="flex-none">
-                                <img src="/assets/images/profile-34.jpeg" className="rounded-full h-12 w-12 object-cover" alt="" />
-                            </div>
+                            <div className="flex-none">{/* <img src="/assets/images/profile-34.jpeg" className="rounded-full h-12 w-12 object-cover" alt="" /> */}</div>
                             <div className="mx-3">
-                                <p className="mb-1 font-semibold">Alon Smith</p>
-                                <p className="text-xs text-white-dark">Software Developer</p>
+                                <p className="mb-1 font-semibold">{studioInfo.Studio_Name}</p>
+                                <p className="text-xs text-white-dark">{studioOptions?.TextFromNumber}</p>
                             </div>
                         </div>
-                        <div className="dropdown">
+                        {/* <div className="dropdown">
                             <Dropdown
                                 offset={[0, 5]}
                                 placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
@@ -353,7 +446,7 @@ const Chat = () => {
                                     </li>
                                 </ul>
                             </Dropdown>
-                        </div>
+                        </div> */}
                     </div>
                     <div className="relative">
                         <input type="text" className="form-input peer ltr:pr-9 rtl:pl-9" placeholder="Searching..." value={searchUser} onChange={(e) => setSearchUser(e.target.value)} />
@@ -361,7 +454,7 @@ const Chat = () => {
                             <IconSearch />
                         </div>
                     </div>
-                    <div className="flex justify-between items-center text-xs">
+                    {/* <div className="flex justify-between items-center text-xs">
                         <button type="button" className="hover:text-primary">
                             <IconMessagesDot className="mx-auto mb-1" />
                             Chats
@@ -381,13 +474,13 @@ const Chat = () => {
                             <IconBell className="w-5 h-5 mx-auto mb-1" />
                             Notification
                         </button>
-                    </div>
+                    </div> */}
                     <div className="h-px w-full border-b border-white-light dark:border-[#1b2e4b]"></div>
                     <div className="!mt-0">
                         <PerfectScrollbar className="chat-users relative h-full min-h-[100px] sm:h-[calc(100vh_-_357px)] space-y-0.5 ltr:pr-3.5 rtl:pl-3.5 ltr:-mr-3.5 rtl:-ml-3.5">
-                            {filteredItems.map((person: any) => {
+                            {filteredItems?.map((person: any, index: any) => {
                                 return (
-                                    <div key={person.userId}>
+                                    <div key={index}>
                                         <button
                                             type="button"
                                             className={`w-full flex justify-between items-center p-2 hover:bg-gray-100 dark:hover:bg-[#050b14] rounded-md dark:hover:text-primary hover:text-primary ${
@@ -398,7 +491,8 @@ const Chat = () => {
                                             <div className="flex-1">
                                                 <div className="flex items-center">
                                                     <div className="flex-shrink-0 relative">
-                                                        <img src={`/assets/images/${person.path}`} className="rounded-full h-12 w-12 object-cover" alt="" />
+                                                        {/* <img src={`/assets/images/${person.path}`} className="rounded-full h-12 w-12 object-cover" alt="" /> */}
+
                                                         {person.active && (
                                                             <div>
                                                                 <div className="absolute bottom-0 ltr:right-0 rtl:left-0">
@@ -550,7 +644,8 @@ const Chat = () => {
                                         <IconMenu />
                                     </button>
                                     <div className="relative flex-none">
-                                        <img src={`/assets/images/${selectedUser.path}`} className="rounded-full w-10 h-10 sm:h-12 sm:w-12 object-cover" alt="" />
+                                        {/* <img src={`/assets/images/${selectedUser.path}`} className="rounded-full w-10 h-10 sm:h-12 sm:w-12 object-cover" alt="" /> */}
+
                                         <div className="absolute bottom-0 ltr:right-0 rtl:left-0">
                                             <div className="w-4 h-4 bg-success rounded-full"></div>
                                         </div>
@@ -611,61 +706,72 @@ const Chat = () => {
                                 </div>
                             </div>
                             <div className="h-px w-full border-b border-white-light dark:border-[#1b2e4b]"></div>
-
-                            <PerfectScrollbar className="relative h-full sm:h-[calc(100vh_-_300px)] chat-conversation-box">
-                                <div className="space-y-5 p-4 sm:pb-0 pb-[68px] sm:min-h-[300px] min-h-[400px]">
-                                    <div className="block m-6 mt-0">
-                                        <h4 className="text-xs text-center border-b border-[#f4f4f4] dark:border-gray-800 relative">
-                                            <span className="relative top-2 px-3 bg-white dark:bg-black">{'Today, ' + selectedUser.time}</span>
-                                        </h4>
-                                    </div>
-                                    {selectedUser.messages && selectedUser.messages.length ? (
-                                        <>
-                                            {selectedUser.messages.map((message: any, index: any) => {
-                                                return (
-                                                    <div key={index}>
-                                                        <div className={`flex items-start gap-3 ${selectedUser.userId === message.fromUserId ? 'justify-end' : ''}`}>
-                                                            <div className={`flex-none ${selectedUser.userId === message.fromUserId ? 'order-2' : ''}`}>
-                                                                {selectedUser.userId === message.fromUserId ? (
-                                                                 <p>m</p>
-                                                                ) : (
-                                                                    ''
-                                                                )}
-                                                                {selectedUser.userId !== message.fromUserId ? (
-                                                                     <p>s</p>
-                                                                ) : (
-                                                                    ''
-                                                                )}
-                                                            </div>
-                                                            <div className="space-y-2">
-                                                                <div className="flex items-center gap-3">
-                                                                    <div
-                                                                        className={`dark:bg-gray-800 p-4 py-2 rounded-md bg-black/10 ${
-                                                                            message.fromUserId === selectedUser.userId
-                                                                                ? 'ltr:rounded-br-none rtl:rounded-bl-none !bg-primary text-white'
-                                                                                : 'ltr:rounded-bl-none rtl:rounded-br-none'
-                                                                        }`}
-                                                                    >
-                                                                        {message.text}
-                                                                    </div>
-                                                                    <div className={`${selectedUser.userId === message.fromUserId ? 'hidden' : ''}`}>
-                                                                        <IconMoodSmile className="hover:text-primary" />
-                                                                    </div>
+                            {loading ? (
+                                <div className="flex items-center justify-center h-full">
+                                    <IconLoader className="w-8 h-8 text-primary animate-spin" />
+                                </div>
+                            ) : (
+                                <PerfectScrollbar className="relative h-full sm:h-[calc(100vh_-_300px)] chat-conversation-box">
+                                    <div className="space-y-5 p-4 sm:pb-0 pb-[68px] sm:min-h-[300px] min-h-[400px]">
+                                        <div className="block m-6 mt-0">
+                                            <h4 className="text-xs text-center border-b border-[#f4f4f4] dark:border-gray-800 relative">
+                                                <span className="relative top-2 px-3 bg-white dark:bg-black">{'Today, ' + selectedUser.time}</span>
+                                            </h4>
+                                        </div>
+                                        {selectedUser.messages && selectedUser.messages.length ? (
+                                            <>
+                                                {selectedUser.messages.map((message: any, index: any) => {
+                                                    return (
+                                                        <div key={index}>
+                                                            <div className={`flex items-start gap-3 ${selectedUser.userId === message.toUserId ? 'justify-end' : ''}`}>
+                                                                <div className={`flex-none ${selectedUser.userId === message.toUserId ? 'order-2' : ''}`}>
+                                                                    {selectedUser.userId === message.toUserId ? (
+                                                                        <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg bg-dark">
+                                                                            <span className="text-lg font-medium leading-none text-white">{studioInfo?.Studio_Name[0]}</span>
+                                                                        </span>
+                                                                    ) : (
+                                                                        ''
+                                                                    )}
+                                                                    {selectedUser.userId !== message.toUserId ? (
+                                                                        // <img src={`/assets/images/${selectedUser.path}`} className="rounded-full h-10 w-10 object-cover" alt="" />
+                                                                        <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gray-500">
+                                                                            <span className="text-lg font-medium leading-none text-white">TW</span>
+                                                                        </span>
+                                                                    ) : (
+                                                                        ''
+                                                                    )}
                                                                 </div>
-                                                                <div className={`text-xs text-white-dark ${selectedUser.userId === message.fromUserId ? 'ltr:text-right rtl:text-left' : ''}`}>
-                                                                    {message.time ? message.time : '5h ago'}
+                                                                <div className="space-y-2">
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div
+                                                                            className={`dark:bg-gray-800 p-4 py-2 rounded-md bg-black/10 ${
+                                                                                message.toUserId === selectedUser.userId
+                                                                                    ? 'ltr:rounded-br-none rtl:rounded-bl-none !bg-primary text-white'
+                                                                                    : 'ltr:rounded-bl-none rtl:rounded-br-none'
+                                                                            }`}
+                                                                        >
+                                                                            {message.text}
+                                                                        </div>
+                                                                        <div className={`${selectedUser.userId === message.toUserId ? 'hidden' : ''}`}>
+                                                                            <IconMoodSmile className="hover:text-primary" />
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className={`text-xs text-white-dark ${selectedUser.userId === message.toUserId ? 'ltr:text-right rtl:text-left' : ''}`}>
+                                                                        {message.time ? message.time : '5h ago'}
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                );
-                                            })}
-                                        </>
-                                    ) : (
-                                        ''
-                                    )}
-                                </div>
-                            </PerfectScrollbar>
+                                                    );
+                                                })}
+                                            </>
+                                        ) : (
+                                            ''
+                                        )}
+                                    </div>
+                                </PerfectScrollbar>
+                            )}
+
                             <div className="p-4 absolute bottom-0 left-0 w-full">
                                 <div className="sm:flex w-full space-x-3 rtl:space-x-reverse items-center">
                                     <div className="relative flex-1">

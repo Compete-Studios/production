@@ -15,7 +15,7 @@ const emailDataInit = {
 };
 
 export default function SendMail({ pipeline, studioOptions, student, setShowActionModal, setDefaultTab, isPrpospect = false }: any) {
-    const { suid } = UserAuth();
+    const { suid }: any = UserAuth();
     const [emailData, setEmailData] = useState<any>(emailDataInit);
     const [emailHtml, setEmailHtml] = useState<any>('');
 

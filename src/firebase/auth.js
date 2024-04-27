@@ -1,4 +1,4 @@
-import { arrayUnion, doc, getDoc, setDoc } from 'firebase/firestore';
+import { addDoc, arrayUnion, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth';
 
@@ -47,6 +47,16 @@ export const logout = async () => {
     try {
         await signOut(auth);
         window.location.reload();
+        return true;
+    } catch (error) {
+        return error.message;
+    }
+};
+
+export const createEvent = async (data, suid) => {
+    try {
+        const docRef = doc(db, suid, data.eventID);
+        await setDoc(docRef, data);
         return true;
     } catch (error) {
         return error.message;

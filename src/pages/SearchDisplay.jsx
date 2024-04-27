@@ -16,6 +16,12 @@ export default function SearchDisplay() {
         navigate(`/students/view-student/${hashedStudentId}/${hashedSUID}`);
     };
 
+    const handleViewProspect= (id) => {
+        const hashedStudentId = hashTheID(id);
+        const hashedSUID = hashTheID(suid);
+        navigate(`/prospects/view-prospect/${hashedStudentId}/${hashedSUID}`);
+    };
+
     console.log(searchedStudentsAndProspects);
 
     return (
@@ -99,7 +105,7 @@ export default function SearchDisplay() {
                                                 </td>
 
                                                 <td>
-                                                    <button onClick={() => handleViewStudent(person.ProspectId)}>
+                                                    <button onClick={() => handleViewProspect(person.ProspectId)}>
                                                         <IconEye className="text-info hover:text-blue-900" />
                                                     </button>
                                                 </td>

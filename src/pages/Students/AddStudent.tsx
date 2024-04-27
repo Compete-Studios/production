@@ -41,7 +41,7 @@ const alertsInit = {
 };
 
 export default function AddStudent() {
-    const { waitingLists, pipelineSteps, programs, classes, marketingSources, suid } = UserAuth();
+    const { waitingLists, pipelineSteps, programs, classes, marketingSources, suid }: any = UserAuth();
     const [alerts, setAlerts] = useState(alertsInit);
     const [studentInfo, setStudentInfo] = useState(studentInfoInit);
     const [programsForStudent, setProgramsForStudent] = useState([]);
@@ -106,8 +106,6 @@ export default function AddStudent() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-   
-
     const handleAddStudent = async (e: any) => {
         e.preventDefault();
 
@@ -120,8 +118,7 @@ export default function AddStudent() {
 
         const classIDs = selectedClasses.map((item: any) => item.ClassId);
         const programIds = programsForStudent.map((item: any) => item.value);
-        const waitingListIds = selectedWaitingLists.map((item: any) => item.WaitingListId);      
-
+        const waitingListIds = selectedWaitingLists.map((item: any) => item.WaitingListId);
 
         if (studentInfo?.fName === '') {
             showErrorMessage('First Name is required');
@@ -148,26 +145,26 @@ export default function AddStudent() {
                 addStudentToClasses(res.NewStudentId, classIDs);
                 addStudentToWaitingLists(res.NewStudentId, waitingListIds);
                 showMessage('Student has been added successfully');
-                const newID = parseInt(res.NewStudentId) * parseInt(suid)
+                const newID = parseInt(res.NewStudentId) * parseInt(suid);
                 navigate(`/students/add-billing-account/${newID}`);
             });
         }
     };
 
+    console.log(studentInfo, 'studentInfo')
+
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
-                    <li>
-                        <Link to="/students/view-students" className="text-primary hover:underline">
-                            Students
-                        </Link>
-                    </li>
-                    <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                        <span>
-                            Add Student
-                        </span>
-                    </li>
-                </ul>
+                <li>
+                    <Link to="/students/view-students" className="text-primary hover:underline">
+                        Students
+                    </Link>
+                </li>
+                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
+                    <span>Add Student</span>
+                </li>
+            </ul>
             <div className="panel bg-gray-100 max-w-5xl mx-auto mt-4">
                 <div className="mb-5">
                     <h5 className="font-semibold text-lg mb-4">Student Info</h5>
@@ -264,9 +261,9 @@ export default function AddStudent() {
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="marketingMethod">Marketing Source</label>
-                                <select id="marketingMethod" className="form-select text-white-dark">
+                                <select id="marketingMethod" className="form-select text-white-dark" onChange={(e) => setStudentInfo({ ...studentInfo, marketingMethod: e.target.value })}>
                                     {marketingSources?.map((source: any) => (
-                                        <option key={source.MarketingSourceId} value={source.MarketingSourceId}>
+                                        <option key={source.MethodId} value={source.MethodId}>
                                             {source.Name}
                                         </option>
                                     ))}
@@ -344,7 +341,11 @@ export default function AddStudent() {
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="pipelineStatus">Programs</label>
-                                <Select placeholder="Select an option" options={options} isMulti isSearchable={false} 
+                                <Select
+                                    placeholder="Select an option"
+                                    options={options}
+                                    isMulti
+                                    isSearchable={false}
                                     onChange={(e: any) => {
                                         setProgramsForStudent(e);
                                     }}

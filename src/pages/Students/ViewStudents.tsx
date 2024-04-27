@@ -10,7 +10,7 @@ import { convertPhone, hashTheID } from '../../functions/shared';
 import IconUserPlus from '../../components/Icon/IconUserPlus';
 
 const ViewStudents = () => {
-    const { suid } = UserAuth();
+    const { suid }: any = UserAuth();
     const [students, setStudents] = useState<any>([]);
     const [showLoading, setShowLoading] = useState(false);
     const [activeOnly, setActiveOnly] = useState(true);

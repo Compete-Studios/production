@@ -23,13 +23,13 @@ interface BillingInfoProps {
     billingInfo: CreditCard[];
 }
 
-export default function StudentsQuickPay({ student, suid }: any) {
+export default function StudentsQuickPay({ student, suid, title = 'Quick Pay', invoiceID = null }: any) {
     const [showQuickPayModal, setShowQuickPayModal] = useState(false);
     const [billingInfo, setBillingInfo] = useState<CreditCard[] | null>(null);
     const [cardToUse, setCardToUse] = useState<CreditCard | null>(null);
     const [notes, setNotes] = useState<string | null>('');
     const [amount, setAmount] = useState(null);
-    const [invoice, setInvoice] = useState(null);
+    const [invoice, setInvoice] = useState<any>(invoiceID);
 
     const showErrorMessage = (msg = '') => {
         const toast = Swal.mixin({
@@ -81,20 +81,32 @@ export default function StudentsQuickPay({ student, suid }: any) {
         getBillingInformation();
     }, [student?.Student_id]);
 
-    const runPayment = () => {
-        console.log('run payment');
-        console.log('Amount:', amount);
+    useEffect(() => {
+        setInvoice(invoiceID);
+    }, [invoiceID]);
+
+    const runPayment = async () => {
         const paymentData = {
-            paymentAccountId: cardToUse?.CustomerId,
+            paymentAccountId: cardToUse?.Id,
             amount: amount,
         };
-        showMessage('Payment has been processed successfully');
-        setCardToUse(null);
-        setAmount(null);
-        setShowQuickPayModal(false);
-        // runPaymentForCustomer(paymentData);
+        try {
+            const response = await runPaymentForCustomer(paymentData);
+            if (response?.Response?.Status === 'Authorized') {
+                showMessage('Payment has been processed successfully');
+                setCardToUse(null);
+                setAmount(null);
+                setShowQuickPayModal(false);
+            } else {
+                const errorMessage = response?.Response?.FailureData?.MerchantActionText || 'An error occurred while processing the payment';
+                showErrorMessage(errorMessage);
+            }
+        } catch {
+            showErrorMessage('An error occurred while processing the payment');
+        }
     };
 
+    console.log(cardToUse);
     const recordPayment = async () => {
         console.log('record payment');
 
@@ -131,9 +143,9 @@ export default function StudentsQuickPay({ student, suid }: any) {
     return (
         <div>
             <div>
-                <button type="button" className="btn btn-primary w-full" onClick={() => setShowQuickPayModal(true)}>
+                <button type="button" className="btn btn-success w-full" onClick={() => setShowQuickPayModal(true)}>
                     <IconDollarSignCircle className="ltr:mr-2 rtl:ml-2" />
-                    Quick Pay
+                    {title}
                 </button>
             </div>
             <Transition appear show={showQuickPayModal} as={Fragment}>
@@ -226,7 +238,7 @@ export default function StudentsQuickPay({ student, suid }: any) {
                                                                                 placeholder="0.00"
                                                                                 value={amount || ''}
                                                                                 className="form-input ltr:rounded-l-none rtl:rounded-r-none"
-                                                                                onChange={(e) => setAmount(parseFloat(e.target.value))}
+                                                                                onChange={(e: any) => setAmount(parseFloat(e.target.value))}
                                                                             />
                                                                         </div>
                                                                     </div>
@@ -281,6 +293,7 @@ export default function StudentsQuickPay({ student, suid }: any) {
                                                                         type="text"
                                                                         placeholder="Invoice Number (optional)"
                                                                         className="form-input ltr:rounded-l-none rtl:rounded-r-none ml-1"
+                                                                        value={invoice}
                                                                         onChange={(e: any) => setInvoice(e.target.value)}
                                                                     />
                                                                 </div>

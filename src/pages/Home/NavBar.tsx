@@ -53,7 +53,7 @@ const callsToAction = [
   { name: "View all products", href: "#", icon: IconEye },
 ];
 
-function classNames(...classes) {
+function classNames(...classes: any) {
   return classes.filter(Boolean).join(" ");
 }
 
@@ -204,7 +204,7 @@ export default function NavBar() {
                     <>
                       <Disclosure.Button className="flex w-full items-center justify-between rounded-lg py-2 pl-3 pr-3.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
                         Product
-                        <ChevronDownIcon
+                        <IconCaretDown
                           className={classNames(
                             open ? "rotate-180" : "",
                             "h-5 w-5 flex-none"

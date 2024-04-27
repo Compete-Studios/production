@@ -2,11 +2,11 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import IconX from '../../components/Icon/IconX';
 import { UserAuth } from '../../context/AuthContext';
-import { addStudentToAWaitingList, addStudentToClass } from '../../functions/api';
+import { addProspectToWaitingList, addStudentToAWaitingList } from '../../functions/api';
 import { showMessage } from '../../functions/shared';
 
-export default function AddStudentToWaitingList({ student, alreadyIn, updateClasses, setUpdateClasses }: any) {
-    const { waitingLists } = UserAuth();
+export default function AddStudentToWaitingList({ student, alreadyIn, updateClasses, setUpdateClasses, isProspect = false }: any) {
+    const { waitingLists }: any = UserAuth();
     const [newClass, setNewClass] = useState('');
     const [showAddClassModal, setShowAddClassModal] = useState(false);
     const [availableClasses, setAvailableClasses] = useState(waitingLists);
@@ -23,7 +23,25 @@ export default function AddStudentToWaitingList({ student, alreadyIn, updateClas
         removeClassesAlreadyIn();
     }, [waitingLists]);
 
-    const handleAddToClass = async () => {
+    const handleAddProspectToWaitingList = async () => {
+        const classData = {
+            prospectId: student,
+            waitingListId: newClass,
+        };
+
+        try {
+            const response = await addProspectToWaitingList(classData);
+            if (response.status === 200) {
+                showMessage('Student added to Waiting List');
+                setUpdateClasses(!updateClasses);
+                setShowAddClassModal(false);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const handleAddStudentToWaitingList = async () => {
         const classData = {
             studentId: student.Student_id,
             waitingListId: newClass,
@@ -46,7 +64,7 @@ export default function AddStudentToWaitingList({ student, alreadyIn, updateClas
             <div>
                 <button className="btn btn-outline-info btn-sm ml-auto" onClick={() => setShowAddClassModal(true)}>
                     {' '}
-                    Add Student To List
+                    Add {isProspect ? 'Prospect' : 'Student'} To List
                 </button>
             </div>
             <Transition appear show={showAddClassModal} as={Fragment}>
@@ -96,9 +114,15 @@ export default function AddStudentToWaitingList({ student, alreadyIn, updateClas
                                                 <button type="button" className="btn btn-outline-danger" onClick={() => setShowAddClassModal(false)}>
                                                     Discard
                                                 </button>
-                                                <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={handleAddToClass}>
-                                                    Add Student to Waiting List
-                                                </button>
+                                                {isProspect ? (
+                                                    <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={handleAddProspectToWaitingList}>
+                                                        Add Prospect to Waiting List
+                                                    </button>
+                                                ) : (
+                                                    <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={handleAddStudentToWaitingList}>
+                                                        Add Student to Waiting List
+                                                    </button>
+                                                )}
                                             </div>
                                         </form>
                                     </div>

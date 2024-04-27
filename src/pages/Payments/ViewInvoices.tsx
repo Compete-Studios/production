@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { UserAuth } from '../../context/AuthContext';
 import { getInvoicesByStudioId, getProspectInvoicesByStudioId } from '../../functions/api';
 import Flatpickr from 'react-flatpickr';
@@ -7,53 +6,29 @@ import 'flatpickr/dist/flatpickr.css';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import IconTrashLines from '../../components/Icon/IconTrashLines';
-
-
+import { formatDate, hashTheID } from '../../functions/shared';
+import IconEye from '../../components/Icon/IconEye';
+import { useDispatch } from 'react-redux';
+import { setPageTitle } from '../../store/themeConfigSlice';
+import { Link } from 'react-router-dom';
 
 export default function ViewInvoices() {
     const { suid }: any = UserAuth();
-    const [startDate, setStartDate] = useState<any>('01-01-2023');
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('Search Payments'));
+    });
+    const [startDate, setStartDate] = useState<any>('04-01-2024');
     const [endDate, setEndDate] = useState<any>('05-01-2024');
     const [studentInvoices, setStudentInvoices] = useState<any>([]);
     const [prospectInvoices, setProspectInvoices] = useState<any>([]);
     const [loading, setLoading] = useState(false);
-   
 
-    const statusCSS = (status: string) => {
-      switch (status) {
-          case 'Pending':
-              return 'text-blue-800';
-          case 'Chargeback':
-              return 'text-red-800';
-          case 'Posted':
-              return 'text-success';
-          case 'Authorized':
-              return 'text-success';
-          case 'Failed':
-              return 'text-red-800';
-          case 'RefundSettled':
-              return 'text-purple-800';
-          case 'Returned':
-              return ' text-orange-800';
-          case 'Reversed':
-              return ' text-red-800';
-          case 'Reversensf':
-              return ' text-red-800';
-          case 'Reverseposted':
-              return ' text-red-800';
-          case 'Settled':
-              return 'text-success';
-          case 'Voided':
-              return ' text-red-800';
-          default:
-              return 'text-gray-800';
-      }
-  };
+    console.log(prospectInvoices);
 
     const handleGetStudentInvoices = async () => {
         try {
             const response = await getInvoicesByStudioId(suid, startDate, endDate);
-            console.log(response);
             setStudentInvoices(response.recordset);
         } catch (error) {
             console.error(error);
@@ -63,7 +38,6 @@ export default function ViewInvoices() {
     const handleGetProspectInvoices = async () => {
         try {
             const response = await getProspectInvoicesByStudioId(suid, startDate, endDate);
-            console.log(response);
             setProspectInvoices(response.recordset);
         } catch (error) {
             console.error(error);
@@ -75,8 +49,12 @@ export default function ViewInvoices() {
         handleGetProspectInvoices();
     }, [suid]);
 
-    const handleSearch = () => {
+    const handleSearch = async () => {
         console.log('searching...');
+        setLoading(true);
+        await handleGetStudentInvoices();
+        await handleGetProspectInvoices();
+        setLoading(false);
     };
 
     return (
@@ -93,7 +71,7 @@ export default function ViewInvoices() {
             <div className="panel ">
                 <div className="mb-4.5 flex md:items-center md:flex-row flex-col gap-5">
                     <div className="flex items-center gap-5">
-                        <h2 className="text-xl">Studio Payment History</h2>
+                        <h2 className="text-xl">View Your Invoices</h2>
                     </div>
                     <div className="ltr:ml-auto rtl:mr-auto">
                         <div className="flex items-center gap-5">
@@ -115,7 +93,8 @@ export default function ViewInvoices() {
                     </div>
                 </div>
                 <p>
-                    Total Invoices: <span className="font-bold">1 Student invoices found. 1 Prospect invoices found.</span>
+                    Total Invoices: <span className="font-bold">{studentInvoices?.length} </span>
+                    Student invoices found. <span className="font-bold">{prospectInvoices?.length} </span> Prospect invoices found.
                 </p>
                 {loading ? (
                     <div className="screen_loader flex items-center justify-center bg-[#fafafa] dark:bg-[#060818] z-[60] place-content-center animate__animated p-24">
@@ -130,58 +109,132 @@ export default function ViewInvoices() {
                     </div>
                 ) : (
                     <div>
-                      <div className="table-responsive mb-5">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Date</th>
-                                <th>Sale</th>
-                                <th>Status</th>
-                                <th className="text-center">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {studentInvoices?.map((data: any) => {
-                                return (
-                                    <tr key={data.id}>
-                                        <td>
-                                            <div className="whitespace-nowrap">{data.name}</div>
-                                        </td>
-                                        <td>{data.date}</td>
-                                        <td>{data.sale}</td>
-                                        <td>
-                                            <div
-                                                className={`whitespace-nowrap ${
-                                                    data.status === 'completed'
-                                                        ? 'text-success'
-                                                        : data.status === 'Pending'
-                                                        ? 'text-secondary'
-                                                        : data.status === 'In Progress'
-                                                        ? 'text-info'
-                                                        : data.status === 'Canceled'
-                                                        ? 'text-danger'
-                                                        : 'text-success'
-                                                }`}
-                                            >
-                                                {data.status}
-                                            </div>
-                                        </td>
-                                        <td className="text-center">
-                                            <Tippy content="Delete">
-                                                <button type="button">
-                                                    <IconTrashLines className="m-auto" />
-                                                </button>
-                                            </Tippy>
-                                        </td>
+                        <div className="table-responsive mt-12">
+                            <h2 className="text-xl">Student Invoices</h2>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Amount</th>
+                                        <th>Date Created</th>
+                                        <th>Date Due</th>
+                                        <th>Status</th>
+                                        <th className="text-center">Action</th>
                                     </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </div>
-                
-                      
+                                </thead>
+                                <tbody>
+                                    {studentInvoices?.map((data: any) => {
+                                        return (
+                                            <tr key={data.InvoiceId}>
+                                                <td>
+                                                    <div className="whitespace-nowrap">{data.StudentName}</div>
+                                                </td>
+                                                <td>${data.Amount?.toFixed(2)}</td>
+                                                <td>{formatDate(data.CreationDate)}</td>
+                                                <td>{formatDate(data.DueDate)}</td>
+
+                                                <td>
+                                                    <div
+                                                        className={`whitespace-nowrap ${
+                                                            data.PaymentId > 0
+                                                                ? 'text-success'
+                                                                : data.status === 'Pending'
+                                                                ? 'text-secondary'
+                                                                : data.status === 'In Progress'
+                                                                ? 'text-info'
+                                                                : data.status === 'Canceled'
+                                                                ? 'text-danger'
+                                                                : 'text-danger'
+                                                        }`}
+                                                    >
+                                                        {data.PaymentId > 0 ? 'Paid' : 'Open'}
+                                                    </div>
+                                                </td>
+                                                <td className="text-center flex items-center justify-center gap-x-2">
+                                                    <div>
+                                                        <Tippy content="View Invoice">
+                                                            <Link to={`/payments/view-invoice/${hashTheID(data.InvoiceId)}/${hashTheID(suid)}`} type="button">
+                                                                <IconEye className="m-auto text-info hover:text-blue-900" />
+                                                            </Link>
+                                                        </Tippy>
+                                                    </div>
+                                                    <div>
+                                                        <Tippy content="Delete Invoice">
+                                                            <button type="button">
+                                                                <IconTrashLines className="m-auto text-danger hover:text-red-800" />
+                                                            </button>
+                                                        </Tippy>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="table-responsive mb-5 mt-12">
+                            <h2 className="text-xl">Prospect Invoices</h2>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Amount</th>
+                                        <th>Date Created</th>
+                                        <th>Date Due</th>
+                                        <th>Status</th>
+                                        <th className="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {prospectInvoices?.map((data: any) => {
+                                        return (
+                                            <tr key={data.InvoiceId}>
+                                                <td>
+                                                    <div className="whitespace-nowrap">{data.Name}</div>
+                                                </td>
+                                                <td>${data.Amount?.toFixed(2)}</td>
+                                                <td>{formatDate(data.CreationDate)}</td>
+                                                <td>{formatDate(data.DueDate)}</td>
+
+                                                <td>
+                                                    <div
+                                                        className={`whitespace-nowrap ${
+                                                            data.PaymentId > 0
+                                                                ? 'text-success'
+                                                                : data.PaymentId === 'Pending'
+                                                                ? 'text-secondary'
+                                                                : data.PaymentId === 'In Progress'
+                                                                ? 'text-info'
+                                                                : data.PaymentId === 'Canceled'
+                                                                ? 'text-danger'
+                                                                : 'text-danger'
+                                                        }`}
+                                                    >
+                                                        {data.PaymentId > 0 ? 'Paid' : 'Open'}
+                                                    </div>
+                                                </td>
+                                                <td className="text-center flex items-center justify-center gap-x-2">
+                                                    <div>
+                                                        <Tippy content="View Invoice">
+                                                        <Link to={`/payments/view-invoice/${hashTheID(data.InvoiceId)}/${hashTheID(suid)}`} type="button">
+                                                                <IconEye className="m-auto text-info hover:text-blue-900" />
+                                                            </Link>
+                                                        </Tippy>
+                                                    </div>
+                                                    <div>
+                                                        <Tippy content="Delete Invoice">
+                                                            <button type="button">
+                                                                <IconTrashLines className="m-auto text-danger hover:text-red-800" />
+                                                            </button>
+                                                        </Tippy>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
             </div>

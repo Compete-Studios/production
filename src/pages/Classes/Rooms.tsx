@@ -1,16 +1,17 @@
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import IconTrash from '../../components/Icon/IconTrash';
-import IconPlus from '../../components/Icon/IconPlus';
 import { UserAuth } from '../../context/AuthContext';
 import { useEffect, useState } from 'react';
-import { loadStudioRooms } from '../../functions/api';
+import { dropRoom, loadStudioRooms } from '../../functions/api';
 import IconEdit from '../../components/Icon/IconEdit';
-
+import AddRoom from './AddRoom';
+import { showWarningMessage } from '../../functions/shared';
 
 export default function Rooms() {
-    const { suid } = UserAuth();
+    const { suid }: any = UserAuth();
     const [rooms, setRooms] = useState([]);
+    const [] = useState(false);
 
     const getStudioRooms = async () => {
         try {
@@ -27,21 +28,36 @@ export default function Rooms() {
         getStudioRooms();
     }, [suid]);
 
-    console.log(rooms)
+    const handleDeleteRoome = async (RoomId: any) => {
+        showWarningMessage('Are you sure you want to delete this room?', 'Remove Room', 'Your Room has been removed successfully')
+            .then((confirmed: boolean) => {
+                if (confirmed) {
+                    dropRoom(RoomId).then((response) => {
+                        if (response) {
+                            getStudioRooms();
+                        }
+                    });
+                } else {
+                    // User canceled the action
+                    console.log('User canceled');
+                }
+            })
+            .catch((error: any) => {
+                // Handle error if any
+                console.error('Error:', error);
+            });
+    };
 
     return (
-        <div className="panel px-0 border-white-light dark:border-[#1b2e4b]">
+        <div className="panel px-0 pb-0 border-white-light dark:border-[#1b2e4b]">
             <div className="mb-4.5 px-5 flex md:items-center md:flex-row flex-col gap-5">
                 <h2 className="text-xl">Rooms</h2>
 
                 <div className="gap-2 ltr:ml-auto rtl:mr-auto">
-                    <button type="button" className="btn btn-primary gap-2 ltr:ml-auto rtl:mr-auto">
-                        <IconPlus />
-                        Add a Room
-                    </button>
+                    <AddRoom update={getStudioRooms} />
                 </div>
             </div>
-            <div className="table-responsive mb-5">
+            <div className="table-responsive ">
                 <table className="table-hover">
                     <thead>
                         <tr>
@@ -50,21 +66,21 @@ export default function Rooms() {
                         </tr>
                     </thead>
                     <tbody>
-                        {rooms?.map((data) => {
+                        {rooms?.map((data: any) => {
                             return (
                                 <tr key={data.RoomId}>
                                     <td>
                                         <div className="whitespace-nowrap">{data.Name}</div>
                                     </td>
-                               
+
                                     <td className="text-center ">
-                                    <Tippy content="Edit">
-                                            <button type="button" className='p-2 text-primary hover:text-emerald-800'>
+                                        <Tippy content="Edit">
+                                            <button type="button" className="p-2 text-primary hover:text-emerald-800">
                                                 <IconEdit />
                                             </button>
                                         </Tippy>
                                         <Tippy content="Delete">
-                                            <button type="button" className='p-2 text-danger hover:text-red-700'>
+                                            <button type="button" className="p-2 text-danger hover:text-red-700" onClick={() => handleDeleteRoome(data.RoomId)}>
                                                 <IconTrash />
                                             </button>
                                         </Tippy>

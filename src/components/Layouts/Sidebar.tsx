@@ -39,7 +39,7 @@ const Sidebar = () => {
         });
     };
 
-    console.log(studioInfo, 'studioInfo');
+   
 
     const handleSetNewStudio = async (studioID: any) => {
         const idString = studioID.toString();
@@ -73,7 +73,7 @@ const Sidebar = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location]);
 
-    console.log(masters)
+  
 
     return (
         <div className={semidark ? 'dark' : ''}>

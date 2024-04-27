@@ -1,5 +1,7 @@
 import { Dialog, Transition, Tab } from '@headlessui/react';
 import { useState, Fragment, useEffect } from 'react';
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
 import IconX from '../../components/Icon/IconX';
 import IconEye from '../../components/Icon/IconEye';
 import { UserAuth } from '../../context/AuthContext';
@@ -26,7 +28,7 @@ export default function ViewClass({ classId }) {
         }
         try {
             getTheClassScheduleByClassId(classId).then((response) => {
-                setScheduleInfo(response);
+                // setScheduleInfo(response);
             });
         } catch (error) {
             console.log(error);
@@ -52,9 +54,11 @@ export default function ViewClass({ classId }) {
 
     return (
         <div>
-            <button onClick={() => handleGetClassInfo()} type="button" className="flex text-info hover:text-primary">
-                <IconEye />
-            </button>
+            <Tippy content="View Class">
+                <button onClick={() => handleGetClassInfo()} type="button" className="flex text-info hover:text-primary">
+                    <IconEye />
+                </button>
+            </Tippy>
             <Transition appear show={modal18} as={Fragment}>
                 <Dialog as="div" open={modal18} onClose={() => setModal18(false)}>
                     <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">

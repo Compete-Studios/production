@@ -6,7 +6,7 @@ import 'flatpickr/dist/flatpickr.css';
 import { constFormateDateMMDDYYYY, formatDate, showErrorMessage, showMessage } from '../../../functions/shared';
 
 export default function QuickUpdate({ student, setShowActionModal, update, setUpdate }: any) {
-    const { pipelineSteps} = UserAuth();
+    const { pipelineSteps }: any = UserAuth();
     const [studentToUpdate, setStudentToUpdate] = useState<any>(student);
     const [currentPipeline, setCurrentPipeline] = useState<any>([]);
     const [staffInitials, setStaffInitials] = useState<any>('');

@@ -2,11 +2,11 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import IconX from '../../components/Icon/IconX';
 import { UserAuth } from '../../context/AuthContext';
-import { addStudentToClass } from '../../functions/api';
+import { addProspectToClass, addStudentToClass } from '../../functions/api';
 import { showMessage } from '../../functions/shared';
 
-export default function AddStudentToClass({ student, alreadyIn, updateClasses, setUpdateClasses }: any) {
-    const { classes } = UserAuth();
+export default function AddStudentToClass({ student, alreadyIn, updateClasses, setUpdateClasses, isProspect = false }: any) {
+    const { classes }: any = UserAuth();
     const [newClass, setNewClass] = useState('');
     const [showAddClassModal, setShowAddClassModal] = useState(false);
     const [availableClasses, setAvailableClasses] = useState(classes);
@@ -22,13 +22,27 @@ export default function AddStudentToClass({ student, alreadyIn, updateClasses, s
     useEffect(() => {
         removeClassesAlreadyIn();
     }, [classes]);
-    
+
+
+    const handleAddProspectToClass = async () => {
+        try {
+            const response = await addProspectToClass(newClass, student);
+            if (response.status === 200) {
+                showMessage('Student added to Program');
+                setUpdateClasses(!updateClasses);
+                setShowAddClassModal(false);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     const handleAddToClass = async () => {
         const classData = {
             studentId: student.Student_id,
             classId: newClass,
-        }   
-        
+        };
+
         try {
             const response = await addStudentToClass(classData);
             if (response.status === 200) {
@@ -46,7 +60,7 @@ export default function AddStudentToClass({ student, alreadyIn, updateClasses, s
             <div>
                 <button className="btn btn-outline-info btn-sm ml-auto" onClick={() => setShowAddClassModal(true)}>
                     {' '}
-                    Add Student To Class
+                    Add {isProspect ? "Prospect" : "Student"} To Class
                 </button>
             </div>
             <Transition appear show={showAddClassModal} as={Fragment}>
@@ -96,9 +110,15 @@ export default function AddStudentToClass({ student, alreadyIn, updateClasses, s
                                                 <button type="button" className="btn btn-outline-danger" onClick={() => setShowAddClassModal(false)}>
                                                     Discard
                                                 </button>
-                                                <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={handleAddToClass}>
-                                                    Add Student to Class
-                                                </button>
+                                                {isProspect ? (
+                                                    <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={handleAddProspectToClass}>
+                                                        Add Prospect to Class
+                                                    </button>
+                                                ) : (
+                                                    <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={handleAddToClass}>
+                                                        Add Student to Class
+                                                    </button>
+                                                )}
                                             </div>
                                         </form>
                                     </div>

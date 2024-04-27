@@ -2,11 +2,11 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import IconX from '../../components/Icon/IconX';
 import { UserAuth } from '../../context/AuthContext';
-import { addAStudentToProgram, addStudentToClass } from '../../functions/api';
+import { addAStudentToProgram, addProspectToProgram, addStudentToClass } from '../../functions/api';
 import { showMessage } from '../../functions/shared';
 
-export default function AddStudentToProgram({ student, alreadyIn, updateClasses, setUpdateClasses }: any) {
-    const { programs } = UserAuth();
+export default function AddStudentToProgram({ student, alreadyIn, updateClasses, setUpdateClasses, isProspect = false }: any) {
+    const { programs }: any = UserAuth();
     const [newProgram, setNewProgram] = useState('');
     const [showAddProgramModal, setShowAddProgramModal] = useState(false);
     const [availablePrograms, setAvailablePrograms] = useState(programs);
@@ -22,13 +22,26 @@ export default function AddStudentToProgram({ student, alreadyIn, updateClasses,
     useEffect(() => {
         removeProgramsAlreadyIn();
     }, [programs]);
-    
+
+    const handleAddProspectToProgram = async () => {
+        try {
+            const response = await addProspectToProgram(newProgram, student);
+            if (response.status === 200) {
+                showMessage('Prospect added to class');
+                setUpdateClasses(!updateClasses);
+                setShowAddProgramModal(false);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     const handleAddToProgram = async () => {
         const programData = {
             studentId: student.Student_id,
             programId: newProgram,
-        }   
-        
+        };
+
         try {
             const response = await addAStudentToProgram(programData);
             if (response.status === 200) {
@@ -46,7 +59,7 @@ export default function AddStudentToProgram({ student, alreadyIn, updateClasses,
             <div>
                 <button className="btn btn-outline-info btn-sm ml-auto" onClick={() => setShowAddProgramModal(true)}>
                     {' '}
-                    Add Student To Program
+                    Add {isProspect ? 'Prospect' : 'Student'} To Program
                 </button>
             </div>
             <Transition appear show={showAddProgramModal} as={Fragment}>
@@ -96,9 +109,15 @@ export default function AddStudentToProgram({ student, alreadyIn, updateClasses,
                                                 <button type="button" className="btn btn-outline-danger" onClick={() => setShowAddProgramModal(false)}>
                                                     Discard
                                                 </button>
-                                                <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={handleAddToProgram}>
-                                                    Add Student to Program
-                                                </button>
+                                                {isProspect ? (
+                                                    <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={handleAddProspectToProgram}>
+                                                        Add Prospect to Program
+                                                    </button>
+                                                ) : (
+                                                    <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={handleAddToProgram}>
+                                                        Add Student to Program
+                                                    </button>
+                                                )}
                                             </div>
                                         </form>
                                     </div>

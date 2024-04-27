@@ -4,14 +4,8 @@ import Swal from 'sweetalert2';
 import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import IconUserPlus from '../../components/Icon/IconUserPlus';
-import IconListCheck from '../../components/Icon/IconListCheck';
-import IconLayoutGrid from '../../components/Icon/IconLayoutGrid';
 import IconSearch from '../../components/Icon/IconSearch';
 import IconUser from '../../components/Icon/IconUser';
-import IconFacebook from '../../components/Icon/IconFacebook';
-import IconInstagram from '../../components/Icon/IconInstagram';
-import IconLinkedin from '../../components/Icon/IconLinkedin';
-import IconTwitter from '../../components/Icon/IconTwitter';
 import IconX from '../../components/Icon/IconX';
 import { Link, useParams } from 'react-router-dom';
 import { getProspectsByClassId, getStudentsByClassId } from '../../functions/api';
@@ -20,9 +14,10 @@ import IconSend from '../../components/Icon/IconSend';
 import IconPrinter from '../../components/Icon/IconPrinter';
 import IconMessage from '../../components/Icon/IconMessage';
 import IconDollarSignCircle from '../../components/Icon/IconDollarSignCircle';
+import { hashTheID } from '../../functions/shared';
 
 const ViewRoster = () => {
-    const { suid } = UserAuth();
+    const { suid }: any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Contacts'));
@@ -250,9 +245,9 @@ const ViewRoster = () => {
 
                                             <td>
                                                 <div className="flex gap-4 items-center justify-center">
-                                                    <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => editUser(contact)}>
+                                                    <Link to={`/students/view-student/${hashTheID(contact.Student_ID)}/${hashTheID(suid)}`}type="button" className="btn btn-sm btn-outline-primary" onClick={() => editUser(contact)}>
                                                         Info
-                                                    </button>
+                                                    </Link>
                                                     <button type="button" className="btn btn-sm btn-outline-danger" onClick={() => deleteUser(contact)}>
                                                         Remove
                                                     </button>

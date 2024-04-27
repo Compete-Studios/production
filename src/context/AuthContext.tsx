@@ -23,6 +23,7 @@ export default function AuthContextProvider({ children }: any) {
     const [latePayementPipeline, setLatePayementPipeline] = useState([]);
     const [masters, setMasters] = useState([]);
     const [isMaster, setIsMaster] = useState(false);
+    const [studioOptions, setStudioOptions] = useState<any>([]);
 
     const [update, setUpdate] = useState(false);
 
@@ -37,13 +38,23 @@ export default function AuthContextProvider({ children }: any) {
         }
     };
 
-    const  fetchFromAPI = async (endpointURL: any, opts: any) => {
-        const { method, body } :any = { method: 'POST', body: null, ...opts }
-        
-    
-        const user = auth.currentUser
-        const token = user && (await user.getIdToken())
-    
+    const fetchRecordSet = async (url: any, setter: any) => {
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            setter(data.recordset[0]);
+            return data;
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchFromAPI = async (endpointURL: any, opts: any) => {
+        const { method, body }: any = { method: 'POST', body: null, ...opts };
+
+        const user = auth.currentUser;
+        const token = user && (await user.getIdToken());
+
         const res = await fetch(`${REACT_API_BASE_URL}/${endpointURL}`, {
             method,
             ...(body && { body: JSON.stringify(body) }),
@@ -51,10 +62,10 @@ export default function AuthContextProvider({ children }: any) {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`,
             },
-        })
-    
-        return res.json()
-    }
+        });
+
+        return res.json();
+    };
 
     const getData = async () => {
         const year = new Date().getFullYear();
@@ -68,6 +79,7 @@ export default function AuthContextProvider({ children }: any) {
         fetchData(`${REACT_API_BASE_URL}/marketing-access/getMarketingMethodsByStudioId/${suid}`, setMarketingSources);
         fetchData(`${REACT_API_BASE_URL}/student-access/getProspectIntros/${suid}/${month}/${year}`, setProspectIntros);
         fetchData(`${REACT_API_BASE_URL}/student-access/getPaymentPipelineStepsByStudioId/${suid}`, setLatePayementPipeline);
+        fetchRecordSet(`${REACT_API_BASE_URL}/studio-access/getStudioOptions/${suid}`, setStudioOptions);
     };
 
     const getSCHDATA = async () => {
@@ -88,15 +100,15 @@ export default function AuthContextProvider({ children }: any) {
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
                 setStudioInfo(docSnap.data());
-                if (docSnap.data().MasterStudio === 1) {
-                    setIsMaster(true);
-                    getMasterStudioNumbers(docSnap.data().Studio_Id);
-                } else if (isMasterLocal === 'true') {
-                    setIsMaster(true);
-                    getMasterStudioNumbers(masterID);
-                } else {
-                    setIsMaster(false);
-                }
+                // if (docSnap.data().MasterStudio === 1) {
+                //     setIsMaster(true);
+                //     getMasterStudioNumbers(docSnap.data().Studio_Id);
+                // } else if (isMasterLocal === 'true') {
+                //     setIsMaster(true);
+                //     getMasterStudioNumbers(masterID);
+                // } else {
+                //     setIsMaster(false);
+                // }
             } else {
                 // doc.data() will be undefined in this case
                 console.log('No such document!');
@@ -149,26 +161,18 @@ export default function AuthContextProvider({ children }: any) {
     useEffect(() => {
         const storedLoggedIn = localStorage.getItem('isLoggedIn');
         const storedSuid = localStorage.getItem('suid');
-        const isMasterLocal = localStorage.getItem('isMaster');
-    
+        // const isMasterLocal = localStorage.getItem('isMaster');
+
         if (storedLoggedIn) {
             setIsLoggedIn(true);
         }
-    
+
         if (storedSuid) {
             setSuid(storedSuid);
         }
-    
+
         const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-            if (currentUser && isMasterLocal === 'true') {
-                setIsLoggedIn(true);
-                setIsMaster(true);
-                const selectedSuid: any = storedSuid;
-                setSuid(selectedSuid);
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('suid', selectedSuid);
-                getStudioInfo(selectedSuid);
-            } else if (currentUser) {
+            if (currentUser) {
                 setIsLoggedIn(true);
                 const selectedSuid: any = currentUser.photoURL;
                 setSuid(selectedSuid);
@@ -183,12 +187,11 @@ export default function AuthContextProvider({ children }: any) {
                 localStorage.removeItem('masterStudioID');
             }
         });
-    
+
         return () => {
             unsubscribe();
         };
     }, []);
-    
 
     return (
         <UserContext.Provider
@@ -214,6 +217,7 @@ export default function AuthContextProvider({ children }: any) {
                 latePayementPipeline,
                 masters,
                 isMaster,
+                studioOptions,
             }}
         >
             {children}

@@ -1,39 +1,47 @@
-import { Fragment, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
+import Flatpickr from 'react-flatpickr';
+import 'flatpickr/dist/flatpickr.css';
 import IconX from '../../components/Icon/IconX';
 import IconPlus from '../../components/Icon/IconPlus';
-import { addProgram } from '../../functions/api';
+import { addWaitingList } from '../../functions/api';
 import { showMessage } from '../../functions/shared';
 import { UserAuth } from '../../context/AuthContext';
 
-export default function AddPrograms() {
+export default function AddWaitingList() {
     const { suid, update, setUpdate }: any = UserAuth();
     const [showQuickPayModal, setShowQuickPayModal] = useState(false);
-    const [programData, setProgramData] = useState({
+    const [waitingListData, setWaitingListData] = useState({
         studioId: '',
-        name: '',
-        description: '',
+        title: '',
+        notificationEnrollmentCount: 0,
+        notes: '',
+        creationDate: new Date().toISOString(),
+        endDate: new Date().toISOString(),
     });
 
-    const handleAddProgram = async () => {
-        programData.studioId = suid;
+    const handleAddRoom = async () => {
+        waitingListData.studioId = suid;
         try {
-            const response = await addProgram(programData);
+            const response = await addWaitingList(waitingListData);
             if (response.status === 200) {
-                showMessage('Room added successfully');
-                setProgramData({
+                showMessage('Waiting List added successfully');
+                setWaitingListData({
                     studioId: '',
-                    name: '',
-                    description: '',
+                    title: '',
+                    notificationEnrollmentCount: 0,
+                    notes: '',
+                    creationDate: new Date().toISOString(),
+                    endDate: new Date().toISOString(),
                 });
                 setShowQuickPayModal(false);
                 setUpdate(!update);
             } else {
-                showMessage('Failed to add program', 'error');
+                showMessage('Failed to add room', 'error');
             }
         } catch (error) {
             console.error(error);
-            showMessage('Failed to add program', 'error');
+            showMessage('Failed to add room', 'error');
         }
     };
 
@@ -42,7 +50,7 @@ export default function AddPrograms() {
             <div>
                 <button type="button" className="btn btn-primary gap-2 ltr:ml-auto rtl:mr-auto" onClick={() => setShowQuickPayModal(true)}>
                     <IconPlus />
-                    Add a Program
+                    Add a Waiting List
                 </button>
             </div>
             <Transition appear show={showQuickPayModal} as={Fragment}>
@@ -69,33 +77,34 @@ export default function AddPrograms() {
                                     >
                                         <IconX />
                                     </button>
-                                    <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">Program Information</div>
+                                    <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">Create a Waiting List</div>
                                     <div className="p-5 space-y-4">
                                         <div>
-                                            <label htmlFor="roomname">Program Name</label>
+                                            <label htmlFor="roomname">Waiting List Name:</label>
                                             <input
                                                 type="text"
                                                 id="roomname"
                                                 name="roomname"
-                                                value={programData.name}
+                                                value={waitingListData.title}
                                                 className="form-input"
-                                                onChange={(e) => setProgramData({ ...programData, name: e.target.value })}
+                                                onChange={(e) => setWaitingListData({ ...waitingListData, title: e.target.value })}
                                             />
                                         </div>
+
                                         <div>
-                                            <label htmlFor="description">Description</label>
+                                            <label htmlFor="notes">Notes</label>
                                             <textarea
-                                                id="description"
+                                                id="notes"
                                                 rows={4}
-                                                name="description"
-                                                value={programData.description}
+                                                name="notes"
+                                                value={waitingListData.notes}
                                                 className="form-input"
-                                                onChange={(e) => setProgramData({ ...programData, description: e.target.value })}
+                                                onChange={(e) => setWaitingListData({ ...waitingListData, notes: e.target.value })}
                                             />
                                         </div>
                                         <div className="flex">
-                                            <button type="button" className="ml-auto btn btn-primary" onClick={handleAddProgram}>
-                                                Add Program
+                                            <button type="button" className="ml-auto btn btn-primary" onClick={handleAddRoom}>
+                                                Add Waiting List
                                             </button>
                                         </div>
                                     </div>

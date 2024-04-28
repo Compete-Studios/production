@@ -14,8 +14,8 @@ export const login = async (userName, password) => {
         return { error: 'No user with that username' };
     } else {
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);         
-            localStorage.setItem('isMaster', 'false');
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);        
+          
             // Check if the display name is not set
             if (!userCredential.user.displayName) {
                 // Set display name using updateProfile
@@ -30,7 +30,7 @@ export const login = async (userName, password) => {
                     photoURL: docSnap.data().studioID[0],
                 });
             }
-
+window.location.reload();
             // If the sign-in is successful, you can return the userCredential or user data here
             return docSnap.data().studioID[0];
         } catch (error) {
@@ -46,6 +46,12 @@ export const login = async (userName, password) => {
 export const logout = async () => {
     try {
         await signOut(auth);
+        localStorage.removeItem('monthlyEmailLimit');
+        localStorage.removeItem('numberOfEmails');
+        localStorage.removeItem('numberOfTexts');
+        localStorage.removeItem('activeStudents');
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('suid');
         window.location.reload();
         return true;
     } catch (error) {

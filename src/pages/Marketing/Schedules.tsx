@@ -121,7 +121,7 @@ export default function Schedules() {
         window.print();
     };
 
-    console.log(dailyScheduleProspects);
+    
 
 
 

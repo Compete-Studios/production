@@ -14,52 +14,65 @@ import { formatDate, formatForEmails } from '../../functions/shared';
 import { getCountOfInactiveOrInactive, getNumberOfTextsSentByStudioHelper } from '../../functions/api';
 
 export default function MarketingMetrics() {
-    const { prospectIntros, suid } = UserAuth();
+    const { prospectIntros, suid }: any = UserAuth();
     const formatDateForPP = (date: any) => {
         const newDate = new Date(date);
         const formattedDate = newDate.toISOString().substr(0, 10);
         return formattedDate;
     };
-    const [loadingPropsects, setLoadingProspects] = useState(true);
     const [loadingActiveStudents, setLoadingActiveStudents] = useState(true);
     const [loadingEmails, setLoadingEmails] = useState(true);
     const [loadingEmailCount, setLoadingEmailCount] = useState(true);
     const [loadingTexts, setLoadingTexts] = useState(true);
-    const [loadingTextCount, setLoadingTextCount] = useState(true);
     const [numberOfEmails, setNumberOfEmails] = useState(0);
     const [monthlyEmailLimit, setMonthlyEmailLimit] = useState(0);
     const [numberOfTexts, setNumberOfTexts] = useState(0);
     const [monthlyTextLimit, setMonthlyTextLimit] = useState(30000);
     const [numberOfActiveStudents, setNumberOfActiveStudents] = useState(0);
-    const [numberOfInactiveStudents, setNumberOfInactiveStudents] = useState(0);
 
     const getAlltheEmails = async () => {
-        const firstDateOfThisMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-        const lastDateOfThisMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
-        const data = {
-            studioId: suid,
-            startDate: formatForEmails(firstDateOfThisMonth),
-            endDate: formatForEmails(lastDateOfThisMonth),
-        };
-        const response = await getNumberOfEmailsSentByStudio(data);
-        if (response) {
-            setNumberOfEmails(response.numberOfEmailsSent);
+        const numOfEmails: any = localStorage.getItem('numberOfEmails');
+
+        if (numOfEmails) {
+            setNumberOfEmails(numOfEmails);
             setLoadingEmailCount(false);
         } else {
-            setNumberOfEmails(0);
-            setLoadingEmailCount(false);
+            const firstDateOfThisMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+            const lastDateOfThisMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
+            const data = {
+                studioId: suid,
+                startDate: formatForEmails(firstDateOfThisMonth),
+                endDate: formatForEmails(lastDateOfThisMonth),
+            };
+            const response = await getNumberOfEmailsSentByStudio(data);
+            if (response) {
+                setNumberOfEmails(response.numberOfEmailsSent);
+                localStorage.setItem('numberOfEmails', response.numberOfEmailsSent);
+                setLoadingEmailCount(false);
+            } else {
+                setNumberOfEmails(0);
+                localStorage.setItem('numberOfEmails', '0');
+                setLoadingEmailCount(false);
+            }
         }
     };
 
     const getMonthlyEmailLimit = async () => {
-        const response = await getMonthlyLimit(suid);
-
-        if (response) {
-            setMonthlyEmailLimit(response?.limit?.recordset[0]?.MonthlyEmailVolume);
+        const emailLimit: any = localStorage.getItem('monthlyEmailLimit');
+        if (emailLimit) {
+            setMonthlyEmailLimit(emailLimit);
             setLoadingEmails(false);
         } else {
-            setMonthlyEmailLimit(0);
-            setLoadingEmails(false);
+            const response = await getMonthlyLimit(suid);
+            if (response) {
+                setMonthlyEmailLimit(response?.limit?.recordset[0]?.MonthlyEmailVolume);
+                localStorage.setItem('monthlyEmailLimit', response?.limit?.recordset[0]?.MonthlyEmailVolume);
+                setLoadingEmails(false);
+            } else {
+                setMonthlyEmailLimit(0);
+                localStorage.setItem('monthlyEmailLimit', "0");
+                setLoadingEmails(false);
+            }
         }
     };
 
@@ -73,21 +86,29 @@ export default function MarketingMetrics() {
     }, [suid]);
 
     const getTotalTexts = async () => {
-        const firstDateOfThisMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-        const lastDateOfThisMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
-        const data = {
-            studioId: suid,
-            startDate: formatForEmails(firstDateOfThisMonth),
-            endDate: formatForEmails(lastDateOfThisMonth),
-        };
-        const response = await getNumberOfTextsSentByStudioHelper(data);
-
-        if (response) {
-            setNumberOfTexts(response);
+        const numOfTexts: any = localStorage.getItem('numberOfTexts');
+        if (numOfTexts) {
+            setNumberOfTexts(numOfTexts);
             setLoadingTexts(false);
         } else {
-            setNumberOfTexts(0);
-            setLoadingTexts(false);
+            const firstDateOfThisMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+            const lastDateOfThisMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
+            const data = {
+                studioId: suid,
+                startDate: formatForEmails(firstDateOfThisMonth),
+                endDate: formatForEmails(lastDateOfThisMonth),
+            };
+            const response = await getNumberOfTextsSentByStudioHelper(data);
+
+            if (response) {
+                setNumberOfTexts(response);
+                localStorage.setItem('numberOfTexts', response);
+                setLoadingTexts(false);
+            } else {
+                setNumberOfTexts(0);
+                localStorage.setItem('numberOfTexts', "0");
+                setLoadingTexts(false);
+            }
         }
     };
 
@@ -96,19 +117,27 @@ export default function MarketingMetrics() {
     }, [suid]);
 
     const getCountOfActiveStudents = async () => {
-        const response = await getCountOfInactiveOrInactive(suid, 1);
-        if (response) {
-            setNumberOfActiveStudents(response?.recordset[0]?.CountOfStudents);
+        const numOfStudents: any = localStorage.getItem('activeStudents');
+        if (numOfStudents) {
+            setNumberOfActiveStudents(numOfStudents);
             setLoadingActiveStudents(false);
         } else {
-            setNumberOfActiveStudents(0);
+            const response = await getCountOfInactiveOrInactive(suid, 1);
+            if (response) {
+                setNumberOfActiveStudents(response?.recordset[0]?.CountOfStudents);
+                localStorage.setItem('activeStudents', response?.recordset[0]?.CountOfStudents);
+                setLoadingActiveStudents(false);
+            } else {
+                setNumberOfActiveStudents(0);
+                localStorage.setItem('activeStudents', "0");
+            }
         }
     };
 
     useEffect(() => {
         getCountOfActiveStudents();
     }, [suid]);
-    
+
     return (
         <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
             <div className="panel h-auto sm:col-span-2 xl:col-span-1 pb-0">

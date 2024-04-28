@@ -19,7 +19,7 @@ import MarketingMetrics from './Studios/MarketingMetrics';
 
 
 const Overview = () => {
-    const { suid } = UserAuth();
+    const { suid }: any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Dashboard'));

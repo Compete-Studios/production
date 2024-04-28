@@ -28,6 +28,7 @@ import IconCamera from '../../components/Icon/IconCamera';
 import { UserAuth } from '../../context/AuthContext';
 import { getTextLogsByStudioId } from '../../functions/texts';
 import IconLoader from '../../components/Icon/IconLoader';
+import { constFormateDateMMDDYYYY } from '../../functions/shared';
 
 // const contactList = [
 //     {
@@ -276,6 +277,11 @@ const Chat = () => {
     const [page, setPage] = useState<number>(1);
     const [loading, setLoading] = useState<boolean>(false);
     const [limitOfMessages, setLimitOfMessages] = useState<number>(100);
+    //start date is 7 days ago
+    const [startDate, setStartDate] = useState<string>(new Date(new Date().setDate(new Date().getDate() - 7)).toISOString().split('T')[0]);
+    const [endDate, setEndDate] = useState<string>(new Date().toISOString().split('T')[0]);
+    
+//format 
 
     const getCreatedTimeFromTimeStamp = (timeStamp: any) => {
         const date = new Date(timeStamp);
@@ -297,10 +303,12 @@ const Chat = () => {
     };
 
     const getTextLog = async () => {
+        const formatStartDate = constFormateDateMMDDYYYY(startDate);
+        const formatEndDate = constFormateDateMMDDYYYY(endDate);
         const dataToSend = {
             studioId: suid,
-            startDate: '04-01-2024',
-            endDate: '04-07-2024',
+            startDate: formatStartDate,
+            endDate: formatEndDate,
         };
 
         try {
@@ -408,6 +416,21 @@ const Chat = () => {
 
     return (
         <div>
+            <div className="flex items-end justify-end gap-x-4 p-5">
+                <div>
+                    <label>Start Date</label>
+                    <input type="date" className="form-input" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                </div>
+                <div>
+                    <label>End Date</label>
+                    <input type="date" className="form-input" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+                </div>
+                <div>
+                    <button type="button" className="btn btn-primary" onClick={getTextLog}>
+                        Search
+                    </button>
+                </div>
+            </div>
             <div className={`flex gap-5 relative sm:h-[calc(100vh_-_150px)] h-full sm:min-h-0 ${isShowChatMenu ? 'min-h-[999px]' : ''}`}>
                 <div className={`panel p-4 flex-none max-w-xs w-full absolute xl:relative z-10 space-y-4 xl:h-full hidden xl:block overflow-hidden ${isShowChatMenu ? '!block' : ''}`}>
                     <div className="flex justify-between items-center">
@@ -418,35 +441,6 @@ const Chat = () => {
                                 <p className="text-xs text-white-dark">{studioOptions?.TextFromNumber}</p>
                             </div>
                         </div>
-                        {/* <div className="dropdown">
-                            <Dropdown
-                                offset={[0, 5]}
-                                placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
-                                btnClassName="bg-[#f4f4f4] dark:bg-[#1b2e4b] hover:bg-primary-light w-8 h-8 rounded-full !flex justify-center items-center hover:text-primary"
-                                button={<IconHorizontalDots className="opacity-70" />}
-                            >
-                                <ul className="whitespace-nowrap">
-                                    <li>
-                                        <button type="button">
-                                            <IconSettings className="w-4.5 h-4.5 ltr:mr-1 rtl:ml-1 shrink-0" />
-                                            Settings
-                                        </button>
-                                    </li>
-                                    <li>
-                                        <button type="button">
-                                            <IconHelpCircle className="w-4.5 h-4.5 ltr:mr-1 rtl:ml-1 shrink-0" />
-                                            Help & feedback
-                                        </button>
-                                    </li>
-                                    <li>
-                                        <button type="button">
-                                            <IconLogin className="ltr:mr-1 rtl:ml-1 shrink-0" />
-                                            Sign Out
-                                        </button>
-                                    </li>
-                                </ul>
-                            </Dropdown>
-                        </div> */}
                     </div>
                     <div className="relative">
                         <input type="text" className="form-input peer ltr:pr-9 rtl:pl-9" placeholder="Searching..." value={searchUser} onChange={(e) => setSearchUser(e.target.value)} />
@@ -454,30 +448,9 @@ const Chat = () => {
                             <IconSearch />
                         </div>
                     </div>
-                    {/* <div className="flex justify-between items-center text-xs">
-                        <button type="button" className="hover:text-primary">
-                            <IconMessagesDot className="mx-auto mb-1" />
-                            Chats
-                        </button>
-
-                        <button type="button" className="hover:text-primary">
-                            <IconPhone className="mx-auto mb-1" />
-                            Calls
-                        </button>
-
-                        <button type="button" className="hover:text-primary">
-                            <IconUserPlus className="mx-auto mb-1" />
-                            Contacts
-                        </button>
-
-                        <button type="button" className="hover:text-primary group">
-                            <IconBell className="w-5 h-5 mx-auto mb-1" />
-                            Notification
-                        </button>
-                    </div> */}
                     <div className="h-px w-full border-b border-white-light dark:border-[#1b2e4b]"></div>
                     <div className="!mt-0">
-                        <PerfectScrollbar className="chat-users relative h-full min-h-[100px] sm:h-[calc(100vh_-_357px)] space-y-0.5 ltr:pr-3.5 rtl:pl-3.5 ltr:-mr-3.5 rtl:-ml-3.5">
+                        <PerfectScrollbar className="chat-users relative h-full min-h-[100px] sm:h-[calc(100vh_-_300px)] space-y-0.5 ltr:pr-3.5 rtl:pl-3.5 ltr:-mr-3.5 rtl:-ml-3.5 border-b">
                             {filteredItems?.map((person: any, index: any) => {
                                 return (
                                     <div key={index}>

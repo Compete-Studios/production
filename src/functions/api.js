@@ -609,6 +609,7 @@ export const getUploadedStudioImages = async (studioId) => {
 };
 
 export const getStudentsByClassId = async (classId) => {
+    console.log(classId, 'classId')
     try {
         const response = await fetchData(`class-access/getStudentsByClassId/${classId}`, 'get');
         console.log(response);
@@ -1132,6 +1133,16 @@ export const getNumberOfTextsSentByStudioHelper = async (textData) => {
 export const getCountOfInactiveOrInactive = async (studioId, activity) => {
     try {
         const response = await fetchData(`studio-access/getCountOfInactiveOrInactive/${studioId}/${activity}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getStudentNameByPhone = async (phone, studioID) => {
+    try {
+        const response = await fetchData(`student-access/getStudentNameByPhone/${studioID}/${phone}`, 'get');
         return response;
     } catch (error) {
         console.error(error);

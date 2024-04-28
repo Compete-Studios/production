@@ -45,7 +45,6 @@ const Sidebar = () => {
         const idString = studioID.toString();
         const masterStudioString = suid.toString();
         localStorage.setItem('suid', idString);
-        localStorage.setItem('isMaster', "true");  
         window.location.reload();          
     }   
 
@@ -237,14 +236,14 @@ const Sidebar = () => {
                                             </div>
                                         </NavLink>
                                     </li>
-                                    <li className="nav-item">
+                                    {/* <li className="nav-item">
                                         <NavLink to="/apps/mailbox" className="group">
                                             <div className="flex items-center">
                                                 <IconMenuMailbox className="group-hover:!text-primary shrink-0" />
                                                 <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('mailbox')}</span>
                                             </div>
                                         </NavLink>
-                                    </li>
+                                    </li> */}
                                     {/* <li className="nav-item">
                                         <NavLink to="/facebook-add-creator" className="group">
                                             <div className="flex items-center">
@@ -327,7 +326,7 @@ const Sidebar = () => {
                                             </div>
                                         </NavLink>
                                     </li>
-                                    {isMaster && (
+                                    {/* {isMaster && (
                                         <li className="menu nav-item">
                                             <button type="button" className={`${currentMenu === 'master' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('master')}>
                                                 <div className="flex items-center">
@@ -354,7 +353,7 @@ const Sidebar = () => {
                                                 </ul>
                                             </AnimateHeight>
                                         </li>
-                                    )}
+                                    )} */}
                                 </ul>
                             </li>
 

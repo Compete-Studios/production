@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { auth, db } from '../firebase/firebase';
 import { REACT_API_BASE_URL } from '../constants';
 import { doc, getDoc } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
 
 const UserContext: any = createContext<any>(null);
 
@@ -21,8 +22,6 @@ export default function AuthContextProvider({ children }: any) {
     const [scheduleID, setScheduleID] = useState('');
     const [studioInfo, setStudioInfo] = useState({});
     const [latePayementPipeline, setLatePayementPipeline] = useState([]);
-    const [masters, setMasters] = useState([]);
-    const [isMaster, setIsMaster] = useState(false);
     const [studioOptions, setStudioOptions] = useState<any>([]);
 
     const [update, setUpdate] = useState(false);
@@ -93,22 +92,11 @@ export default function AuthContextProvider({ children }: any) {
     };
 
     const getStudioInfo = async (suid: any) => {
-        const isMasterLocal = localStorage.getItem('isMaster');
-        const masterID = auth.currentUser?.photoURL;
         try {
             const docRef = doc(db, 'studios', suid);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
-                setStudioInfo(docSnap.data());
-                // if (docSnap.data().MasterStudio === 1) {
-                //     setIsMaster(true);
-                //     getMasterStudioNumbers(docSnap.data().Studio_Id);
-                // } else if (isMasterLocal === 'true') {
-                //     setIsMaster(true);
-                //     getMasterStudioNumbers(masterID);
-                // } else {
-                //     setIsMaster(false);
-                // }
+                setStudioInfo(docSnap.data());                
             } else {
                 // doc.data() will be undefined in this case
                 console.log('No such document!');
@@ -129,27 +117,27 @@ export default function AuthContextProvider({ children }: any) {
         }
     };
 
-    const getMasterStudioNumbers = async (id: any) => {
-        try {
-            const response = await fetchFromAPI(`admin-tools/getMasterStudioRosterById/${id}`, {
-                method: 'GET',
-            });
-            const masters: any = [];
+    // const getMasterStudioNumbers = async (id: any) => {
+    //     try {
+    //         const response = await fetchFromAPI(`admin-tools/getMasterStudioRosterById/${id}`, {
+    //             method: 'GET',
+    //         });
+    //         const masters: any = [];
 
-            for (let i = 0; i < response.recordset.length; i++) {
-                const master = response.recordset[i];
-                const masterInfo = await getStudioNameById(master.StudioId);
-                masters.push({
-                    studioID: response.recordset[i].StudioId,
-                    studioName: masterInfo.Studio_Name,
-                    userName: masterInfo.Desired_UserName,
-                });
-            }
-            setMasters(masters);
-        } catch (error) {
-            console.error(error);
-        }
-    };
+    //         for (let i = 0; i < response.recordset.length; i++) {
+    //             const master = response.recordset[i];
+    //             const masterInfo = await getStudioNameById(master.StudioId);
+    //             masters.push({
+    //                 studioID: response.recordset[i].StudioId,
+    //                 studioName: masterInfo.Studio_Name,
+    //                 userName: masterInfo.Desired_UserName,
+    //             });
+    //         }
+    //         setMasters(masters);
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // };
 
     useEffect(() => {
         setShowLoading(true);
@@ -159,39 +147,20 @@ export default function AuthContextProvider({ children }: any) {
     }, [suid, update]);
 
     useEffect(() => {
-        const storedLoggedIn = localStorage.getItem('isLoggedIn');
-        const storedSuid = localStorage.getItem('suid');
-        // const isMasterLocal = localStorage.getItem('isMaster');
-
-        if (storedLoggedIn) {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser: any) => {
+          if (currentUser) {
             setIsLoggedIn(true);
-        }
-
-        if (storedSuid) {
-            setSuid(storedSuid);
-        }
-
-        const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-            if (currentUser) {
-                setIsLoggedIn(true);
-                const selectedSuid: any = currentUser.photoURL;
-                setSuid(selectedSuid);
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('suid', selectedSuid);
-                getStudioInfo(selectedSuid);
-            } else {
-                setIsLoggedIn(false);
-                localStorage.removeItem('isLoggedIn');
-                localStorage.removeItem('suid');
-                localStorage.removeItem('isMaster');
-                localStorage.removeItem('masterStudioID');
-            }
+            console.log("It ran again", currentUser.photoURL);
+            setSuid(currentUser.photoURL);
+            getStudioInfo(currentUser.photoURL);
+          } else {
+            setIsLoggedIn(false);
+          }
         });
-
         return () => {
-            unsubscribe();
+          unsubscribe(); // Clean up the onAuthStateChanged listener
         };
-    }, []);
+      }, []);
 
     return (
         <UserContext.Provider
@@ -215,8 +184,6 @@ export default function AuthContextProvider({ children }: any) {
                 studioInfo,
                 scheduleID,
                 latePayementPipeline,
-                masters,
-                isMaster,
                 studioOptions,
             }}
         >

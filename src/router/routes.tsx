@@ -1,6 +1,7 @@
 import { lazy } from 'react';
 import ProtectedRoute from './ProtectedRoutes';
 
+
 const LoginBoxed = lazy(() => import('../pages/Authentication/LoginBoxed'));
 const RegisterBoxed = lazy(() => import('../pages/Authentication/RegisterBoxed'));
 const Error = lazy(() => import('../components/Error'));
@@ -21,6 +22,7 @@ const ViewInvoices = lazy(() => import('../pages/Payments/ViewInvoices'));
 const ViewInvoice = lazy(() => import('../pages/Payments/ViewInvoice'));
 const ViewPayments = lazy(() => import('../pages/Payments/ViewPayments'));
 const PayInvoice = lazy(() => import('../pages/Payments/PayInvoice'));
+const ViewLatePayment = lazy(() => import('../pages/Payments/ViewLatePayment'));
 const ExisitingBillingAccounts = lazy(() => import('../pages/Payments/ExisitingBillingAccounts'));
 const ViewClasses = lazy(() => import('../pages/Classes/ViewClasses'));
 const ViewRoster = lazy(() => import('../pages/Classes/ViewRoster'));
@@ -81,7 +83,7 @@ const AddABillingAccount = lazy(() => import('../pages/Students/AddABillingAccou
 const FinishedAddingAccountOptions = lazy(() => import('../pages/Students/FinishedAddingAccountOptions'));
 
 
-
+const CompeteLegacyForms = lazy(() => import('../pages/Forms/CompeteLegacyForms'));
 const Methods = lazy(() => import('../pages/Marketing/Methods'));
 const FacebookAddCreator = lazy(() => import('../pages/Marketing/FacebookAddCreator'));
 const EditMethod = lazy(() => import('../pages/Marketing/EditMethod'));
@@ -135,7 +137,7 @@ const routes = [
         path: '/auth/signin',
         element: <LoginBoxed />,
         layout: 'blank',
-    },
+    },  
     {
         path: '/',
         element: <HomeMain />,
@@ -202,6 +204,10 @@ const routes = [
     {
         path: '/payments/view-invoice/:id/:stud',
         element: <ViewInvoice />,
+    },
+    {
+        path: '/payments/view-late-payment/:stud/:id',
+        element: <ViewLatePayment />,
     },
 
     //classes
@@ -623,11 +629,16 @@ const routes = [
         element: <PayInvoice />,
         layout: 'blank',
     },
+    {
+        path: '/compete-forms/:sid/:hsid',
+        element: <CompeteLegacyForms />,
+        layout: 'blank',
+    },
 
     //errors
     {
         path: '*',
-        element: <Error />,
+        element: <HomeMain />,
         layout: 'blank',
     },
 ];

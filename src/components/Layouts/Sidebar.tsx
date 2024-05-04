@@ -189,7 +189,7 @@ const Sidebar = () => {
                                             <NavLink to="/payments/quick-pay">Quick Pay</NavLink>
                                         </li>
                                         <li>
-                                            <NavLink to="/payments/late-payment-pipeline">Late Payment Pipeline</NavLink>
+                                            <NavLink to="/payments/late-payment-pipeline" className="whitespace-nowrap">Late Payment Pipeline</NavLink>
                                         </li>
                                         <li>
                                             <NavLink to="/payments/view-invoices">View Invoices</NavLink>
@@ -326,7 +326,7 @@ const Sidebar = () => {
                                             </div>
                                         </NavLink>
                                     </li>
-                                    {/* {isMaster && (
+                                    {!isMaster && (
                                         <li className="menu nav-item">
                                             <button type="button" className={`${currentMenu === 'master' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('master')}>
                                                 <div className="flex items-center">
@@ -353,7 +353,7 @@ const Sidebar = () => {
                                                 </ul>
                                             </AnimateHeight>
                                         </li>
-                                    )} */}
+                                    )}
                                 </ul>
                             </li>
 

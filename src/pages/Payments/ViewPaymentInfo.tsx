@@ -14,7 +14,7 @@ import { sendIndividualEmail } from '../../functions/emails';
 import { REACT_BASE_URL } from '../../constants';
 
 export default function ViewPaymentInfo() {
-    const { suid, studioInfo } = UserAuth();
+    const { suid, studioInfo }:any = UserAuth();
     const { payID, amyID }: any = useParams();
     const [paymentInfo, setPaymentInfo] = useState<any>({});
     const [customerPaymentAccount, setCustomerPaymentAccount] = useState<any>({});

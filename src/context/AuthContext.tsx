@@ -106,6 +106,17 @@ export default function AuthContextProvider({ children }: any) {
         }
     };
 
+    const updateStudioLatePaymentPipeline = async (studioID: any) => {
+        try {
+            const response = await fetchFromAPI(`late-payment-pipeline/addLatePaymentsFromPaysimpleToCompeteD/${studioID}`, {
+                method: 'POST',
+            });
+            return response;
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     const getStudioNameById = async (id: any) => {
         try {
             const response = await fetchFromAPI(`studio-access/getStudioInfo/${id}`, {

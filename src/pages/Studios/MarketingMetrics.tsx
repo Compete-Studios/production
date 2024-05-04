@@ -8,13 +8,12 @@ import IconMessage2 from '../../components/Icon/IconMessage2';
 import IconUsers from '../../components/Icon/IconUsers';
 
 import 'tippy.js/dist/tippy.css';
-import { REACT_API_BASE_URL } from '../../constants';
 import { getMonthlyLimit, getNumberOfEmailsSentByStudio } from '../../functions/emails';
-import { formatDate, formatForEmails } from '../../functions/shared';
+import { convertPhone, formatDate, formatForEmails } from '../../functions/shared';
 import { getCountOfInactiveOrInactive, getNumberOfTextsSentByStudioHelper } from '../../functions/api';
 
 export default function MarketingMetrics() {
-    const { prospectIntros, suid }: any = UserAuth();
+    const { studioInfo, suid }: any = UserAuth();
     const formatDateForPP = (date: any) => {
         const newDate = new Date(date);
         const formattedDate = newDate.toISOString().substr(0, 10);
@@ -29,6 +28,8 @@ export default function MarketingMetrics() {
     const [numberOfTexts, setNumberOfTexts] = useState(0);
     const [monthlyTextLimit, setMonthlyTextLimit] = useState(30000);
     const [numberOfActiveStudents, setNumberOfActiveStudents] = useState(0);
+
+    console.log('suid', studioInfo);
 
     const getAlltheEmails = async () => {
         const numOfEmails: any = localStorage.getItem('numberOfEmails');
@@ -70,7 +71,7 @@ export default function MarketingMetrics() {
                 setLoadingEmails(false);
             } else {
                 setMonthlyEmailLimit(0);
-                localStorage.setItem('monthlyEmailLimit', "0");
+                localStorage.setItem('monthlyEmailLimit', '0');
                 setLoadingEmails(false);
             }
         }
@@ -106,7 +107,7 @@ export default function MarketingMetrics() {
                 setLoadingTexts(false);
             } else {
                 setNumberOfTexts(0);
-                localStorage.setItem('numberOfTexts', "0");
+                localStorage.setItem('numberOfTexts', '0');
                 setLoadingTexts(false);
             }
         }
@@ -129,7 +130,7 @@ export default function MarketingMetrics() {
                 setLoadingActiveStudents(false);
             } else {
                 setNumberOfActiveStudents(0);
-                localStorage.setItem('activeStudents', "0");
+                localStorage.setItem('activeStudents', '0');
             }
         }
     };
@@ -138,9 +139,12 @@ export default function MarketingMetrics() {
         getCountOfActiveStudents();
     }, [suid]);
 
+    console.log('numberOfEmails', numberOfEmails);
+    console.log('monthlyEmailLimit', monthlyEmailLimit);
+
     return (
-        <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
-            <div className="panel h-auto sm:col-span-2 xl:col-span-1 pb-0">
+        <div className="grid sm:grid-cols-2 xl:grid-cols-2 gap-6 mb-6">
+            {/* <div className="panel h-auto sm:col-span-2 xl:col-span-1 pb-0">
                 <h5 className="font-semibold text-lg dark:text-white-light mb-5">Prospect Intros</h5>
 
                 <PerfectScrollbar className="relative h-[160px] ltr:pr-3 rtl:pl-3 ltr:-mr-3 rtl:-ml-3 mb-4">
@@ -170,15 +174,30 @@ export default function MarketingMetrics() {
                         )}
                     </div>
                 </PerfectScrollbar>
-                {/* <div className="border-t border-white-light dark:border-white/10">
+                <div className="border-t border-white-light dark:border-white/10">
                             <Link to="/" className=" font-semibold group hover:text-primary p-4 flex items-center justify-center group">
                                 View All
                                 <IconArrowLeft className="rtl:rotate-180 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition duration-300 ltr:ml-1 rtl:mr-1" />
                             </Link>
-                        </div> */}
+                        </div>
+            </div> */}
+            <div className="panel h-full ">
+                <div className="flex items-center justify-between dark:text-white-light mb-5">
+                    <h5 className="font-semibold text-lg">Studio Information</h5>
+                    <p className="text-xs text-white-dark dark:text-gray-500">{formatDate(new Date())}</p>
+                </div>
+                <div>
+                    <p className="text-white-dark dark:text-white font-bold">Studio Name: <span className='text-dark dark:text-zinc-400'>{studioInfo?.Studio_Name}</span></p>
+                    <p className="text-white-dark dark:text-white font-bold">Studio Address: <span className='text-dark dark:text-zinc-400'>{studioInfo?.Contact_Address}</span></p>
+                    <p className="text-white-dark dark:text-white font-bold">City: <span className='text-dark dark:text-zinc-400'>{studioInfo?.Contact_City}</span></p>
+                    <p className="text-white-dark dark:text-white font-bold">State: <span className='text-dark dark:text-zinc-400'>{studioInfo?.Contact_State}</span></p>
+                    <p className="text-white-dark dark:text-white font-bold">Zip Code: <span className='text-dark dark:text-zinc-400'>{studioInfo?.Contact_Zip}</span></p>
+                    <p className="text-white-dark dark:text-white font-bold mt-6">Phone: <span className='text-dark dark:text-zinc-400'>{convertPhone(studioInfo?.Contact_Number)}</span></p>
+                    <p className="text-white-dark dark:text-white font-bold">Email: <span className='text-dark dark:text-zinc-400'>{studioInfo?.Contact_Email}</span></p>
+                </div>
             </div>
 
-            <div className="panel h-full sm:col-span-2 xl:col-span-2">
+            <div className="panel h-full ">
                 <div className="flex items-center justify-between dark:text-white-light mb-5">
                     <h5 className="font-semibold text-lg">Marketing Summary</h5>
                     <div className="dropdown">
@@ -207,9 +226,9 @@ export default function MarketingMetrics() {
                         <div className="flex-1">
                             <div className="flex font-semibold text-white-dark mb-2">
                                 <h6>
-                                    Emails Sent <span className="text-secondary">({numberOfEmails}) </span>
+                                    Emails Sent <span className="text-secondary">({numberOfEmails}/{monthlyEmailLimit > 0 ? monthlyEmailLimit : 0}) </span>
                                 </h6>
-                                <p className="ltr:ml-auto rtl:mr-auto">{convertToPercentage(numberOfEmails, monthlyEmailLimit).toFixed(0)}%</p>
+                                <p className="ltr:ml-auto rtl:mr-auto">{convertToPercentage(numberOfEmails, monthlyEmailLimit) ? convertToPercentage(numberOfEmails, monthlyEmailLimit).toFixed(0) : 100}%</p>
                             </div>
                             {loadingEmails && <div>Loading...</div>}
                             {loadingEmails ? (
@@ -224,6 +243,7 @@ export default function MarketingMetrics() {
                                     ></div>
                                 </div>
                             )}
+                            {!(monthlyEmailLimit > 0) && <button className="text-danger hover:text-red-800">Click Here to Increase Email Limit</button>}
                         </div>
                     </div>
                     <div className="flex items-center">
@@ -235,9 +255,9 @@ export default function MarketingMetrics() {
                         <div className="flex-1">
                             <div className="flex font-semibold text-white-dark mb-2">
                                 <h6>
-                                    Text Messages Sent <span className="text-primary">({numberOfTexts}) </span>
+                                    Text Messages Sent <span className="text-primary">({numberOfTexts}/{monthlyTextLimit}) </span>
                                 </h6>
-                                <p className="ltr:ml-auto rtl:mr-auto">{convertToPercentage(numberOfTexts, monthlyTextLimit).toFixed(0)}%</p>
+                                <p className="ltr:ml-auto rtl:mr-auto">{convertToPercentage(numberOfTexts, monthlyTextLimit) ? convertToPercentage(numberOfTexts, monthlyTextLimit).toFixed(0) : 100}%</p>
                             </div>
                             {loadingTexts && <div>Loading...</div>}
                             {loadingTexts ? (
@@ -248,10 +268,11 @@ export default function MarketingMetrics() {
                                 <div className="w-full rounded-full h-2 bg-dark-light dark:bg-[#1b2e4b] shadow">
                                     <div
                                         className="bg-gradient-to-r from-[#3cba92] to-[#0ba360] w-full h-full rounded-full"
-                                        style={{ width: `${convertToPercentage(numberOfTexts, monthlyTextLimit)}%` }}
+                                        style={{ width: `${convertToPercentage(numberOfTexts, monthlyTextLimit) ? convertToPercentage(numberOfTexts, monthlyTextLimit) : 100}%` }}
                                     ></div>
                                 </div>
                             )}
+                            {monthlyTextLimit}
                         </div>
                     </div>
                     <div className="flex items-center">

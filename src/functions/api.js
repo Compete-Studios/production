@@ -609,7 +609,7 @@ export const getUploadedStudioImages = async (studioId) => {
 };
 
 export const getStudentsByClassId = async (classId) => {
-    console.log(classId, 'classId')
+    console.log(classId, 'classId');
     try {
         const response = await fetchData(`class-access/getStudentsByClassId/${classId}`, 'get');
         console.log(response);
@@ -819,7 +819,7 @@ export const addAProspectPipelineStep = async (data) => {
 
 export const deleteStudentPipelineStep = async (pipelineStepId) => {
     try {
-        const response = await fetchData(`marketing-access/deleteStudentPipelineStep/${pipelineStepId}`, 'post');
+        const response = await fetchData(`marketing-access/deleteStudentPipelineStep/${pipelineStepId}`, 'get');
         return { response, status: 200 };
     } catch (error) {
         console.error(error);
@@ -947,13 +947,13 @@ export const addProspectToWaitingLists = async (prospectId, waitingListIds) => {
 };
 
 export const addProspectToWaitingList = async (listData) => {
-        try {
-            const response = await fetchData('marketing-access/addProspectToWaitingList', 'post', listData);
-            return { response, status: 200 };
-        } catch (error) {
-            console.error(error);
-            throw error;
-        }
+    try {
+        const response = await fetchData('marketing-access/addProspectToWaitingList', 'post', listData);
+        return { response, status: 200 };
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 };
 
 export const addAStudentToProgram = async (programData) => {

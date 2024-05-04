@@ -683,6 +683,8 @@ const SearchPayments = () => {
             });
     }, []);
 
+    console.log(payments, 'payments')
+
     return (
         <div>
             {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">

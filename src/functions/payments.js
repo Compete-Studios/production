@@ -91,3 +91,59 @@ export const voidAPayment = async (paymentData) => {
         throw error;
     }
 };
+
+export const getPaymentsByPipelineStep = async (pipelineStepId, studioID) => {
+    try {
+        const response = await fetchData(`late-payment-pipeline/getPaymentsByPipelineStep/${pipelineStepId}/${studioID}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getLatePayment = async (paymentId) => {
+    try {
+        const response = await fetchData(`late-payment-pipeline/getLatePayment/${paymentId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getPaymentInfo = async (paymentId) => {
+    try {
+        const response = await fetchData(`late-payment-pipeline/getPaymentInfo/${paymentId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getPaymentNotes = async (paymentId) => {
+    try {
+        const response = await fetchData(`payments/getPaymentNotes/${paymentId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
+
+export const addPaymentNotes = async (paymentId, notes) => {
+    const paymentData = {
+        paymentId: paymentId,
+        notes: notes
+    }
+    console.log(paymentData);
+    try {
+        const response = await fetchData(`payments/addPaymentNotes`, 'post',  paymentData);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};

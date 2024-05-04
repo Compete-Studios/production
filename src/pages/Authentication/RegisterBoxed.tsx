@@ -3,16 +3,48 @@ import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../../store';
 import { setPageTitle, toggleRTL } from '../../store/themeConfigSlice';
 import { useEffect, useState } from 'react';
-import Dropdown from '../../components/Dropdown';
-import i18next from 'i18next';
-import IconCaretDown from '../../components/Icon/IconCaretDown';
-import IconUser from '../../components/Icon/IconUser';
-import IconMail from '../../components/Icon/IconMail';
-import IconLockDots from '../../components/Icon/IconLockDots';
-import IconInstagram from '../../components/Icon/IconInstagram';
-import IconFacebookCircle from '../../components/Icon/IconFacebookCircle';
-import IconTwitter from '../../components/Icon/IconTwitter';
-import IconGoogle from '../../components/Icon/IconGoogle';
+import { createUser } from '../../firebase/auth';
+import NavBar from '../Home/NavBar';
+
+interface User {
+    studio_Name: string;
+    contact_Name: string;
+    contact_Number: string;
+    contact_Email: string;
+    contact_Address: string;
+    contact_City: string;
+    contact_State: string;
+    contact_Zip: string;
+    method_of_Contact: string;
+    is_Activated: boolean;
+    desired_UserName: string;
+    desired_Pswd: string;
+    salt: string;
+    paysimpleCustomerId: string;
+    role: string;
+    Studio_Id: string;
+    userRole: string;
+}
+
+const userInit = {
+    studio_Name: '',
+    contact_Name: '',
+    contact_Number: '',
+    contact_Email: '',
+    contact_Address: '',
+    contact_City: '',
+    contact_State: '',
+    contact_Zip: '',
+    method_of_Contact: '',
+    is_Activated: false,
+    desired_UserName: '',
+    desired_Pswd: '',
+    salt: '',
+    paysimpleCustomerId: '',
+    role: '',
+    Studio_Id: '',
+    userRole: '',
+};
 
 const RegisterBoxed = () => {
     const dispatch = useDispatch();
@@ -20,175 +52,266 @@ const RegisterBoxed = () => {
         dispatch(setPageTitle('Register Boxed'));
     });
     const navigate = useNavigate();
-    const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
-    const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
-    const themeConfig = useSelector((state: IRootState) => state.themeConfig);
-    const setLocale = (flag: string) => {
-        setFlag(flag);
-        if (flag.toLowerCase() === 'ae') {
-            dispatch(toggleRTL('rtl'));
-        } else {
-            dispatch(toggleRTL('ltr'));
-        }
-    };
-    const [flag, setFlag] = useState(themeConfig.locale);
+    const [loading, setLoading] = useState(false);
+    const [userData, setUserData] = useState<User>(userInit);
+    const [error, setError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string>('');
+    const [confirmPassword, setConfirmPassword] = useState<string>('');
+    const [firstName, setFirstName] = useState<string>('');
+    const [lastName, setLastName] = useState<string>('');
 
-    const submitForm = () => {
-        navigate('/');
+    useEffect(() => {
+        setUserData({
+            ...userData,
+            contact_Name: `${firstName} ${lastName}`,
+        });
+    }, [firstName, lastName]);
+
+    const handleCreateUser = (e: any) => {
+        e.preventDefault();
+        setLoading(true);
+        if (userData?.desired_Pswd !== confirmPassword) {
+            alert('Passwords do not match');
+            setLoading(false);
+            return;
+        } else {
+            createUser(userData?.contact_Email, confirmPassword, userData)
+                .then((res) => {
+                    if (res.status === 'success') {
+                        setLoading(false);
+                        window.location.href = '/';
+                    } else if (res.error) {
+                        setLoading(false);
+                        setError(true);
+                        setErrorMessage(res.error);
+                    } else {
+                        setLoading(false);
+                        console.log(res);
+                    }
+                })
+                .catch((error) => {
+                    setLoading(false);
+                    console.error('Error creating user:', error); // Log the error
+                    // You can handle the error or return a response indicating the failure
+                });
+        }
     };
 
     return (
-        <div>
+        <>
+            <NavBar />
             <div className="absolute inset-0">
                 <img src="/assets/images/auth/bg-gradient.png" alt="image" className="h-full w-full object-cover" />
             </div>
 
+            {loading && (
+                <div className="fixed top-0 left-0 z-50 w-screen h-screen flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-com"></div>
+                </div>
+            )}
             <div className="relative flex min-h-screen items-center justify-center  bg-cover bg-center bg-no-repeat px-6 py-10 dark:bg-[#060818] sm:px-16">
                 <img src="/assets/images/auth/coming-soon-object1.png" alt="image" className="absolute left-0 top-1/2 h-full max-h-[893px] -translate-y-1/2" />
-             
+
                 <img src="/assets/images/auth/coming-soon-object3.png" alt="image" className="absolute right-0 top-0 h-[300px]" />
-           
                 <div className="relative w-full max-w-[870px] rounded-md bg-[linear-gradient(45deg,#fff9f9_0%,rgba(255,255,255,0)_25%,rgba(255,255,255,0)_75%,_#fff9f9_100%)] p-2 dark:bg-[linear-gradient(52.22deg,#0E1726_0%,rgba(14,23,38,0)_18.66%,rgba(14,23,38,0)_51.04%,rgba(14,23,38,0)_80.07%,#0E1726_100%)]">
                     <div className="relative flex flex-col justify-center rounded-md bg-white/60 backdrop-blur-lg dark:bg-black/50 px-6 lg:min-h-[758px] py-20">
-                        <div className="absolute top-6 end-6">
-                            <div className="dropdown">
-                                <Dropdown
-                                    offset={[0, 8]}
-                                    placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
-                                    btnClassName="flex items-center gap-2.5 rounded-lg border border-white-dark/30 bg-white px-2 py-1.5 text-white-dark hover:border-primary hover:text-primary dark:bg-black"
-                                    button={
-                                        <>
-                                            <div>
-                                                <img src={`/assets/images/flags/${flag.toUpperCase()}.svg`} alt="image" className="h-5 w-5 rounded-full object-cover" />
-                                            </div>
-                                            <div className="text-base font-bold uppercase">{flag}</div>
-                                            <span className="shrink-0">
-                                                <IconCaretDown />
-                                            </span>
-                                        </>
-                                    }
-                                >
-                                    <ul className="!px-2 text-dark dark:text-white-dark grid grid-cols-2 gap-2 font-semibold dark:text-white-light/90 w-[280px]">
-                                        {themeConfig.languageList.map((item: any) => {
-                                            return (
-                                                <li key={item.code}>
-                                                    <button
-                                                        type="button"
-                                                        className={`flex w-full hover:text-primary rounded-lg ${flag === item.code ? 'bg-primary/10 text-primary' : ''}`}
-                                                        onClick={() => {
-                                                            i18next.changeLanguage(item.code);
-                                                            // setFlag(item.code);
-                                                            setLocale(item.code);
-                                                        }}
-                                                    >
-                                                        <img src={`/assets/images/flags/${item.code.toUpperCase()}.svg`} alt="flag" className="w-5 h-5 object-cover rounded-full" />
-                                                        <span className="ltr:ml-3 rtl:mr-3">{item.name}</span>
-                                                    </button>
-                                                </li>
-                                            );
-                                        })}
-                                    </ul>
-                                </Dropdown>
+                        <img src="/assets/images/logodark.png" alt="logo" className="mx-auto max-w-48" />
+                        <div className="mx-auto w-full max-w-[440px] mt-12">
+                            <div className="sm:mx-auto sm:w-full sm:max-w-sm mt-4">
+                                <h2 className="text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Create a new studio account.</h2>
                             </div>
-                        </div>
-                        <div className="mx-auto w-full max-w-[440px]">
-                            <div className="mb-10">
-                                <h1 className="text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">Sign Up</h1>
-                                <p className="text-base font-bold leading-normal text-white-dark">Enter your email and password to register</p>
-                            </div>
-                            <form className="space-y-5 dark:text-white" onSubmit={submitForm}>
-                                <div>
-                                    <label htmlFor="Name">Name</label>
-                                    <div className="relative text-white-dark">
-                                        <input id="Name" type="text" placeholder="Enter Name" className="form-input ps-10 placeholder:text-white-dark" />
-                                        <span className="absolute start-4 top-1/2 -translate-y-1/2">
-                                            <IconUser fill={true} />
-                                        </span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label htmlFor="Email">Email</label>
-                                    <div className="relative text-white-dark">
-                                        <input id="Email" type="email" placeholder="Enter Email" className="form-input ps-10 placeholder:text-white-dark" />
-                                        <span className="absolute start-4 top-1/2 -translate-y-1/2">
-                                            <IconMail fill={true} />
-                                        </span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label htmlFor="Password">Password</label>
-                                    <div className="relative text-white-dark">
-                                        <input id="Password" type="password" placeholder="Enter Password" className="form-input ps-10 placeholder:text-white-dark" />
-                                        <span className="absolute start-4 top-1/2 -translate-y-1/2">
-                                            <IconLockDots fill={true} />
-                                        </span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="flex cursor-pointer items-center">
-                                        <input type="checkbox" className="form-checkbox bg-white dark:bg-black" />
-                                        <span className="text-white-dark">Subscribe to weekly newsletter</span>
-                                    </label>
-                                </div>
-                                <button type="submit" className="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]">
-                                    Sign Up
-                                </button>
-                            </form>
-                            <div className="relative my-7 text-center md:mb-9">
-                                <span className="absolute inset-x-0 top-1/2 h-px w-full -translate-y-1/2 bg-white-light dark:bg-white-dark"></span>
-                                <span className="relative bg-white px-2 font-bold uppercase text-white-dark dark:bg-dark dark:text-white-light">or</span>
-                            </div>
-                            <div className="mb-10 md:mb-[60px]">
-                                <ul className="flex justify-center gap-3.5 text-white">
-                                    <li>
-                                        <Link
-                                            to="#"
-                                            className="inline-flex h-8 w-8 items-center justify-center rounded-full p-0 transition hover:scale-110"
-                                            style={{ background: 'linear-gradient(135deg, rgba(239, 18, 98, 1) 0%, rgba(67, 97, 238, 1) 100%)' }}
-                                        >
-                                            <IconInstagram />
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link
-                                            to="#"
-                                            className="inline-flex h-8 w-8 items-center justify-center rounded-full p-0 transition hover:scale-110"
-                                            style={{ background: 'linear-gradient(135deg, rgba(239, 18, 98, 1) 0%, rgba(67, 97, 238, 1) 100%)' }}
-                                        >
-                                            <IconFacebookCircle />
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link
-                                            to="#"
-                                            className="inline-flex h-8 w-8 items-center justify-center rounded-full p-0 transition hover:scale-110"
-                                            style={{ background: 'linear-gradient(135deg, rgba(239, 18, 98, 1) 0%, rgba(67, 97, 238, 1) 100%)' }}
-                                        >
-                                            <IconTwitter fill={true} />
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link
-                                            to="#"
-                                            className="inline-flex h-8 w-8 items-center justify-center rounded-full p-0 transition hover:scale-110"
-                                            style={{ background: 'linear-gradient(135deg, rgba(239, 18, 98, 1) 0%, rgba(67, 97, 238, 1) 100%)' }}
-                                        >
-                                            <IconGoogle />
-                                        </Link>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div className="text-center dark:text-white">
-                                Already have an account ?&nbsp;
-                                <Link to="/auth/signin" className="uppercase text-primary underline transition hover:text-black dark:hover:text-white">
-                                    SIGN IN
+
+                            <p className="text-center text-sm text-gray-600">
+                                Or{' '}
+                                <Link to="/login" className="font-medium text-orn hover:text-ornhover">
+                                    sign in to your existing account
                                 </Link>
+                            </p>
+
+                            <div className="mt-6 grid sm:grid-cols-4 grid-cols-1 sm:gap-2">
+                                <div className="sm:col-span-4 relative text-white-dark">
+                                    <input
+                                        type="text"
+                                        name="studio-name"
+                                        id="studio-name"
+                                        className="form-input  placeholder:text-white-dark h-12"
+                                        placeholder="Studio Name"
+                                        onChange={(e) => setUserData({ ...userData, studio_Name: e.target.value })}
+                                    />
+                                </div>
+                                <div className="sm:col-span-4 mt-2">
+                                    <input
+                                        type="text"
+                                        name="user-name"
+                                        id="user-name"
+                                        className="form-input  placeholder:text-white-dark h-12"
+                                        placeholder="Username"
+                                        onChange={(e) => setUserData({ ...userData, desired_UserName: e.target.value })}
+                                    />
+
+                                    {error && <p className="text-red-500 text-xs mt-1">{errorMessage}</p>}
+                                </div>
+                                <div className="mt-2 sm:col-span-2">
+                                    <input
+                                        type="text"
+                                        name="first-name"
+                                        id="first-name"
+                                        className="form-input  placeholder:text-white-dark h-12"
+                                        placeholder="First Name"
+                                        onChange={(e) => setFirstName(e.target.value)}
+                                    />
+                                </div>
+                                <div className="mt-2 sm:col-span-2">
+                                    <input
+                                        type="text"
+                                        name="last-name"
+                                        id="last-name"
+                                        className="form-input  placeholder:text-white-dark h-12"
+                                        placeholder="Last Name"
+                                        onChange={(e) => setLastName(e.target.value)}
+                                    />
+                                </div>
+                                <div className="mt-2 sm:col-span-4">
+                                    <input
+                                        type="tel"
+                                        name="phone"
+                                        id="phone"
+                                        className="form-input  placeholder:text-white-dark h-12"
+                                        placeholder="Phone Number"
+                                        onChange={(e) => setUserData({ ...userData, contact_Number: e.target.value })}
+                                    />
+                                </div>
+                                <div className="mt-2 sm:col-span-4">
+                                    <input
+                                        type="text"
+                                        name="address"
+                                        id="address"
+                                        className="form-input  placeholder:text-white-dark h-12"
+                                        placeholder="Address"
+                                        onChange={(e) => setUserData({ ...userData, contact_Address: e.target.value })}
+                                    />
+                                </div>
+                                <div className="mt-2 sm:col-span-2">
+                                    <input
+                                        type="text"
+                                        name="city"
+                                        id="city"
+                                        className="form-input  placeholder:text-white-dark h-12"
+                                        placeholder="City"
+                                        onChange={(e) => setUserData({ ...userData, contact_City: e.target.value })}
+                                    />
+                                </div>
+                                <div className="mt-2">
+                                    <select className="form-select placeholder:text-white-dark h-12" onChange={(e) => setUserData({ ...userData, contact_State: e.target.value })}>
+                                        <option value="AL">Alabama</option>
+                                        <option value="AK">Alaska</option>
+                                        <option value="AZ">Arizona</option>
+                                        <option value="AR">Arkansas</option>
+                                        <option value="CA">California</option>
+                                        <option value="CO">Colorado</option>
+                                        <option value="CT">Connecticut</option>
+                                        <option value="DE">Delaware</option>
+                                        <option value="DC">District Of Columbia</option>
+                                        <option value="FL">Florida</option>
+                                        <option value="GA">Georgia</option>
+                                        <option value="HI">Hawaii</option>
+                                        <option value="ID">Idaho</option>
+                                        <option value="IL">Illinois</option>
+                                        <option value="IN">Indiana</option>
+                                        <option value="IA">Iowa</option>
+                                        <option value="KS">Kansas</option>
+                                        <option value="KY">Kentucky</option>
+                                        <option value="LA">Louisiana</option>
+                                        <option value="ME">Maine</option>
+                                        <option value="MD">Maryland</option>
+                                        <option value="MA">Massachusetts</option>
+                                        <option value="MI">Michigan</option>
+                                        <option value="MN">Minnesota</option>
+                                        <option value="MS">Mississippi</option>
+                                        <option value="MO">Missouri</option>
+                                        <option value="MT">Montana</option>
+                                        <option value="NE">Nebraska</option>
+                                        <option value="NV">Nevada</option>
+                                        <option value="NH">New Hampshire</option>
+                                        <option value="NJ">New Jersey</option>
+                                        <option value="NM">New Mexico</option>
+                                        <option value="NY">New York</option>
+                                        <option value="NC">North Carolina</option>
+                                        <option value="ND">North Dakota</option>
+                                        <option value="OH">Ohio</option>
+                                        <option value="OK">Oklahoma</option>
+                                        <option value="OR">Oregon</option>
+                                        <option value="PA">Pennsylvania</option>
+                                        <option value="RI">Rhode Island</option>
+                                        <option value="SC">South Carolina</option>
+                                        <option value="SD">South Dakota</option>
+                                        <option value="TN">Tennessee</option>
+                                        <option value="TX">Texas</option>
+                                        <option value="UT">Utah</option>
+                                        <option value="VT">Vermont</option>
+                                        <option value="VA">Virginia</option>
+                                        <option value="WA">Washington</option>
+                                        <option value="WV">West Virginia</option>
+                                        <option value="WI">Wisconsin</option>
+                                        <option value="WY">Wyoming</option>
+                                    </select>
+                                </div>
+                                <div className="mt-2">
+                                    <input
+                                        type="text"
+                                        name="zip"
+                                        id="zip"
+                                        className="form-input  placeholder:text-white-dark h-12"
+                                        placeholder="Zip Code"
+                                        onChange={(e) => setUserData({ ...userData, contact_Zip: e.target.value })}
+                                    />
+                                </div>
+
+                                <div className="mt-2 sm:col-span-4">
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        id="email"
+                                        className="form-input  placeholder:text-white-dark h-12"
+                                        placeholder="you@email.com"
+                                        onChange={(e) => setUserData({ ...userData, contact_Email: e.target.value })}
+                                    />
+                                </div>
+                                <div className="mt-2 sm:col-span-full">
+                                    <input
+                                        type="password"
+                                        name="password"
+                                        id="password"
+                                        className="form-input placeholder:text-white-dark h-12"
+                                        placeholder="Password"
+                                        onChange={(e) => setUserData({ ...userData, desired_Pswd: e.target.value })}
+                                    />
+                                </div>
+                                <div className="mt-2 sm:col-span-full">
+                                    <input
+                                        type="password"
+                                        name="confirm"
+                                        id="confirm"
+                                        className="form-input placeholder:text-white-dark h-12"
+                                        placeholder="Re-enter password"
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                    />
+                                </div>
+                                <div className="mt-2 sm:col-span-4">
+                                    <button
+                                        type="submit"
+                                        className="btn btn-primary w-full h-12 border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]"
+                                        onClick={(e) => handleCreateUser(e)}
+                                    >
+                                        Create Account
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 

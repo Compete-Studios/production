@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { REACT_API_BASE_URL } from '../../constants';
 import { convertPhone, hashTheID } from '../../functions/shared';
 import IconUserPlus from '../../components/Icon/IconUserPlus';
+import IconPlus from '../../components/Icon/IconPlus';
 
 const ViewStudents = () => {
     const { suid }: any = UserAuth();
@@ -167,6 +168,17 @@ const ViewStudents = () => {
                         </tbody>
                     </table>
                 </div>
+                {filteredItems?.length === 0 && (
+                <div className="flex items-center justify-center h-40">
+                    <div className='text-center'>
+                        <p className="text-lg text-danger">No Students found</p>
+                        <button className="btn btn-info gap-2 mt-2 w-full flex items-center justify-center">
+                            <IconPlus />
+                            Add a Student
+                        </button>
+                    </div>
+                </div>
+            )}
             </div>
         </div>
     );

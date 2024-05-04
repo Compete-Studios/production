@@ -274,6 +274,7 @@ const ViewStudent = () => {
         scrollTop();
     }, []);
 
+
     const handleDeleteFromClass = (classID: any) => {
         showWarningMessage('Are you sure you want to remove this student from this class?', 'Remove Student From Class', 'Your student has been removed from the class').then((confirmed: boolean) => {
             if (confirmed) {
@@ -604,7 +605,7 @@ const ViewStudent = () => {
                                                             <span className="text-danger">{schedule?.ScheduleStatus}</span>
                                                         )}
 
-                                                        <span className="block text-white-dark dark:text-white-light">{formatDate(schedule?.EndDate)}</span>
+                                                        <span className="block text-white-dark dark:text-white-light">{formatDate(schedule?.CreatedOn)} - {formatDate(schedule?.EndDate)}</span>
                                                     </h6>
                                                     <div className="flex items-start justify-between ltr:ml-auto rtl:mr-auto">
                                                         <p className="font-semibold">${parseInt(schedule?.PaymentAmount)?.toFixed(2)}</p>

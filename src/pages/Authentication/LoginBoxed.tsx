@@ -10,7 +10,7 @@ import Error from './Error';
 
 
 const LoginBoxed = () => {
-    const { isLoggedIn } = UserAuth();
+    const { isLoggedIn }: any = UserAuth();
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(false);
@@ -83,7 +83,7 @@ const LoginBoxed = () => {
                                             type="text"
                                             placeholder="Enter Username"
                                             value={userName}
-                                            className="form-input ps-10 placeholder:text-white-dark"
+                                            className="form-input ps-10 placeholder:text-white-dark h-12"
                                             onChange={(e) => setUserName(e.target.value)}
                                         />
                                         <span className="absolute start-4 top-1/2 -translate-y-1/2">
@@ -101,7 +101,7 @@ const LoginBoxed = () => {
                                             type="password"
                                             value={password}
                                             placeholder="Enter Password"
-                                            className="form-input ps-10 placeholder:text-white-dark"
+                                            className="form-input ps-10 placeholder:text-white-dark h-12"
                                             onChange={(e) => setPassword(e.target.value)}
                                         />
                                         <span className="absolute start-4 top-1/2 -translate-y-1/2">

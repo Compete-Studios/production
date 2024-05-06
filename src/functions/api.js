@@ -1239,3 +1239,23 @@ export const getProspectAttendanceByClassIdDate = async (classId, date, type) =>
         throw error;
     }
 };
+
+export const addNewStudio = async (formData) => {
+    try {
+        const response = await fetchData('studio-access/addStudio', 'post', formData);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const updateStudioOptions = async (formData) => {
+    try {
+        const response = await fetchData('studio-access/updateStudioOptions', 'post', formData);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};

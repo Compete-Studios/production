@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { formatDate, showErrorMessage, showMessage, unHashTheID } from '../../functions/shared';
+import { formatDate, hashTheID, showErrorMessage, showMessage, unHashTheID } from '../../functions/shared';
 import { UserAuth } from '../../context/AuthContext';
 import { addPaymentNotes, getAllCustomerPaymentAccounts, getLatePayment, getPaymentByID, getPaymentNotes } from '../../functions/payments';
 import Tippy from '@tippyjs/react';
@@ -12,11 +12,12 @@ import IconPrinter from '../../components/Icon/IconPrinter';
 import { sendIndividualEmail } from '../../functions/emails';
 import { REACT_BASE_URL } from '../../constants';
 import IconSend from '../../components/Icon/IconSend';
+import SendQuickText from '../Students/buttoncomponents/SendQuickText';
+import IconEye from '../../components/Icon/IconEye';
 
 export default function ViewLatePayment() {
     const { suid, latePayementPipeline, studioInfo, studioOptions }: any = UserAuth();
     const { id, stud }: any = useParams();
-    const paymentID = unHashTheID(id);
 
     const [paymentInfo, setPaymentInfo] = useState<any>({});
     const [paymentIDInfo, setPaymentIDInfo] = useState<any>({});
@@ -219,52 +220,56 @@ export default function ViewLatePayment() {
             console.log(error);
         }
     };
+    console.log('paymentInfo', student);
 
     return (
         <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 max-w-5xl mx-auto">
             <div className="panel pb-0 sm:col-span-2 px-0">
-                <div className="space-y-4 px-5">
-                    <p className="font-bold ">
-                        Student:{' '}
-                        <span className="font-semibold text-primary">
-                            {student?.First_Name} {student?.Last_Name}
-                        </span>
-                    </p>
-                    <p className="font-bold ">
-                        Billing Account: <span className="font-semibold text-primary">{paymentInfo?.CustomerName}</span>
-                    </p>
-                    <p className="font-bold ">
-                        Card Number: <span className="font-semibold">{paymentInfo?.CustomerName}</span>
-                    </p>
-                    <p className="font-bold ">
-                        Transaction ID: <span className="font-semibold">{paymentInfo?.PaysimpleTransactionId}</span>
-                    </p>
-                    <p className="font-bold ">
-                        Authorization Code: <span className="font-semibold">{paymentIDInfo?.ProviderAuthCode}</span>
-                    </p>
-                    <p className="font-bold ">
-                        Amount: <span className="font-semibold text-success">${paymentInfo?.Amount}</span>
-                    </p>
-                    <p className="font-bold ">
-                        Payment Type: <span className="font-semibold">{paymentIDInfo?.PaymentType}</span>
-                    </p>
-                    <p className="font-bold ">
-                        Settlement Date: <span className="font-semibold">{paymentIDInfo?.ActualSettledDate && formatDate(paymentIDInfo?.ActualSettledDate)}</span>
-                    </p>
-                    <p className="font-bold ">
-                        Status: <span className={`font-semibold ${paymentIDInfo?.Status === 'Failed' && 'text-danger'}`}>{paymentIDInfo?.Status}</span>
-                    </p>
-                    <p className="font-bold ">
-                        Can Void Until: <span className="font-semibold">{paymentIDInfo?.CanVoidUntil && formatDate(paymentIDInfo?.CanVoidUntil)}</span>
-                    </p>
-                    <p className="font-bold ">
-                        Return Date: <span className="font-semibold">{}</span>
-                    </p>
-                    <p className="font-bold ">
-                        Payment Schedule Id: <span className="font-semibold">{paymentIDInfo?.RecurringScheduleId}</span>
-                    </p>
+                <div className="flex items-start justify-between">
+                    <div className="space-y-4 px-5">
+                        <p className="font-bold flex gap-2">
+                            Student:{' '}
+                            <Link to={`/students/view-student/${hashTheID(student.Student_id)}/${hashTheID(suid)}`} type="button" className="font-semibold text-primary flex items-center gap-2">
+                                {student?.First_Name} {student?.Last_Name} <IconEye />
 
-                    {/* <ul className="mt-7 flex items-center justify-center gap-2 ">
+                            </Link>
+                        </p>
+                        <p className="font-bold ">
+                            Billing Account: <span className="font-semibold text-primary">
+                                {paymentInfo?.CustomerName}</span>
+                        </p>
+                        <p className="font-bold ">
+                            Card Number: <span className="font-semibold">{paymentInfo?.CustomerName}</span>
+                        </p>
+                        <p className="font-bold ">
+                            Transaction ID: <span className="font-semibold">{paymentInfo?.PaysimpleTransactionId}</span>
+                        </p>
+                        <p className="font-bold ">
+                            Authorization Code: <span className="font-semibold">{paymentIDInfo?.ProviderAuthCode}</span>
+                        </p>
+                        <p className="font-bold ">
+                            Amount: <span className="font-semibold text-success">${paymentInfo?.Amount}</span>
+                        </p>
+                        <p className="font-bold ">
+                            Payment Type: <span className="font-semibold">{paymentIDInfo?.PaymentType}</span>
+                        </p>
+                        <p className="font-bold ">
+                            Settlement Date: <span className="font-semibold">{paymentIDInfo?.ActualSettledDate && formatDate(paymentIDInfo?.ActualSettledDate)}</span>
+                        </p>
+                        <p className="font-bold ">
+                            Status: <span className={`font-semibold ${paymentIDInfo?.Status === 'Failed' && 'text-danger'}`}>{paymentIDInfo?.Status}</span>
+                        </p>
+                        <p className="font-bold ">
+                            Can Void Until: <span className="font-semibold">{paymentIDInfo?.CanVoidUntil && formatDate(paymentIDInfo?.CanVoidUntil)}</span>
+                        </p>
+                        <p className="font-bold ">
+                            Return Date: <span className="font-semibold">{}</span>
+                        </p>
+                        <p className="font-bold ">
+                            Payment Schedule Id: <span className="font-semibold">{paymentIDInfo?.RecurringScheduleId}</span>
+                        </p>
+
+                        {/* <ul className="mt-7 flex items-center justify-center gap-2 ">
                         <li>
                             <SendQuickEmail student={student} />
                         </li>
@@ -276,13 +281,25 @@ export default function ViewLatePayment() {
                             </Tippy>
                         </li>
                     </ul> */}
+                    </div>
+                    <div className="space-y-4 px-5">
+                        <div className="flex items-center gap-x-2 font-sans font-bold">
+                            <SendQuickText student={student} /> Send Text
+                        </div>
+                        <div className="flex items-center gap-x-2 font-sans font-bold">
+                            <SendQuickEmail student={student} /> Send Email
+                        </div>
+                    </div>
                 </div>
                 <div className="flex justify-center mt-8  ">
                     <div className="cursor-pointer w-full border p-5 rounded-bl-lg text-center font-semibold text-success hover:bg-success/10" onClick={() => setEmailReciept(!emailReciept)}>
-                        Send Email Recipet
+                        Send Email Receipt
                     </div>
-                    <button className="cursor-pointer w-full border p-5 rounded-br-lg text-center font-semibold text-info hover:bg-info/10" onClick={handlePrintReceipt}>
-                        Print Recipet
+                    <button className="cursor-pointer w-full border p-5 text-center font-semibold text-info hover:bg-info/10" onClick={handlePrintReceipt}>
+                        Print Receipt
+                    </button>
+                    <button className="cursor-pointer w-full border p-5 rounded-br-lg text-center font-semibold text-warning hover:bg-warning/10" onClick={handlePrintReceipt}>
+                        Retry Payment
                     </button>
                 </div>
                 {emailReciept && (
@@ -339,9 +356,9 @@ export default function ViewLatePayment() {
                 })}
                 <textarea className="form-textarea w-full h-20 mt-4" placeholder="Add a note" value={newNote} onChange={(e) => setNewNote(e.target.value)} />
                 <div className="flex justify-end">
-                    <button className="btn btn-primary"
-                        onClick={handleAddNote}
-                    >Add Note</button>
+                    <button className="btn btn-primary" onClick={handleAddNote}>
+                        Add Note
+                    </button>
                 </div>
             </div>
             <div className="panel">

@@ -16,10 +16,10 @@ import IconMessage from '../../components/Icon/IconMessage';
 import IconDollarSignCircle from '../../components/Icon/IconDollarSignCircle';
 
 const ViewProgramRoster = () => {
-    const { suid }: any = UserAuth();
+    const { suid, programs }: any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Contacts'));
+        dispatch(setPageTitle('View Program Roster'));
     });
     const [addContactModal, setAddContactModal] = useState<any>(false);
     const [studentRoster, setStudentRoster] = useState<any>([]);
@@ -37,7 +37,7 @@ const ViewProgramRoster = () => {
 
     const [params, setParams] = useState<any>(JSON.parse(JSON.stringify(defaultParams)));
 
-    const { prID, uid } = useParams<any>();
+    const { prID, uid }: any = useParams<any>();
 
     const changeValue = (e: any) => {
         const { value, id } = e.target;
@@ -46,10 +46,12 @@ const ViewProgramRoster = () => {
 
     const [search, setSearch] = useState<any>('');
 
+    const programName = programs?.find((program: any) => parseInt(program.ProgramId) === parseInt(prID))?.Name;
+
     useEffect(() => {
         try {
             if (suid === uid) {
-              getStudentsByProgramId(prID).then((res) => {
+                getStudentsByProgramId(prID).then((res) => {
                     setStudentRoster(res.recordset);
                 });
                 getProspectsByProgramId(prID).then((res) => {
@@ -82,25 +84,21 @@ const ViewProgramRoster = () => {
         });
     }, [search, prospectRoster]);
 
-
-   
-
-   
-
-
     return (
-        <> <ul className="flex space-x-2 rtl:space-x-reverse">
-        <li>
-            <Link to="/classes/view-classes" className="text-primary hover:underline">
-                View Classes
-            </Link>
-        </li>
-        <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-            <span>Class</span>
-        </li>
-    </ul>
+        <>
+            {' '}
+            <ul className="flex space-x-2 rtl:space-x-reverse">
+                <li>
+                    <Link to="/classes/programs" className="text-primary hover:underline">
+                        View Programs
+                    </Link>
+                </li>
+                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
+                    <span>{programName || 'Program'}</span>
+                </li>
+            </ul>
             <div>
-                <div className="flex items-center justify-between flex-wrap gap-4">
+                <div className="sm:flex sm:items-center sm:justify-between sm:flex-wrap sm:gap-4">
                     <h2 className="text-xl">Students Enrolled</h2>
                     <div>
                         <div className="flex sm:flex-row flex-col sm:items-center justify-end sm:gap-3 gap-4 w-full sm:w-auto">
@@ -111,35 +109,31 @@ const ViewProgramRoster = () => {
                                 </button>
                             </div>
                         </div>
-                        <div className="flex sm:flex-row flex-col sm:items-center justify-end sm:gap-3 gap-4 w-full sm:w-auto mt-3">
-                            <button type="button" className="btn btn-primary">
+                        <div className="sm:flex sm:items-center sm:justify-end sm:gap-3 w-full mt-3 space-y-4 sm:space-y-0">
+                            <Link to="/students/add-student" type="button" className="btn btn-primary w-full whitespace-nowrap">
                                 <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
-                                Add Student
+                                Add Student To Program
+                            </Link>
+
+                            <button type="button" className="btn btn-secondary w-full whitespace-nowrap">
+                                <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
+                                Add Prospect To Program
                             </button>
 
-                            <button type="button" className="btn btn-secondary">
-                                <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
-                                Add Prospect
-                            </button>
-
-                            <button type="button" className="btn btn-info gap-2">
+                            <button type="button" className="btn btn-info gap-2 w-full whitespace-nowrap">
                                 <IconSend />
                                 Email Class
                             </button>
-                            <button type="button" className="btn btn-success gap-2">
+                            <button type="button" className="btn btn-success gap-2 w-full whitespace-nowrap">
                                 <IconPrinter />
                                 Print Roster
                             </button>
 
-                            <Link to="/apps/invoice/add" className="btn btn-dark gap-2">
+                            <Link to="/apps/invoice/add" className="btn btn-dark gap-2 w-full whitespace-nowrap">
                                 <IconMessage />
                                 Text CLass
                             </Link>
 
-                            <Link to="/apps/invoice/edit" className="btn btn-warning gap-2">
-                                <IconDollarSignCircle />
-                                Bulk Pay
-                            </Link>
                         </div>
                     </div>
                 </div>
@@ -181,10 +175,10 @@ const ViewProgramRoster = () => {
 
                                             <td>
                                                 <div className="flex gap-4 items-center justify-center">
-                                                    <button type="button" className="btn btn-sm btn-outline-primary" >
+                                                    <button type="button" className="btn btn-sm btn-outline-primary">
                                                         Info
                                                     </button>
-                                                    <button type="button" className="btn btn-sm btn-outline-danger" >
+                                                    <button type="button" className="btn btn-sm btn-outline-danger">
                                                         Remove
                                                     </button>
                                                 </div>
@@ -308,10 +302,10 @@ const ViewProgramRoster = () => {
                                                 <td className="whitespace-nowrap">{contact.email}</td>
                                                 <td>
                                                     <div className="flex gap-4 items-center justify-center">
-                                                        <button type="button" className="btn btn-sm btn-outline-primary" >
+                                                        <button type="button" className="btn btn-sm btn-outline-primary">
                                                             Info
                                                         </button>
-                                                        <button type="button" className="btn btn-sm btn-outline-danger" >
+                                                        <button type="button" className="btn btn-sm btn-outline-danger">
                                                             Remove
                                                         </button>
                                                     </div>
@@ -393,7 +387,7 @@ const ViewProgramRoster = () => {
                                                     <button type="button" className="btn btn-outline-danger" onClick={() => setAddContactModal(false)}>
                                                         Cancel
                                                     </button>
-                                                    <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" >
+                                                    <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4">
                                                         {params.id ? 'Update' : 'Add'}
                                                     </button>
                                                 </div>

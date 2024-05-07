@@ -23,6 +23,11 @@ export default function AuthContextProvider({ children }: any) {
     const [studioInfo, setStudioInfo] = useState({});
     const [latePayementPipeline, setLatePayementPipeline] = useState([]);
     const [studioOptions, setStudioOptions] = useState<any>([]);
+    const [masters, setMasters] = useState([]);
+    const [isMaster, setIsMaster] = useState(false);
+    const [selectedSuid, setSelectedSuid] = useState<any>('');
+    const [metrics, setMetrics] = useState<any>([]);
+    const [students, setStudents] = useState<any>([]);
 
     const [update, setUpdate] = useState(false);
 
@@ -78,6 +83,7 @@ export default function AuthContextProvider({ children }: any) {
         fetchData(`${REACT_API_BASE_URL}/marketing-access/getMarketingMethodsByStudioId/${suid}`, setMarketingSources);
         fetchData(`${REACT_API_BASE_URL}/student-access/getProspectIntros/${suid}/${month}/${year}`, setProspectIntros);
         fetchData(`${REACT_API_BASE_URL}/student-access/getPaymentPipelineStepsByStudioId/${suid}`, setLatePayementPipeline);
+        fetchData(`${REACT_API_BASE_URL}/studio-access/getStudentsByStudioId/${suid}/1`, setStudents);
         fetchRecordSet(`${REACT_API_BASE_URL}/studio-access/getStudioOptions/${suid}`, setStudioOptions);
     };
 
@@ -91,27 +97,34 @@ export default function AuthContextProvider({ children }: any) {
         }
     };
 
-    const getStudioInfo = async (suid: any) => {
+    const getStudioInfo = async (suid: any, main: any) => {
         try {
             const docRef = doc(db, 'studios', suid);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
-                setStudioInfo(docSnap.data());                
+                setStudioInfo(docSnap.data());
             } else {
                 // doc.data() will be undefined in this case
                 console.log('No such document!');
             }
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const updateStudioLatePaymentPipeline = async (studioID: any) => {
-        try {
-            const response = await fetchFromAPI(`late-payment-pipeline/addLatePaymentsFromPaysimpleToCompeteD/${studioID}`, {
-                method: 'POST',
-            });
-            return response;
+            let mainSnap = null;
+            if (main === suid) {
+                mainSnap = docSnap;
+            } else {
+                const mainRef = doc(db, 'studios', main);
+                mainSnap = await getDoc(mainRef);
+            }
+            if (mainSnap.exists()) {
+                if (mainSnap.data().MasterStudio === 1) {
+                    setIsMaster(true);
+                    getMasterStudioNumbers(main);
+                } else {
+                    setIsMaster(false);
+                }
+            } else {
+                // doc.data() will be undefined in this case
+                console.log('No such document!');
+            }
         } catch (error) {
             console.error(error);
         }
@@ -128,27 +141,27 @@ export default function AuthContextProvider({ children }: any) {
         }
     };
 
-    // const getMasterStudioNumbers = async (id: any) => {
-    //     try {
-    //         const response = await fetchFromAPI(`admin-tools/getMasterStudioRosterById/${id}`, {
-    //             method: 'GET',
-    //         });
-    //         const masters: any = [];
+    const getMasterStudioNumbers = async (id: any) => {
+        try {
+            const response = await fetchFromAPI(`admin-tools/getMasterStudioRosterById/${id}`, {
+                method: 'GET',
+            });
+            const masters: any = [];
 
-    //         for (let i = 0; i < response.recordset.length; i++) {
-    //             const master = response.recordset[i];
-    //             const masterInfo = await getStudioNameById(master.StudioId);
-    //             masters.push({
-    //                 studioID: response.recordset[i].StudioId,
-    //                 studioName: masterInfo.Studio_Name,
-    //                 userName: masterInfo.Desired_UserName,
-    //             });
-    //         }
-    //         setMasters(masters);
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // };
+            for (let i = 0; i < response.recordset.length; i++) {
+                const master = response.recordset[i];
+                const masterInfo = await getStudioNameById(master.StudioId);
+                masters.push({
+                    studioID: response.recordset[i].StudioId,
+                    studioName: masterInfo.Studio_Name,
+                    userName: masterInfo.Desired_UserName,
+                });
+            }
+            setMasters(masters);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     useEffect(() => {
         setShowLoading(true);
@@ -158,20 +171,22 @@ export default function AuthContextProvider({ children }: any) {
     }, [suid, update]);
 
     useEffect(() => {
+        const suid = localStorage.getItem('suid');
+        console.log('It ran', suid);
         const unsubscribe = onAuthStateChanged(auth, (currentUser: any) => {
-          if (currentUser) {
-            setIsLoggedIn(true);
-            console.log("It ran again", currentUser.photoURL);
-            setSuid(currentUser.photoURL);
-            getStudioInfo(currentUser.photoURL);
-          } else {
-            setIsLoggedIn(false);
-          }
+            if (currentUser) {
+                setIsLoggedIn(true);
+                console.log('It ran again', currentUser.photoURL);
+                setSuid(suid ? suid : currentUser.photoURL);
+                getStudioInfo(suid ? suid : currentUser.photoURL, currentUser.photoURL);
+            } else {
+                setIsLoggedIn(false);
+            }
         });
         return () => {
-          unsubscribe(); // Clean up the onAuthStateChanged listener
+            unsubscribe(); // Clean up the onAuthStateChanged listener
         };
-      }, []);
+    }, [selectedSuid]);
 
     return (
         <UserContext.Provider
@@ -196,6 +211,11 @@ export default function AuthContextProvider({ children }: any) {
                 scheduleID,
                 latePayementPipeline,
                 studioOptions,
+                isMaster,
+                masters,
+                selectedSuid,
+                setSelectedSuid,
+                students
             }}
         >
             {children}

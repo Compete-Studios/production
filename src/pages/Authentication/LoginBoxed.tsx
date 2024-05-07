@@ -8,7 +8,6 @@ import IconLockDots from '../../components/Icon/IconLockDots';
 import NavBar from '../Home/NavBar';
 import Error from './Error';
 
-
 const LoginBoxed = () => {
     const { isLoggedIn }: any = UserAuth();
     const [userName, setUserName] = useState('');
@@ -27,6 +26,8 @@ const LoginBoxed = () => {
         if (response.error) {
             setError(true);
             setErrorMessage(response.error);
+        } else if (parseInt(response) > 0) {
+            window.location.href = '/password-reset/' + response;
         } else {
             setError(false);
             setErrorMessage('');
@@ -38,7 +39,7 @@ const LoginBoxed = () => {
         setErrorMessage('');
         setUserName('');
         setPassword('');
-    } 
+    };
 
     const scrollToBottom = () => {
         window.scrollTo({

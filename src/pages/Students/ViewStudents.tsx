@@ -11,18 +11,9 @@ import IconUserPlus from '../../components/Icon/IconUserPlus';
 import IconPlus from '../../components/Icon/IconPlus';
 
 const ViewStudents = () => {
-    const { suid }: any = UserAuth();
-    const [students, setStudents] = useState<any>([]);
+    const { suid, students }: any = UserAuth();
     const [showLoading, setShowLoading] = useState(false);
     const [activeOnly, setActiveOnly] = useState(true);
-
-    useEffect(() => {
-        setShowLoading(true);
-        fetch(`${REACT_API_BASE_URL}/studio-access/getStudentsByStudioId/${suid}/1`)
-            .then((response) => response.json())
-            .then((json) => setStudents(json.recordset));
-        setShowLoading(false);
-    }, []);
 
     const dispatch = useDispatch();
     useEffect(() => {
@@ -146,12 +137,7 @@ const ViewStudents = () => {
                                         <td className="whitespace-nowrap">{convertPhone(contact.Phone)}</td>
                                         <td>
                                             <div className="flex gap-4 items-center justify-center">
-                                                <Link
-                                                    to={`/students/view-student/${hashTheID(contact.Student_ID)}/${hashTheID(suid)}`}
-                                                    type="button"
-                                                    className="btn btn-sm btn-outline-info"
-                                                   
-                                                >
+                                                <Link to={`/students/view-student/${hashTheID(contact.Student_ID)}/${hashTheID(suid)}`} type="button" className="btn btn-sm btn-outline-info">
                                                     View
                                                 </Link>
                                                 {/* <Link to="/students/edit-student" type="button" className="btn btn-sm btn-outline-primary" onClick={() => editUser(contact)}>
@@ -169,16 +155,16 @@ const ViewStudents = () => {
                     </table>
                 </div>
                 {filteredItems?.length === 0 && (
-                <div className="flex items-center justify-center h-40">
-                    <div className='text-center'>
-                        <p className="text-lg text-danger">No Students found</p>
-                        <button className="btn btn-info gap-2 mt-2 w-full flex items-center justify-center">
-                            <IconPlus />
-                            Add a Student
-                        </button>
+                    <div className="flex items-center justify-center h-40">
+                        <div className="text-center">
+                            <p className="text-lg text-danger">No Students found</p>
+                            <button className="btn btn-info gap-2 mt-2 w-full flex items-center justify-center">
+                                <IconPlus />
+                                Add a Student
+                            </button>
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
             </div>
         </div>
     );

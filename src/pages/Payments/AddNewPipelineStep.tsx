@@ -13,7 +13,7 @@ export default function AddNewPipelineStep() {
     useEffect(() => {
         dispatch(setPageTitle('Add a Late Payment Pipeline Step'));
     });
-    const { suid, update, setUpdate } = UserAuth();
+    const { suid, update, setUpdate }: any = UserAuth();
     const [pipelineStepName, setPipelineStepName] = useState<string>('');
     const [notes, setNotes] = useState<string>('');
     const [smsDefaultText, setSmsDefaultText] = useState<string>('');

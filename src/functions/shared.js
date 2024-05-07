@@ -43,8 +43,7 @@ export const hashTheID = (id) => {
 
 export const unHashTheID = (id) => {
     return parseInt(id) / 123456789;
-}
-
+};
 
 export const hashThePayID = (id, stud, amt) => {
     const floatedAmount = parseFloat(amt);
@@ -52,9 +51,8 @@ export const hashThePayID = (id, stud, amt) => {
     return (parseInt(id) + floatedStudent + floatedAmount) * 123456789;
 };
 
-export const unHashThePayID = (id, stud, amt) => 
-{
-    return (parseInt(id) / 123456789) - parseInt(stud) - parseInt(amt)
+export const unHashThePayID = (id, stud, amt) => {
+    return parseInt(id) / 123456789 - parseInt(stud) - parseInt(amt);
 };
 
 export const constFormateDateMMDDYYYY = (date) => {
@@ -133,13 +131,46 @@ export const showWarningMessage = (msg = '', text = '', confirmed = '', title = 
                 if (result.value) {
                     Swal.fire({ title: title, text: confirmed, icon: 'success', customClass: 'sweet-alerts' });
                     resolve(true);
-                } 
+                }
             })
             .catch((error) => {
                 reject(error);
             });
     });
 };
+
+export const showCreationAlert = async (type) => {
+    return new Promise((resolve, reject) => {
+        const toast = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-secondary',
+                cancelButton: 'btn btn-dark ltr:mr-3 rtl:ml-3',
+                popup: 'sweet-alerts',
+            },
+            buttonsStyling: false,
+        });
+        toast
+            .fire({
+                icon: 'question',
+                title: "Create Default Student Pipeline Steps?",
+                text: "You can always edit the steps later",
+                showCancelButton: true,
+                confirmButtonText: "Create Steps",
+                cancelButtonText: 'No, cancel!',
+                reverseButtons: true,
+                padding: '2em',
+            })
+            .then((result) => {
+                if (result.value) {
+                    Swal.fire({ title: "Steps Created", text: "You can now begin adding students to steps", icon: 'success', customClass: 'sweet-alerts' });
+                    resolve(true);
+                }
+            })
+            .catch((error) => {
+                reject(error);
+            });
+    });
+}
 
 // export const createUsersFromLargeJSON = (json) => {
 //   try {

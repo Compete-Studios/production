@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import 'flatpickr/dist/flatpickr.css';
 import { Tab } from '@headlessui/react';
@@ -8,28 +8,18 @@ import IconMail from '../../components/Icon/IconMail';
 import IconMessage2 from '../../components/Icon/IconMessage2';
 import IconNotes from '../../components/Icon/IconNotes';
 import IconListCheck from '../../components/Icon/IconListCheck';
-import SendMail from '../Students/components/SendMail';
-import SendText from '../Students/components/SendText';
-import QuickUpdate from '../Students/components/QuickUpdate';
-import QuickUpdateShared from '../Students/components/QuickUpdateShared';
-import { getProspectById } from '../../functions/api';
-import QuickUpdateProspect from './QuickUpdateProspect';
+import SendMail from './components/SendMail';
+import SendText from './components/SendText';
+import QuickUpdate from './components/QuickUpdate';
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
 
-export default function ActionItemProspect({ student, pipeline, studioOptions, update, setUpdate, prospectPipelineSteps }: any) {
+export default function ViewStudentActionItem({ student, pipeline, studioOptions, update, setUpdate }: any) {
     const [showActionModal, setShowActionModal] = useState(false);
     const [expandedDescription, setExpandedDescription] = useState(false);
     const [defaultTab, setDefaultTab] = useState(0);
-    const [prospect, setProspect] = useState({});
 
     const description = pipeline?.Description || '';
-
-    console.log('prospect', student);
-
-    useEffect(() => {
-        getProspectById(student.ProspectId).then((res) => {
-            setProspect(res);
-        });
-    }, [student]);
 
     const toggleDescription = () => {
         setExpandedDescription(!expandedDescription);
@@ -65,13 +55,14 @@ export default function ActionItemProspect({ student, pipeline, studioOptions, u
             );
         }
     };
-
     return (
         <div>
             <div>
-                <button type="button" className=" text-info hover:text-blue-800" onClick={() => setShowActionModal(true)}>
-                    <IconBolt fill={true} />
-                </button>
+                <Tippy content="Action Item">
+                    <button type="button" className=" btn btn-info flex items-center justify-center rounded-full w-10 h-10 p-0" onClick={() => setShowActionModal(true)}>
+                        <IconBolt fill={true} />
+                    </button>
+                </Tippy>
             </div>
             <Transition appear show={showActionModal} as={Fragment}>
                 <Dialog as="div" open={showActionModal} onClose={() => setShowActionModal(false)} className="relative z-[51]">
@@ -148,28 +139,20 @@ export default function ActionItemProspect({ student, pipeline, studioOptions, u
                                                         <SendMail
                                                             pipeline={pipeline}
                                                             studioOptions={studioOptions}
-                                                            student={prospect}
-                                                            setShowActionModal={setShowActionModal}
-                                                            setDefaultTab={setDefaultTab}
-                                                            isPrpospect={true}
-                                                        />
-                                                    </div>
-                                                </Tab.Panel>
-                                                <Tab.Panel>
-                                                    <div className="pt-8">
-                                                        <SendText defaultText={pipeline} student={prospect} setDefaultTab={setDefaultTab} />
-                                                    </div>
-                                                </Tab.Panel>
-                                                <Tab.Panel>
-                                                    <div className="pt-8">
-                                                        <QuickUpdateProspect
                                                             student={student}
                                                             setShowActionModal={setShowActionModal}
-                                                            setUpdate={setUpdate}
-                                                            update={update}
-                                                            pipelineSteps={prospectPipelineSteps}
-                                                            isPrpospect={true}
+                                                            setDefaultTab={setDefaultTab}
                                                         />
+                                                    </div>
+                                                </Tab.Panel>
+                                                <Tab.Panel>
+                                                    <div className="pt-8">
+                                                        <SendText defaultText={pipeline} student={student} setDefaultTab={setDefaultTab} />
+                                                    </div>
+                                                </Tab.Panel>
+                                                <Tab.Panel>
+                                                    <div className="pt-8">
+                                                        <QuickUpdate student={student} setShowActionModal={setShowActionModal} setUpdate={setUpdate} update={update} />
                                                     </div>
                                                 </Tab.Panel>
                                             </Tab.Panels>

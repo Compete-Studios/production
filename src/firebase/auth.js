@@ -1,6 +1,6 @@
 import { addDoc, arrayUnion, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebase';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendSignInLinkToEmail, signInWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth';
 import fetchData from '../functions/fetchdata';
 
 export const login = async (userName, password) => {
@@ -10,13 +10,14 @@ export const login = async (userName, password) => {
         return { error: 'No user with that username' };
     }
     const email = docSnap.data().email;
+    const suid = docSnap.data().studioID[0];
 
     if (!email) {
         return { error: 'No user with that username' };
     } else {
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);        
-          
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
             // Check if the display name is not set
             if (!userCredential.user.displayName) {
                 // Set display name using updateProfile
@@ -31,11 +32,17 @@ export const login = async (userName, password) => {
                     photoURL: docSnap.data().studioID[0],
                 });
             }
-window.location.reload();
+            window.location.reload();
             // If the sign-in is successful, you can return the userCredential or user data here
             return docSnap.data().studioID[0];
         } catch (error) {
             // If an error occurs during sign-in, catch it and return the error message
+            if (error.code === 'auth/user-not-found') {
+                console.log('User not found');
+                console.log(email, password, suid);
+                const studio = await createStudioWithData(email, password, suid);
+                return studio;
+            }
             return {
                 error: error.message === 'Firebase: Error (auth/wrong-password).' ? 'Incorrect Password' : error.message,
             };
@@ -43,6 +50,33 @@ window.location.reload();
     }
 };
 
+const createStudioWithData = async (email, password, suid) => {
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        // Set display name using updateProfile
+        await updateProfile(user, {
+            displayName: suid,
+            photoURL: suid,
+        });
+
+        return suid;
+    } catch (error) {
+        return {
+            error: error.message,
+        };
+    }
+};
+
+export const resetPassword = async (email, newPassword) => {
+    try {
+        const user = auth.currentUser;
+        const response = await user.updatePassword(user, newPassword);
+        return response;
+    } catch (error) {
+        return error.message;
+    }
+};
 
 export const logout = async () => {
     try {
@@ -71,86 +105,81 @@ export const createEvent = async (data, suid) => {
 };
 
 export const createUser = async (email, password, userData) => {
-    console.log(userData);
     try {
-      // Check if the desiredUsername already exists in userTable
-      const userTableRef = doc(db, "users", userData.desired_UserName);
-  
-      const existingUsernames = await getDoc(userTableRef);
-  
-      if (existingUsernames.exists()) {
-        // Username already exists, ask the user to pick a new one or handle it as needed
-        return {
-          error: "Username already exists. Please choose a different one.",
-        };
-      } else {
-        // Send a request to your API
-        const response = await await fetchData(`studio-access/addStudio`, 'post', userData);
-        console.log(response);
-  
-        if (response.NewStudioId) {
-          // Create a new user
-          const userCredential = await createUserWithEmailAndPassword(
-            auth,
-            email,
-            password
-          );
-          const user = userCredential.user;
-          // Set display name using updateProfile
-          await updateProfile(user, {
-            displayName: userData.desired_UserName,
-            photoURL: response.NewStudioId.toString(),
-          });
-  
-          const userRef = doc(db, "studios", response.NewStudioId.toString());
-  
-          // Set user data in the users collection
-          await setDoc(userRef, {
-            uid: user.uid,
-            email: user.email,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            Studio_Id: response.NewStudioId,
-            Constact_Address: userData.contact_Address,
-            Contact_City: userData.contact_City,
-            Contact_Email: userData.contact_Email,
-            Contact_Name: userData.contact_Name,
-            Contact_Number: userData.contact_Number,
-            Contact_State: userData.contact_State,
-            Contact_Zip: userData.contact_Zip,
-            Desired_Pswd: userData.desired_Pswd,
-            Desired_UserName: userData.desired_UserName,
-            Is_Activated: userData.is_Activated,
-            Method_of_Contact: userData.method_of_Contact,
-            PaysimpleCustomerId: userData.paysimpleCustomerId,
-            Role: userData.role,
-            Salt: userData.salt,
-            Studio_Name: userData.studio_Name,
-            User_Role: userData.userRole,
-          });
-  
-          await setDoc(
-            doc(db, "users", userData.desired_UserName),
-            {
-              uid: user.uid,
-              username: userData.desired_UserName,
-              name: userData.contact_Name,
-              email: user.email,
-              studioID: arrayUnion(response.NewStudioId),
-            },
-            { merge: true }
-          );
-  
-          return { ...userData, status: "success", response };
+        // Check if the desiredUsername already exists in userTable
+        const userTableRef = doc(db, 'users', userData.desired_UserName);
+
+        const existingUsernames = await getDoc(userTableRef);
+
+        if (existingUsernames.exists()) {
+            // Username already exists, ask the user to pick a new one or handle it as needed
+            return {
+                error: 'Username already exists. Please choose a different one.',
+            };
         } else {
-          return { error: response.error };
+            // Send a request to your API
+            const response = await await fetchData(`studio-access/addStudio`, 'post', userData);
+            console.log(response);
+
+            if (response.NewStudioId) {
+                // Create a new user
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                // Set display name using updateProfile
+                await updateProfile(user, {
+                    displayName: userData.desired_UserName,
+                    photoURL: response.NewStudioId.toString(),
+                });
+
+                const userRef = doc(db, 'studios', response.NewStudioId.toString());
+
+                // Set user data in the users collection
+                await setDoc(userRef, {
+                    uid: user.uid,
+                    email: user.email,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    Studio_Id: response.NewStudioId,
+                    Constact_Address: userData.contact_Address,
+                    Contact_City: userData.contact_City,
+                    Contact_Email: userData.contact_Email,
+                    Contact_Name: userData.contact_Name,
+                    Contact_Number: userData.contact_Number,
+                    Contact_State: userData.contact_State,
+                    Contact_Zip: userData.contact_Zip,
+                    Desired_Pswd: userData.desired_Pswd,
+                    Desired_UserName: userData.desired_UserName,
+                    Is_Activated: userData.is_Activated,
+                    Method_of_Contact: userData.method_of_Contact,
+                    PaysimpleCustomerId: userData.paysimpleCustomerId,
+                    Role: userData.role,
+                    Salt: userData.salt,
+                    Studio_Name: userData.studio_Name,
+                    User_Role: userData.userRole,
+                });
+
+                await setDoc(
+                    doc(db, 'users', userData.desired_UserName),
+                    {
+                        uid: user.uid,
+                        username: userData.desired_UserName,
+                        name: userData.contact_Name,
+                        email: user.email,
+                        studioID: arrayUnion(response.NewStudioId),
+                    },
+                    { merge: true }
+                );
+
+                return { ...userData, status: 'success', response };
+            } else {
+                return { error: response.error };
+            }
         }
-      }
     } catch (error) {
-      console.log(error);
-      return { error: error.message };
+        console.log(error);
+        return { error: error.message };
     }
-  };
+};
 
 // export const seedDatabase = async () => {
 //     const tables = [

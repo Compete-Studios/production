@@ -22,6 +22,7 @@ export default function ActionItem({ student, pipeline, studioOptions, update, s
     const toggleDescription = () => {
         setExpandedDescription(!expandedDescription);
     };
+    
 
     const renderDescription = () => {
         if (!description) return null;

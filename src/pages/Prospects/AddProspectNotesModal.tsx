@@ -36,6 +36,8 @@ export default function AddProspectNotesModal({ student, setStudent, studentID }
             padding: '10px 20px',
         });
     };
+
+    console.log('student', studentID);
     
     const handleAddNoteToTopOfNotes = async (e: any) => {
         e.preventDefault();

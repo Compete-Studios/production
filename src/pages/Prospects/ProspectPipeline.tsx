@@ -58,8 +58,8 @@ export default function ProspectPipeline() {
                 </div>
             </div>
             <div className="table-responsive">
-                <table className="table-hover">
-                    <thead>
+                <table className="table-striped">
+                    <thead className=''>
                         <tr>
                             <th>Pipeline Step</th>
                             <th>Prospects In Step</th>

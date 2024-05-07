@@ -44,12 +44,14 @@ import AddStudentToProgram from '../Classes/AddStudenToProgram';
 import AddStudentToWaitingList from '../Classes/AddStudentToWaitingList';
 import SendQuickText from './buttoncomponents/SendQuickText';
 import SendQuickEmail from './buttoncomponents/SendQuickEmail';
+import ViewStudentActionItem from './ViewStudentActionItem';
 
 const ViewStudent = () => {
-    const { suid, marketingSources }: any = UserAuth();
+    const { suid, marketingSources, pipelineSteps, studioOptions }: any = UserAuth();
     const [billingLoading, setBillingLoading] = useState<boolean>(true);
     const [updateClasses, setUpdateClasses] = useState<boolean>(false);
     const [paymentsLoading, setPaymentsLoading] = useState<boolean>(true);
+    const [update, setUpdate] = useState<boolean>(false);
     const [student, setStudent] = useState<any>({});
     const [paySimpleInfo, setPaySimpleInfo] = useState<any>({});
     const [billingInfo, setBillingInfo] = useState<any>({});
@@ -68,7 +70,6 @@ const ViewStudent = () => {
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const { uid, studioid } = useParams<{ uid: string; studioid: any }>();
 
-   
     const navigate = useNavigate();
 
     const handleGoToPayments = () => {
@@ -274,73 +275,78 @@ const ViewStudent = () => {
         scrollTop();
     }, []);
 
-
     const handleDeleteFromClass = (classID: any) => {
-        showWarningMessage('Are you sure you want to remove this student from this class?', 'Remove Student From Class', 'Your student has been removed from the class').then((confirmed: boolean) => {
-            if (confirmed) {
-                // User confirmed the action
-                const studentID: any = unHashTheID(uid);
-                dropStudentFromClass(studentID, classID).then((response) => {
-                    if (response) {
-                        setUpdateClasses(!updateClasses);
-                    }
-                });
-            } else {
-                // User canceled the action
-                console.log('User canceled');
-            }
-        }).catch((error) => {
-            // Handle error if any
-            console.error('Error:', error);
-        });
+        showWarningMessage('Are you sure you want to remove this student from this class?', 'Remove Student From Class', 'Your student has been removed from the class')
+            .then((confirmed: boolean) => {
+                if (confirmed) {
+                    // User confirmed the action
+                    const studentID: any = unHashTheID(uid);
+                    dropStudentFromClass(studentID, classID).then((response) => {
+                        if (response) {
+                            setUpdateClasses(!updateClasses);
+                        }
+                    });
+                } else {
+                    // User canceled the action
+                    console.log('User canceled');
+                }
+            })
+            .catch((error) => {
+                // Handle error if any
+                console.error('Error:', error);
+            });
     };
 
     const handleDeleteFromProgram = (programId: any) => {
-        showWarningMessage('Are you sure you want to remove this student from this program?', 'Remove Student From Program', 'Your student has been removed from the program').then((confirmed: boolean) => {
-            if (confirmed) {
-                // User confirmed the action
-                const studentId: any = unHashTheID(uid);
-                dropStudentFromProgram(programId, studentId).then((response) => {
-                    if (response) {
-                        setUpdateClasses(!updateClasses);
-                    }
-                });
-            } else {
-                // User canceled the action
-                console.log('User canceled');
-            }
-        }).catch((error) => {
-            // Handle error if any
-            console.error('Error:', error);
-        });
+        showWarningMessage('Are you sure you want to remove this student from this program?', 'Remove Student From Program', 'Your student has been removed from the program')
+            .then((confirmed: boolean) => {
+                if (confirmed) {
+                    // User confirmed the action
+                    const studentId: any = unHashTheID(uid);
+                    dropStudentFromProgram(programId, studentId).then((response) => {
+                        if (response) {
+                            setUpdateClasses(!updateClasses);
+                        }
+                    });
+                } else {
+                    // User canceled the action
+                    console.log('User canceled');
+                }
+            })
+            .catch((error) => {
+                // Handle error if any
+                console.error('Error:', error);
+            });
     };
 
     const handleRemoveFromList = (waitingListId: any) => {
-        showWarningMessage('Are you sure you want to remove this student from this waiting list?', 'Remove Student From Waiting List', 'Your student has been removed from the waiting list').then((confirmed: boolean) => {
-            if (confirmed) {
-                // User confirmed the action
-                const studentId: any = unHashTheID(uid);
-                const listID = waitingListId[0]
-                dropStudentFromWaitingList(studentId, listID).then((response) => {
-                    if (response) {
-                        setUpdateClasses(!updateClasses);
-                    }
-                });
-            } else {
-                // User canceled the action
-                console.log('User canceled');
-            }
-        }).catch((error) => {
-            // Handle error if any
-            console.error('Error:', error);
-        });
+        showWarningMessage('Are you sure you want to remove this student from this waiting list?', 'Remove Student From Waiting List', 'Your student has been removed from the waiting list')
+            .then((confirmed: boolean) => {
+                if (confirmed) {
+                    // User confirmed the action
+                    const studentId: any = unHashTheID(uid);
+                    const listID = waitingListId[0];
+                    dropStudentFromWaitingList(studentId, listID).then((response) => {
+                        if (response) {
+                            setUpdateClasses(!updateClasses);
+                        }
+                    });
+                } else {
+                    // User canceled the action
+                    console.log('User canceled');
+                }
+            })
+            .catch((error) => {
+                // Handle error if any
+                console.error('Error:', error);
+            });
     };
 
     const [hasedRefID, setHasedRefID] = useState<any>(null);
 
     const handleTest = () => {
-        console.log("testing")
-    }
+        console.log('testing');
+    };
 
     useEffect(() => {
         if (!student) return;
@@ -424,6 +430,18 @@ const ViewStudent = () => {
                                 <li>
                                     <SendQuickEmail student={student} />
                                 </li>
+                                {new Date(student?.NextContactDate) <= new Date() && (
+                                    <li>
+                                        <ViewStudentActionItem
+                                            student={student}
+                                            pipeline={pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(student?.StudentPipelineStatus ?? ''))}
+                                            studioOptions={studioOptions}
+                                            setUpdate={setUpdate}
+                                            update={update}
+                                        />
+                                    </li>
+                                )}
+
                                 <li>
                                     <Tippy content="Update Barcode">
                                         <Link to="/students/update-barcode" className="btn btn-warning flex items-center justify-center rounded-full w-10 h-10 p-0">
@@ -605,7 +623,9 @@ const ViewStudent = () => {
                                                             <span className="text-danger">{schedule?.ScheduleStatus}</span>
                                                         )}
 
-                                                        <span className="block text-white-dark dark:text-white-light">{formatDate(schedule?.CreatedOn)} - {formatDate(schedule?.EndDate)}</span>
+                                                        <span className="block text-white-dark dark:text-white-light">
+                                                            {formatDate(schedule?.CreatedOn)} - {formatDate(schedule?.EndDate)}
+                                                        </span>
                                                     </h6>
                                                     <div className="flex items-start justify-between ltr:ml-auto rtl:mr-auto">
                                                         <p className="font-semibold">${parseInt(schedule?.PaymentAmount)?.toFixed(2)}</p>
@@ -679,9 +699,9 @@ const ViewStudent = () => {
                             {programs?.map((programItem: any, index: any) => (
                                 <div key={index} className="flex items-center justify-between">
                                     <h6 className="text-[#515365] font-semibold dark:text-white-dark">{programItem?.Name}</h6>
-                                    <button className="btn btn-danger btn-sm"
-                                    onClick={() => handleDeleteFromProgram(programItem?.ProgramId)}
-                                    >Remove</button>
+                                    <button className="btn btn-danger btn-sm" onClick={() => handleDeleteFromProgram(programItem?.ProgramId)}>
+                                        Remove
+                                    </button>
                                 </div>
                             ))}
                             {programs?.length === 0 && <div className="text-[#515365] dark:text-white-dark">None</div>}
@@ -695,9 +715,9 @@ const ViewStudent = () => {
                                 <div key={index} className="">
                                     <div key={index} className="flex items-center justify-between">
                                         <h6 className="text-[#515365] font-semibold dark:text-white-dark">{listItem?.Title}</h6>
-                                        <button className="btn btn-danger btn-sm"
-                                        onClick={() => handleRemoveFromList(listItem?.WaitingListId)}
-                                        >Remove</button>
+                                        <button className="btn btn-danger btn-sm" onClick={() => handleRemoveFromList(listItem?.WaitingListId)}>
+                                            Remove
+                                        </button>
                                     </div>
                                 </div>
                             ))}

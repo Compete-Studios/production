@@ -1021,6 +1021,7 @@ export const getProspectsByPipelineStep = async (pipelineStepId, studioId) => {
 };
 
 export const updateProspectPipelineStatus = async (data) => {
+    console.log(data)
     try {
         const response = await fetchData(`marketing-access/updateProspectPipelineStatus`, 'post', data);
         return response;

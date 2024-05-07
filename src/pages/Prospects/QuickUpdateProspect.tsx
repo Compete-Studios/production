@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { UserAuth } from '../../../context/AuthContext';
-import { getStudentInfo, updateStudentNotes, updateStudentPipelineStatus } from '../../../functions/api';
+import { useEffect, useState } from 'react';
+import { updateProspectPipelineStatus, updateStudentPipelineStatus } from '../../functions/api';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
-import { constFormateDateMMDDYYYY, formatDate, showErrorMessage, showMessage } from '../../../functions/shared';
+import { constFormateDateMMDDYYYY, formatDate, showErrorMessage, showMessage } from '../../functions/shared';
 
-export default function QuickUpdate({ student, setShowActionModal, update, setUpdate }: any) {
-    const { pipelineSteps }: any = UserAuth();
+export default function QuickUpdateProspect({ student, setShowActionModal, update, setUpdate, pipelineSteps, isPrpospect = false }: any) {
     const [studentToUpdate, setStudentToUpdate] = useState<any>(student);
     const [currentPipeline, setCurrentPipeline] = useState<any>([]);
     const [staffInitials, setStaffInitials] = useState<any>('');
@@ -14,20 +12,23 @@ export default function QuickUpdate({ student, setShowActionModal, update, setUp
     const [newNotes, setNewNotes] = useState<any>('');
     const currentDate = new Date();
     const noteDate = `${currentDate.getMonth() + 1}/${currentDate.getDate()}/${currentDate.getFullYear() % 100}`;
-    
+
+    console.log('student', student);
+
     useEffect(() => {
         setStudentToUpdate(student);
-        const statusIDAsNumber = parseInt(student.StudentPipelineStatus);
+        const statusIDAsNumber = parseInt(student.CurrentPipelineStatus);
         setCurrentPipeline(statusIDAsNumber);
         setNewContactDate(student.NextContactDate);
-    }, [student]);
+    }, [student.Student_id]);
 
     const handleUpdateStudent = async (e: any) => {
         e.preventDefault();
-        const newNote = noteDate + ' ' + staffInitials + ' ' + newNotes + '\n' + student.notes;
+        const currentNotes = student.Notes ? student.Notes : '';
+        const newNote = noteDate + ' ' + staffInitials + ' ' + newNotes + '\n' + currentNotes;
         const formatedDate = formatDate(newContactDate);
         const data = {
-            studentId: student.StudentId,
+            prospectId: student.ProspectId,
             pipelineStatus: currentPipeline,
             nextContactDate: formatedDate,
             notes: newNote,
@@ -44,7 +45,27 @@ export default function QuickUpdate({ student, setShowActionModal, update, setUp
         }
     };
 
-    console.log(currentPipeline);
+    const handleUpdateProspect = async (e: any) => {
+        e.preventDefault();
+        const newNote = noteDate + ' ' + staffInitials + ' ' + newNotes + '\n' + student.Notes;
+        const formatedDate = formatDate(newContactDate);
+        const data = {
+            prospectId: student.ProspectId,
+            pipelineStatus: currentPipeline,
+            nextContactDate: formatedDate,
+            notes: newNote,
+        };
+        const updatePipelineStatus = await updateProspectPipelineStatus(data);
+
+        if (updatePipelineStatus.status === 200) {
+            showMessage('Student Updated Successfully');
+            setShowActionModal(false);
+            setUpdate(!update);
+        } else {
+            console.log('Error updating student');
+            showErrorMessage('Error updating student');
+        }
+    };
 
     return (
         <div className="space-y-4">
@@ -72,7 +93,11 @@ export default function QuickUpdate({ student, setShowActionModal, update, setUp
             </div>
             <div>
                 <label htmlFor="contactDate">Next Contact Date</label>
-                <Flatpickr value={newContactDate} className="form-input" options={{ dateFormat: 'm-d-Y', position: 'auto right' }} onChange={(date: any) => setNewContactDate(date)} />
+                <Flatpickr 
+                value={newContactDate} 
+                className="form-input" 
+                options={{ dateFormat: 'm-d-Y', position: 'auto right' }} 
+                onChange={(date: any) => setNewContactDate(date)} />
             </div>
             <div>
                 <input type="text" className="form-input w-full" placeholder="Staff Initials" value={staffInitials} onChange={(e) => setStaffInitials(e.target.value)} />
@@ -81,7 +106,7 @@ export default function QuickUpdate({ student, setShowActionModal, update, setUp
                 <textarea className="form-textarea w-full" placeholder="Add a note" rows={4} value={newNotes} onChange={(e) => setNewNotes(e.target.value)} />
             </div>
             <div className="w-full">
-                <button className="btn btn-info ml-auto" onClick={handleUpdateStudent}>
+                <button className="btn btn-info ml-auto" onClick={isPrpospect ? handleUpdateProspect : handleUpdateStudent}>
                     Update Student
                 </button>
             </div>

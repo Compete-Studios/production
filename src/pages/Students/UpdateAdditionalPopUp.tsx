@@ -35,7 +35,7 @@ interface StudentInfo {
 }
 
 export default function UpdateAdditionalPopUp({ student }: any) {
-    const { marketingSources, suid } = UserAuth();
+    const { marketingSources, suid }: any = UserAuth();
     const [showUpdateModal, setUpdateModal] = useState(false);
     const [originalRank, setOriginalRank] = useState<any>('');
     const [allRanks, setAllRanks] = useState<any>([]);
@@ -231,7 +231,7 @@ export default function UpdateAdditionalPopUp({ student }: any) {
                                                     />
                                                 </div>
 
-                                                <div className="sm:col-span-full">
+                                                {/* <div className="sm:col-span-full">
                                                     <label htmlFor="notes">Notes</label>
                                                     <textarea
                                                         id="notes"
@@ -241,7 +241,7 @@ export default function UpdateAdditionalPopUp({ student }: any) {
                                                         className="form-textarea"
                                                         onChange={(e) => setStudentToUpdate({ ...studentToUpdate, notes: e.target.value })}
                                                     />
-                                                </div>
+                                                </div> */}
                                                 <div>
                                                     <label htmlFor="rank">Rank</label>
                                                     <select value={rank} className="form-select" onChange={(e) => setRank(e.target.value)}>

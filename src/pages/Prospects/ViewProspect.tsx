@@ -88,7 +88,7 @@ const ViewProspect = () => {
     const handleSaveNotes = () => {
         const noteData = {
             prospectId: unHashTheID(uid),
-            notes: student?.notes,
+            notes: student?.Notes,
         };
         console.log(noteData);
         updateProspectNotes(noteData);
@@ -176,6 +176,8 @@ const ViewProspect = () => {
             navigate('/404');
         }
     }, [uid, studioid, suid]);
+
+    console.log(unHashTheID(uid), "ID")
 
     useEffect(() => {
         // getStudentBarcode(unHashTheID(uid));
@@ -488,7 +490,7 @@ const ViewProspect = () => {
                                     Save Notes
                                 </button>
                             ) : (
-                                <AddProspectNotesModal student={student} setStudent={setStudent} studenID={unHashTheID(uid)} />
+                                <AddProspectNotesModal student={student} setStudent={setStudent} studentID={unHashTheID(uid)} />
                             )}
                         </div>
 

@@ -39,7 +39,7 @@
         console.log(sid, hsid, fid)
 
         // // Redirect to another page with the parameters
-        window.location.href = `https://compete-f8fc5.web.app/compete-forms/${sid}/${fid}`;
+        window.location.href = `https://forms.competestudio.com/${sid}/${fid}`;
     </script>
 </body>
 </html>

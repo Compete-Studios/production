@@ -7,7 +7,7 @@ import IconUsers from '../../components/Icon/IconUsers';
 import IconEdit from '../../components/Icon/IconEdit';
 import { Link } from 'react-router-dom';
 import { deleteStudentPipelineStep } from '../../functions/api';
-import { showWarningMessage } from '../../functions/shared';
+import { showCreationAlert, showWarningMessage } from '../../functions/shared';
 
 export default function StudentPipeline() {
     const { pipelineSteps, suid, update, setUpdate }: any = UserAuth();
@@ -32,7 +32,10 @@ export default function StudentPipeline() {
             });
     };
 
-    console.log(pipelineSteps);
+    const handleAlert = async () => {
+        const response = await showCreationAlert(10);
+        console.log(response);
+    };
 
     return (
         <div className="panel px-0 pb-0 border-white-light dark:border-[#1b2e4b]">
@@ -52,7 +55,7 @@ export default function StudentPipeline() {
                 </div>
             </div>
             <div className="table-responsive">
-                <table className="table-hover">
+                <table className="table-striped">
                     <thead>
                         <tr>
                             <th>Pipeline Step</th>
@@ -82,8 +85,8 @@ export default function StudentPipeline() {
                                             </Link>
                                         </Tippy>
                                         <Tippy content="Delete Step">
-                                        <button type="button" onClick={() => handleDeleteStep(data.PipelineStepId)}>
-                                        <IconTrash className="w-5 h-5 text-danger hover:text-red-800" />
+                                            <button type="button" onClick={() => handleDeleteStep(data.PipelineStepId)}>
+                                                <IconTrash className="w-5 h-5 text-danger hover:text-red-800" />
                                             </button>
                                         </Tippy>
                                     </td>
@@ -97,7 +100,7 @@ export default function StudentPipeline() {
                 <div className="flex items-center justify-center h-40">
                     <div>
                         <p className="text-lg text-danger">No Student Pipeline steps found</p>
-                        <button className="text-info gap-2 mt-2 w-full flex items-center justify-center">
+                        <button className="text-info gap-2 mt-2 w-full flex items-center justify-center" onClick={handleAlert}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-box-arrow-right" viewBox="0 0 16 16">
                                 <path
                                     fill-rule="evenodd"

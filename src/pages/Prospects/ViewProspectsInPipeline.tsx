@@ -58,7 +58,7 @@ export default function ViewStudentsInPipeline() {
         <>
             <ul className="flex space-x-2 rtl:space-x-reverse">
                 <li>
-                    <Link to="/students/student-pipeline" className="text-primary hover:underline">
+                    <Link to="/prospects/prospect-pipeline" className="text-primary hover:underline">
                         Prospect Pipeline
                     </Link>
                 </li>

@@ -11,6 +11,9 @@ import AddEditClass from './AddEditClass';
 import ViewClass from './ViewClass';
 import IconUsers from '../../components/Icon/IconUsers';
 import { dropClassByClassID } from '../../functions/api';
+import IconSearch from '../../components/Icon/IconSearch';
+import IconUserPlus from '../../components/Icon/IconUserPlus';
+import IconPlus from '../../components/Icon/IconPlus';
 
 export default function ViewClasses() {
     const { classes, suid, update, setUpdate }: any = UserAuth();
@@ -89,103 +92,78 @@ export default function ViewClasses() {
     }, [sortStatus]);
 
     return (
-        <>
-            <div className="panel px-0 border-white-light dark:border-[#1b2e4b]">
-                <div className="invoice-table">
-                    <div className="mb-4.5 px-5 flex md:items-center md:flex-row flex-col gap-5">
-                        <h5 className="font-semibold text-lg dark:text-white-light">View Classes</h5>
-
-                        <div className="flex items-center gap-2">
-                            <div className="">
-                                <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
-                            </div>
-                        </div>
-
-                        <div className="gap-2 ltr:ml-auto rtl:mr-auto">
-                            <AddEditClass />
-                        </div>
+        <div>
+            <div className="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                    <h2 className="text-xl">Classes</h2>
+                </div>
+                <div className="flex sm:flex-row flex-col sm:items-center sm:gap-3 gap-4 w-full sm:w-auto">
+                    <div className="flex gap-3">
+                        <AddEditClass />
                     </div>
-
-                    <div className="datatables pagination-padding">
-                        <DataTable
-                            className={`whitespace-nowrap table-hover invoice-table`}
-                            records={records}
-                            columns={[
-                                {
-                                    accessor: 'name',
-                                    sortable: true,
-                                    render: ({ Name }: { Name: any }) => (
-                                        <div className="flex items-center font-semibold">
-                                            <div>{Name}</div>
-                                        </div>
-                                    ),
-                                },
-                                {
-                                    accessor: 'enrollment',
-                                    title: 'Enrollment',
-                                    sortable: true,
-                                },
-                                {
-                                    accessor: 'prospectEnrollment',
-                                    title: 'Prospects',
-                                    sortable: true,
-                                },
-                                {
-                                    accessor: 'EnrollmentLimit',
-                                    title: 'Limit',
-                                    sortable: true,
-                                },
-                                {
-                                    accessor: 'status',
-                                    sortable: false,
-                                    render: ({ EnrollmentLimit, enrollment, prospectEnrollment }: { EnrollmentLimit: any; enrollment: any; prospectEnrollment: any }) => (
-                                        <span className={`badge badge-outline-alert ${EnrollmentLimit < enrollment + prospectEnrollment && 'badge- badge-outline-danger'} `}>
-                                            {EnrollmentLimit < enrollment + prospectEnrollment ? 'Over Enrolled' : null}
-                                        </span>
-                                    ),
-                                },
-                                {
-                                    accessor: 'action',
-                                    title: 'Actions',
-                                    sortable: false,
-                                    textAlignment: 'center',
-                                    render: ({ ClassId }: { ClassId: any }) => (
-                                        <div className="flex gap-4 items-center w-max mx-auto ">
-                                            <ViewClass classId={ClassId} />
-
-                                            <AddEditClass classId={ClassId} editClass={true} />
-                                            <Tippy content="View Roster">
-                                                <NavLink to={`/classes/view-roster/${ClassId}/${suid}`} className="flex hover:text-orange-800 text-orange-600">
-                                                    <IconUsers />
-                                                </NavLink>
-                                            </Tippy>
-                                            {/* <NavLink to="" className="flex"> */}
-                                            <Tippy content="Delete Class">
-                                                <button type="button" className="flex text-danger hover:text-danger" onClick={(e) => deleteRow(ClassId)}>
-                                                    <IconTrashLines />
-                                                </button>
-                                            </Tippy>
-                                            {/* </NavLink> */}
-                                        </div>
-                                    ),
-                                },
-                            ]}
-                            highlightOnHover
-                            totalRecords={initialRecords.length}
-                            recordsPerPage={pageSize}
-                            page={page}
-                            onPageChange={(p) => setPage(p)}
-                            recordsPerPageOptions={PAGE_SIZES}
-                            onRecordsPerPageChange={setPageSize}
-                            sortStatus={sortStatus}
-                            onSortStatusChange={setSortStatus}
-                            // selectedRecords={selectedRecords}
-                            // onSelectedRecordsChange={setSelectedRecords}
-                            paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
-                        />
+                    <div className="relative">
+                        <input type="text" placeholder="Search Classes" className="form-input py-2 ltr:pr-11 rtl:pl-11 peer" value={search} onChange={(e) => setSearch(e.target.value)} />
+                        <button type="button" className="absolute ltr:right-[11px] rtl:left-[11px] top-1/2 -translate-y-1/2 peer-focus:text-primary">
+                            <IconSearch className="mx-auto" />
+                        </button>
                     </div>
                 </div>
             </div>
-        </>
+            <div className="mt-5 panel p-0 border-0 overflow-hidden">
+                <div className="table-responsive">
+                    <table className="table-striped ">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Enrollment</th>
+                                <th>Prospects</th>
+                                <th>Limit</th>
+                                <th className="!text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {records?.map((rec: any) => {
+                                return (
+                                    <tr key={rec.ClassId} className={`${rec.EnrollmentLimit < rec.enrollment + rec.prospectEnrollment && 'bg-cs'}`}>
+                                        <td>
+                                            <div className="flex items-center w-max">
+                                                <div>{rec.Name}</div>
+                                            </div>
+                                        </td>
+                                        <td>{rec.enrollment || 0}</td>
+                                        <td>{rec.prospectEnrollment || 0}</td>
+                                        <td>{rec.EnrollmentLimit || 0}</td>
+                                        <td>
+                                            <div className="flex gap-4 items-center justify-center">
+                                                <Link to={`/students/view-student/`} type="button" className="btn btn-sm btn-outline-info">
+                                                    View
+                                                </Link>
+                                                {/* <Link to="/students/edit-student" type="button" className="btn btn-sm btn-outline-primary" onClick={() => editUser(contact)}>
+                                                    Edit
+                                                </Link> */}
+                                                <Link to="/students/delete-student" type="button" className="btn btn-sm btn-outline-danger">
+                                                    Delete
+                                                </Link>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+                {records?.length === 0 && (
+                    <div className="flex items-center justify-center h-40">
+                        <div className="text-center">
+                            <p className="text-lg text-danger">No Students found</p>
+                            <button className="btn btn-info gap-2 mt-2 w-full flex items-center justify-center">
+                                <IconPlus />
+                                Add a Class
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
     );
 }

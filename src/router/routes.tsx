@@ -1,7 +1,6 @@
 import { lazy } from 'react';
 import ProtectedRoute from './ProtectedRoutes';
 
-
 const LoginBoxed = lazy(() => import('../pages/Authentication/LoginBoxed'));
 const RegisterBoxed = lazy(() => import('../pages/Authentication/RegisterBoxed'));
 const Error = lazy(() => import('../components/Error'));
@@ -82,6 +81,7 @@ const AddPaymentSchedule = lazy(() => import('../pages/Students/AddPaymentSchedu
 const AddABillingAccount = lazy(() => import('../pages/Students/AddABillingAccount'));
 const FinishedAddingAccountOptions = lazy(() => import('../pages/Students/FinishedAddingAccountOptions'));
 
+const PasswordReset = lazy(() => import('../pages/Studios/PasswordReset'));
 
 const CompeteLegacyForms = lazy(() => import('../pages/Forms/CompeteLegacyForms'));
 const Methods = lazy(() => import('../pages/Marketing/Methods'));
@@ -130,14 +130,13 @@ const AddProspectsToEmailList = lazy(() => import('../pages/Prospects/AddProspec
 const ActivateAsStudent = lazy(() => import('../pages/Prospects/ActivateAsStudent'));
 const ViewProspect = lazy(() => import('../pages/Prospects/ViewProspect'));
 
-
 const routes = [
     //Authentication
     {
         path: '/auth/signin',
         element: <LoginBoxed />,
         layout: 'blank',
-    },  
+    },
     {
         path: '/',
         element: <HomeMain />,
@@ -594,6 +593,11 @@ const routes = [
     {
         path: '/performances/edit-performance',
         element: <EditPerformance />,
+    },
+    //studios
+    {
+        path: '/studios/password-reset/:id',
+        element: <PasswordReset />,
     },
 
     //other

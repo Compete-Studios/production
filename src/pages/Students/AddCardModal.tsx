@@ -122,11 +122,12 @@ export default function AddCardModal({ student, paySimpleID, cards, update, setU
             <div className="flex items-center justify-center">
                 {inStudent ? (
                     <Tippy content="Add Credit Card">
-                        <button className="btn btn-dark flex items-center justify-center rounded-full w-10 h-10 p-0" onClick={() => setModal(true)}>
+                        <button className="uppercase font-lg font-bold w-full hover:bg-dark-light p-4 text-left flex items-center gap-4 whitespace-nowrap" onClick={() => setModal(true)}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-credit-card-2-front" viewBox="0 0 16 16">
                                 <path d="M14 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" />
                                 <path d="M2 5.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5" />
                             </svg>
+                            Add Credit Card
                         </button>
                     </Tippy>
                 ) : cards?.length === 0 || !cards ? (

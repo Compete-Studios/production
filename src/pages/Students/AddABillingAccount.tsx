@@ -21,7 +21,7 @@ const billingInfoInit = {
 };
 
 export default function AddABillingAccount() {
-    const { suid } = UserAuth();
+    const { suid }: any = UserAuth();
     const [billingInfo, setBillingInfo] = useState<any>(billingInfoInit);
     const [studentInfo, setStudentInfo] = useState<any>({});
     const [studentID, setStudentID] = useState<number>(0);

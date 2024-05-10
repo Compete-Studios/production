@@ -1,5 +1,9 @@
 import { lazy } from 'react';
 import ProtectedRoute from './ProtectedRoutes';
+import Forms from '../pages/Marketing/Forms';
+
+const Birthdays = lazy(() => import('../pages/Reports/Birthday'));
+const DNS = lazy(() => import('../pages/Reports/DNS'));
 
 const LoginBoxed = lazy(() => import('../pages/Authentication/LoginBoxed'));
 const RegisterBoxed = lazy(() => import('../pages/Authentication/RegisterBoxed'));
@@ -147,6 +151,11 @@ const routes = [
         element: <RegisterBoxed />,
         layout: 'blank',
     },
+    {
+        path: '/form/:id',
+        element: <Forms />,
+        layout: 'blank',
+    },
     //payments
     {
         path: '/payments/search-payments',
@@ -208,6 +217,18 @@ const routes = [
         path: '/payments/view-late-payment/:stud/:id',
         element: <ViewLatePayment />,
     },
+
+    //reports
+    {
+        path: '/reports/birthday',
+        element: <Birthdays />,
+    },
+    {
+        path: '/reports/dns-reports',
+        element: <DNS />,
+    },
+
+
 
     //classes
     {

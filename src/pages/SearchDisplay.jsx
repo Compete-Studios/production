@@ -22,8 +22,6 @@ export default function SearchDisplay() {
         navigate(`/prospects/view-prospect/${hashedStudentId}/${hashedSUID}`);
     };
 
-    console.log(searchedStudentsAndProspects);
-
     return (
         <div className="grid 2xl:grid-cols-2 grid-cols-12 gap-x-2">
             <div className='2xl:col-span-1 col-span-7'>

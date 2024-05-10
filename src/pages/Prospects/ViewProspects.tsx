@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { UserAuth } from "../../context/AuthContext";
 import { searchProspects } from "../../functions/api";
-import { convertPhone } from "../../functions/shared";
+import { convertPhone, hashTheID } from "../../functions/shared";
 
 const initDisplay = {
   FName: false,
@@ -40,7 +40,7 @@ const initValues = {
 };
 
 export default function ViewProspects() {
-  const { suid, setStudentToEdit } = UserAuth();
+  const { suid, setStudentToEdit }: any = UserAuth();
 
   const [displayedStudents, setDisplayedStudents] = useState([]);
   const [display, setDisplay] = useState(initDisplay);
@@ -77,13 +77,17 @@ export default function ViewProspects() {
   };
   const navigate = useNavigate();
 
-  const handleStudentToEdit = (id: any) => {
-    setStudentToEdit(id);
-    navigate("/students/view-student");
-  };
+ 
+
+  const handleViewProspect= (id: any) => {
+    const hashedStudentId = hashTheID(id);
+    const hashedSUID = hashTheID(suid);
+    navigate(`/prospects/view-prospect/${hashedStudentId}/${hashedSUID}`);
+};
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 panel">
+    <div className="panel p-0">
+      <div className="px-5">
       <div className="sm:flex sm:items-center ">
         <div className="sm:flex-auto">
           <h1 className="text-base font-semibold leading-6 text-gray-900">
@@ -116,6 +120,7 @@ export default function ViewProspects() {
           </div>
           <label
             htmlFor="first-name"
+            className=" whitespace-nowrap"
             
           >
             First name
@@ -300,41 +305,28 @@ export default function ViewProspects() {
           Search
         </button>
       </div>
-      <div className="mt-8 flow-root">
-        <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-          <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-              <table className="min-w-full divide-y divide-gray-300">
+      </div>
+      <div className="mt-8 ">
+        
+            <div className="table-responsive">
+              <table className="table-striped">
                 <thead className="bg-gray-50">
                   <tr>
                     <th
-                      scope="col"
-                      className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 "
                     >
                       Name
                     </th>
                     <th
-                      scope="col"
-                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 hidden sm:table-cell"
                     >
                       Email
                     </th>
                     <th
-                      scope="col"
-                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 hidden sm:table-cell"
                     >
                       Phone
                     </th>
 
                     <th
-                      scope="col"
-                      className="relative py-3.5 pl-3 pr-4 sm:pr-6"
-                    >
-                      <span className="sr-only">Edit</span>
-                    </th>
-                    <th
-                      scope="col"
-                      className="relative py-3.5 pl-3 pr-4 sm:pr-6"
+                    className="text-right"
                     >
                       <span className="sr-only">Edit</span>
                     </th>
@@ -344,41 +336,43 @@ export default function ViewProspects() {
                   {displayedStudents?.length > 0 ?
                     displayedStudents?.map((person: any) => (
                       <tr key={person.ProspectId}>
-                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                          {person.FName} {person.LName}
+                        <td className="">
+                        {person.LName}, {person.FName} 
                         </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 hidden sm:table-cell">
+                        <td className="">
                           {person.Email}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 hidden sm:table-cell">
+                        <td className="">
                           {convertPhone(person.Phone)}
                         </td>
 
-                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                          <button
-                            className="text-com hover:text-indigo-900"
-                            onClick={() =>
-                              handleStudentToEdit(person.Student_id)
-                            }
+                        
+                        <td className="text-right flex items-center justify-end gap-2">
+                        <button
+                            className="btn btn-info"
+                            onClick={() => handleViewProspect(person.ProspectId)}
                           >
                             View<span className="sr-only">, {person.name}</span>
                           </button>
-                        </td>
-                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                          <a
-                            href="#"
-                            className="text-alert hover:text-alerthover"
+                          <button
+                            className="btn btn-danger"
                           >
                             Delete
                             <span className="sr-only">, {person.name}</span>
-                          </a>
+                          </button>
+                          <button
+                            className="btn btn-warning"
+                          >
+                            Activate as Student
+                            <span className="sr-only">, {person.name}</span>
+                          </button>
                         </td>
                       </tr>
                     )) : (
                     <tr>
                       <td
-                        colSpan="5"
-                        className="text-center py-4 text-sm font-medium text-gray-900"
+                        colSpan={5}
+                        className="text-center "
                       >
                         No prospects found
                       </td>
@@ -387,38 +381,9 @@ export default function ViewProspects() {
                 </tbody>
               </table>
             </div>
-          </div>
-          {/* <nav
-            className="flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6"
-            aria-label="Pagination"
-          >
-            <div className="hidden sm:block">
-              <p className="text-sm text-gray-700">
-                Showing <span className="font-medium">{startIndex + 1}</span> to{" "}
-                <span className="font-medium">
-                  {endIndex > students?.length ? students?.length : endIndex}
-                </span>{" "}
-                of <span className="font-medium">{students?.length}</span>{" "}
-                results
-              </p>
-            </div>
-            <div className="flex flex-1 justify-between sm:justify-end">
-              <button
-                className="relative inline-flex items-center rounded-md  px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0 bg-white"
-                onClick={() => handlePageChange(currentPage - 1)}
-              >
-                Previous
-              </button>
-              <button
-                href="#"
-                className="relative ml-3 inline-flex items-center rounded-md  px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0 bg-white"
-                onClick={() => handlePageChange(currentPage + 1)}
-              >
-                Next
-              </button>
-            </div>
-          </nav> */}
-        </div>
+          
+         
+       
       </div>
     </div>
   );

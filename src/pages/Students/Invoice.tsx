@@ -23,7 +23,7 @@ const invoiceInit = {
 };
 
 const Invoice = () => {
-    const { studioInfo, suid } = UserAuth();
+    const { studioInfo, suid }: any = UserAuth();
     const [student, setStudent] = useState<any>(null);
     const [invoiceData, setInvoiceData] = useState<any>(invoiceInit);
     const [sendEmail, setSendEmail] = useState(true);

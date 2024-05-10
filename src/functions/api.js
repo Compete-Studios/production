@@ -1,5 +1,25 @@
 import fetchData from './fetchdata';
 
+export const getBirthdaysByStudioId = async (studioId, index) => {
+    try {
+        const response = await fetchData(`student-access/getBirthdays/${studioId}/${index}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
+export const getDNSReportForReport = async (studioId, date) => {
+    try {
+        const response = await fetchData(`studio-access/getDNSReport/${studioId}/${date}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
 export const addNewStudent = async (formData) => {
     try {
         const response = await fetchData('student-access/addStudent', 'post', formData);
@@ -1234,6 +1254,37 @@ export const getAttendanceByClassIdDate = async (classId, date, type) => {
 export const getProspectAttendanceByClassIdDate = async (classId, date, type) => {
     try {
         const response = await fetchData(`studio-access/getProspectAttendanceByClassIdDate/${classId}/${date}/${type}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+
+export const getWaiverByStudioId = async (studioId) => {
+    try {
+        const response = await fetchData(`waiver-access/getWaiverByStudioId/${studioId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const updateProspectByColumn = async (data) => {
+    try {
+        const response = await fetchData(`marketing-access/updateProspectByColumnname`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const updateStudentByColumn = async (data) => {
+    try {
+        const response = await fetchData(`student-access/updateStudentByColumnname`, 'post', data);
         return response;
     } catch (error) {
         console.error(error);

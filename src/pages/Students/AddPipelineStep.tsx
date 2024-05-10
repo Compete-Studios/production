@@ -12,7 +12,7 @@ export default function AddPipelineStep() {
     useEffect(() => {
         dispatch(setPageTitle('Add a Student Pipeline Step'));
     });
-    const { suid } = UserAuth();
+    const { suid }: any = UserAuth();
     const [pipelineStepName, setPipelineStepName] = useState<string>('');
     const [notes, setNotes] = useState<string>('');
     const [smsDefaultText, setSmsDefaultText] = useState<string>('');

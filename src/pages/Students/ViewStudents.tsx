@@ -79,6 +79,7 @@ const ViewStudents = () => {
             padding: '10px 20px',
         });
     };
+    
 
     return (
         <div>
@@ -97,6 +98,7 @@ const ViewStudents = () => {
             <div className="flex items-center justify-between flex-wrap gap-4">
                 <div>
                     <h2 className="text-xl">Students</h2>
+                    <p>*Students with a highlighted background need to renew payments.</p>
                 </div>
                 <div className="flex sm:flex-row flex-col sm:items-center sm:gap-3 gap-4 w-full sm:w-auto">
                     <div className="flex gap-3">

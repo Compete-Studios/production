@@ -106,7 +106,6 @@ export default function StudentsQuickPay({ student, suid, title = 'Quick Pay', i
         }
     };
 
-    console.log(cardToUse);
     const recordPayment = async () => {
         console.log('record payment');
 
@@ -143,8 +142,7 @@ export default function StudentsQuickPay({ student, suid, title = 'Quick Pay', i
     return (
         <div>
             <div>
-                <button type="button" className="btn btn-success w-full" onClick={() => setShowQuickPayModal(true)}>
-                    <IconDollarSignCircle className="ltr:mr-2 rtl:ml-2" />
+                <button className="uppercase font-lg font-bold w-full hover:bg-success-light p-4 text-left" onClick={() => setShowQuickPayModal(true)}>
                     {title}
                 </button>
             </div>

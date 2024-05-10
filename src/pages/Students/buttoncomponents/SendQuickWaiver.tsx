@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import IconX from '../../../components/Icon/IconX';
 import { UserAuth } from '../../../context/AuthContext';
 import { getTextLogsByStudioIdAndPhoneNumber, sendIndividualEmail } from '../../../functions/emails';
-import { sendAText } from '../../../functions/api';
+import { getWaiverByStudioId, sendAText } from '../../../functions/api';
 import { showErrorMessage, showMessage } from '../../../functions/shared';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -24,12 +24,12 @@ interface EmailData {
 const emailDataInit = {
     to: '',
     from: '',
-    subject: '',
+    subject: 'Waiver - Please Sign and Return',
     html: '',
     deliverytime: null,
 };
 
-export default function SendQuickEmail({ student }: any, prospect = false) {
+export default function SendQuickWaiver({ student }: any, prospect = false) {
     const { suid, studioOptions }: any = UserAuth();
     const [showEmailModal, setShowEmailModal] = useState<boolean>(false);
     const [emailData, setEmailData] = useState<EmailData>(emailDataInit);
@@ -72,11 +72,24 @@ export default function SendQuickEmail({ student }: any, prospect = false) {
         });
     };
 
+    const handleGetWaiver = async () => {
+        try {
+            const response = await getWaiverByStudioId(suid);
+            setEmailHtml(response?.recordset[0]?.WaiverBody);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    useEffect(() => {
+        handleGetWaiver();
+    }, []);
+
     return (
         <div>
             <div>
                 {prospect ? (
-                    <button className="uppercase font-lg font-bold w-full hover:bg-info-light p-4 text-left" onClick={() => setShowEmailModal(true)}>Email Prospect</button>
+                    <button className="uppercase font-lg font-bold w-full hover:bg-success-light p-4 text-left" onClick={() => setShowEmailModal(true)}>Send Waiver</button>
                 ) : (
                     <Tippy content="Send Email">
                         <button className="btn btn-danger flex items-center justify-center rounded-full w-10 h-10 p-0" onClick={() => setShowEmailModal(true)}>
@@ -143,7 +156,11 @@ export default function SendQuickEmail({ student }: any, prospect = false) {
                                             </div>
 
                                             <div className="h-fit">
-                                                <ReactQuill theme="snow" value={emailHtml} style={{ minHeight: '200px' }} onChange={setEmailHtml} />
+                                                <ReactQuill 
+                                                theme="snow" 
+                                                value={emailHtml} 
+                                                style={{ minHeight: '200px' }}
+                                                 onChange={setEmailHtml} />
                                             </div>
 
                                             <div>

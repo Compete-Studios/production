@@ -11,10 +11,6 @@ import IconCaretDown from '../Icon/IconCaretDown';
 import IconMenuDashboard from '../Icon/Menu/IconMenuDashboard';
 import IconMinus from '../Icon/IconMinus';
 import IconMenuChat from '../Icon/Menu/IconMenuChat';
-import IconMenuMailbox from '../Icon/Menu/IconMenuMailbox';
-import IconMenuTodo from '../Icon/Menu/IconMenuTodo';
-import IconMenuNotes from '../Icon/Menu/IconMenuNotes';
-import IconMenuScrumboard from '../Icon/Menu/IconMenuScrumboard';
 import IconMenuInvoice from '../Icon/Menu/IconMenuInvoice';
 import IconMenuCalendar from '../Icon/Menu/IconMenuCalendar';
 import IconMenuElements from '../Icon/Menu/IconMenuElements';
@@ -24,6 +20,7 @@ import IconMenuUsers from '../Icon/Menu/IconMenuUsers';
 import IconUserPlus from '../Icon/IconUserPlus';
 import { UserAuth } from '../../context/AuthContext';
 import IconMenuAuthentication from '../Icon/Menu/IconMenuAuthentication';
+import IconMenuForms from '../Icon/Menu/IconMenuForms';
 
 const Sidebar = () => {
     const { studioInfo, isMaster, masters, suid }: any = UserAuth();
@@ -228,6 +225,38 @@ const Sidebar = () => {
 
                             <li className="nav-item">
                                 <ul>
+                                <li className="nav-item">
+                                        <NavLink to="/prospects/prospect-pipeline" className="group">
+                                            <div className="flex items-center">
+                                                <IconMenuElements className="group-hover:!text-primary shrink-0" />
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Prospect Pipeline</span>
+                                            </div>
+                                        </NavLink>
+                                    </li>
+                                    <li className="nav-item">
+                                        <NavLink to="/prospects/view-prospects" className="group">
+                                            <div className="flex items-center">
+                                                <IconMenuUsers className="group-hover:!text-primary shrink-0" />
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Search Prospects</span>
+                                            </div>
+                                        </NavLink>
+                                    </li>
+                                    <li className="nav-item">
+                                        <NavLink to="/prospects/add-prospect" className="group">
+                                            <div className="flex items-center">
+                                                <IconUserPlus className="group-hover:!text-primary shrink-0" />
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Add Prospect</span>
+                                            </div>
+                                        </NavLink>
+                                    </li>
+                                    <li className="nav-item">
+                                        <NavLink to="/marketing/capture-forms" className="group">
+                                            <div className="flex items-center">
+                                                <IconMenuForms className="group-hover:!text-primary shrink-0" />
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Capture Forms</span>
+                                            </div>
+                                        </NavLink>
+                                    </li>
                                     <li className="nav-item">
                                         <NavLink to="/apps/chat" className="group">
                                             <div className="flex items-center">
@@ -260,30 +289,7 @@ const Sidebar = () => {
                                             </div>
                                         </NavLink>
                                     </li>
-                                    <li className="nav-item">
-                                        <NavLink to="/prospects/prospect-pipeline" className="group">
-                                            <div className="flex items-center">
-                                                <IconMenuElements className="group-hover:!text-primary shrink-0" />
-                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Prospect Pipeline</span>
-                                            </div>
-                                        </NavLink>
-                                    </li>
-                                    <li className="nav-item">
-                                        <NavLink to="/prospects/view-prospects" className="group">
-                                            <div className="flex items-center">
-                                                <IconMenuUsers className="group-hover:!text-primary shrink-0" />
-                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">View Prospects</span>
-                                            </div>
-                                        </NavLink>
-                                    </li>
-                                    <li className="nav-item">
-                                        <NavLink to="/prospects/add-prospect" className="group">
-                                            <div className="flex items-center">
-                                                <IconUserPlus className="group-hover:!text-primary shrink-0" />
-                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Add Prospect</span>
-                                            </div>
-                                        </NavLink>
-                                    </li>
+                                    
                                 </ul>
                             </li>
 
@@ -326,6 +332,22 @@ const Sidebar = () => {
                                             </div>
                                         </NavLink>
                                     </li>
+                                    {/* <li className="nav-item">
+                                        <NavLink to="/reports/birthday" className="group">
+                                            <div className="flex items-center">
+                                                <IconMenuCalendar className="group-hover:!text-primary shrink-0" />
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Birthday Reports</span>
+                                            </div>
+                                        </NavLink>
+                                    </li>
+                                    <li className="nav-item">
+                                        <NavLink to="/reports/dns-reports" className="group">
+                                            <div className="flex items-center">
+                                                <IconMenuCalendar className="group-hover:!text-primary shrink-0" />
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">DNS Reports</span>
+                                            </div>
+                                        </NavLink>
+                                    </li> */}
                                     {!isMaster && (
                                         <li className="menu nav-item">
                                             <button type="button" className={`${currentMenu === 'master' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('master')}>

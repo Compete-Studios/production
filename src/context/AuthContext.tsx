@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { auth, db } from '../firebase/firebase';
 import { REACT_API_BASE_URL } from '../constants';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 
 const UserContext: any = createContext<any>(null);
@@ -28,7 +28,7 @@ export default function AuthContextProvider({ children }: any) {
     const [selectedSuid, setSelectedSuid] = useState<any>('');
     const [metrics, setMetrics] = useState<any>([]);
     const [students, setStudents] = useState<any>([]);
-
+    const [fbForms, setFBForms] = useState<any>([]);
     const [update, setUpdate] = useState(false);
 
     const fetchData = async (url: any, setter: any) => {
@@ -163,11 +163,35 @@ export default function AuthContextProvider({ children }: any) {
         }
     };
 
+    const getFromsFromFirebaseWithStudioID = async (suid: any) => {
+        const idToString = suid.toString();
+
+        if (!idToString) {
+            return;
+        }
+        try {
+            const q = query(collection(db, 'forms'), where('studioID', '==', idToString));
+            const querySnapshot = await getDocs(q);
+            const forms: any = [];
+            querySnapshot.forEach((doc: any) => {
+                const dacData = {
+                    id: doc.id,
+                    ...doc.data(),
+                };
+                forms.push(dacData);
+            });
+            setFBForms(forms);
+        } catch (error) {
+            console.error('Error getting documents: ', error);
+        }
+    };
+
     useEffect(() => {
         setShowLoading(true);
         getData();
         getSCHDATA();
         setShowLoading(false);
+        getFromsFromFirebaseWithStudioID(suid);
     }, [suid, update]);
 
     useEffect(() => {
@@ -215,7 +239,8 @@ export default function AuthContextProvider({ children }: any) {
                 masters,
                 selectedSuid,
                 setSelectedSuid,
-                students
+                students,
+                fbForms
             }}
         >
             {children}

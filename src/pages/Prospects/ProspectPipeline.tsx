@@ -40,6 +40,8 @@ export default function ProspectPipeline() {
             });
     };
 
+    console.log(prospectPipelineSteps, "pipelinesteps")
+
     return (
         <div className="panel px-0 pb-0 border-white-light dark:border-[#1b2e4b]">
             <div className="mb-4.5 px-5 flex md:items-center md:flex-row flex-col gap-5">
@@ -58,7 +60,7 @@ export default function ProspectPipeline() {
                 </div>
             </div>
             <div className="table-responsive">
-                <table className="table-striped">
+                <table className="">
                     <thead className=''>
                         <tr>
                             <th>Pipeline Step</th>

@@ -75,7 +75,6 @@ export default function AddEditClass({ editClass = false, classId = null }) {
             //     endTime: getTimeOnlyfromZulueStamp(response.EndTime),
             //     roomId: response.RoomId,
             // });
-            console.log(response);
         });
     };
 

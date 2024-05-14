@@ -1,39 +1,60 @@
 import React, { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import 'flatpickr/dist/flatpickr.css';
-import { Tab } from '@headlessui/react';
 import IconX from '../../components/Icon/IconX';
-import IconBolt from '../../components/Icon/IconBolt';
-import IconMail from '../../components/Icon/IconMail';
-import IconMessage2 from '../../components/Icon/IconMessage2';
-import IconNotes from '../../components/Icon/IconNotes';
-import IconListCheck from '../../components/Icon/IconListCheck';
-import SendMail from './components/SendMail';
 import SendText from './components/SendText';
-import QuickUpdate from './components/QuickUpdate';
-import IconLink from '../../components/Icon/IconLink';
-import IconInfoCircle from '../../components/Icon/IconInfoCircle';
-import IconPlus from '../../components/Icon/IconPlus';
 
-export default function ActionItem({ student, pipeline, studioOptions, update, setUpdate }: any) {
-    const [showActionModal, setShowActionModal] = useState(false);
+export default function ActionItemText({ student, pipeline }: any) {
+    const [showTextActionModal, setTextShowActionModal] = useState(false);
     const [expandedDescription, setExpandedDescription] = useState(false);
     const [defaultTab, setDefaultTab] = useState(0);
 
     const description = pipeline?.Description || '';
 
+    const toggleDescription = () => {
+        setExpandedDescription(!expandedDescription);
+    };
 
-    console.log(student)
+    const renderDescription = () => {
+        if (!description) return null;
+
+        const lines = description.split('\n');
+        const maxLines = 3;
+
+        if (lines.length <= maxLines || expandedDescription) {
+            return (
+                <div>
+                    Description: <span className="text-primary">{description}</span>
+                    {expandedDescription && (
+                        <button className="text-info px-5 mt-1 underline" onClick={toggleDescription}>
+                            Read Less
+                        </button>
+                    )}
+                </div>
+            );
+        } else {
+            return (
+                <div>
+                    <p>
+                        Description: <span className="text-primary">{description?.slice(0, description.indexOf('\n', description.indexOf('\n') + 1))}</span>
+                        <button className="text-info px-5 mt-1 underline" onClick={toggleDescription}>
+                            Read more
+                        </button>
+                    </p>
+                </div>
+            );
+        }
+    };
 
     return (
         <div>
             <div className="flex items-center gap-2 justify-end">
-                <button type="button" className="btn btn-info btn-sm flex items-center gap-1" onClick={() => setShowActionModal(true)}>
-                    <IconBolt fill={true} className="h-4 w-4" /> Update Step
+                <button type="button" className="btn btn-danger btn-sm flex items-center gap-1" onClick={() => setTextShowActionModal(true)}>
+                    Send Text
                 </button>
             </div>
-            <Transition.Root show={showActionModal} as={Fragment}>
-                <Dialog className="relative z-50" onClose={setShowActionModal}>
+            <Transition.Root show={showTextActionModal} as={Fragment}>
+                <Dialog className="relative z-50" onClose={setTextShowActionModal}>
                     <div className="fixed inset-0" />
 
                     <div className="fixed inset-0 overflow-hidden">
@@ -56,15 +77,14 @@ export default function ActionItem({ student, pipeline, studioOptions, update, s
                                                     <div className="flex items-start justify-between space-x-3">
                                                         <div className="space-y-1">
                                                             <Dialog.Title className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ">
-                                                                Action Pipeline Step <span className="font-bold text-primary">{pipeline?.StepName}</span>{' '}
+                                                                Action Text <span className="font-bold text-primary">{pipeline?.StepName}</span>{' '}
                                                             </Dialog.Title>
                                                             <p className="text-sm text-gray-500">This action toolbar allows you to quickly email, text, add notes, or update the student step.</p>
                                                             <h4 className="text-lg font-medium text-gray-900 dark:text-white-dark pt-4">Student: <span className='text-secondary'>{student?.FName} {student?.LName}</span></h4> 
-                                                         
                                                         </div>
 
                                                         <div className="flex h-7 items-center">
-                                                            <button type="button" className="relative text-gray-400 hover:text-gray-500" onClick={() => setShowActionModal(false)}>
+                                                            <button type="button" className="relative text-gray-400 hover:text-gray-500" onClick={() => setTextShowActionModal(false)}>
                                                                 <span className="absolute -inset-2.5" />
                                                                 <span className="sr-only">Close panel</span>
                                                                 <IconX className="h-6 w-6" aria-hidden="true" />
@@ -74,11 +94,8 @@ export default function ActionItem({ student, pipeline, studioOptions, update, s
                                                 </div>
 
                                                 {/* Divider container */}
-                                                <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0 px-5 mt-8">
-                                                    <QuickUpdate 
-                                                    student={student} 
-                                                    setShowActionModal={setShowActionModal} 
-                                                    setUpdate={setUpdate} update={update} />
+                                                <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0">
+                                                    <SendText defaultText={pipeline} student={student} setDefaultTab={setDefaultTab} />
                                                 </div>
                                             </div>
                                         </form>

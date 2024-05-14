@@ -17,7 +17,7 @@ import { getStudentInfo } from '../../functions/api';
 import QuickUpdateShared from '../Students/components/QuickUpdateShared';
 
 export default function ActionItemForSchedule({ student, isStudent = false, update, setUpdate, studioOptions }: any) {
-    const { pipelineSteps } = UserAuth();
+    const { pipelineSteps }: any = UserAuth();
     const [showActionModal, setShowActionModal] = useState<boolean>(false);
     const [expandedDescription, setExpandedDescription] = useState<boolean>(false);
     const [defaultTab, setDefaultTab] = useState<number>(0);

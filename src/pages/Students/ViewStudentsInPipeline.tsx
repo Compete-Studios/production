@@ -8,10 +8,13 @@ import { setPageTitle } from '../../store/themeConfigSlice';
 import IconPlus from '../../components/Icon/IconPlus';
 import { hashTheID } from '../../functions/shared';
 import ActionItem from './ActionItem';
+import IconEye from '../../components/Icon/IconEye';
+import ActionItemText from './ActionItemText';
+import ActionItemEmail from './ActionItemEmail';
+import ActionItemNote from './ActionItemNote';
 
 export default function ViewStudentsInPipeline() {
-    const { suid, setStudentToEdit, pipelineSteps, studioOptions }: any = UserAuth();
-    const [update, setUpdate] = useState(false);
+    const { suid, setStudentToEdit, pipelineSteps, studioOptions, update, setUpdate }: any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('View Students In Pipeline'));
@@ -22,7 +25,10 @@ export default function ViewStudentsInPipeline() {
 
     const { id } = useParams();
 
-    console.log(studioOptions);
+    const handleGetTimeZoneOfUser = () => {
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        return timeZone;
+    };
 
     useEffect(() => {
         try {
@@ -63,7 +69,7 @@ export default function ViewStudentsInPipeline() {
                         </h1>
                         <p className="dark:text-white">*Students with a highlighted background should be contacted.</p>
                     </div>
-                    <div className="sm:flex sm:items-center sm:gap-x-4 w-full space-y-4 sm:space-y-0 lg:mt-0 mt-4 ">
+                    {/* <div className="sm:flex sm:items-center sm:gap-x-4 w-full space-y-4 sm:space-y-0 lg:mt-0 mt-4 ">
                         <button className="btn btn-primary gap-x-1 w-full sm:w-auto shrink-0 ml-auto " onClick={() => navigate('/students/delete-student')}>
                             <IconPlus /> Email This List
                         </button>
@@ -73,7 +79,7 @@ export default function ViewStudentsInPipeline() {
                         <button className="btn btn-secondary gap-x-1 w-full sm:w-auto shrink-0" onClick={() => navigate('/students/delete-student')}>
                             <IconPlus /> Add To Email List
                         </button>
-                    </div>
+                    </div> */}
                 </div>
                 {loading ? (
                     <div className="flex items-center justify-center">
@@ -115,17 +121,42 @@ export default function ViewStudentsInPipeline() {
                                                             new Date(list.NextContactDate) <= new Date() ? 'text-danger font-bold' : 'text-gray-900 dark:text-white'
                                                         }`}
                                                     >
-                                                        {list.NextContactDate && formatDate(list.NextContactDate)}
+                                                        {list.NextContactDate && list.NextContactDate !== '1900-01-01T00:00:00.000Z'
+                                                            ? formatDate(new Date(list.NextContactDate), { month: 'short', day: 'numeric', year: 'numeric', timeZone: handleGetTimeZoneOfUser() })
+                                                            : 'N/A'}
                                                     </td>
                                                     <td className="relative whitespace-nowrap text-right text-sm font-medium">
                                                         {new Date(list.NextContactDate) <= new Date() && (
-                                                            <ActionItem
-                                                                student={list}
-                                                                pipeline={pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
-                                                                studioOptions={studioOptions}
-                                                                setUpdate={setUpdate}
-                                                                update={update}
-                                                            />
+                                                            <div className="flex items-center justify-end gap-1">
+                                                                <ActionItemEmail
+                                                                    student={list}
+                                                                    pipeline={pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
+                                                                    studioOptions={studioOptions}
+                                                                    setUpdate={setUpdate}
+                                                                    update={update}
+                                                                />
+                                                                <ActionItemText
+                                                                    student={list}
+                                                                    pipeline={pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
+                                                                    studioOptions={studioOptions}
+                                                                    setUpdate={setUpdate}
+                                                                    update={update}
+                                                                />
+                                                                <ActionItemNote
+                                                                    student={list}
+                                                                    pipeline={pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
+                                                                    studioOptions={studioOptions}
+                                                                    setUpdate={setUpdate}
+                                                                    update={update}
+                                                                />
+                                                                <ActionItem
+                                                                    student={list}
+                                                                    pipeline={pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
+                                                                    studioOptions={studioOptions}
+                                                                    setUpdate={setUpdate}
+                                                                    update={update}
+                                                                />
+                                                            </div>
                                                         )}
                                                     </td>
 
@@ -133,8 +164,11 @@ export default function ViewStudentsInPipeline() {
                                                         <Link
                                                             to={`/students/view-student/${hashTheID(list.StudentId)}/${hashTheID(suid)}`}
                                                             type="button"
-                                                            className={`btn btn-sm ${new Date(list.NextContactDate) <= new Date() ? 'btn-success' : 'btn-outline-success dark:bg-gray-800'}`}
+                                                            className={`btn btn-sm flex items-center gap-1 ${
+                                                                new Date(list.NextContactDate) <= new Date() ? 'btn-success' : 'btn-outline-success dark:bg-gray-800'
+                                                            }`}
                                                         >
+                                                            {' '}
                                                             View
                                                         </Link>
                                                     </td>

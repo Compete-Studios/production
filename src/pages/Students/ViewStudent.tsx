@@ -1,7 +1,6 @@
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../../store';
-import Dropdown from '../../components/Dropdown';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import { Fragment, Suspense, useEffect, useState } from 'react';
 import IconPencilPaper from '../../components/Icon/IconPencilPaper';
@@ -438,14 +437,16 @@ const ViewStudent = () => {
                     <div className="p-4">
                         <div className="text-zinc-500">Studio</div>
                         <div className="font-bold">{studioInfo?.Studio_Name}</div>
+                        <div className="text-zinc-500 mt-2">Classes</div>
+                        <div className="font-bold">{classes.length > 0 ? classes.map((c: any) => c.Name).join(', ') : 'No classes'}</div>
                     </div>
                     <div className="">
                         <StudentsQuickPay student={student} suid={suid} />
                         <button className="uppercase font-lg font-bold w-full hover:bg-success-light p-4 text-left" onClick={() => navigate(`/students/invoice/${hasedRefID}`)}>
                             Invoice
                         </button>
-                        <SendQuickEmail student={student} prospect={false} />
-                        <SendQuickText student={student} isProspect={false} />
+                        <SendQuickEmail student={student} name="Student" />
+                        <SendQuickText student={student} name="Student"  />
                         <SendQuickWaiver student={student} prospect={false} />
                         <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left">Create a Billing Account</button>
                         <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left">Clone Student</button>

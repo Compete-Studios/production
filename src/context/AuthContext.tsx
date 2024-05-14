@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { auth, db } from '../firebase/firebase';
 import { REACT_API_BASE_URL } from '../constants';
-import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, onSnapshot, query, where } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 
 const UserContext: any = createContext<any>(null);
@@ -165,26 +165,32 @@ export default function AuthContextProvider({ children }: any) {
 
     const getFromsFromFirebaseWithStudioID = async (suid: any) => {
         const idToString = suid.toString();
-
+    
         if (!idToString) {
             return;
         }
+    
         try {
             const q = query(collection(db, 'forms'), where('studioID', '==', idToString));
-            const querySnapshot = await getDocs(q);
-            const forms: any = [];
-            querySnapshot.forEach((doc: any) => {
-                const dacData = {
-                    id: doc.id,
-                    ...doc.data(),
-                };
-                forms.push(dacData);
+            const unsubscribe = onSnapshot(q, (querySnapshot) => {
+                const forms: any = [];
+                querySnapshot.forEach((doc) => {
+                    const dacData = {
+                        id: doc.id,
+                        ...doc.data(),
+                    };
+                    forms.push(dacData);
+                });
+                setFBForms(forms);
             });
-            setFBForms(forms);
+    
+            // Remember to unsubscribe when component unmounts or when you don't need the listener anymore
+            return unsubscribe;
         } catch (error) {
             console.error('Error getting documents: ', error);
         }
     };
+    
 
     useEffect(() => {
         setShowLoading(true);

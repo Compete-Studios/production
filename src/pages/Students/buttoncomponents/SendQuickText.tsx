@@ -21,7 +21,7 @@ const textInit = {
     message: '',
 };
 
-export default function SendQuickText({ student }: any, isProspect = false) {
+export default function SendQuickText({ student, name }: any) {
     const { suid, studioOptions }: any = UserAuth();
     const [showChatModal, setShowChatModal] = useState<boolean>(false);
     const [textMessage, setTextMessage] = useState<TextMessage>(textInit);
@@ -85,18 +85,9 @@ export default function SendQuickText({ student }: any, isProspect = false) {
     return (
         <div>
             <div>
-                {isProspect ? (
-                    <button className="uppercase font-lg font-bold w-full hover:bg-danger-light p-4 text-left" onClick={() => setShowChatModal(true)}>Text Prospect</button>
-                ) : (
-                    <Tippy content="Send Text">
-                        <button className="btn btn-secondary flex items-center justify-center rounded-full w-10 h-10 p-0" onClick={() => setShowChatModal(true)}>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-chat-left-text" viewBox="0 0 16 16">
-                                <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4.414A2 2 0 0 0 3 11.586l-2 2V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z" />
-                                <path d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6m0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5" />
-                            </svg>
-                        </button>
-                    </Tippy>
-                )}
+             
+                    <button className="uppercase font-lg font-bold w-full hover:bg-danger-light p-4 text-left" onClick={() => setShowChatModal(true)}>Text {name}</button>
+             
             </div>
             <Transition appear show={showChatModal} as={Fragment}>
                 <Dialog as="div" open={showChatModal} onClose={() => setShowChatModal(false)} className="relative z-[51]">

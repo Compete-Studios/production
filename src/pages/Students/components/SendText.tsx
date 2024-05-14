@@ -93,8 +93,10 @@ export default function SendText({ defaultText, student, setDefaultTab }: any) {
 
     return (
         <div className="h-96">
-            <div>
-                <label htmlFor="to">To Number:</label>
+            <div className="px-12 py-4 flex items-center gap-4">
+                <label htmlFor="to" className=" whitespace-nowrap">
+                    To Number:
+                </label>
                 <input id="title" type="text" className="form-input" placeholder="Phone Number" value={textMessage.to} onChange={(e) => setTextMessage({ ...textMessage, to: e.target.value })} />
             </div>
             <div className="block m-6 mt-0">
@@ -161,16 +163,18 @@ export default function SendText({ defaultText, student, setDefaultTab }: any) {
                         <textarea
                             className="form-input rounded-md border-0 bg-[#f4f4f4] pr-12 focus:outline-none py-2"
                             placeholder="Type a message"
+                            rows={12}
                             value={textMessage.message}
                             onChange={(e) => setTextMessage({ ...textMessage, message: e.target.value })}
                             onKeyUp={sendMessageHandle}
                         />
-                        <button type="button" className="absolute ltr:right-4 rtl:left-4 top-1/2 -translate-y-1/2 hover:text-primary" onClick={() => sendMessage()}>
-                            <IconSend />
-                        </button>
                     </div>
                 </div>
+                <button type="button" className="btn btn-info ml-auto gap-1" onClick={() => sendMessage()}>
+                <IconSend /> Send Text 
+            </button>
             </div>
+            
         </div>
     );
 }

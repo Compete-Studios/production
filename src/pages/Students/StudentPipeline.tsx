@@ -55,7 +55,7 @@ export default function StudentPipeline() {
                 </div>
             </div>
             <div className="table-responsive">
-                <table className="table-striped">
+                <table >
                     <thead>
                         <tr>
                             <th>Pipeline Step</th>

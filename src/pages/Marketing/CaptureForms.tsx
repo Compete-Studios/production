@@ -30,11 +30,14 @@ export default function CaptureForms() {
     };
 
     const copyNewFromToClipboard = (id: any) => {
-      const iFrame = `<iframe src="${REACT_BASE_URL}/form/${id}" width="100%" height="100%" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>`;
-      navigator.clipboard.writeText(iFrame);
-      showMessage('Copied successfully!');
-  };
-   
+        const iFrame = `<iframe src="${REACT_BASE_URL}/form/${id}" width="100%" height="100%" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>`;
+        navigator.clipboard.writeText(iFrame);
+        showMessage('Copied successfully!');
+    };
+
+    const handlePreview = (id: any) => {
+        window.open(`${REACT_BASE_URL}/form/${id}`, '_blank');
+    };
 
     return (
         <>
@@ -92,8 +95,10 @@ export default function CaptureForms() {
                                                                 <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1zm1 12h2V2h-2zm-3 0V7H7v7zm-5 0v-3H2v3z" />
                                                             </svg>
                                                         </td>
-                                                        <td className="flex items-center gap-2">
-                                                          <button className="text-com hover:text-indigo-900">Preiview</button>
+                                                        <td className="flex items-center justify-end gap-2">
+                                                            <button className="text-com hover:text-indigo-900" onClick={() => handlePreview(list.id)}>
+                                                                Preview
+                                                            </button>
                                                             <button className="text-com hover:text-indigo-900">Edit</button>
                                                             <a href="#" className="text-alert hover:text-alerthover">
                                                                 Delete
@@ -113,16 +118,9 @@ export default function CaptureForms() {
                                                             </button>
                                                         </td>
 
-                                                        <td>
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-bar-chart-line" viewBox="0 0 16 16">
-                                                                <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1zm1 12h2V2h-2zm-3 0V7H7v7zm-5 0v-3H2v3z" />
-                                                            </svg>
-                                                        </td>
-                                                        <td className="flex items-center gap-2">
-                                                            <button className="text-com hover:text-indigo-900">Edit</button>
-                                                            <a href="#" className="text-alert hover:text-alerthover">
-                                                                Delete
-                                                            </a>
+                                                        <td colSpan={2} className='text-danger text-right'>
+                                                           Please update this form to the new version by clicking on the edit button
+                                                           <button className="text-info hover:text-indigo-900 ml-2"> Edit Here</button>
                                                         </td>
                                                     </tr>
                                                 ))}

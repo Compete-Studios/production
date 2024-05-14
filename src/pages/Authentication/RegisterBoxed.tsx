@@ -86,7 +86,6 @@ const RegisterBoxed = () => {
                         setErrorMessage(res.error);
                     } else {
                         setLoading(false);
-                        console.log(res);
                     }
                 })
                 .catch((error) => {

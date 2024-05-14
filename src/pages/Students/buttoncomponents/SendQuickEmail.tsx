@@ -29,14 +29,34 @@ const emailDataInit = {
     deliverytime: null,
 };
 
-export default function SendQuickEmail({ student }: any, prospect = false) {
-    const { suid, studioOptions }: any = UserAuth();
+export default function SendQuickEmail({ student, name }: any) {
+    const { suid, studioOptions, pipelineSteps, prospectPipelineSteps }: any = UserAuth();
     const [showEmailModal, setShowEmailModal] = useState<boolean>(false);
     const [emailData, setEmailData] = useState<EmailData>(emailDataInit);
     const [emailHtml, setEmailHtml] = useState<any>('');
 
+    console.log('pipelineSteps', student);
+
     useEffect(() => {
-        setEmailData({ ...emailData, to: student?.email || student?.Email, from: studioOptions?.EmailFromAddress });
+        if (name === 'Prospect') {
+            const pipeline = prospectPipelineSteps.find((step: any) => step.PipelineStepId === parseInt(student?.StudentPipelineStatus));
+            if (pipeline) {
+                setEmailData({ ...emailData, subject: pipeline?.DefaultEmailSubject, to: student?.email || student?.Email ? student?.Email : student?.email, from: studioOptions?.EmailFromAddress });
+                setEmailHtml(pipeline?.DefaultEmailText);
+            } else {
+                setEmailData({ ...emailData, to: student?.email || student?.Email, from: studioOptions?.EmailFromAddress });
+            }
+        } else if (name === 'Student') {
+            const pipeline = pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(student?.StudentPipelineStatus));
+            if (pipeline) {
+                setEmailData({ ...emailData, subject: pipeline?.DefaultEmailSubject, to: student?.email, from: studioOptions?.EmailFromAddress });
+                setEmailHtml(pipeline?.DefaultEmailText);
+            } else {
+                setEmailData({ ...emailData, to: student?.email || student?.Email, from: studioOptions?.EmailFromAddress });
+            }
+        } else {
+            setEmailData({ ...emailData, to: student?.email || student?.Email, from: studioOptions?.EmailFromAddress });
+        }
     }, [student]);
 
     const changeValue = (e: any) => {
@@ -75,17 +95,9 @@ export default function SendQuickEmail({ student }: any, prospect = false) {
     return (
         <div>
             <div>
-                {prospect ? (
-                    <button className="uppercase font-lg font-bold w-full hover:bg-info-light p-4 text-left" onClick={() => setShowEmailModal(true)}>Email Prospect</button>
-                ) : (
-                    <Tippy content="Send Email">
-                        <button className="btn btn-danger flex items-center justify-center rounded-full w-10 h-10 p-0" onClick={() => setShowEmailModal(true)}>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-envelope" viewBox="0 0 16 16">
-                                <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z" />
-                            </svg>
-                        </button>
-                    </Tippy>
-                )}
+                <button className="uppercase font-lg font-bold w-full hover:bg-info-light p-4 text-left" onClick={() => setShowEmailModal(true)}>
+                    Email {name}
+                </button>
             </div>
             <Transition appear show={showEmailModal} as={Fragment}>
                 <Dialog as="div" open={showEmailModal} onClose={() => setShowEmailModal(false)} className="relative z-[51]">
@@ -141,7 +153,6 @@ export default function SendQuickEmail({ student }: any, prospect = false) {
                                                     onChange={(e) => setEmailData({ ...emailData, subject: e.target.value })}
                                                 />
                                             </div>
-
                                             <div className="h-fit">
                                                 <ReactQuill theme="snow" value={emailHtml} style={{ minHeight: '200px' }} onChange={setEmailHtml} />
                                             </div>

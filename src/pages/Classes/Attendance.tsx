@@ -90,7 +90,6 @@ export default function Attendance() {
         setStudentNamesAndDates(students);
     }, [attendance]);
 
-    console.log(studentNamesAndDates);
 
     const handleNewCheck = (studentId: any, date: any) => {
         const index: any = newChecks.findIndex((item: any) => item.StudentId === studentId);

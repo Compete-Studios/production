@@ -1,53 +1,80 @@
 import React, { useEffect, useState } from 'react';
 import { UserAuth } from '../../../context/AuthContext';
-import { getStudentInfo, updateStudentNotes, updateStudentPipelineStatus } from '../../../functions/api';
-import Flatpickr from 'react-flatpickr';
-import 'flatpickr/dist/flatpickr.css';
-import { constFormateDateMMDDYYYY, formatDate, showErrorMessage, showMessage } from '../../../functions/shared';
+import { getStudentInfo, updateStudentByColumn, updateStudentNotes, updateStudentPipelineStatus } from '../../../functions/api';
+
+import { formatDate } from '@fullcalendar/core';
+import { hashTheID, showMessage } from '../../../functions/shared';
+import { useNavigate } from 'react-router-dom';
 
 export default function QuickUpdate({ student, setShowActionModal, update, setUpdate }: any) {
-    const { pipelineSteps }: any = UserAuth();
+    const { pipelineSteps, suid }: any = UserAuth();
     const [studentToUpdate, setStudentToUpdate] = useState<any>(student);
     const [currentPipeline, setCurrentPipeline] = useState<any>([]);
     const [staffInitials, setStaffInitials] = useState<any>('');
-    const [newContactDate, setNewContactDate] = useState<any>('');
     const [newNotes, setNewNotes] = useState<any>('');
     const currentDate = new Date();
     const noteDate = `${currentDate.getMonth() + 1}/${currentDate.getDate()}/${currentDate.getFullYear() % 100}`;
     
-    useEffect(() => {
-        setStudentToUpdate(student);
-        const statusIDAsNumber = parseInt(student.StudentPipelineStatus);
-        setCurrentPipeline(statusIDAsNumber);
-        setNewContactDate(student.NextContactDate);
-    }, [student]);
+    const navigate = useNavigate();
 
-    const handleUpdateStudent = async (e: any) => {
+    const handleGetStudentInfo = async (studentId: any) => {
+        const studentInfo = await getStudentInfo(studentId);
+        setStudentToUpdate(studentInfo);
+    };
+
+    useEffect(() => {
+        handleGetStudentInfo(student.StudentId);
+    }, [student]);
+ 
+
+    const handleUpdateByColumn = async (column: string, secondColumn: string, e: any) => {
         e.preventDefault();
-        const newNote = noteDate + ' ' + staffInitials + ' ' + newNotes + '\n' + student.notes;
-        const formatedDate = formatDate(newContactDate);
         const data = {
             studentId: student.StudentId,
-            pipelineStatus: currentPipeline,
-            nextContactDate: formatedDate,
-            notes: newNote,
+            columnName: column,
+            value: studentToUpdate[column],
         };
-        const updatePipelineStatus = await updateStudentPipelineStatus(data);
-
-        if (updatePipelineStatus.status === 200) {
-            showMessage('Student Updated Successfully');
+        const data2 = {
+            studentId: student.StudentId,
+            columnName: secondColumn,
+            value: studentToUpdate[secondColumn],
+        };
+        try {
+            const response = await updateStudentByColumn(data);
+            const response2 = await updateStudentByColumn(data2);
+            showMessage('Updated Successfully');
             setShowActionModal(false);
+            navigate(`/students/view-student/${hashTheID(student.StudentId)}/${hashTheID(suid)}`)
             setUpdate(!update);
-        } else {
-            console.log('Error updating student');
-            showErrorMessage('Error updating student');
+        } catch (error) {
+            console.log(error);
         }
     };
 
-    console.log(currentPipeline);
+    const handleGetTimeZoneOfUser = () => {
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        return timeZone;
+    };
 
     return (
         <div className="space-y-4">
+            <div>
+                <div className="font-bold">
+                    Current Contact Date:{' '}
+                    <span className="text-danger">
+                        {studentToUpdate.NextContactDate && studentToUpdate.NextContactDate !== '1900-01-01T00:00:00.000Z'
+                            ? formatDate(new Date(studentToUpdate.NextContactDate), { month: 'short', day: 'numeric', year: 'numeric', timeZone: handleGetTimeZoneOfUser() })
+                            : 'N/A'}
+                    </span>
+                </div>
+            </div>
+            <div>
+                <label htmlFor="contactDate">Next Contact Date</label>
+                <input type="date" 
+                value={studentToUpdate.NextContactDate}
+                className="form-input" 
+                onChange={(e) => setStudentToUpdate({ ...studentToUpdate, NextContactDate: e.target.value })} />
+            </div>            
             <div className="grid grid-cols-2">
                 {pipelineSteps.map((step: any) => {
                     return (
@@ -56,33 +83,18 @@ export default function QuickUpdate({ student, setShowActionModal, update, setUp
                                 type="radio"
                                 name="pipeline"
                                 className="form-radio"
-                                value={currentPipeline}
-                                checked={currentPipeline === step.PipelineStepId}
-                                onChange={() => setCurrentPipeline(step.PipelineStepId)}
+                                value={parseInt(studentToUpdate?.StudentPipelineStatus)}
+                                checked={parseInt(studentToUpdate?.StudentPipelineStatus) === step.PipelineStepId}
+                                onChange={() => setStudentToUpdate({ ...studentToUpdate, StudentPipelineStatus: step.PipelineStepId })}
                             />
                             <span>{step.StepName}</span>
                         </label>
                     );
                 })}
             </div>
-            <div>
-                <div className="font-bold">
-                    Current Contact Date: <span className="text-danger">{constFormateDateMMDDYYYY(studentToUpdate?.NextContactDate) || 'Not Set'}</span>
-                </div>
-            </div>
-            <div>
-                <label htmlFor="contactDate">Next Contact Date</label>
-                <Flatpickr value={newContactDate} className="form-input" options={{ dateFormat: 'm-d-Y', position: 'auto right' }} onChange={(date: any) => setNewContactDate(date)} />
-            </div>
-            <div>
-                <input type="text" className="form-input w-full" placeholder="Staff Initials" value={staffInitials} onChange={(e) => setStaffInitials(e.target.value)} />
-            </div>
-            <div>
-                <textarea className="form-textarea w-full" placeholder="Add a note" rows={4} value={newNotes} onChange={(e) => setNewNotes(e.target.value)} />
-            </div>
             <div className="w-full">
-                <button className="btn btn-info ml-auto" onClick={handleUpdateStudent}>
-                    Update Student
+                <button className="btn btn-info ml-auto" onClick={(e: any) => handleUpdateByColumn('StudentPipelineStatus', 'NextContactDate', e)}>
+                    Update and View Student
                 </button>
             </div>
         </div>

@@ -110,19 +110,23 @@ const heightOptions = [
 ];
 
 export default function CreateCaptureForms() {
-    const { suid }: any = UserAuth();
+    const { suid, prospectPipelineSteps }: any = UserAuth();
     const [formInfo, setFormInfo] = useState(formInfoSelected);
     const [value, setValue] = useState('');
     const [formName, setFormName] = useState('');
     const [formDescription, setFormDescription] = useState('');
-    const [selectedColor, setSelectedColor] = useState(colors[2]);
+    const [selectedColor, setSelectedColor] = useState(colors[6]);
     const [mem, setMem] = useState(roundedOptions[2]);
     const [heightOption, setHeightOption] = useState(heightOptions[0]);
     const [loading, setLoading] = useState(false);
     const [alertFormName, setAlertFormName] = useState(false);
+    const [pipelineStep, setPipelineStep] = useState('' as any);
+    const [sendEmail, setSendEmail] = useState(false);
+    const [formHeadline, setFormHeadline] = useState('' as any);
 
     const formData = {
         formName,
+        formHeadline,
         formDescription,
         formInfo,
         value,
@@ -130,6 +134,9 @@ export default function CreateCaptureForms() {
         mem,
         heightOption,
         studioID: suid,
+        pipelineStep,
+        sendEmail,
+        stats: []
     };
 
     const navigate = useNavigate();
@@ -240,34 +247,41 @@ export default function CreateCaptureForms() {
                                         onClick={() => setAlertFormName(false)}
                                     />
                                     {alertFormName && <p className="text-danger text-xs">Form Name is Required</p>}
-                                    <label htmlFor="form-name" className="mt-4">
-                                        Form Description
-                                    </label>
-                                    <textarea
-                                        rows={4}
-                                        name="description"
-                                        id="description"
-                                        className="form-textarea w-full"
-                                        placeholder={'Description of Form'}
-                                        onChange={(e) => setFormDescription(e.target.value)}
-                                    />
 
                                     <label htmlFor="form-name" className="mt-6">
                                         Pipeline Step
                                     </label>
                                     <p className="text-gray-500 mb-2 text-xs">Select the pipeline step that you would like to add the prospect to when they fill out this form.</p>
-                                    <input type="text" className="form-input w-full" placeholder="Form Name" />
-                                    <label htmlFor="response-subject" className="mt-6">
-                                        Response Email Subject
-                                    </label>
-                                    <input type="text" className="form-input w-full" placeholder="Subject" />
+                                    <select id="pipelineStatus" className="form-select" onChange={(e) => setPipelineStep(e.target.value)}>
+                                        {prospectPipelineSteps?.map((step: any) => (
+                                            <option key={step.PipelineStepId} value={step.PipelineStepId}>
+                                                {step.StepName}
+                                            </option>
+                                        ))}
+                                    </select>
                                     <label htmlFor="form-name" className="mt-6">
-                                        Response Email
+                                        Send Email Notification
                                     </label>
-                                    <p className="text-gray-500 mb-2 text-xs">This is the email that will be sent to the prospect when they fill out the form.</p>
-                                    <div className="">
-                                        <ReactQuill theme="snow" value={value} onChange={setValue} />
+                                    <p className="text-gray-500 mb-2 text-xs">Would you like to receive an email notification when someone fills out the form?</p>
+                                    <div className="flex items-center ">
+                                        <input type="checkbox" className="form-checkbox" onChange={() => setSendEmail(!sendEmail)} />
+                                        <label htmlFor="form-name">Yes, Send Email Notification</label>
                                     </div>
+                                    {sendEmail && (
+                                        <>
+                                            <label htmlFor="response-subject" className="mt-6">
+                                                Response Email Subject
+                                            </label>
+                                            <input type="text" className="form-input w-full" placeholder="Subject" />
+                                            <label htmlFor="form-name" className="mt-6">
+                                                Response Email
+                                            </label>
+                                            <p className="text-gray-500 mb-2 text-xs">This is the email that will be sent to the prospect when they fill out the form.</p>
+                                            <div className="">
+                                                <ReactQuill theme="snow" value={value} onChange={setValue} />
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             </Tab.Panel>
                             <Tab.Panel>
@@ -275,6 +289,28 @@ export default function CreateCaptureForms() {
                                     <h4 className=" text-2xl font-semibold">Form Values</h4>
                                     <p className="mb-4 text-xs">Select the values that you would like to collect from the prospect when they fill out the form.</p>
                                     <div className="grid grid-cols-2 gap-4">
+                                        <div className="col-span-full">
+                                            <label htmlFor="form-name" className="mt-2">
+                                                Form Headline
+                                            </label>
+                                            <input
+                                                type="text"
+                                                className={`form-input w-full ${alertFormName && 'borderr bg-danger-light border-danger'}`}
+                                                placeholder="Form Headline"
+                                                onChange={(e) => setFormHeadline(e.target.value)}
+                                            />
+                                            <label htmlFor="form-name" className="mt-4">
+                                                Form Description
+                                            </label>
+                                            <textarea
+                                                rows={4}
+                                                name="description"
+                                                id="description"
+                                                className="form-textarea w-full"
+                                                placeholder={'Description of Form'}
+                                                onChange={(e) => setFormDescription(e.target.value)}
+                                            />
+                                        </div>
                                         <button
                                             type="button"
                                             className={`${
@@ -441,7 +477,7 @@ export default function CreateCaptureForms() {
                                     <div className="mt-8">
                                         <RadioGroup value={mem} onChange={setMem} className="mt-2">
                                             <RadioGroup.Label className="block text-sm font-medium leading-6 text-gray-900">Roundness Level</RadioGroup.Label>
-                                            <div  className="mt-4 grid 2xl:grid-cols-6 grid-cols-3 gap-3">
+                                            <div className="mt-4 grid 2xl:grid-cols-6 grid-cols-3 gap-3">
                                                 {roundedOptions.map((option) => (
                                                     <RadioGroup.Option
                                                         key={option.name}
@@ -495,7 +531,7 @@ export default function CreateCaptureForms() {
                     <div className={`p-5 ${selectedColor?.bg} ${mem.rounded} shadow shadow-zinc-400 grid max-w-2xl mx-auto grid-cols-1 sm:grid-cols-6 gap-4`}>
                         {formInfo.FriendlyName && (
                             <div className="sm:col-span-full">
-                                <div className="text-2xl font-semibold text-center">{formName || ' Form Name'}</div>
+                                <div className="text-2xl font-semibold text-center">{formHeadline || 'Headline'}</div>
                                 {formInfo.FormDescription && <p className="text-gray-500 mb-2 text-xs text-center">{formDescription || 'Form Description'}</p>}
                             </div>
                         )}

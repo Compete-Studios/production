@@ -116,10 +116,7 @@ export default function AddProspect() {
 
         const classIDS = selectedClasses?.map((item: any) => item.ClassId);
 
-        console.log('Class IDS:', classIDS);
-        console.log('Program IDS:', programIds);
-        console.log('Waiting List IDS:', waitingListIDs);
-
+        
         console.log('Prospect Info:', prospectInfoData);
         await addProspect(prospectInfoData).then((res) => {
             console.log('Prospect added:', res.output.NewProspectId);

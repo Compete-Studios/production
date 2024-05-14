@@ -1291,3 +1291,14 @@ export const updateStudentByColumn = async (data) => {
         throw error;
     }
 };
+
+
+export const getIncomingUnreadTextMessages = async (data) => {
+    try {
+        const response = await fetchData(`text-helper/getIncomingUnreadTextMessages`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};

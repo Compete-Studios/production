@@ -33,7 +33,7 @@ import IconX from '../../components/Icon/IconX';
 import { formatDate } from 'date-fns';
 
 const Chat = () => {
-    const { suid, studioOptions, studioInfo }: any = UserAuth();
+    const { suid, studioOptions, studioInfo, students }: any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Chat'));
@@ -57,6 +57,8 @@ const Chat = () => {
     const [endDate, setEndDate] = useState<string>(new Date().toISOString().split('T')[0]);
 
     //format
+
+   
 
     const getCreatedTimeFromTimeStamp = (timeStamp: any) => {
         const date = new Date(timeStamp);
@@ -113,7 +115,7 @@ const Chat = () => {
                 if (!messageThreads[phoneNumber]) {
                     messageThreads[phoneNumber] = {
                         userId: phoneNumber,
-                        name: phoneNumber, // You might want to fetch the name from somewhere
+                        name: students.find((student: any) => student.Phone === phoneNumber)?.Name || phoneNumber,
                         path: 'profile-16.jpeg',
                         time: getCreatedTimeFromTimeStamp(chat.CreationDate),
                         preview: chat.Body,

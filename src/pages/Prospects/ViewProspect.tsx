@@ -390,8 +390,8 @@ const ViewProspect = () => {
                         <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left" onClick={() => navigate(`/students/add-student`)}>
                             Activate As Student
                         </button>
-                        <SendQuickEmail student={student} prospect={true} />
-                        <SendQuickText student={student} isProspect={true} />
+                        <SendQuickEmail student={student} name="Prospect" />
+                        <SendQuickText student={student} name="Prospect" />
                         <SendQuickWaiver student={student} prospect={true} />
                         <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left">Create a Billing Account</button>
                         <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left">Clone Prospect</button>

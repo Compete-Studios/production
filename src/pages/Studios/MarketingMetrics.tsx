@@ -29,7 +29,7 @@ export default function MarketingMetrics() {
     const [monthlyTextLimit, setMonthlyTextLimit] = useState(0);
     const [numberOfActiveStudents, setNumberOfActiveStudents] = useState(0);
 
-    console.log('suid', studioOptions);
+   
 
     useEffect(() => {
         if (studioOptions) {
@@ -40,7 +40,7 @@ export default function MarketingMetrics() {
     const getAlltheEmails = async () => {
         const firstDateOfThisMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
         const lastDateOfThisMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
-        console.log('firstDateOfThisMonth', firstDateOfThisMonth);
+        
         const data = {
             studioId: suid,
             startDate: formatForEmails(firstDateOfThisMonth),

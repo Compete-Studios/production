@@ -147,3 +147,23 @@ export const addPaymentNotes = async (paymentId, notes) => {
         throw error;
     }
 };
+
+export const ignorePayment = async (paymentId) => {
+    try {
+        const response = await fetchData(`late-payment-pipeline/ignorePayment/${paymentId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getCustomerPayments = async (data) => {
+    try {
+        const response = await fetchData(`paysimple-helper/getCustomerPayments`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}

@@ -36,7 +36,7 @@ export default function ActionItemForSchedule({ student, isStudent = false, upda
         });
     }, [student, update]);
 
-    console.log(student, 'student');
+
 
     const renderDescription = () => {
         if (!description) return null;

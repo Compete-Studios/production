@@ -8,13 +8,21 @@ import ActionItemProspects from '../Prospects/ActionItemProspects';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { REACT_API_BASE_URL } from '../../constants';
-import { getProspectsInScheduleByPipelineStep, getStudentsInScheduleByPipelineStep, getStudioOptions } from '../../functions/api';
+import {
+    getProspectsInScheduleByPipelineStep,
+    getProspectsInScheduleByPipelineStepFromArrayOfSteps,
+    getStudentsInScheduleByPipelineStep,
+    getStudentsInScheduleByPipelineStepFromArrayOfSteps,
+    getStudioOptions,
+} from '../../functions/api';
 import ActionItemForSchedule from './ActionItemForSchedule';
 import { hashTheID } from '../../functions/shared';
 import IconLoader from '../../components/Icon/IconLoader';
+import IconNotes from '../../components/Icon/IconNotes';
+import UpdateNotesForStudent from '../Students/UpdateNotesForStudent';
 
 export default function Schedules() {
-    const { suid, scheduleID, update, setUpdate, prospectPipelineSteps }: any = UserAuth();
+    const { suid, scheduleID, update, setUpdate }: any = UserAuth();
     const [dailyScheduleStudentSteps, setDailyScheduleStudentSteps] = useState<any>([]);
     const [dailyScheduleProspectSteps, setDailyScheduleProspectSteps] = useState<any>([]);
     const [dailyScheduleStudents, setDailyScheduleStudents] = useState<any>([]);
@@ -23,6 +31,7 @@ export default function Schedules() {
     const [loading, setLoading] = useState(true);
     const [gettingStudents, setGettingStudents] = useState(true);
     const [gettingProspects, setGettingProspects] = useState(true);
+    const [scheduleDate, setScheduleDate] = useState(new Date());
 
     useEffect(() => {
         try {
@@ -38,7 +47,6 @@ export default function Schedules() {
         const data = await fetch(`${REACT_API_BASE_URL}/daily-schedule-tools/getSPStepsForSchedule/${scheduleID}/${suid}`);
         const dataJson = await data.json();
         if (dataJson.length > 0) {
-            console.log(dataJson);
             setDailyScheduleStudentSteps(dataJson);
         } else {
             setDailyScheduleStudentSteps([]);
@@ -49,8 +57,7 @@ export default function Schedules() {
     const handleGetProspects = async () => {
         const data = await fetch(`${REACT_API_BASE_URL}/daily-schedule-tools/getPPStepsForSchedule/${scheduleID}/${suid}`);
         const dataJson = await data.json();
-        if (dataJson.length > 0) {
-            console.log(dataJson.recordset);
+        if (dataJson?.recordset?.length > 0) {
             setDailyScheduleProspectSteps(dataJson.recordset);
         } else {
             setDailyScheduleProspectSteps([]);
@@ -61,7 +68,12 @@ export default function Schedules() {
     useEffect(() => {
         handleGetStudents();
         handleGetProspects();
-    }, [suid, scheduleID]);
+    }, [suid, scheduleID, update]);
+
+    const handleGetNewSchedule = async () => {
+        handleGetStudents();
+        handleGetProspects();
+    };
 
     useEffect(() => {
         if (!gettingStudents && !gettingProspects) {
@@ -73,37 +85,38 @@ export default function Schedules() {
 
     const getStudents = async () => {
         if (dailyScheduleStudentSteps?.length > 0) {
-            const studentsArray: any = [];
-            // Get today's date
-            const today = new Date();
             // Format today's date as 'YYYY-MM-DD'
-            const formattedDate = today.toISOString().split('T')[0];
+            const formattedDate = scheduleDate.toISOString().split('T')[0];
 
-            for (let i = 0; i < dailyScheduleStudentSteps.length; i++) {
-                const data = {
-                    studioId: suid,
-                    pipelineStepId: dailyScheduleStudentSteps[i].PipelineStepId,
-                    nextContactDate: formattedDate, // Set to today's date
-                };
-                const newStudData = await getStudentsInScheduleByPipelineStep(data);
-                console.log(newStudData);
-                if (newStudData.recordset.length > 0) {
-                    // Get the main data from recordset[0]
-                    const mainData = { ...newStudData.recordset[0] };
-                    // Extract all class names into an array
-                    const classNames = newStudData.recordset.map((student: any) => student.ClassName);
-                    // Remove duplicates if necessary
-                    const uniqueClassNames = [...new Set(classNames)];
-                    // Add the 'Classes' array to the main data
-                    mainData.Classes = uniqueClassNames;
-                    // Push the main data to studentsArray
-                    studentsArray.push(mainData);
-                    setGettingStudents(false);
+            const data = {
+                studioId: suid,
+                steps: dailyScheduleStudentSteps,
+                nextContactDate: formattedDate, // Set to today's date
+            };
+
+            const response = await getStudentsInScheduleByPipelineStepFromArrayOfSteps(data);
+            const studentData = response.find((item: any) => item.recordset.length > 0)?.recordset || [];
+
+            // Grouping student data by Student_id
+            const groupedStudents: any = {};
+            studentData.forEach((student: any) => {
+                const studentId = student.Student_id;
+                if (!groupedStudents[studentId]) {
+                    groupedStudents[studentId] = {
+                        StepName: student.StepName,
+                        Student_id: student.Student_id,
+                        StudentName: student.StudentName,
+                        Contact1: student.Contact1,
+                        Classes: [student.ClassName], // Assuming you want an array of class names
+                    };
                 } else {
-                    setGettingStudents(false);
+                    groupedStudents[studentId].Classes.push(student.ClassName);
                 }
-            }
-            setDailyScheduleStudents(studentsArray);
+            });
+            // Converting the grouped students object to an array
+            const dailySS = Object.values(groupedStudents);
+            setDailyScheduleStudents(dailySS);
+            setGettingStudents(false);
         } else {
             setGettingStudents(false);
         }
@@ -111,38 +124,45 @@ export default function Schedules() {
 
     const getProspects = async () => {
         if (dailyScheduleProspectSteps?.length > 0) {
-            const prospectArray: any = [];
+            const formattedDate = scheduleDate.toISOString().split('T')[0];
 
-            const today = new Date();
-            // Format today's date as 'YYYY-MM-DD'
-            const formattedDate = today.toISOString().split('T')[0];
+            const data = {
+                studioId: suid,
+                steps: dailyScheduleProspectSteps,
+                nextContactDate: formattedDate, // Set to today's date
+            };
 
-            for (let i = 0; i < dailyScheduleProspectSteps.length; i++) {
-                const data = {
-                    studioId: suid,
-                    pipelineStepId: dailyScheduleProspectSteps[i].PipelineStepId,
-                    nextContactDate: formattedDate,
-                };
-                const newProsData = await getProspectsInScheduleByPipelineStep(data);
-                if (newProsData.recordset.length > 0) {
-                    // Get the main data from recordset[0]
-                    const mainData = { ...newProsData.recordset[0] };
-                    // Extract all class names into an array
-                    const classNames = newProsData.recordset.map((prospect: any) => prospect.ClassName);
-                    // Remove duplicates if necessary
-                    const uniqueClassNames = [...new Set(classNames)];
-                    // Add the 'Classes' array to the main data
-                    mainData.Classes = uniqueClassNames;
-                    // Push the main data to prospectArray
-                    prospectArray.push(mainData);
-                    setGettingProspects(false);
+            const response = await getProspectsInScheduleByPipelineStepFromArrayOfSteps(data);
+            // Filter response items with recordset length greater than 1
+            const filteredResponse = response.filter((item: any) => item.recordset.length > 1);
+
+            // Extract student data from filtered response
+            const studentData = filteredResponse.map((item: any) => item.recordset).flat();
+
+            // Grouping student data by ProspectId
+            const groupedStudents: any = {};
+            studentData.forEach((student: any) => {
+                const studentId = student.ProspectId;
+                if (!groupedStudents[studentId]) {
+                    groupedStudents[studentId] = {
+                        StepName: student.StepName,
+                        Student_id: student.ProspectId,
+                        StudentName: student.ProspectName,
+                        Contact1: student.ParentName,
+                        Classes: [student.ClassName], // Assuming you want an array of class names
+                    };
                 } else {
-                    setGettingProspects(false);
+                    groupedStudents[studentId].Classes.push(student.ClassName);
                 }
-            }
-            setDailyScheduleProspects(prospectArray);
+            });
+
+            // Converting the grouped students object to an array
+            const dailySP = Object.values(groupedStudents);
+            setDailyScheduleProspects(dailySP);
+            setGettingProspects(false);
         } else {
             setGettingProspects(false);
+            console.log('No prospects today');
         }
     };
 
@@ -154,21 +174,362 @@ export default function Schedules() {
         getProspects();
     }, [dailyScheduleProspectSteps]);
 
-    const handlePrintSchedule = () => {
-        window.print();
+    const handlePrintProspectSchedule = () => {
+        const htmlData: any = prospectTableHTML();
+        const printWindow = window.open('', '', 'height=600,width=800');
+        printWindow?.document.open();
+        printWindow?.document.write(htmlData);
+        printWindow?.document.close();
+        printWindow?.print();
+    };
+    
+
+    const prospectTableHTML = () => {
+        const htmlForPrint =
+            dailyScheduleProspects?.length > 0
+                ? `<!DOCTYPE html>
+            <html>
+            <head>
+            <style>
+            /* Styles for the table */
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            th, td {
+                padding: 4px;
+                text-align: left;
+                border-bottom: 1px solid #ddd;
+                font-size: 12px;
+            }
+            th {
+                background-color: #f2f2f2;
+            }
+            tr:hover {
+                background-color: #f5f5f5;
+            }
+            /* Styles for the notes section */
+            .note-section {
+                margin-top: 10px;
+                font-style: italic;
+                color: #888;
+            }
+        </style>
+            </head>
+            <body>
+                <div class="grid grid-cols-1 gap-6 mb-6 border-t">                    
+                    <div class="panel px-0 pb-0">
+                        <div class="">
+                            <h2 >Prospect Schedule</h2>                        
+                        </div>
+                        <div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th class="ltr:rounded-l-md rtl:rounded-r-md">Pipeline Step</th>
+                                        <th>Name</th>
+                                        <th>Parent Name</th>
+                                        <th>Class</th>
+                                        <th class="ltr:rounded-r-md rtl:rounded-l-md">Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>                                   
+                                    ${dailyScheduleProspects
+                                        ?.map(
+                                            (prospect: any) => `
+                                            <tr class="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
+                                                <td class="">
+                                                    <div class="">${prospect?.StepName}</div>
+                                                </td>
+                                                <td>
+                                                    <h5>
+                                                        ${prospect?.StudentName}
+                                                        
+                                                    </h5>
+                                                </td>
+                                                <td>${prospect?.Contact1}</td>
+                                                <td style="font-size: 8px;">
+                                                    ${prospect?.Classes?.map((className: string) => `<div key="${className}">${className}</div>`).join('')}
+                                                </td>
+                                                <td>
+                                               
+                                                </td>
+                                            </tr>
+                                        `
+                                        )
+                                        .join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </body>
+            </html>`
+                : ` 
+                <!DOCTYPE html>
+<html>
+    <head>
+        <style>
+                        /* Styles for the table */
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+                        th, td {
+                            padding: 8px;
+                            text-align: left;
+                            border-bottom: 1px solid #ddd;
+                        }
+                        th {
+                            background-color: #f2f2f2;
+                        }
+                        tr:hover {
+                            background-color: #f5f5f5;
+                        }
+                        /* Styles for the notes section */
+                        .note-section {
+                            margin-top: 10px;
+                            font-style: italic;
+                            color: #888;
+                        }
+                    </style>
+    </head>
+    <body>
+        <div class="grid grid-cols-1 gap-6 mb-6 border-t">
+            <div class="panel px-0 pb-0">
+                <div class>
+                    <h2>Prospect Schedule</h2>
+                </div>
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th
+                                    class="ltr:rounded-l-md rtl:rounded-r-md">Pipeline
+                                    Step</th>
+                                <th>Name</th>
+                                <th>Parent Name</th>
+                                <th>Class</th>
+                                <th
+                                    class="ltr:rounded-r-md rtl:rounded-l-md">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr className>
+                                <td className colSpan="6" style="text-align: center;">
+                                    No Prospects Today
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+            `;
+
+        return htmlForPrint;
     };
 
+    const handlePrintStudentSchedule = () => {
+        const htmlData: any = studentTableHTML();
+        const printWindow = window.open('', '', 'height=600,width=800');
+        printWindow?.document.open();
+        printWindow?.document.write(htmlData);
+        printWindow?.document.close();
+        printWindow?.print();
+    };
+
+    const studentTableHTML = () => {
+        const htmlForPrint =
+            dailyScheduleStudents?.length > 0
+                ? `<!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    /* Styles for the table */
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+                    th, td {
+                        padding: 4px;
+                        text-align: left;
+                        border-bottom: 1px solid #ddd;
+                        font-size: 12px;
+                    }
+                    th {
+                        background-color: #f2f2f2;
+                    }
+                    tr:hover {
+                        background-color: #f5f5f5;
+                    }
+                    /* Styles for the notes section */
+                    .note-section {
+                        margin-top: 10px;
+                        font-style: italic;
+                        color: #888;
+                    }
+                </style>
+            </head>
+            <body style="background: #f8f8f8; padding: 4px 4px; font-family:arial; line-height:28px; height:100%;  width: 100%; color: #514d6a;">
+                <div class="grid grid-cols-1 gap-6 mb-6 border-t">                    
+                    <div class="panel px-0 pb-0">
+                        <div class="">
+                            <h2 >Student Schedule</h2>                        
+                        </div>
+                        <div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th class="ltr:rounded-l-md rtl:rounded-r-md">Pipeline Step</th>
+                                        <th>Name</th>
+                                        <th>Contact</th>
+                                        <th>Class</th>
+                                        <th class="ltr:rounded-r-md rtl:rounded-l-md">Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>                                   
+                                    ${dailyScheduleStudents
+                                        ?.map(
+                                            (student: any) => `
+                                            <tr class="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
+                                                <td class="">
+                                                    <div class="">${student?.StepName}</div>
+                                                </td>
+                                                <td>
+                                                    <h5>
+                                                        ${student?.StudentName}
+                                                        
+                                                    </h5>
+                                                </td>
+                                                <td>${student?.Contact1}</td>
+                                                <td style="font-size: 8px;">
+                                                    ${student?.Classes?.map((className: string) => `<div key="${className}">${className}</div>`).join('')}
+                                                </td>
+                                                <td>
+                                               
+                                                </td>
+                                            </tr>
+                                        `
+                                        )
+                                        .join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </body>
+            </html>`
+                : ` 
+                <!DOCTYPE html>
+<html>
+    <head>
+        <style>
+                        /* Styles for the table */
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+                        th, td {
+                            padding: 8px;
+                            text-align: left;
+                            border-bottom: 1px solid #ddd;
+                        }
+                        th {
+                            background-color: #f2f2f2;
+                        }
+                        tr:hover {
+                            background-color: #f5f5f5;
+                        }
+                        /* Styles for the notes section */
+                        .note-section {
+                            margin-top: 10px;
+                            font-style: italic;
+                            color: #888;
+                        }
+                    </style>
+    </head>
+    <body>
+        <div class="grid grid-cols-1 gap-6 mb-6 border-t">
+            <div class="panel px-0 pb-0">
+                <div class>
+                    <h2>Student Schedule</h2>
+                </div>
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th
+                                    class="ltr:rounded-l-md rtl:rounded-r-md">Pipeline
+                                    Step</th>
+                                <th>Name</th>
+                                <th>Contact</th>
+                                <th>Class</th>
+                                <th
+                                    class="ltr:rounded-r-md rtl:rounded-l-md">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr className>
+                                <td className colSpan="6" style="text-align: center;">
+                                    No Students Today
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+            `;
+
+        return htmlForPrint;
+    };
+
+    const handlePrintBoth = () => {
+        const htmlData: any = studentTableHTML() + prospectTableHTML();
+        const printWindow = window.open('', '', 'height=600,width=800');
+        printWindow?.document.open();
+        printWindow?.document.write(htmlData);
+        printWindow?.document.close();
+        printWindow?.print();
+    }
+
+
     return (
-        <div className="grid 2xl:grid-cols-2 grid-cols-1 gap-6 mb-6">
+        <div className="grid grid-cols-1 gap-6 mb-6  border-t">
             {loading ? (
                 <div className="panel bg-gray-100 animate-pulse h-full"></div>
             ) : (
                 <Suspense fallback={<div>Loading...</div>}>
-                    <div className="panel px-0 pb-0">
+                    <div className="flex items-center justify-between whitespace-nowrap mt-12">
+                        <div className="flex items-center gap-4 sm:w-1/2 w-full">
+                            <label htmlFor="scheduleDate">Next Contact Date</label>
+                            <input
+                                type="date"
+                                id="scheduleDate"
+                                value={scheduleDate.toISOString().split('T')[0]}
+                                onChange={(e) => setScheduleDate(new Date(e.target.value))}
+                                className="w-full border border-gray-300 rounded-md p-2"
+                            />
+                            <button onClick={handleGetNewSchedule} className="btn btn-primary ">
+                                Update Schedule
+                            </button>
+                        </div>
+                        <div>
+                            <button onClick={handlePrintBoth} className="btn btn-secondary gap-1">
+                                <IconPrinter /> Print Schedule
+                            </button>
+                        </div>
+                    </div>
+                    <div className="panel px-0 pb-0 ">
                         <div className="flex items-center justify-between mb-5 px-5">
                             <h5 className="font-semibold text-lg dark:text-white-light">Prospect Schedule</h5>
                             <Tippy content="Print Schedule">
-                                <button type="button" onClick={handlePrintSchedule} className="font-semibold hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-600">
+                                <button type="button" onClick={handlePrintProspectSchedule} className="font-semibold hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-600">
                                     <span className="flex items-center">
                                         <IconPrinter className="w-5 h-5 text-black/70 dark:text-white/70 hover:!text-primary" />
                                     </span>
@@ -196,32 +557,31 @@ export default function Schedules() {
                                                         <span className="whitespace-nowrap">{prospect?.StepName}</span>
                                                     </div>
                                                 </td>
-                                                <td className="text-primary">{prospect?.ProspectName}</td>
                                                 <td>
-                                                    <Link to="/apps/invoice/preview">{prospect?.ParentName}</Link>
+                                                    <Link
+                                                        to={`/prospects/view-prospect/${hashTheID(prospect.Student_id)}/${hashTheID(suid)}`}
+                                                        className="flex hover:text-green-800 text-primary font-bold gap-1"
+                                                    >
+                                                        {prospect?.StudentName}{' '}
+                                                        <span className="text-warning hover:yellow-900">
+                                                            <IconNotes />
+                                                        </span>
+                                                    </Link>
                                                 </td>
+                                                <td>{prospect?.Contact1}</td>
                                                 <td>
                                                     {prospect?.Classes?.map((className: string) => (
                                                         <div key={className}>{className}</div>
                                                     ))}
                                                 </td>
                                                 <td className="flex gap-1 staff-center w-max mx-auto ">
-                                                    <Tippy content="Contact">
-                                                        <ActionItemProspects
-                                                            student={prospect}
-                                                            pipeline={prospectPipelineSteps.find((step: any) => step.PipelineStepId === parseInt(prospect.CurrentPipelineStatus))}
-                                                            studioOptions={studioOptions}
-                                                            setUpdate={setUpdate}
-                                                            update={update}
-                                                            prospectPipelineSteps={prospectPipelineSteps}
-                                                        />
-                                                    </Tippy>
                                                     <Tippy content="View">
                                                         <NavLink
-                                                            to={`/prospects/view-prospect/${hashTheID(prospect.ProspectId)}/${hashTheID(suid)}`}
-                                                            className="flex text-primary hover:text-primary/90"
+                                                            to={`/prospects/view-prospect/${hashTheID(prospect.Student_id)}/${hashTheID(suid)}`}
+                                                            className="flex text-primary hover:text-primary/90 gap-1"
                                                         >
-                                                            <IconEye />
+                                                            {' '}
+                                                            <IconEye /> View
                                                         </NavLink>
                                                     </Tippy>
                                                 </td>
@@ -248,7 +608,7 @@ export default function Schedules() {
                         <div className="flex items-center justify-between mb-5 px-5">
                             <h5 className="font-semibold text-lg dark:text-white-light">Students Schedule</h5>
                             <Tippy content="Print Schedule">
-                                <button type="button" onClick={handlePrintSchedule} className="font-semibold hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-600">
+                                <button type="button" onClick={handlePrintStudentSchedule} className="font-semibold hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-600">
                                     <span className="flex items-center">
                                         <IconPrinter className="w-5 h-5 text-black/70 dark:text-white/70 hover:!text-primary" />
                                     </span>
@@ -274,12 +634,7 @@ export default function Schedules() {
                                                     <div>{student?.StepName}</div>
                                                 </td>
                                                 <td className="">
-                                                    <Link
-                                                        to={`/students/view-student/${hashTheID(student.Student_id)}/${hashTheID(suid)}`}
-                                                        className="flex hover:text-green-800 text-primary font-bold"
-                                                    >
-                                                        {student?.StudentName}
-                                                    </Link>
+                                                    <UpdateNotesForStudent student={student} update={update} setUpdate={setUpdate} />
                                                 </td>
                                                 <td>{student?.Contact1}</td>
                                                 <td>
@@ -287,12 +642,13 @@ export default function Schedules() {
                                                         <div key={className}>{className}</div>
                                                     ))}
                                                 </td>
-                                                <td className="flex gap-1 staff-center w-max mx-auto ">
-                                                    <ActionItemForSchedule student={student} isStudent={true} update={update} setUpdate={setUpdate} studioOptions={studioOptions} />
-
+                                                <td className="flex-wra">
                                                     <Tippy content="View">
-                                                        <Link to={`/students/view-student/${hashTheID(student.Student_id)}/${hashTheID(suid)}`} className="flex hover:text-green-800 text-primary">
-                                                            <IconEye />
+                                                        <Link
+                                                            to={`/students/view-student/${hashTheID(student.Student_id)}/${hashTheID(suid)}`}
+                                                            className="flex hover:text-green-800 text-primary gap-1"
+                                                        >
+                                                            <IconEye /> View
                                                         </Link>
                                                     </Tippy>
                                                 </td>

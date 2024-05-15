@@ -58,7 +58,7 @@ export default function LatePaymentPipeline() {
                 </div>
             </div>
             <div className="table-responsive">
-                <table className="table-striped">
+                <table>
                     <thead>
                         <tr>
                             <th>Pipeline Step</th>

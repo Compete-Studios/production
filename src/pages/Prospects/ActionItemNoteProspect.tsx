@@ -1,19 +1,57 @@
-import { Fragment, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import 'flatpickr/dist/flatpickr.css';
 import IconX from '../../components/Icon/IconX';
-import IconBolt from '../../components/Icon/IconBolt';
+import IconNotes from '../../components/Icon/IconNotes';
+import QuickNoteProspect from './QuickNoteProspect';
 
-import QuickUpdateProspect from './QuickUpdateProspect';
-
-export default function ActionItemProspect({ student, pipeline, prospectPipelineSteps, update, setUpdate }: any) {
+export default function ActionItemNoteProspect({ student, pipeline, studioOptions, update, setUpdate }: any) {
     const [showActionModal, setShowActionModal] = useState(false);
+    const [expandedDescription, setExpandedDescription] = useState(false);
+    const [defaultTab, setDefaultTab] = useState(0);
+
+    const description = pipeline?.Description || '';
+
+    const toggleDescription = () => {
+        setExpandedDescription(!expandedDescription);
+    };
+
+    const renderDescription = () => {
+        if (!description) return null;
+
+        const lines = description.split('\n');
+        const maxLines = 3;
+
+        if (lines.length <= maxLines || expandedDescription) {
+            return (
+                <div>
+                    Description: <span className="text-primary">{description}</span>
+                    {expandedDescription && (
+                        <button className="text-info px-5 mt-1 underline" onClick={toggleDescription}>
+                            Read Less
+                        </button>
+                    )}
+                </div>
+            );
+        } else {
+            return (
+                <div>
+                    <p>
+                        Description: <span className="text-primary">{description?.slice(0, description.indexOf('\n', description.indexOf('\n') + 1))}</span>
+                        <button className="text-info px-5 mt-1 underline" onClick={toggleDescription}>
+                            Read more
+                        </button>
+                    </p>
+                </div>
+            );
+        }
+    };
 
     return (
         <div>
             <div className="flex items-center gap-2 justify-end">
-                <button type="button" className="btn btn-info btn-sm flex items-center gap-1" onClick={() => setShowActionModal(true)}>
-                    <IconBolt fill={true} className="h-4 w-4" /> Update Step
+                <button type="button" className="btn btn-warning btn-sm flex items-center gap-1" onClick={() => setShowActionModal(true)}>
+                    <IconNotes fill={true} className="h-4 w-4" /> View Notes
                 </button>
             </div>
             <Transition.Root show={showActionModal} as={Fragment}>
@@ -40,15 +78,10 @@ export default function ActionItemProspect({ student, pipeline, prospectPipeline
                                                     <div className="flex items-start justify-between space-x-3">
                                                         <div className="space-y-1">
                                                             <Dialog.Title className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ">
-                                                                Action Pipeline Step <span className="font-bold text-primary">{pipeline?.StepName}</span>{' '}
+                                                                Action Email <span className="font-bold text-primary">{pipeline?.StepName}</span>{' '}
                                                             </Dialog.Title>
                                                             <p className="text-sm text-gray-500">This action toolbar allows you to quickly email, text, add notes, or update the student step.</p>
-                                                            <h4 className="text-lg font-medium text-gray-900 dark:text-white-dark pt-4">
-                                                                Student:{' '}
-                                                                <span className="text-secondary">
-                                                                    {student?.FName} {student?.LName}
-                                                                </span>
-                                                            </h4>
+                                                            <h4 className="text-lg font-medium text-gray-900 dark:text-white-dark pt-4">Student: <span className='text-secondary'>{student?.FName} {student?.LName}</span></h4> 
                                                         </div>
 
                                                         <div className="flex h-7 items-center">
@@ -62,15 +95,8 @@ export default function ActionItemProspect({ student, pipeline, prospectPipeline
                                                 </div>
 
                                                 {/* Divider container */}
-                                                <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0 px-5 mt-2">
-                                                    <QuickUpdateProspect
-                                                        student={student}
-                                                        setShowActionModal={setShowActionModal}
-                                                        setUpdate={setUpdate}
-                                                        update={update}
-                                                        pipelineSteps={prospectPipelineSteps}
-                                                        isPrpospect={true}
-                                                    />
+                                                <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0 px-5">
+                                                    <QuickNoteProspect student={student} setShowActionModal={setShowActionModal} setUpdate={setUpdate} update={update} />
                                                 </div>
                                             </div>
                                         </form>

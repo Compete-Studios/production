@@ -9,7 +9,6 @@ export default function QuickNote({ student, setShowActionModal, update, setUpda
 
     useEffect(() => {
         setStudentToUpdate(student);
-        const statusIDAsNumber = parseInt(student.StudentPipelineStatus);
     }, [student]);
 
     const handleUpdateByColumn = async (column: string, e: any) => {

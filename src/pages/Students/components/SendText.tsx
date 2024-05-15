@@ -163,7 +163,7 @@ export default function SendText({ defaultText, student, setDefaultTab }: any) {
                         <textarea
                             className="form-input rounded-md border-0 bg-[#f4f4f4] pr-12 focus:outline-none py-2"
                             placeholder="Type a message"
-                            rows={12}
+                            rows={8}
                             value={textMessage.message}
                             onChange={(e) => setTextMessage({ ...textMessage, message: e.target.value })}
                             onKeyUp={sendMessageHandle}

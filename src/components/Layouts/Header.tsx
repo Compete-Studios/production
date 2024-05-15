@@ -33,7 +33,7 @@ import IconMenuMore from '../Icon/Menu/IconMenuMore';
 import { logout } from '../../firebase/auth';
 import AddStudentNote from '../../pages/Apps/AddStudentNote';
 import { UserAuth } from '../../context/AuthContext';
-import { searchByValue, searchProspectsByValue } from '../../functions/api';
+import { searchByValue, searchByValues, searchProspectsByValue, searchProspectsByValues } from '../../functions/api';
 import Select from 'react-select';
 
 const Header = () => {
@@ -151,6 +151,32 @@ const Header = () => {
         // },
     ]);
 
+    const [searchParams, setSearchParams] = useState({
+        studioId: suid,
+        searchValue: '',
+        searchValue2: '',
+    });
+
+    const [numberOfSearchValues, setNumberOfSearchValues] = useState(0);
+
+    useEffect(() => {
+        // if search terms has a space
+        if (searchItem.includes(' ')) {
+            setSearchParams({
+                ...searchParams,
+                searchValue: searchItem.split(' ')[0],
+                searchValue2: searchItem.split(' ')[1],
+            });
+            setNumberOfSearchValues(2);
+        } else {
+            setSearchParams({
+                ...searchParams,
+                searchValue: searchItem,
+            });
+            setNumberOfSearchValues(1);
+        }
+    }, [searchItem]);
+
     const removeNotification = (value: number) => {
         setNotifications(notifications.filter((user: any) => user.id !== value));
     };
@@ -175,22 +201,30 @@ const Header = () => {
 
     const navigate = useNavigate();
 
-    const searchParams = {
-        studioId: suid,
-        searchValue: searchItem,
-    };
-
     const handleSearchUsers = async (e: any) => {
         e.preventDefault();
+        setSearchedStudentsAndProspects({ students: [], prospects: [] });
         let students: any = [];
         let prospects: any = [];
-        await searchByValue(searchParams).then((response) => {
-            students = response.recordset;
-        });
-        await searchProspectsByValue(searchParams).then((response) => {
-            prospects = response.recordset;
-        });
-        setSearchedStudentsAndProspects({ students, prospects });
+
+        if (numberOfSearchValues === 2) {
+            await searchByValues(searchParams).then((response) => {
+                students = response.recordset;
+            });
+            await searchProspectsByValues(searchParams).then((response) => {
+                prospects = response.recordset;
+            });
+            setSearchedStudentsAndProspects({ students, prospects });
+        } else {
+            await searchByValue(searchParams).then((response) => {
+                students = response.recordset;
+            });
+            await searchProspectsByValue(searchParams).then((response) => {
+                prospects = response.recordset;
+            });
+            setSearchedStudentsAndProspects({ students, prospects });
+        }
+        
         setSearch(false);
         navigate('/search');
     };

@@ -49,6 +49,7 @@ import IconUsers from '../../components/Icon/IconUsers';
 import IconEdit from '../../components/Icon/IconEdit';
 import SendQuickWaiver from '../Students/buttoncomponents/SendQuickWaiver';
 import IconBolt from '../../components/Icon/IconBolt';
+import IconInfoTriangle from '../../components/Icon/IconInfoTriangle';
 
 interface UpdateValues {
     [key: string]: any;
@@ -344,24 +345,14 @@ const ViewProspect = () => {
                 </ul>
             </div>
             {new Date(student.NextContactDate) <= new Date() && (
-                <div className="mt-4 relative flex items-center border p-3.5 rounded before:absolute before:top-1/2 ltr:before:left-0 rtl:before:right-0 rtl:before:rotate-180 before:-mt-2 before:border-l-8 before:border-t-8 before:border-b-8 before:border-t-transparent before:border-b-transparent before:border-l-inherit text-info bg-info-light !border-info ltr:border-l-[64px] rtl:border-r-[64px] dark:bg-info-dark-light">
+                <div className="mt-4 relative flex items-center border p-3.5 rounded before:absolute before:top-1/2 ltr:before:left-0 rtl:before:right-0 rtl:before:rotate-180 before:-mt-2 before:border-l-8 before:border-t-8 before:border-b-8 before:border-t-transparent before:border-b-transparent before:border-l-inherit text-danger bg-danger-light !border-danger ltr:border-l-[64px] rtl:border-r-[64px] dark:bg-danger-dark-light">
                     <span className="absolute ltr:-left-11 rtl:-right-11 inset-y-0 text-white w-6 h-6 m-auto">
-                        <IconBolt />
+                        <IconInfoTriangle />
                     </span>
                     <span className="ltr:pr-2 rtl:pl-2">
                         <strong className="ltr:mr-1 rtl:ml-1">Time to Contact!</strong>This prospect is due for a follow-up.
                     </span>
-                    <button type="button" className="ltr:ml-auto rtl:mr-auto hover:opacity-80 relative inline-block">
-                        <ActionItemProspects
-                            student={prospect}
-                            pipeline={prospectPipelineSteps.find((step: any) => step.PipelineStepId === parseInt(student.CurrentPipelineStatus))}
-                            studioOptions={studioOptions}
-                            setUpdate={setUpdate}
-                            update={update}
-                            prospectPipelineSteps={prospectPipelineSteps}
-                        />
-                        <span className="absolute right-0 top-0 block h-2.5 w-2.5 rounded-full bg-danger ring-2 ring-white animate-pulse" />
-                    </button>
+                    
                 </div>
             )}
 

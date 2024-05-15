@@ -19,15 +19,11 @@ import MarketingMetrics from './Studios/MarketingMetrics';
 
 
 const Overview = () => {
-    const { suid }: any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Dashboard'));
-    });
+    }); 
   
-
-  
-
     return (
         <div>
         <Tab.Group>

@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { getPaymentPipelineStepById } from '../../functions/api';
 import IconPlus from '../../components/Icon/IconPlus';
-import { formatDate, hashTheID, hashThePayID } from '../../functions/shared';
-import { getPaymentsByPipelineStep } from '../../functions/payments';
+import { hashTheID, hashThePayID, showWarningMessage } from '../../functions/shared';
+import { getPaymentsByPipelineStep, ignorePayment } from '../../functions/payments';
 import { UserAuth } from '../../context/AuthContext';
 import LatePaymentAction from './LatePaymentAction';
+import { formatDate } from '@fullcalendar/core';
 
 export default function ViewPayments() {
     const { suid, latePayementPipeline, update, setUpdate, studioOptions }: any = UserAuth();
@@ -17,7 +18,10 @@ export default function ViewPayments() {
 
     const navigate = useNavigate();
 
-    console.log(studentsInPipeline)
+    const handleGetTimeZoneOfUser = () => {
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        return timeZone;
+    };
 
     useEffect(() => {
         try {
@@ -29,7 +33,30 @@ export default function ViewPayments() {
         } catch (error) {
             console.log(error);
         }
-    }, [id, suid]);
+    }, [id, suid, update]);
+   
+
+    const handleIgnorePayment = (id: any) => {
+        showWarningMessage('Are you sure you want to ignore this payment?', 'Ignore Payment', 'Payment Ignored', 'Ignored!')
+            .then(async (confirmed: boolean) => {
+                if (confirmed) {
+                    console.log(id);
+                    const res = await ignorePayment(id);
+                   if (res.status === 200) {
+                        setUpdate(!update);
+                    } else {
+                        console.error('Failed to ignore payment');
+                    }
+                } else {
+                    // User canceled the action
+                    console.log('User canceled');
+                }
+            })
+            .catch((error: any) => {
+                // Handle error if any
+                console.error('Error:', error);
+            });
+    };
 
     return (
         <>
@@ -50,9 +77,7 @@ export default function ViewPayments() {
                             Students in Pipeline Step{' '}
                             <span className="font-bold text-primary">{latePayementPipeline?.find((step: any) => step.PaymentPipelineStepId === parseInt(id ?? ''))?.PipelineStepName}</span>
                         </h1>
-                       
                     </div>
-                    
                 </div>
                 {loading ? (
                     <div className="flex items-center justify-center">
@@ -70,7 +95,7 @@ export default function ViewPayments() {
                                                     Billing Name
                                                 </th>
                                                 <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 hidden sm:table-cell dark:text-white">
-                                                   Date
+                                                    Date
                                                 </th>
                                                 <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 hidden sm:table-cell dark:text-white">
                                                     Amount
@@ -78,7 +103,6 @@ export default function ViewPayments() {
                                                 <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 hidden sm:table-cell dark:text-white">
                                                     Next Contact Date
                                                 </th>
-                                            
 
                                                 <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
                                                     <span className="sr-only">View</span>
@@ -89,27 +113,23 @@ export default function ViewPayments() {
                                             {studentsInPipeline?.map((list: any) => (
                                                 <tr key={list.PaymentId} className={`${new Date(list.NextContactDate) <= new Date() && 'bg-cs text-gray-900'}`}>
                                                     <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium  sm:pl-6">{list.CustomerName}</td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm  hidden sm:table-cell">{formatDate(list.Date)}</td>
-                                                    <td
-                                                        className="whitespace-nowrap px-3 py-4 text-sm  hidden sm:table-cell"
-                                                    >
-                                                        ${list.Amount}
+                                                    <td className="whitespace-nowrap px-3 py-4 text-sm  hidden sm:table-cell">
+                                                        {list.Date && list.Date !== '1900-01-01T00:00:00.000Z'
+                                                            ? formatDate(new Date(list.Date), { month: 'short', day: 'numeric', year: 'numeric', timeZone: handleGetTimeZoneOfUser() })
+                                                            : 'N/A'}
                                                     </td>
+                                                    <td className="whitespace-nowrap px-3 py-4 text-sm  hidden sm:table-cell">${list.Amount}</td>
                                                     <td
-                                                        className="whitespace-nowrap px-3 py-4 text-sm  hidden sm:table-cell"
+                                                        className={`whitespace-nowrap px-3 py-4 text-sm hidden sm:table-cell ${
+                                                            new Date(list.NextContactDate) <= new Date() ? 'text-danger font-bold' : 'text-gray-900 dark:text-white'
+                                                        }`}
                                                     >
-                                                        {list.NextContactDate ? formatDate(list.NextContactDate) : 'N/A'}
+                                                        {list.NextContactDate && list.NextContactDate !== '1900-01-01T00:00:00.000Z'
+                                                            ? formatDate(new Date(list.NextContactDate), { month: 'short', day: 'numeric', year: 'numeric', timeZone: handleGetTimeZoneOfUser() })
+                                                            : 'N/A'}
                                                     </td>
 
                                                     <td className="text-center gap-x-4 flex items-center justify-center">
-                                                    <LatePaymentAction
-                                                                student={list}
-                                                                pipeline={latePayementPipeline.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
-                                                                studioOptions={studioOptions}
-                                                                setUpdate={setUpdate}
-                                                                update={update}
-                                                                prospectPipelineSteps={latePayementPipeline}
-                                                            />
                                                         <Link
                                                             to={`/payments/view-late-payment/${suid}/${list.PaysimpleTransactionId}`}
                                                             type="button"
@@ -117,13 +137,9 @@ export default function ViewPayments() {
                                                         >
                                                             View
                                                         </Link>
-                                                        <Link
-                                                            to={`/students/view-student/${hashTheID(list.StudentId)}/${hashTheID(suid)}`}
-                                                            type="button"
-                                                            className={`btn btn-sm ${new Date(list.NextContactDate) <= new Date() ? 'btn-danger' : 'btn-outline-danger dark:bg-gray-800'}`}
-                                                        >
+                                                        <button type="button" className={`btn btn-sm btn-outline-danger`} onClick={() => handleIgnorePayment(list.PaymentId)}>
                                                             Ignore
-                                                        </Link>
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             ))}

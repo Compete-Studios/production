@@ -9,10 +9,13 @@ import IconPlus from '../../components/Icon/IconPlus';
 import { hashTheID } from '../../functions/shared';
 import ActionItemForSchedule from '../Marketing/ActionItemForSchedule';
 import ActionItemProspects from './ActionItemProspects';
+import ActionItemEmailProspect from './ActionItemEmailProspect';
+import ActionItemTextProspect from './ActionItemTextProspect';
+import ActionItemNoteProspect from './ActionItemNoteProspect';
 
 export default function ViewStudentsInPipeline() {
-    const { suid, setProspectToEdit, prospectPipelineSteps }: any = UserAuth();
-    const [update, setUpdate] = useState(false);
+    const { suid, setProspectToEdit, prospectPipelineSteps, update, setUpdate }: any = UserAuth();
+
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('View Prospects In Pipeline'));
@@ -37,7 +40,7 @@ export default function ViewStudentsInPipeline() {
     useEffect(() => {
         try {
             getProspectsByPipelineStep(id, suid).then((res) => {
-              console.log(res);
+                console.log(res);
                 setStudentsInPipeline(res.recordset);
                 setLoading(false);
             });
@@ -50,7 +53,7 @@ export default function ViewStudentsInPipeline() {
     const navigate = useNavigate();
 
     const handleStudentToEdit = (id: any) => {
-      setProspectToEdit(id);
+        setProspectToEdit(id);
         navigate('/students/view-student');
     };
 
@@ -74,7 +77,7 @@ export default function ViewStudentsInPipeline() {
                         </h1>
                         <p className="dark:text-white">*Students with a highlighted background should be contacted.</p>
                     </div>
-                    <div className="sm:flex sm:items-center sm:gap-x-4 w-full space-y-4 sm:space-y-0 lg:mt-0 mt-4 ">
+                    {/* <div className="sm:flex sm:items-center sm:gap-x-4 w-full space-y-4 sm:space-y-0 lg:mt-0 mt-4 ">
                         <button className="btn btn-primary gap-x-1 w-full sm:w-auto shrink-0 ml-auto " onClick={() => navigate('/students/delete-student')}>
                             <IconPlus /> Email This List
                         </button>
@@ -84,7 +87,7 @@ export default function ViewStudentsInPipeline() {
                         <button className="btn btn-secondary gap-x-1 w-full sm:w-auto shrink-0" onClick={() => navigate('/students/delete-student')}>
                             <IconPlus /> Add To Email List
                         </button>
-                    </div>
+                    </div> */}
                 </div>
                 {loading ? (
                     <div className="flex items-center justify-center">
@@ -130,14 +133,37 @@ export default function ViewStudentsInPipeline() {
                                                     </td>
                                                     <td className="relative whitespace-nowrap text-right text-sm font-medium">
                                                         {new Date(list.NextContactDate) <= new Date() && (
-                                                            <ActionItemProspects
-                                                                student={list}
-                                                                pipeline={prospectPipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
-                                                                studioOptions={studioOptions}
-                                                                setUpdate={setUpdate}
-                                                                update={update}
-                                                                prospectPipelineSteps={prospectPipelineSteps}
-                                                            />
+                                                            <div className="flex items-center justify-end gap-1">
+                                                                <ActionItemEmailProspect
+                                                                    student={list}
+                                                                    pipeline={prospectPipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
+                                                                    studioOptions={studioOptions}
+                                                                    setUpdate={setUpdate}
+                                                                    update={update}
+                                                                />
+                                                                <ActionItemTextProspect
+                                                                    student={list}
+                                                                    pipeline={prospectPipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
+                                                                    studioOptions={studioOptions}
+                                                                    setUpdate={setUpdate}
+                                                                    update={update}
+                                                                />
+                                                                <ActionItemNoteProspect
+                                                                    student={list}
+                                                                    pipeline={prospectPipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
+                                                                    studioOptions={studioOptions}
+                                                                    setUpdate={setUpdate}
+                                                                    update={update}
+                                                                />
+                                                                <ActionItemProspects
+                                                                    student={list}
+                                                                    pipeline={prospectPipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
+                                                                    studioOptions={studioOptions}
+                                                                    setUpdate={setUpdate}
+                                                                    update={update}
+                                                                    prospectPipelineSteps={prospectPipelineSteps}
+                                                                />
+                                                            </div>
                                                         )}
                                                     </td>
 

@@ -37,6 +37,7 @@ export const formatDate = (date) => {
     return formattedDate;
 };
 
+
 export const hashTheID = (id) => {
     return parseInt(id) * 123456789;
 };
@@ -131,6 +132,9 @@ export const showWarningMessage = (msg = '', text = '', confirmed = '', title = 
                 if (result.value) {
                     Swal.fire({ title: title, text: confirmed, icon: 'success', customClass: 'sweet-alerts' });
                     resolve(true);
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    Swal.fire({ title: 'Cancelled', text: 'Your data is safe :)', icon: 'error', customClass: 'sweet-alerts' });
+                    resolve(false);
                 }
             })
             .catch((error) => {

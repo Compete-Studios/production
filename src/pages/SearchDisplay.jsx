@@ -16,11 +16,15 @@ export default function SearchDisplay() {
         navigate(`/students/view-student/${hashedStudentId}/${hashedSUID}`);
     };
 
-    const handleViewProspect= (id) => {
+    const handleViewProspect = (id) => {
         const hashedStudentId = hashTheID(id);
         const hashedSUID = hashTheID(suid);
         navigate(`/prospects/view-prospect/${hashedStudentId}/${hashedSUID}`);
     };
+
+    // Sort students and prospects by last name
+    const sortedStudents = searchedStudentsAndProspects?.students?.sort((a, b) => a.Last_Name.localeCompare(b.Last_Name));
+    const sortedProspects = searchedStudentsAndProspects?.prospects?.sort((a, b) => a.LName.localeCompare(b.LName));
 
     return (
         <div className="grid 2xl:grid-cols-2 grid-cols-12 gap-x-2">
@@ -42,15 +46,15 @@ export default function SearchDisplay() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {searchedStudentsAndProspects?.students?.length > 0 ? (
-                                    searchedStudentsAndProspects?.students?.map((person) => (
-                                        <tr key={person.email}>
+                                {sortedStudents?.length > 0 ? (
+                                    sortedStudents.map((person) => (
+                                        <tr key={person.Last_Name}>
                                             <td>
                                                 <div className="flex flex-wrap">
-                                                    {person.First_Name} {person.Last_Name}
+                                                    {person.Last_Name}, {person.First_Name}
                                                 </div>
                                             </td>
-                                            <td>{person.activity === 1 ? 'Active' : 'Inactive'}</td>
+                                            <td className={`${person.activity === 1 ? "text-success" : "text-danger"}`}>{person.activity === 1 ? 'Active' : 'Inactive'}</td>
                                             <td>
                                                 <button onClick={() => handleViewStudent(person.Student_id)}>
                                                     <IconEye className="text-info hover:text-blue-900" />
@@ -93,12 +97,12 @@ export default function SearchDisplay() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {searchedStudentsAndProspects?.prospects?.length > 0 ? (
-                                        searchedStudentsAndProspects?.prospects?.map((person) => (
-                                            <tr key={person.email}>
+                                    {sortedProspects?.length > 0 ? (
+                                        sortedProspects.map((person) => (
+                                            <tr key={person.LName}>
                                                 <td>
                                                     <div className="flex flex-wrap">
-                                                        {person.FName} {person.LName}
+                                                        {person.LName}, {person.FName}
                                                     </div>
                                                 </td>
 
@@ -108,9 +112,9 @@ export default function SearchDisplay() {
                                                     </button>
                                                 </td>
                                                 <td>
-                                                <div>{person.email}</div>
-                                                <div>{person.Phone}</div>
-                                            </td>
+                                                    <div>{person.Email}</div>
+                                                    <div>{person.Phone}</div>
+                                                </td>
                                             </tr>
                                         ))
                                     ) : (

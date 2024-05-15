@@ -321,6 +321,7 @@ export const searchStudents = async (queryParams) => {
 };
 
 export const searchByValue = async (queryParams) => {
+    console.log(queryParams);
     try {
         const response = await fetchData(`student-access/searchByValue`, 'post', queryParams);
         return response;
@@ -330,10 +331,33 @@ export const searchByValue = async (queryParams) => {
     }
 };
 
+export const searchByValues = async (queryParams) => {
+    console.log(queryParams);
+    try {
+        const response = await fetchData(`student-access/searchByValues`, 'post', queryParams);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+
 export const searchProspectsByValue = async (queryParams) => {
     console.log(queryParams);
     try {
         const response = await fetchData(`student-access/searchProspectsByValue`, 'post', queryParams);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const searchProspectsByValues = async (queryParams) => {
+    console.log(queryParams);
+    try {
+        const response = await fetchData(`student-access/searchProspectsByValues`, 'post', queryParams);
         return response;
     } catch (error) {
         console.error(error);
@@ -507,6 +531,16 @@ export const searchProspects = async (queryParams) => {
 export const getStudentsInScheduleByPipelineStep = async (data) => {
     try {
         const response = await fetchData(`daily-schedule-tools/getStudentsInScheduleByPipelineStep/${data.pipelineStepId}/${data.studioId}/${data.nextContactDate}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getStudentsInScheduleByPipelineStepFromArrayOfSteps = async (data) => {
+    try {
+        const response = await fetchData(`daily-schedule-tools/getStudentsInScheduleByPipelineStepFromArrayOfSteps`, 'post', data);
         return response;
     } catch (error) {
         console.error(error);
@@ -1194,6 +1228,16 @@ export const getProspectsByNextContactDate = async (dateData) => {
 export const getProspectsInScheduleByPipelineStep = async (data) => {
     try {
         const response = await fetchData(`daily-schedule-tools/getProspectsInScheduleByPipelineStep/${data.pipelineStepId}/${data.studioId}/${data.nextContactDate}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getProspectsInScheduleByPipelineStepFromArrayOfSteps = async (data) => {
+    try {
+        const response = await fetchData(`daily-schedule-tools/getProspectsInScheduleByPipelineStepFromArrayOfSteps`, 'post', data);
         return response;
     } catch (error) {
         console.error(error);

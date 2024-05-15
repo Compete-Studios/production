@@ -91,6 +91,7 @@ const ViewStudent = () => {
     const [rank, setRank] = useState<any>(null);
     const [hasCards, setHasCards] = useState<boolean>(false);
     const [paymentSchedules, setPaymentSchedules] = useState<any>([]);
+    const [pipeline, setPipeline] = useState<any>([]);
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Profile'));
@@ -129,10 +130,10 @@ const ViewStudent = () => {
             console.log(error);
         }
     };
-
-    const scrollToBottom = () => {
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    };
+    useEffect(() => {
+        const pipeliner = pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(student?.StudentPipelineStatus));
+        setPipeline(pipeliner);
+    }, [student]);
 
     const handleUpdateNotes = () => {
         setUpdateNotes(true);
@@ -396,16 +397,23 @@ const ViewStudent = () => {
         const hashedStudent = parseInt(student?.Student_id) * 548756 * parseInt(suid);
         setHasedRefID(hashedStudent);
     }, [student]);
+    
 
-    console.log(student);
+   
+
 
     return (
         <div>
             <div className="sm:flex sm:items-center sm:justify-between">
                 <ul className="flex space-x-2 rtl:space-x-reverse">
-                    <li>
+                <li>
                         <Link to="/students/view-students" className="text-primary hover:underline">
-                            Students
+                           Students
+                        </Link>
+                    </li>
+                    <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2 text-primary hover:underline">
+                        <Link to={`/students/view-students-in-pipeline/${student?.StudentPipelineStatus}/${suid}`} className="text-primary hover:underline">
+                            Pipeline Step
                         </Link>
                     </li>
                     <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
@@ -415,45 +423,67 @@ const ViewStudent = () => {
                     </li>
                 </ul>
             </div>
-            <div className="grid md:grid-cols-12 grid-cols-1 gap-4 mt-4">
+            <div className="grid lg:grid-cols-12 grid-cols-1 gap-4 mt-4">
                 {/* CONTACT INFO */}
-                <div className="panel p-0 md:col-span-3 divide-y divide-y-zinc-600 ">
+                <div className="panel p-0 lg:col-span-3 divide-y divide-y-zinc-600 ">
                     <div className="flex items-start justify-between mb-5 p-4">
                         <div>
                             <div className="font-semibold  text-2xl">
                                 {student?.First_Name} {student?.Last_Name}
                             </div>
-                            <p className="font-normal text-md">{student?.Email}</p>
+                            <p className="font-normal text-sm">{student?.email}</p>
                             <p className="font-normal text-sm">{convertPhoneNumber(student?.Phone)}</p>
-                            <p className="font-normal text-sm">{student?.Phone2}</p>
+                            <p className="font-normal text-sm">{convertPhoneNumber(student?.Phone2)}</p>
 
                             <p className={`font-normal text-md mt-4 ${student?.activity ? 'text-success' : 'text-danger'}`}>{student?.activity ? 'Active' : 'Inactive'}</p>
                             <p className="font-normal text-xs ">Next Contact Date: {formatDate(student?.NextContactDate)}</p>
                             <p className="font-normal text-xs ">Created: {formatDate(student?.EntryDate)}</p>
                             <p className={`font-normal text-xs ${rank ? 'text-success' : 'text-danger'}`}>Rank: {rank ? rank : 'No rank set'}</p>
                             <p className={`font-normal text-xs ${barcode ? 'text-success' : 'text-danger'}`}>Barcode ID: {barcode ? barcode : 'No barcode set'}</p>
+                            <p className={`font-normal text-xs`}>
+                                Pipeline Step: <span className={`font-normal text-xs ${pipeline?.StepName ? 'text-success' : 'text-danger'}`}>{pipeline?.StepName}</span>
+                            </p>
                         </div>
                     </div>
                     <div className="p-4">
-                        <div className="text-zinc-500">Studio</div>
+                        <div className="text-zinc-500 underline">Studio</div>
                         <div className="font-bold">{studioInfo?.Studio_Name}</div>
-                        <div className="text-zinc-500 mt-2">Classes</div>
+                        <div className="text-zinc-500 mt-2 underline">Classes</div>
                         <div className="font-bold">{classes.length > 0 ? classes.map((c: any) => c.Name).join(', ') : 'No classes'}</div>
+                        <div className="text-zinc-500 mt-2 underline">Payment Schedules</div>
+                        <div className="">
+                            {paymentSchedules.map((data: any, index: any) => {
+                                return (
+                                    <>
+                                        {' '}
+                                        {data?.EndDate !== data?.StartDate && (
+                                            <div key={index} className="flex items-center text-xs gap-2 mt-2">
+                                                <div className={`${data.ScheduleStatus === 'Active' ? 'text-success' : 'text-danger'}`}>{data.ScheduleStatus}</div>
+                                                <div className="font-bold">${parseInt(data?.PaymentAmount)?.toFixed(2)}</div>
+                                                <div>
+                                                    {formatDate(data?.StartDate)} - {formatDate(data?.EndDate)}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </>
+                                );
+                            })}
+                        </div>
                     </div>
                     <div className="">
                         <StudentsQuickPay student={student} suid={suid} />
                         <button className="uppercase font-lg font-bold w-full hover:bg-success-light p-4 text-left" onClick={() => navigate(`/students/invoice/${hasedRefID}`)}>
                             Invoice
                         </button>
-                        <SendQuickEmail student={student} name="Student" />
-                        <SendQuickText student={student} name="Student"  />
+                        <SendQuickEmail student={student} name="Student" pipeline={pipeline} />
+                        <SendQuickText student={student} name="Student" pipeline={pipeline} />
                         <SendQuickWaiver student={student} prospect={false} />
                         <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left">Create a Billing Account</button>
                         <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left">Clone Student</button>
                         <button className="uppercase font-lg font-bold w-full hover:bg-danger-light p-4 text-left">Delete Student</button>
                     </div>
                 </div>
-                <div className="sm:col-span-9 md:row-span-2">
+                <div className="lg:col-span-9 md:row-span-2">
                     <Tab.Group>
                         <Tab.List className="flex flex-wrap">
                             <Tab as={Fragment}>
@@ -1149,7 +1179,7 @@ const ViewStudent = () => {
                                                                             <tr key={index}>
                                                                                 <td className="font-bold">${parseInt(data?.PaymentAmount)?.toFixed(2)}</td>
                                                                                 <td>
-                                                                                    <div className="whitespace-nowrap">{formatDate(data?.CreatedOn)}</div>
+                                                                                    <div className="whitespace-nowrap">{formatDate(data?.StartDate)}</div>
                                                                                 </td>
                                                                                 <td>{formatDate(data?.EndDate)}</td>
                                                                                 <td>

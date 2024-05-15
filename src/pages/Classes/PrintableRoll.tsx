@@ -63,9 +63,6 @@ export default function PrintableRoll({ classes }: any) {
         }
     };
 
-    console.log('roster', roster);
-    console.log('scheduleDates', scheduleDates);
-
     const tableHTML = (sDates: any, rstr: any) => {
         const htmlForEmail = `<!DOCTYPE html>
         <html>

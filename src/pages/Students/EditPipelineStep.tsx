@@ -13,7 +13,7 @@ export default function EditPipelineStep() {
     useEffect(() => {
         dispatch(setPageTitle('Edit Pipeline Step'));
     });
-    const { suid, pipelineSteps, update, setUpdate } = UserAuth();
+    const { suid, pipelineSteps, update, setUpdate }: any = UserAuth();
     const [pipelineStepName, setPipelineStepName] = useState<string>('');
     const [notes, setNotes] = useState<string>('');
     const [smsDefaultText, setSmsDefaultText] = useState<string>('');
@@ -24,16 +24,17 @@ export default function EditPipelineStep() {
     const [value, setValue] = useState<string>('');
 
     const { id, stud } = useParams<any>();
+   
 
     useEffect(() => {
-        if (parseInt(stud) !== parseInt(suid)) {
+        if (parseInt(stud ?? '') !== parseInt(suid)) {
             alert('Match');
         }
         getUploadedStudioImages(suid).then((res) => {
             setImages(res.recordset);
         });
-        if (pipelineSteps.find((step: any) => parseInt(step.PipelineStepId) === parseInt(id))) {
-            const step = pipelineSteps.find((step: any) => parseInt(step.PipelineStepId) === parseInt(id));
+        if (pipelineSteps.find((step: any) => parseInt(step.PipelineStepId) === parseInt(id ?? ''))) {
+            const step = pipelineSteps.find((step: any) => parseInt(step.PipelineStepId) === parseInt(id ?? ''));
             console.log(step);
             setPipelineStepName(step.StepName);
             setNotes(step.Description);
@@ -127,7 +128,7 @@ export default function EditPipelineStep() {
                             <div className="mb-4 w-full ">
                                 <label htmlFor="emailDefaultText">Email Default Text</label>
                                 <div className="">
-                                    <ReactQuill theme="snow" value={value} onChange={setValue} />
+                                    <ReactQuill theme="snow" value={value} onChange={setValue} className="editor"/>
                                 </div>
                             </div>
                             <div className="flex">

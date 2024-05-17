@@ -4,6 +4,8 @@ import Forms from '../pages/Marketing/Forms';
 
 const Birthdays = lazy(() => import('../pages/Reports/Birthday'));
 const DNS = lazy(() => import('../pages/Reports/DNS'));
+const Snapshot = lazy(() => import('../pages/Reports/Snapshot'));
+const AttendanceReport = lazy(() => import('../pages/Reports/AttendanceReport'));
 
 const LoginBoxed = lazy(() => import('../pages/Authentication/LoginBoxed'));
 const RegisterBoxed = lazy(() => import('../pages/Authentication/RegisterBoxed'));
@@ -86,6 +88,8 @@ const AddABillingAccount = lazy(() => import('../pages/Students/AddABillingAccou
 const FinishedAddingAccountOptions = lazy(() => import('../pages/Students/FinishedAddingAccountOptions'));
 
 const PasswordReset = lazy(() => import('../pages/Studios/PasswordReset'));
+const Account = lazy(() => import('../pages/Studios/Account'));
+const Profile = lazy(() => import('../pages/Studios/Profile'));
 
 const CompeteLegacyForms = lazy(() => import('../pages/Forms/CompeteLegacyForms'));
 const Methods = lazy(() => import('../pages/Marketing/Methods'));
@@ -123,6 +127,7 @@ const Mailbox = lazy(() => import('../pages/Tools/Mailbox'));
 
 const ViewProspects = lazy(() => import('../pages/Prospects/ViewProspects'));
 const AddProspect = lazy(() => import('../pages/Prospects/AddProspect'));
+const ActivateStudent = lazy(() => import('../pages/Prospects/ActivateStudent'));
 const SearchDisplay = lazy(() => import('../pages/SearchDisplay'));
 const ProspectPipeline = lazy(() => import('../pages/Prospects/ProspectPipeline'));
 const ViewProspectsInPipeline = lazy(() => import('../pages/Prospects/ViewProspectsInPipeline'));
@@ -226,6 +231,14 @@ const routes = [
     {
         path: '/reports/dns-reports',
         element: <DNS />,
+    },
+    {
+        path: '/reports/snapshot',
+        element: <Snapshot />,
+    },
+    {
+        path: '/reports/attendance-report',
+        element: <AttendanceReport />,
     },
 
 
@@ -472,6 +485,10 @@ const routes = [
         element: <AddProspect />,
     },
     {
+        path: '/prospects/activate/:uid',
+        element: <ActivateStudent />,
+    },
+    {
         path: '/prospects/view-prospect/:uid/:studioid',
         element: <ViewProspect />,
     },
@@ -619,6 +636,14 @@ const routes = [
     {
         path: '/studios/password-reset/:id',
         element: <PasswordReset />,
+    },
+    {
+        path: '/studios/account',
+        element: <Account />,
+    },
+    {
+        path: '/studios/Profile',
+        element: <Profile />,
     },
 
     //other

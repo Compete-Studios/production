@@ -10,6 +10,16 @@ export const getBirthdaysByStudioId = async (studioId, index) => {
     }
 }
 
+export const getStudentsByMonth = async (studioId, month) => {
+    try {
+        const response = await fetchData(`student-access/getBirthdaysByStudioId/${studioId}/${month}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
 export const getDNSReportForReport = async (studioId, date) => {
     try {
         const response = await fetchData(`studio-access/getDNSReport/${studioId}/${date}`, 'get');
@@ -172,8 +182,18 @@ export const getClassesByStudentId = async (studentId) => {
     }
 };
 
+export const dropProspect = async (prospectId) => {
+    try {
+        const response = await fetchData(`marketing-access/dropProspect/${prospectId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const dropProspectFromWaitingList = async (prospectId, waitingListId) => {
-    console.log(prospectId, waitingListId);
+   
     try {
         const response = await fetchData(`marketing-access/dropProspectFromWaitingList/${prospectId}/${waitingListId}`, 'get');
         return response;
@@ -321,7 +341,6 @@ export const searchStudents = async (queryParams) => {
 };
 
 export const searchByValue = async (queryParams) => {
-    console.log(queryParams);
     try {
         const response = await fetchData(`student-access/searchByValue`, 'post', queryParams);
         return response;
@@ -332,7 +351,6 @@ export const searchByValue = async (queryParams) => {
 };
 
 export const searchByValues = async (queryParams) => {
-    console.log(queryParams);
     try {
         const response = await fetchData(`student-access/searchByValues`, 'post', queryParams);
         return response;
@@ -344,7 +362,6 @@ export const searchByValues = async (queryParams) => {
 
 
 export const searchProspectsByValue = async (queryParams) => {
-    console.log(queryParams);
     try {
         const response = await fetchData(`student-access/searchProspectsByValue`, 'post', queryParams);
         return response;
@@ -355,7 +372,6 @@ export const searchProspectsByValue = async (queryParams) => {
 };
 
 export const searchProspectsByValues = async (queryParams) => {
-    console.log(queryParams);
     try {
         const response = await fetchData(`student-access/searchProspectsByValues`, 'post', queryParams);
         return response;
@@ -634,7 +650,6 @@ export const getRankByStudentId = async (studentId) => {
 export const getRankIDStudentId = async (studentId) => {
     try {
         const response = await fetchData(`ranks/getRankByStudentId/${studentId}`, 'get');
-        console.log(response);
         return response?.recordset[0]?.RankId;
     } catch (error) {
         console.error(error);
@@ -663,16 +678,24 @@ export const getUploadedStudioImages = async (studioId) => {
 };
 
 export const getStudentsByClassId = async (classId) => {
-    console.log(classId, 'classId');
     try {
         const response = await fetchData(`class-access/getStudentsByClassId/${classId}`, 'get');
-        console.log(response);
         return response.recordset;
     } catch (error) {
         console.error(error);
         return { status: 400 };
     }
 };
+
+export const getAttendanceByClassAndDate = async (classId, studentId, startDate, endDate) => {
+    try {
+        const response = await fetchData(`class-access/getAttendanceByClassAndDate/${classId}/${studentId}/${startDate}/${endDate}`, 'get');
+        return response.recordset;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
 
 export const getTextMessageThread = async (studioId, toNumber, fromNumber) => {
     const query = new URLSearchParams({
@@ -729,6 +752,7 @@ export const getTheClassScheduleByClassId = async (classId) => {
     }
 };
 
+
 export const updateAttendance = async (data) => {
     try {
         const response = await fetchData(`class-access/updateAttendance`, 'post', data);
@@ -752,7 +776,7 @@ export const getClassByClassId = async (classId) => {
 export const addRoom = async (data) => {
     try {
         const response = await fetchData(`class-access/addRoom`, 'post', data);
-        console.log(response);
+     
         return response;
     } catch (error) {
         console.error(error);
@@ -833,7 +857,6 @@ export const addMarketingMethod = async (data) => {
 export const updateMarketingMethod = async (data) => {
     try {
         const response = await fetchData(`marketing-access/updateMarketingMethod`, 'post', data);
-        console.log(response);
         return { response, status: 200 };
     } catch (error) {
         console.error(error);
@@ -962,7 +985,6 @@ export const updateStudentPipelineStep = async (data) => {
 };
 
 export const getProspectsByClassId = async (classId) => {
-    console.log(classId);
     try {
         const response = await fetchData(`class-access/getProspectsByClassId/${classId}`, 'get');
         return response.recordset;
@@ -1075,7 +1097,6 @@ export const getProspectsByPipelineStep = async (pipelineStepId, studioId) => {
 };
 
 export const updateProspectPipelineStatus = async (data) => {
-    console.log(data)
     try {
         const response = await fetchData(`marketing-access/updateProspectPipelineStatus`, 'post', data);
         return response;
@@ -1119,6 +1140,16 @@ export const getStaffByClassId = async (classId) => {
     try {
         const response = await fetchData(`staff-access/getStaffByClassId/${classId}`, 'get');
         return response.recordset;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getStaffByStaffId = async (staffId) => {
+    try {
+        const response = await fetchData(`staff-access/getStaffByStaffId/${staffId}`, 'get');
+        return response.recordset[0];
     } catch (error) {
         console.error(error);
         throw error;
@@ -1341,6 +1372,16 @@ export const getIncomingUnreadTextMessages = async (data) => {
     try {
         const response = await fetchData(`text-helper/getIncomingUnreadTextMessages`, 'post', data);
         return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getStudioSnapShot = async (startDate, endDate, suid) => {
+    try {
+        const response = await fetchData(`marketing-access/getStudioSnapshot/${startDate}/${endDate}/${suid}`, 'get');
+        return response.recordset[0];
     } catch (error) {
         console.error(error);
         throw error;

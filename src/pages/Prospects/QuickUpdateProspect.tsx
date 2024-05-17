@@ -64,7 +64,7 @@ export default function QuickUpdateProspect({ student, setShowActionModal, updat
             <div>
                 <label htmlFor="contactDate">Next Contact Date</label>
                 <input type="date" 
-                value={studentToUpdate.NextContactDate}
+                 value={studentToUpdate.NextContactDate ? studentToUpdate.NextContactDate.slice(0, 10) : ''}
                 className="form-input" 
                 onChange={(e) => setStudentToUpdate({ ...studentToUpdate, NextContactDate: e.target.value })} />
             </div>

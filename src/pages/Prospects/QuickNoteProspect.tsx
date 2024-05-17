@@ -19,7 +19,6 @@ export default function QuickNoteProspect({ student, setShowActionModal, update,
             prospectId: student.ProspectId,
             notes: studentToUpdate?.Notes,
         };
-        console.log(noteData);
         updateProspectNotes(noteData);
         showMessage('Notes Updated!');
         setUpdate(!update);

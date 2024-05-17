@@ -7,13 +7,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import IconTrashLines from '../../components/Icon/IconTrashLines';
 import { UserAuth } from '../../context/AuthContext';
-import AddEditClass from './AddEditClass';
 import ViewClass from './ViewClass';
 import IconUsers from '../../components/Icon/IconUsers';
 import { dropClassByClassID } from '../../functions/api';
 import IconSearch from '../../components/Icon/IconSearch';
 import IconUserPlus from '../../components/Icon/IconUserPlus';
 import IconPlus from '../../components/Icon/IconPlus';
+import IconEdit from '../../components/Icon/IconEdit';
+import ViewEditClass from './ViewEditClass';
+import AddNewClass from './AddNewClass';
+import { showWarningMessage } from '../../functions/shared';
 
 export default function ViewClasses() {
     const { classes, suid, update, setUpdate }: any = UserAuth();
@@ -22,34 +25,55 @@ export default function ViewClasses() {
         dispatch(setPageTitle('Search Prospects'));
     });
 
-    const deleteRow = (id: any = null) => {
-        if (window.confirm('Are you sure want to delete this class?')) {
-            if (id) {
-                alert('Class Deleted');
-                setRecords(classes?.filter((user: any) => user.ClassId !== id));
-                setInitialRecords(classes?.filter((user: any) => user.ClassId !== id));
-                setSearch('');
-                setSelectedRecords([]);
-                dropClassByClassID(id);
-                setUpdate(!update);
-            } else {
-                let selectedRows = selectedRecords || [];
-                const ids = selectedRows.map((d: any) => {
-                    return d.ClassId;
-                });
-                const result = classes?.filter((d: any) => !ids.includes(d.ClassId as never));
-                setRecords(result);
-                setInitialRecords(result);
-                setSearch('');
-                setSelectedRecords([]);
-                setPage(1);
-            }
-        }
+    const handleDeleteClass = (id: any) => {
+        showWarningMessage('Are you sure want to delete this class?', 'Delete Class', 'Your class has been removed')
+            .then(async (confirmed: boolean) => {
+                if (confirmed) {
+                    const dropRes = await dropClassByClassID(id);
+                    if (dropRes.status === 200) {
+                    setRecords(classes?.filter((user: any) => user.ClassId !== id));
+                    setInitialRecords(classes?.filter((user: any) => user.ClassId !== id));
+                    setSearch('');
+                    setSelectedRecords([]);                    
+                    setUpdate(!update);
+                    } else {
+                        console.error('Error:', dropRes);
+                    }
+                } else {
+                    // User canceled the action
+                    console.log('User canceled');
+                }
+            })
+            .catch((error) => {
+                // Handle error if any
+                console.error('Error:', error);
+            });
     };
 
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[1]);
+    // const handleDeleteClasss = (id: any = null) => {
+    //     if (window.confirm('Are you sure want to delete this class?')) {
+    //         if (id) {
+    //             alert('Class Deleted');
+    //             setRecords(classes?.filter((user: any) => user.ClassId !== id));
+    //             setInitialRecords(classes?.filter((user: any) => user.ClassId !== id));
+    //             setSearch('');
+    //             setSelectedRecords([]);
+    //             dropClassByClassID(id);
+    //             setUpdate(!update);
+    //         } else {
+    //             let selectedRows = selectedRecords || [];
+    //             const ids = selectedRows.map((d: any) => {
+    //                 return d.ClassId;
+    //             });
+    //             const result = classes?.filter((d: any) => !ids.includes(d.ClassId as never));
+    //             setRecords(result);
+    //             setInitialRecords(result);
+    //             setSearch('');
+    //             setSelectedRecords([]);
+    //         }
+    //     }
+    // };
+
     const [initialRecords, setInitialRecords] = useState([]);
     const [records, setRecords] = useState(initialRecords);
     const [selectedRecords, setSelectedRecords] = useState<any>([]);
@@ -61,19 +85,8 @@ export default function ViewClasses() {
     });
 
     useEffect(() => {
-        setPage(1);
-        /* eslint-disable react-hooks/exhaustive-deps */
-    }, [pageSize]);
-
-    useEffect(() => {
         setInitialRecords(classes);
     }, [classes]);
-
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecords([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
 
     useEffect(() => {
         setInitialRecords(() => {
@@ -88,7 +101,6 @@ export default function ViewClasses() {
     useEffect(() => {
         const data2 = initialRecords;
         setRecords(sortStatus.direction === 'desc' ? data2.reverse() : data2);
-        setPage(1);
     }, [sortStatus]);
 
     return (
@@ -99,7 +111,7 @@ export default function ViewClasses() {
                 </div>
                 <div className="flex sm:flex-row flex-col sm:items-center sm:gap-3 gap-4 w-full sm:w-auto">
                     <div className="flex gap-3">
-                        <AddEditClass />
+                        <AddNewClass color={true} />
                     </div>
                     <div className="relative">
                         <input type="text" placeholder="Search Classes" className="form-input py-2 ltr:pr-11 rtl:pl-11 peer" value={search} onChange={(e) => setSearch(e.target.value)} />
@@ -111,7 +123,7 @@ export default function ViewClasses() {
             </div>
             <div className="mt-5 panel p-0 border-0 overflow-hidden">
                 <div className="table-responsive">
-                    <table className="table-striped ">
+                    <table>
                         <thead>
                             <tr>
                                 <th>Name</th>
@@ -122,7 +134,7 @@ export default function ViewClasses() {
                             </tr>
                         </thead>
                         <tbody>
-                            {records?.map((rec: any) => {
+                            {initialRecords?.map((rec: any) => {
                                 return (
                                     <tr key={rec.ClassId} className={`${rec.EnrollmentLimit < rec.enrollment + rec.prospectEnrollment && 'bg-cs'}`}>
                                         <td>
@@ -135,15 +147,13 @@ export default function ViewClasses() {
                                         <td>{rec.EnrollmentLimit || 0}</td>
                                         <td>
                                             <div className="flex gap-4 items-center justify-center">
-                                                <Link to={`/students/view-student/`} type="button" className="btn btn-sm btn-outline-info">
-                                                    View
+                                                <Link to={`/classes/view-roster/${rec.ClassId}/${suid}`} type="button" className="flex hover:text-orange-800 text-warning">
+                                                    <IconUsers /> Roster
                                                 </Link>
-                                                {/* <Link to="/students/edit-student" type="button" className="btn btn-sm btn-outline-primary" onClick={() => editUser(contact)}>
-                                                    Edit
-                                                </Link> */}
-                                                <Link to="/students/delete-student" type="button" className="btn btn-sm btn-outline-danger">
-                                                    Delete
-                                                </Link>
+                                                {/* <ViewEditClass classId={rec.ClassId} nameOfClass={rec?.Name} /> */}
+                                                <button type="button" className="flex text-danger hover:text-danger" onClick={() => handleDeleteClass(rec.ClassId)}>
+                                                    <IconTrashLines /> Delete
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -152,14 +162,13 @@ export default function ViewClasses() {
                         </tbody>
                     </table>
                 </div>
-                {records?.length === 0 && (
+                {initialRecords?.length === 0 && (
                     <div className="flex items-center justify-center h-40">
                         <div className="text-center">
                             <p className="text-lg text-danger">No Students found</p>
-                            <button className="btn btn-info gap-2 mt-2 w-full flex items-center justify-center">
-                                <IconPlus />
-                                Add a Class
-                            </button>
+                            <div className="w-full">
+                                <AddNewClass color={false} />
+                            </div>
                         </div>
                     </div>
                 )}

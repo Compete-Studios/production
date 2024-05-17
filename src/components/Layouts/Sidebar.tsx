@@ -21,9 +21,12 @@ import IconUserPlus from '../Icon/IconUserPlus';
 import { UserAuth } from '../../context/AuthContext';
 import IconMenuAuthentication from '../Icon/Menu/IconMenuAuthentication';
 import IconMenuForms from '../Icon/Menu/IconMenuForms';
+import IconMenuCharts from '../Icon/Menu/IconMenuCharts';
+import IconMinusCircle from '../Icon/IconMinusCircle';
+import IconMenuTodo from '../Icon/Menu/IconMenuTodo';
 
 const Sidebar = () => {
-    const { studioInfo, isMaster, masters, suid }: any = UserAuth();
+    const { isMaster, masters, suid }: any = UserAuth();
     const [currentMenu, setCurrentMenu] = useState<string>('');
     const themeConfig = useSelector((state: IRootState) => state.themeConfig);
     const semidark = useSelector((state: IRootState) => state.themeConfig.semidark);
@@ -217,6 +220,32 @@ const Sidebar = () => {
                                     </ul>
                                 </AnimateHeight>
                             </li>
+                            <li className="menu nav-item">
+                                <button type="button" className={`${currentMenu === 'charts' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('charts')}>
+                                    <div className="flex items-center">
+                                        <IconMenuCharts className="group-hover:!text-primary shrink-0" />
+                                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Reports</span>
+                                    </div>
+
+                                    <div className={currentMenu !== 'charts' ? 'rtl:rotate-90 -rotate-90' : ''}>
+                                        <IconCaretDown />
+                                    </div>
+                                </button>
+
+                                <AnimateHeight duration={300} height={currentMenu === 'charts' ? 'auto' : 0}>
+                                    <ul className="sub-menu text-gray-500">
+                                        <li>
+                                            <NavLink to="/reports/dns-reports">DNS Reports</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/reports/snapshot">Snapshot Reports</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/reports/attendance-report">Attendance Reports</NavLink>
+                                        </li>
+                                    </ul>
+                                </AnimateHeight>
+                            </li>
 
                             <h2 className="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
                                 <IconMinus className="w-4 h-5 flex-none hidden" />
@@ -339,15 +368,8 @@ const Sidebar = () => {
                                                 <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Birthday Reports</span>
                                             </div>
                                         </NavLink>
-                                    </li>
-                                    <li className="nav-item">
-                                        <NavLink to="/reports/dns-reports" className="group">
-                                            <div className="flex items-center">
-                                                <IconMenuCalendar className="group-hover:!text-primary shrink-0" />
-                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">DNS Reports</span>
-                                            </div>
-                                        </NavLink>
                                     </li> */}
+                                 
                                     {!isMaster && (
                                         <li className="menu nav-item">
                                             <button type="button" className={`${currentMenu === 'master' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('master')}>

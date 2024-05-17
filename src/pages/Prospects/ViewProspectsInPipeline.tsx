@@ -12,6 +12,7 @@ import ActionItemProspects from './ActionItemProspects';
 import ActionItemEmailProspect from './ActionItemEmailProspect';
 import ActionItemTextProspect from './ActionItemTextProspect';
 import ActionItemNoteProspect from './ActionItemNoteProspect';
+import { formatWithTimeZone, handleGetTimeZoneOfUser } from '../../functions/dates';
 
 export default function ViewStudentsInPipeline() {
     const { suid, setProspectToEdit, prospectPipelineSteps, update, setUpdate }: any = UserAuth();
@@ -129,7 +130,7 @@ export default function ViewStudentsInPipeline() {
                                                             new Date(list.NextContactDate) <= new Date() ? 'text-danger font-bold' : 'text-gray-900 dark:text-white'
                                                         }`}
                                                     >
-                                                        {list.NextContactDate && formatDate(list.NextContactDate)}
+                                                        {formatWithTimeZone(list.NextContactDate, handleGetTimeZoneOfUser())}
                                                     </td>
                                                     <td className="relative whitespace-nowrap text-right text-sm font-medium">
                                                         {new Date(list.NextContactDate) <= new Date() && (

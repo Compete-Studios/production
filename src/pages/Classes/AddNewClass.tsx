@@ -14,15 +14,19 @@ import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
+import { showErrorMessage, showMessage } from '../../functions/shared';
 
-export default function AddEditClass({ editClass = false, classId = null }) {
-    const { suid, setUpdate, update, classes, staff } = UserAuth();
+export default function AddNewClass({color}: any) {
+    const { suid, setUpdate, update, classes, staff }: any = UserAuth();
+    const [rooms, setRooms] = useState([]);
     const [modal21, setModal21] = useState(false);
     const setNewDateTo12PM = () => {
         const newDate = new Date();
         newDate.setHours(12, 0, 0, 0);
         return newDate;
     };
+
+    console.log('color', color);
     const [classToAdd, setClassToAdd] = useState({
         studioId: suid || 1000,
         name: '',
@@ -35,6 +39,7 @@ export default function AddEditClass({ editClass = false, classId = null }) {
         endTime: '',
         roomId: '',
     });
+
     const [isLoading, setIsLoading] = useState(false);
     const [options, setOptions] = useState([
         { value: 'orange', label: 'Orange' },
@@ -43,47 +48,6 @@ export default function AddEditClass({ editClass = false, classId = null }) {
     ]);
 
     const daysOfTheWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-
-    //edit class
-    useEffect(() => {
-        const classForEditing = classes.find((c) => c.ClassId === classId);
-        if (classForEditing) {
-            setClassToAdd({
-                description: classForEditing.Description,
-                name: classForEditing.Name,
-                enrollmentLimit: classForEditing.EnrollmentLimit,
-                notes: classForEditing.Notes,
-                classId: classForEditing.ClassId,
-            });
-        }
-    }, [classId, classes, modal21]);
-
-    const [rooms, setRooms] = useState([]);
-
-    const getTimeOnlyfromZulueStamp = (date) => {
-        const timeString = date.split('T')[1];
-        return timeString.slice(0, 5);
-    };
-
-    const getTheSchedule = async (cuid) => {
-        getTheClassScheduleByClassId(cuid).then((response) => {
-            // setClassToAdd({
-            //     ...classToAdd,
-            //     dayOfWeek: response.DayOfWeek,
-            //     dayIndex: response.DayIndex,
-            //     startTime: getTimeOnlyfromZulueStamp(response.StartTime),
-            //     endTime: getTimeOnlyfromZulueStamp(response.EndTime),
-            //     roomId: response.RoomId,
-            // });
-        });
-    };
-
-    const handleAddEditAClass = (cuid) => {
-        // Add your code here to add a class
-        getTheSchedule(cuid);
-
-        setModal21(true);
-    };
 
     const getStudioRooms = async () => {
         try {
@@ -102,15 +66,15 @@ export default function AddEditClass({ editClass = false, classId = null }) {
 
     useEffect(() => {
         setClassToAdd({ ...classToAdd, studioId: suid });
-        const newStaffObj = staff.map((st) => {
+        const newStaffObj = staff.map((st: any) => {
             return { value: st.StaffId, label: st.Name };
         });
         setOptions(newStaffObj);
     }, [suid]);
 
-    const handleEnrollmentLimit = (e) => {
+    const handleEnrollmentLimit = (e: any) => {
         e.preventDefault();
-        const enrollInt = parseInt(e.target.value);
+        const enrollInt: any = parseInt(e.target.value);
         if (enrollInt > 0) {
             setClassToAdd({ ...classToAdd, enrollmentLimit: enrollInt });
         } else {
@@ -145,50 +109,12 @@ export default function AddEditClass({ editClass = false, classId = null }) {
         });
     };
 
-    const showMessage = (msg = '', type = 'success') => {
-        const toast = Swal.mixin({
-            toast: true,
-            position: 'top',
-            showConfirmButton: false,
-            timer: 3000,
-            customClass: { container: 'toast' },
-        });
-        toast.fire({
-            icon: type,
-            title: msg,
-            padding: '10px 20px',
-        });
-    };
-
-    const showErrorMessage = (msg = '') => {
-        const toast = Swal.mixin({
-            toast: true,
-            position: 'top',
-            showConfirmButton: false,
-            timer: 3000,
-            customClass: { container: 'toast' },
-        });
-        toast.fire({
-            icon: 'error',
-            title: msg,
-            padding: '10px 20px',
-        });
-    };
-
     return (
         <div>
-            {editClass ? (
-                <Tippy content="Edit Class">
-                    <button className="flex text-primary hover:text-primary-light" onClick={() => handleAddEditAClass(classId)}>
-                        <IconEdit className="w-4.5 h-4.5" />
-                    </button>
-                </Tippy>
-            ) : (
-                <button type="button" onClick={() => setModal21(true)} className="btn btn-primary gap-2 ltr:ml-auto rtl:mr-auto">
-                    <IconPlus />
-                    Add Class
-                </button>
-            )}
+            <button type="button" onClick={() => setModal21(true)} className={`btn ${color ? "btn-primary" : "btn-info"} gap-2 ltr:ml-auto rtl:mr-auto w-full`}>
+                <IconPlus />
+                Add Class
+            </button>
 
             <Transition appear show={modal21} as={Fragment}>
                 <Dialog
@@ -260,7 +186,7 @@ export default function AddEditClass({ editClass = false, classId = null }) {
                                                 <select
                                                     className="form-select"
                                                     value={classToAdd.dayOfWeek}
-                                                    onChange={(e) => setClassToAdd({ ...classToAdd, dayIndex: e.target.selectedIndex - 1, dayOfWeek: e.target.value })}
+                                                    onChange={(e: any) => setClassToAdd({ ...classToAdd, dayIndex: e.target.selectedIndex - 1, dayOfWeek: e.target.value })}
                                                 >
                                                     <option value="">Select Day</option>
                                                     {daysOfTheWeek.map((day, index) => (
@@ -339,15 +265,10 @@ export default function AddEditClass({ editClass = false, classId = null }) {
                                                     onChange={(e) => setClassToAdd({ ...classToAdd, description: e.target.value })}
                                                 ></textarea>
                                             </div>
-                                            {editClass ? (
-                                                <button type="button" className="btn btn-primary w-full" onClick={() => setModal21(false)} disabled={isLoading}>
-                                                    Update Class
-                                                </button>
-                                            ) : (
-                                                <button type="button" className="btn btn-primary w-full" onClick={handleAddAClass} disabled={isLoading}>
-                                                    Add Class
-                                                </button>
-                                            )}
+
+                                            <button type="button" className="btn btn-primary w-full" onClick={handleAddAClass} disabled={isLoading}>
+                                                Add Class
+                                            </button>
                                         </form>
                                     </div>
                                 </Dialog.Panel>

@@ -40,13 +40,13 @@ export default function ViewPaymentInfo() {
 
     const cardIcons: any = {
         Visa: visaIcon,
-        MasterCard: mastercardIcon,
+        Master: mastercardIcon,
         Amex: amexIcon,
         Discover: discoverIcon,
         Generic: genericIcon,
     };
     const amount = parseInt(amyID) / 12;
-    const unHashed = unHashThePayID(payID, suid, amount);
+    const unHashed = unHashThePayID(payID, suid, amount);   
 
     const handleGetCustomerInfo = async (customerID: any) => {
         try {
@@ -113,6 +113,7 @@ export default function ViewPaymentInfo() {
         if (customerPaymentAccount.length > 0) {
             const card = customerPaymentAccount.find((card: any) => card.Id === paymentInfo.AccountId);
             setCreditCard(card);
+            
         }
     }, [customerPaymentAccount, paymentInfo.AccountId]);
 

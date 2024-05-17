@@ -7,6 +7,7 @@ import { getPaymentsByPipelineStep, ignorePayment } from '../../functions/paymen
 import { UserAuth } from '../../context/AuthContext';
 import LatePaymentAction from './LatePaymentAction';
 import { formatDate } from '@fullcalendar/core';
+import { convertToUserLocalDate } from '../../functions/dates';
 
 export default function ViewPayments() {
     const { suid, latePayementPipeline, update, setUpdate, studioOptions }: any = UserAuth();
@@ -22,6 +23,8 @@ export default function ViewPayments() {
         const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         return timeZone;
     };
+
+    console.log(convertToUserLocalDate(new Date(), handleGetTimeZoneOfUser()))
 
     useEffect(() => {
         try {
@@ -111,7 +114,7 @@ export default function ViewPayments() {
                                         </thead>
                                         <tbody className="divide-y divide-gray-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                                             {studentsInPipeline?.map((list: any) => (
-                                                <tr key={list.PaymentId} className={`${new Date(list.NextContactDate) <= new Date() && 'bg-cs text-gray-900'}`}>
+                                                <tr key={list.PaymentId} className={`${convertToUserLocalDate(list.NextContactDate, handleGetTimeZoneOfUser()) < convertToUserLocalDate(new Date(), handleGetTimeZoneOfUser()) && 'bg-cs text-gray-900'}`}>
                                                     <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium  sm:pl-6">{list.CustomerName}</td>
                                                     <td className="whitespace-nowrap px-3 py-4 text-sm  hidden sm:table-cell">
                                                         {list.Date && list.Date !== '1900-01-01T00:00:00.000Z'

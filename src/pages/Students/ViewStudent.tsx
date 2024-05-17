@@ -423,9 +423,9 @@ const ViewStudent = () => {
                     </li>
                 </ul>
             </div>
-            <div className="grid lg:grid-cols-12 grid-cols-1 gap-4 mt-4">
+            <div className="lg:flex lg:items-start gap-4 mt-4">
                 {/* CONTACT INFO */}
-                <div className="panel p-0 lg:col-span-3 divide-y divide-y-zinc-600 ">
+                <div className="panel p-0 lg:min-w-80 divide-y divide-y-zinc-600 ">
                     <div className="flex items-start justify-between mb-5 p-4">
                         <div>
                             <div className="font-semibold  text-2xl">
@@ -450,13 +450,13 @@ const ViewStudent = () => {
                         <div className="font-bold">{studioInfo?.Studio_Name}</div>
                         <div className="text-zinc-500 mt-2 underline">Classes</div>
                         <div className="font-bold">{classes.length > 0 ? classes.map((c: any) => c.Name).join(', ') : 'No classes'}</div>
-                        <div className="text-zinc-500 mt-2 underline">Payment Schedules</div>
+                        <div className="text-zinc-500 mt-2 underline">Active Pay Schedules</div>
                         <div className="">
                             {paymentSchedules.map((data: any, index: any) => {
                                 return (
                                     <>
                                         {' '}
-                                        {data?.EndDate !== data?.StartDate && (
+                                        {(data?.EndDate !== data?.StartDate && data.ScheduleStatus === "Active") && (
                                             <div key={index} className="flex items-center text-xs gap-2 mt-2">
                                                 <div className={`${data.ScheduleStatus === 'Active' ? 'text-success' : 'text-danger'}`}>{data.ScheduleStatus}</div>
                                                 <div className="font-bold">${parseInt(data?.PaymentAmount)?.toFixed(2)}</div>
@@ -483,7 +483,7 @@ const ViewStudent = () => {
                         <button className="uppercase font-lg font-bold w-full hover:bg-danger-light p-4 text-left">Delete Student</button>
                     </div>
                 </div>
-                <div className="lg:col-span-9 md:row-span-2">
+                <div className="lg:w-full lg:mt-0 mt-8">
                     <Tab.Group>
                         <Tab.List className="flex flex-wrap">
                             <Tab as={Fragment}>
@@ -974,11 +974,11 @@ const ViewStudent = () => {
                                 </div>
                             </Tab.Panel>
                             <Tab.Panel>
-                                <div className="active pt-5">
-                                    <div className="grid grid-cols-2">
+                                <div className="active pt-5 panel">
+                                    <div className="sm:flex sm:flex-wrap sm:flex-row">
                                         {pipelineSteps.map((step: any) => {
                                             return (
-                                                <label htmlFor={step.PipelineStepId} className="flex items-center cursor-pointer hover:bg-gray-100 p-1">
+                                                <label htmlFor={step.PipelineStepId} className="flex items-center cursor-pointer hover:bg-gray-100 p-1 sm:basis-1/2">
                                                     <input
                                                         type="radio"
                                                         name="pipeline"

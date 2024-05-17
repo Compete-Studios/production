@@ -167,3 +167,33 @@ export const getCustomerPayments = async (data) => {
         throw error;
     }
 }
+
+export const getInternalPaymentsByStudentId = async (studentId) => {
+    try {
+        const response = await fetchData(`payments/getInternalPaymentsByStudentId/${studentId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
+export const deleteInternalPayment = async (paymentId) => {
+    try {
+        const response = await fetchData(`payments/deleteInternalPayment/${paymentId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
+export const updateLatePaymentDateStepID = async (paymentData) => {
+    try {
+        const response = await fetchData(`late-payment-pipeline/updateLatePaymentDateStepID`, 'post', paymentData);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}

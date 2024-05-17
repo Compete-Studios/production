@@ -1,18 +1,22 @@
 import { lazy } from 'react';
-import ProtectedRoute from './ProtectedRoutes';
 import Forms from '../pages/Marketing/Forms';
 
+const Overview = lazy(() => import('../pages/Overview'));
+const CompeteLegacyForms = lazy(() => import('../pages/Forms/CompeteLegacyForms'));
+
+// Reports
 const Birthdays = lazy(() => import('../pages/Reports/Birthday'));
 const DNS = lazy(() => import('../pages/Reports/DNS'));
 const Snapshot = lazy(() => import('../pages/Reports/Snapshot'));
 const AttendanceReport = lazy(() => import('../pages/Reports/AttendanceReport'));
 
+// Authentication
 const LoginBoxed = lazy(() => import('../pages/Authentication/LoginBoxed'));
 const RegisterBoxed = lazy(() => import('../pages/Authentication/RegisterBoxed'));
 const Error = lazy(() => import('../components/Error'));
 const HomeMain = lazy(() => import('../pages/Home/HomeMain'));
 
-const Overview = lazy(() => import('../pages/Overview'));
+// Payments
 const SearchPayments = lazy(() => import('../pages/Payments/SearchPayments'));
 const QuickPay = lazy(() => import('../pages/Payments/QuickPay'));
 const LatePaymentPipeline = lazy(() => import('../pages/Payments/LatePaymentPipeline'));
@@ -29,8 +33,8 @@ const ViewPayments = lazy(() => import('../pages/Payments/ViewPayments'));
 const PayInvoice = lazy(() => import('../pages/Payments/PayInvoice'));
 const ViewLatePayment = lazy(() => import('../pages/Payments/ViewLatePayment'));
 const ExisitingBillingAccounts = lazy(() => import('../pages/Payments/ExisitingBillingAccounts'));
-const ViewClasses = lazy(() => import('../pages/Classes/ViewClasses'));
-const ViewRoster = lazy(() => import('../pages/Classes/ViewRoster'));
+
+// Staff
 const ViewStaff = lazy(() => import('../pages/Staff/ViewStaff'));
 const AddStaff = lazy(() => import('../pages/Staff/AddStaff'));
 const ViewStaffMember = lazy(() => import('../pages/Staff/ViewStaffMember'));
@@ -41,6 +45,11 @@ const EmailAllStaff = lazy(() => import('../pages/Staff/EmailAllStaff'));
 const TextAllStaff = lazy(() => import('../pages/Staff/TextAllStaff'));
 const AddToEmailLIst = lazy(() => import('../pages/Staff/AddToEmailLIst'));
 const SearchStaff = lazy(() => import('../pages/Staff/SearchStaff'));
+
+
+// Classes
+const ViewClasses = lazy(() => import('../pages/Classes/ViewClasses'));
+const ViewRoster = lazy(() => import('../pages/Classes/ViewRoster'));
 const Attendance = lazy(() => import('../pages/Classes/Attendance'));
 const Rooms = lazy(() => import('../pages/Classes/Rooms'));
 const WaitingLists = lazy(() => import('../pages/Classes/WaitingLists'));
@@ -58,6 +67,8 @@ const EditProgram = lazy(() => import('../pages/Classes/EditProgram'));
 const AddNewRank = lazy(() => import('../pages/Classes/AddNewRank'));
 const StudentsInRank = lazy(() => import('../pages/Classes/StudentsInRank'));
 const EditRank = lazy(() => import('../pages/Classes/EditRank'));
+
+// Students
 const AddStudent = lazy(() => import('../pages/Students/AddStudent'));
 const ViewStudent = lazy(() => import('../pages/Students/ViewStudent'));
 const ViewStudents = lazy(() => import('../pages/Students/ViewStudents'));
@@ -66,7 +77,6 @@ const StudentPipeline = lazy(() => import('../pages/Students/StudentPipeline'));
 const StudentsQuickPay = lazy(() => import('../pages/Students/StudentsQuickPay'));
 const Invoice = lazy(() => import('../pages/Students/Invoice'));
 const DeleteStudent = lazy(() => import('../pages/Students/DeleteStudent'));
-
 const UpdateBilling = lazy(() => import('../pages/Students/UpdateBilling'));
 const ViewActivePaymentSchedules = lazy(() => import('../pages/Students/ViewActivePaymentSchedules'));
 const UpdateAdditionalInfo = lazy(() => import('../pages/Students/UpdateAdditionalInfo'));
@@ -87,11 +97,12 @@ const AddPaymentSchedule = lazy(() => import('../pages/Students/AddPaymentSchedu
 const AddABillingAccount = lazy(() => import('../pages/Students/AddABillingAccount'));
 const FinishedAddingAccountOptions = lazy(() => import('../pages/Students/FinishedAddingAccountOptions'));
 
+// Studios
 const PasswordReset = lazy(() => import('../pages/Studios/PasswordReset'));
 const Account = lazy(() => import('../pages/Studios/Account'));
 const Profile = lazy(() => import('../pages/Studios/Profile'));
 
-const CompeteLegacyForms = lazy(() => import('../pages/Forms/CompeteLegacyForms'));
+// Marketing
 const Methods = lazy(() => import('../pages/Marketing/Methods'));
 const FacebookAddCreator = lazy(() => import('../pages/Marketing/FacebookAddCreator'));
 const EditMethod = lazy(() => import('../pages/Marketing/EditMethod'));
@@ -118,6 +129,7 @@ const EditNumbersInPerformance = lazy(() => import('../pages/Marketing/EditNumbe
 const AddANumberInPerformance = lazy(() => import('../pages/Marketing/AddANumberInPerformance'));
 const EditPerformance = lazy(() => import('../pages/Marketing/EditPerformance'));
 
+// Tools
 const TodoList = lazy(() => import('../pages/Tools/TodoList'));
 const Notes = lazy(() => import('../pages/Tools/Notes'));
 const PerformancePlanner = lazy(() => import('../pages/Tools/PerformancePlanner'));
@@ -125,6 +137,7 @@ const Calendar = lazy(() => import('../pages/Tools/Calendar'));
 const Chat = lazy(() => import('../pages/Tools/Chat'));
 const Mailbox = lazy(() => import('../pages/Tools/Mailbox'));
 
+//Prospects
 const ViewProspects = lazy(() => import('../pages/Prospects/ViewProspects'));
 const AddProspect = lazy(() => import('../pages/Prospects/AddProspect'));
 const ActivateStudent = lazy(() => import('../pages/Prospects/ActivateStudent'));
@@ -161,6 +174,7 @@ const routes = [
         element: <Forms />,
         layout: 'blank',
     },
+
     //payments
     {
         path: '/payments/search-payments',
@@ -240,8 +254,6 @@ const routes = [
         path: '/reports/attendance-report',
         element: <AttendanceReport />,
     },
-
-
 
     //classes
     {
@@ -336,7 +348,7 @@ const routes = [
         element: <ViewStaffMember />,
     },
     {
-        path: '/staff/edit-staff-member',
+        path: '/staff/edit-staff-member/:staffID',
         element: <EditStaffMember />,
     },
     {

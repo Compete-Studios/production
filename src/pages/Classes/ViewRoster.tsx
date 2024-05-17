@@ -16,9 +16,10 @@ import IconMessage from '../../components/Icon/IconMessage';
 import IconDollarSignCircle from '../../components/Icon/IconDollarSignCircle';
 import { hashTheID } from '../../functions/shared';
 import { formatHoursFromDateTime, handleGetTimeZoneOfUser } from '../../functions/dates';
+import Tippy from '@tippyjs/react';
 
 const ViewRoster = () => {
-    const { suid, classes }: any = UserAuth();
+    const { suid, classes, staff }: any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Contacts'));
@@ -27,10 +28,10 @@ const ViewRoster = () => {
     const [studentRoster, setStudentRoster] = useState<any>([]);
     const [prospectRoster, setProspectRoster] = useState<any>([]);
     const [classData, setClassData] = useState<any>([]);
-    const [staff, setStaff] = useState<any>([]);
+    const [classStaff, setClassStaff] = useState<any>([]);
     const [classSchedule, setClassSchedule] = useState<any>([{}]);
     const [value, setValue] = useState<any>('list');
-    
+
     const [defaultParams] = useState({
         id: null,
         name: '',
@@ -54,13 +55,15 @@ const ViewRoster = () => {
         setClassData(classes.find((d: any) => d.ClassId === parseInt(classId ?? '')));
     }, [classId, classes]);
 
+   
     const handleGetClassStaff = async () => {
         try {
             const res = await getStaffByClassId(classId);
             if (res) {
-                setStaff(res);
+               const activeStaff = staff.filter((d: any) => res.map((d: any) => d.StaffId[0]).includes(d.StaffId));
+                setClassStaff(activeStaff);
             } else {
-                setStaff([]);
+                setClassStaff([]);
             }
         } catch (error) {
             console.log(error);
@@ -76,7 +79,6 @@ const ViewRoster = () => {
             console.log(error);
         }
     };
-
 
     useEffect(() => {
         handleGetClassStaff();
@@ -204,17 +206,37 @@ const ViewRoster = () => {
                 <div className="flex items-center justify-between flex-wrap gap-4 mt-4">
                     <div>
                         <h2 className="text-xl font-bold">Roster for {classData?.Name}</h2>
-                        <div className="text-sm text-gray-500 dark:text-gray-400 mb-4">Instructors: 
-                            {staff.map((d: any, index: any) => (
-                                <span key={index} className='font-bold text-info'> {d.FirstName} {d.LastName}</span>
-                            ))}
+                        <div className="text-sm text-gray-500 dark:text-gray-400 mb-4 flex items-center gap-1">
+                            Instructors:
+                            <div className='flex flex-wrap'>
+                            {classStaff?.length > 0 ? (
+                                classStaff?.map((d: any, index: any) => (
+                                    <div className='block'>
+                                    <span key={index} className="font-bold text-info">                                      
+                                        {d.FirstName} {d.LastName}{classStaff?.length > 1 && ','} 
+                                    </span>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="font-bold text-danger flex items-center gap-1">
+                                    {' '}
+                                    No Assigned Instructor
+                                    <Tippy content="Assign Instructor">
+                                    <button>
+                                        <IconUserPlus className="ltr:mr-2 rtl:ml-2 text-info" />
+                                    </button>
+                                    </Tippy>
+                                </div>
+                            )}
+                           </div>
                         </div>
                         {classSchedule.map((d: any) => (
-                        <div className="text-sm text-gray-500 dark:text-gray-400 font-bold"> 
-                            
-                                <span key={d.ClassScheduleId} > {d.DayOfWeek} {formatHoursFromDateTime(d.StartTime, handleGetTimeZoneOfUser())} - {formatHoursFromDateTime(d.EndTime, handleGetTimeZoneOfUser())}</span>
-                            
-                        </div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400 font-bold">
+                                <span key={d.ClassScheduleId}>
+                                    {' '}
+                                    {d.DayOfWeek} {formatHoursFromDateTime(d.StartTime, handleGetTimeZoneOfUser())} - {formatHoursFromDateTime(d.EndTime, handleGetTimeZoneOfUser())}
+                                </span>
+                            </div>
                         ))}
                     </div>
 
@@ -256,9 +278,9 @@ const ViewRoster = () => {
                                 <table className="table-striped table-hover">
                                     <thead>
                                         <tr>
-                                            <th>Name</th>
-                                            <th>Phone</th>
-                                            <th>Email</th>
+                                            <th className="">Name</th>
+                                            <th className="hidden lg:table-cell">Phone</th>
+                                            <th className="hidden sm:table-cell">Email</th>
 
                                             <th className="!text-center">Actions</th>
                                         </tr>
@@ -283,8 +305,8 @@ const ViewRoster = () => {
                                                             <div>{contact.Name}</div>
                                                         </div>
                                                     </td>
-                                                    <td className="whitespace-nowrap">{contact.Phone}</td>
-                                                    <td>{contact.email}</td>
+                                                    <td className="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">{contact.Phone}</td>
+                                                    <td className="hidden px-3 py-4 text-sm text-gray-500 sm:table-cell">{contact.email}</td>
 
                                                     <td>
                                                         <div className="flex gap-4 items-center justify-center">

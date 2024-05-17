@@ -40,7 +40,7 @@ export default function ProspectPipeline() {
             });
     };
 
-    console.log(prospectPipelineSteps, "pipelinesteps")
+  
 
     return (
         <div className="panel px-0 pb-0 border-white-light dark:border-[#1b2e4b]">

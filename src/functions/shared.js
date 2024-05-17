@@ -31,12 +31,15 @@ export const convertPhone = (phone) => {
     }
 };
 
+export const convertPhoneNumber = (phone) => {
+    return phone?.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+};
+
 export const formatDate = (date) => {
     const newDate = new Date(date);
     const formattedDate = newDate.toISOString().substr(0, 10);
     return formattedDate;
 };
-
 
 export const hashTheID = (id) => {
     return parseInt(id) * 123456789;

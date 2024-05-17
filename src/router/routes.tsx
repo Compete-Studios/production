@@ -96,6 +96,7 @@ const AddPipelineStep = lazy(() => import('../pages/Students/AddPipelineStep'));
 const AddPaymentSchedule = lazy(() => import('../pages/Students/AddPaymentSchedule'));
 const AddABillingAccount = lazy(() => import('../pages/Students/AddABillingAccount'));
 const FinishedAddingAccountOptions = lazy(() => import('../pages/Students/FinishedAddingAccountOptions'));
+const ViewPaymentMethods = lazy(() => import('../pages/Students/ViewPaymentMethods'));
 
 // Studios
 const PasswordReset = lazy(() => import('../pages/Studios/PasswordReset'));
@@ -408,6 +409,10 @@ const routes = [
     {
         path: '/students/quick-pay',
         element: <StudentsQuickPay />,
+    },
+    {
+        path: '/students/viewpayment-methods',
+        element: <ViewPaymentMethods />,
     },
     {
         path: '/students/invoice/:id',

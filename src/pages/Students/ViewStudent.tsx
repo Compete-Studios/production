@@ -401,18 +401,14 @@ const ViewStudent = () => {
         const hashedStudent = parseInt(student?.Student_id) * 548756 * parseInt(suid);
         setHasedRefID(hashedStudent);
     }, [student]);
-    
-
-   
-
 
     return (
         <div>
             <div className="sm:flex sm:items-center sm:justify-between">
                 <ul className="flex space-x-2 rtl:space-x-reverse">
-                <li>
+                    <li>
                         <Link to="/students/view-students" className="text-primary hover:underline">
-                           Students
+                            Students
                         </Link>
                     </li>
                     <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2 text-primary hover:underline">
@@ -429,7 +425,7 @@ const ViewStudent = () => {
             </div>
             <div className="lg:flex lg:items-start gap-4 mt-4">
                 {/* CONTACT INFO */}
-                <div className="panel p-0 lg:min-w-80 divide-y divide-y-zinc-600 ">
+                <div className="panel p-0 lg:min-w-80 lg:max-w-96 divide-y divide-y-zinc-600 ">
                     <div className="flex items-start justify-between mb-5 p-4">
                         <div>
                             <div className="font-semibold  text-2xl">
@@ -453,14 +449,14 @@ const ViewStudent = () => {
                         <div className="text-zinc-500 underline">Studio</div>
                         <div className="font-bold">{studioInfo?.Studio_Name}</div>
                         <div className="text-zinc-500 mt-2 underline">Classes</div>
-                        <div className="font-bold">{classes.length > 0 ? classes.map((c: any) => c.Name).join(', ') : 'No classes'}</div>
+                        <div className="font-bold flex flex-wrap">{classes.length > 0 ? classes.map((c: any) => c.Name).join(', ') : 'No classes'}</div>
                         <div className="text-zinc-500 mt-2 underline">Active Pay Schedules</div>
                         <div className="">
                             {paymentSchedules.map((data: any, index: any) => {
                                 return (
                                     <>
                                         {' '}
-                                        {(data?.EndDate !== data?.StartDate && data.ScheduleStatus === "Active") && (
+                                        {data?.EndDate !== data?.StartDate && data.ScheduleStatus === 'Active' && (
                                             <div key={index} className="flex items-center text-xs gap-2 mt-2">
                                                 <div className={`${data.ScheduleStatus === 'Active' ? 'text-success' : 'text-danger'}`}>{data.ScheduleStatus}</div>
                                                 <div className="font-bold">${parseInt(data?.PaymentAmount)?.toFixed(2)}</div>
@@ -482,7 +478,6 @@ const ViewStudent = () => {
                         <SendQuickEmail student={student} name="Student" pipeline={pipeline} />
                         <SendQuickText student={student} name="Student" pipeline={pipeline} />
                         <SendQuickWaiver student={student} prospect={false} />
-                        <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left">Create a Billing Account</button>
                         <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left">Clone Student</button>
                         <button className="uppercase font-lg font-bold w-full hover:bg-danger-light p-4 text-left">Delete Student</button>
                     </div>
@@ -1128,6 +1123,27 @@ const ViewStudent = () => {
                                                                 </p>
                                                             </div>
                                                             <ul className="mt-7 ">
+                                                                {/* <li>
+                                                                    <Tippy content="Add Credit Card">
+                                                                        <Link
+                                                                            to="/students/viewpayment-methods"
+                                                                            className="uppercase font-lg font-bold w-full hover:bg-dark-light p-4 text-left flex items-center gap-4 whitespace-nowrap"
+                                                                        >
+                                                                            <svg
+                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                                width="16"
+                                                                                height="16"
+                                                                                fill="currentColor"
+                                                                                className="bi bi-credit-card-2-front"
+                                                                                viewBox="0 0 16 16"
+                                                                            >
+                                                                                <path d="M14 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" />
+                                                                                <path d="M2 5.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5" />
+                                                                            </svg>
+                                                                            View Payment Methods
+                                                                        </Link>
+                                                                    </Tippy>
+                                                                </li> */}
                                                                 <li>
                                                                     <AddCardModal inStudent={true} />
                                                                 </li>

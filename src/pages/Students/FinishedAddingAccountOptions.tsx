@@ -9,7 +9,7 @@ import { hashTheID } from '../../functions/shared';
 import { getAllCustomerPaymentAccounts } from '../../functions/payments';
 
 export default function FinishedAddingAccountOptions() {
-    const { suid } = UserAuth();
+    const { suid }: any = UserAuth();
     const [studentID, setStudentID] = useState<number>(0);
     const [update, setUpdate] = useState<boolean>(false);
     const [studentInfo, setStudentInfo] = useState<any>({});
@@ -34,10 +34,6 @@ export default function FinishedAddingAccountOptions() {
             padding: '10px 20px',
         });
     };
-
-    
-
-    
 
     useEffect(() => {
         const parsedId: number = parseInt(id ?? '');
@@ -90,8 +86,14 @@ export default function FinishedAddingAccountOptions() {
                     </span>{' '}
                 </p>
             </div>
-            <AddCardModal student={studentInfo} paySimpleID={customerID} cards={cards} update={update} setUpdate={setUpdate} />
-            <AddBankModal student={studentInfo} paySimpleID={customerID} bankAccounts={bankAccounts} update={update} setUpdate={setUpdate} />
+            <div className="sm:flex space-y-4 sm:space-y-0 gap-4">
+                <div className="w-full">
+                    <AddCardModal student={studentInfo} paySimpleID={customerID} cards={cards} update={update} setUpdate={setUpdate} />
+                </div>
+                <div className="w-full">
+                    <AddBankModal student={studentInfo} paySimpleID={customerID} bankAccounts={bankAccounts} update={update} setUpdate={setUpdate} />
+                </div>
+            </div>
             <Link to={`/students/view-student/${hashTheID(studentID)}/${hashTheID(suid)}`} className="block text-center text-primary font-semibold">
                 Go To Students Info
             </Link>

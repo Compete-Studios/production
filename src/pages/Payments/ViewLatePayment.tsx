@@ -379,11 +379,11 @@ export default function ViewLatePayment() {
             paysimpleTransactionId: paymentInfo.PaysimpleTransactionId,
             currentPipelineStatus: mutablePipelineStep,
             nextContactDate: mutablePaymentInfo.NextContactDate,
-        };       
+        };
         try {
             const res = await updateLatePaymentDateStepID(data);
             if (res) {
-                console.log(res)
+                console.log(res);
                 showMessage('Pipeline Updated');
                 setUpdate(!update);
             }
@@ -420,7 +420,14 @@ export default function ViewLatePayment() {
         navigate(`/students/${newID}/finish-billing-setup-options`);
     };
 
-    const overallLoading = loadingData.student || loadingData.paymentInfo || loadingData.paymentIDInfo || loadingData.customerPaymentAccount || loadingData.paymentNotes || loadingData.billingInfo;
+    // const overallLoading = loadingData.student || loadingData.paymentInfo || loadingData.paymentIDInfo || loadingData.customerPaymentAccount || loadingData.paymentNotes || loadingData.billingInfo;
+    const [overallLoading, setOverallLoading] = useState(true);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setOverallLoading(false);
+        }, 2000);
+    }, [loadingData]);
 
     return (
         <>

@@ -10,9 +10,10 @@ import Sidebar from './Sidebar';
 import Portals from '../../components/Portals';
 import { UserAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import ReportIssue from '../ReportIssue';
 
 const DefaultLayout = ({ children }: PropsWithChildren) => {
-    const { isLoggedIn, showLoading } = UserAuth();
+    const { isLoggedIn, showLoading }: any = UserAuth();
     const themeConfig = useSelector((state: IRootState) => state.themeConfig);
     const dispatch = useDispatch();
 
@@ -99,7 +100,10 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
 
                         {/* BEGIN CONTENT AREA */}
                         <Suspense>
-                            <div className={`${themeConfig.animation} p-6 animate__animated`}>{children}</div>
+                            <div className={`${themeConfig.animation} p-6 animate__animated`}>
+                                {children}
+                                <ReportIssue />
+                            </div>
                         </Suspense>
                         {/* END CONTENT AREA */}
 

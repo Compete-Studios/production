@@ -9,6 +9,7 @@ import { REACT_API_BASE_URL } from '../../constants';
 import { convertPhone, hashTheID } from '../../functions/shared';
 import IconUserPlus from '../../components/Icon/IconUserPlus';
 import IconPlus from '../../components/Icon/IconPlus';
+import { copyDocAndCreateNew } from '../../firebase/firebaseFunctions';
 
 const ViewStudents = () => {
     const { suid, students }: any = UserAuth();
@@ -79,8 +80,8 @@ const ViewStudents = () => {
             padding: '10px 20px',
         });
     };
-    
 
+ 
     return (
         <div>
             {showLoading && (
@@ -102,7 +103,8 @@ const ViewStudents = () => {
                 </div>
                 <div className="flex sm:flex-row flex-col sm:items-center sm:gap-3 gap-4 w-full sm:w-auto">
                     <div className="flex gap-3">
-                        <Link to="/students/add-student" type="button" className="btn btn-primary">
+                        <Link to="/students/add-student" type="button" className="btn btn-primary"
+                        >
                             <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
                             Add Student
                         </Link>

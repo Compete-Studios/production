@@ -3,14 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../../store';
 import { Tab } from '@headlessui/react';
 import { Fragment } from 'react';
-import Dropdown from '../../components/Dropdown';
 import { setPageTitle } from '../../store/themeConfigSlice';
-import { Suspense, useEffect, useState } from 'react';
-import IconPencilPaper from '../../components/Icon/IconPencilPaper';
-import IconCalendar from '../../components/Icon/IconCalendar';
-import Tippy from '@tippyjs/react';
+import { useEffect, useState } from 'react';
+
 import 'tippy.js/dist/tippy.css';
-import IconHorizontalDots from '../../components/Icon/IconHorizontalDots';
 import { UserAuth } from '../../context/AuthContext';
 import {
     dropProspectFromClass,
@@ -23,32 +19,17 @@ import {
     updateProspectByColumn,
     updateProspectNotes,
 } from '../../functions/api';
-import IconUser from '../../components/Icon/IconUser';
-import ActionItemProspects from './ActionItemProspects';
-import IconTrash from '../../components/Icon/IconTrash';
-import IconDollarSignCircle from '../../components/Icon/IconDollarSignCircle';
-import IconPlus from '../../components/Icon/IconPlus';
-import { convertPhone, showMessage, showWarningMessage } from '../../functions/shared';
+import { showMessage, showWarningMessage } from '../../functions/shared';
 import { formatDate } from '@fullcalendar/core';
-import { getAllCustomerPaymentAccounts } from '../../functions/payments';
 import AddStudentToClass from '../Classes/AddStudentToClass';
 import AddStudentToProgram from '../Classes/AddStudenToProgram';
 import AddStudentToWaitingList from '../Classes/AddStudentToWaitingList';
-import StudentsQuickPay from '../Students/StudentsQuickPay';
-import UpdateContactPopUp from '../Students/UpdateContactPopUp';
-import UpdateAdditionalPopUp from '../Students/UpdateAdditionalPopUp';
-import AddCardModal from '../Students/AddCardModal';
-import AddBankModal from '../Students/AddBankModal';
-import AddNoteModal from '../Students/AddNoteModal';
 import SendQuickText from '../Students/buttoncomponents/SendQuickText';
 import SendQuickEmail from '../Students/buttoncomponents/SendQuickEmail';
 import AddProspectNotesModal from './AddProspectNotesModal';
-import IconMenuDashboard from '../../components/Icon/Menu/IconMenuDashboard';
-import IconUsersGroup from '../../components/Icon/IconUsersGroup';
-import IconUsers from '../../components/Icon/IconUsers';
+
 import IconEdit from '../../components/Icon/IconEdit';
 import SendQuickWaiver from '../Students/buttoncomponents/SendQuickWaiver';
-import IconBolt from '../../components/Icon/IconBolt';
 import IconInfoTriangle from '../../components/Icon/IconInfoTriangle';
 
 interface UpdateValues {
@@ -74,7 +55,7 @@ const updateValuesInit = {
 };
 
 const ViewProspect = () => {
-    const { suid, marketingSources, waitingLists, studioInfo, prospectPipelineSteps, studioOptions, setUpdate, update }: any = UserAuth();
+    const {  setToActivate, suid, marketingSources, waitingLists, studioInfo, prospectPipelineSteps }: any = UserAuth();
     const [billingLoading, setBillingLoading] = useState<boolean>(true);
     const [updateClasses, setUpdateClasses] = useState<boolean>(false);
     const [toUpdate, setToUpdate] = useState<UpdateValues>(updateValuesInit);
@@ -93,7 +74,7 @@ const ViewProspect = () => {
     const [paymentSchedules, setPaymentSchedules] = useState<any>([]);
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Profile'));
+        dispatch(setPageTitle('Prospect Profile'));
     });
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const { uid, studioid } = useParams<{ uid: string; studioid: any }>();
@@ -175,7 +156,7 @@ const ViewProspect = () => {
         }
     };
 
-    const getWiatingListsForStudent = async (studentID: any) => {
+    const getWaitingListsForStudent = async (studentID: any) => {
         try {
             const response = await getWaitingListByProspectId(studentID);
 
@@ -223,7 +204,7 @@ const ViewProspect = () => {
 
     useEffect(() => {
         getClassesForStudent(unHashTheID(uid));
-        getWiatingListsForStudent(unHashTheID(uid));
+        getWaitingListsForStudent(unHashTheID(uid));
         getProgramsForStudent(unHashTheID(uid));
     }, [uid, suid, updateClasses]);
 
@@ -238,6 +219,7 @@ const ViewProspect = () => {
     useEffect(() => {
         scrollTop();
     }, []);
+    
 
     const handleDeleteFromClass = (classID: any) => {
         showWarningMessage('Are you sure you want to remove this student from this class?', 'Remove Student From Class', 'Your student has been removed from the class')
@@ -323,6 +305,11 @@ const ViewProspect = () => {
         ProspectId: unHashTheID(uid),
     };
 
+    const handleActivate = (e: any) => {
+        e.preventDefault();
+        navigate(`/prospects/activate/${uid}`);
+    };
+
     return (
         <div>
             <div className="sm:flex sm:items-center sm:justify-between">
@@ -352,7 +339,6 @@ const ViewProspect = () => {
                     <span className="ltr:pr-2 rtl:pl-2">
                         <strong className="ltr:mr-1 rtl:ml-1">Time to Contact!</strong>This prospect is due for a follow-up.
                     </span>
-                    
                 </div>
             )}
 
@@ -378,7 +364,7 @@ const ViewProspect = () => {
                         <div className="font-bold">{studioInfo?.Studio_Name}</div>
                     </div>
                     <div className="">
-                        <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left" onClick={() => navigate(`/students/add-student`)}>
+                        <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left" onClick={(e: any) => handleActivate(e)}>
                             Activate As Student
                         </button>
                         <SendQuickEmail student={student} name="Prospect" />
@@ -461,7 +447,7 @@ const ViewProspect = () => {
                                             <path d="M14 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" />
                                             <path d="M2 5.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5" />
                                         </svg>
-                                       Billing
+                                        Billing
                                     </button>
                                 )}
                             </Tab>
@@ -829,13 +815,10 @@ const ViewProspect = () => {
                             </Tab.Panel>
                             <Tab.Panel>
                                 <div className="active pt-5">
-                                    <div className="grid grid-cols-2">
+                                    <div className="grid grid-cols-2 panel">
                                         {prospectPipelineSteps.map((step: any) => {
                                             return (
-                                                <label
-                                                    htmlFor={step.PipelineStepId}
-                                                    className="flex items-center cursor-pointer hover:bg-gray-100 p-1"                                                    
-                                                >
+                                                <label htmlFor={step.PipelineStepId} className="flex items-center cursor-pointer hover:bg-gray-100 p-1">
                                                     <input
                                                         type="radio"
                                                         name="pipeline"

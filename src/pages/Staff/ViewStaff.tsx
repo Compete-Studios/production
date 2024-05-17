@@ -9,6 +9,7 @@ import IconEdit from '../../components/Icon/IconEdit';
 import IconEye from '../../components/Icon/IconEye';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import { UserAuth } from '../../context/AuthContext';
+import ViewStaffMember from './ViewStaffMember';
 
 const ViewStaff = () => {
     const { staff }: any = UserAuth();
@@ -17,12 +18,11 @@ const ViewStaff = () => {
         dispatch(setPageTitle('View Staff'));
     });
 
-
     const deleteRow = (id: any = null) => {
         if (window.confirm('Are you sure want to delete selected row ?')) {
             if (id) {
-                setRecords(staff.filter((user) => user.StaffId !== id));
-                setInitialRecords(staff.filter((user) => user.StaffId !== id));
+                setRecords(staff.filter((user: any) => user.StaffId !== id));
+                setInitialRecords(staff.filter((user: any) => user.StaffId !== id));
                 setSearch('');
                 setSelectedRecords([]);
             } else {
@@ -30,7 +30,7 @@ const ViewStaff = () => {
                 const ids = selectedRows.map((d: any) => {
                     return d.id;
                 });
-                const result = staff.filter((d) => !ids.includes(d.StaffId as never));
+                const result = staff.filter((d: any) => !ids.includes(d.StaffId as never));
                 setRecords(result);
                 setInitialRecords(result);
                 setSearch('');
@@ -66,12 +66,8 @@ const ViewStaff = () => {
 
     useEffect(() => {
         setInitialRecords(() => {
-            return staff.filter((item) => {
-                return (
-                    item.Name.toLowerCase().includes(search.toLowerCase()) ||
-                    item.email.toLowerCase().includes(search.toLowerCase()) ||
-                    item.Phone.toLowerCase().includes(search.toLowerCase())
-                );
+            return staff.filter((item: any) => {
+                return item.Name.toLowerCase().includes(search.toLowerCase()) || item.email.toLowerCase().includes(search.toLowerCase()) || item.Phone.toLowerCase().includes(search.toLowerCase());
             });
         });
     }, [search]);
@@ -86,17 +82,15 @@ const ViewStaff = () => {
         <div className="panel px-0 border-white-light dark:border-[#1b2e4b]">
             <div className="invoice-table">
                 <div className="mb-4.5 px-5 flex md:staff-center md:flex-row flex-col gap-5">
-                <div className="">
+                    <div className="">
                         <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>
                     <div className="flex staff-center gap-2 ltr:ml-auto rtl:mr-auto">
-                
                         <Link to="/staff/add-staff" className="btn btn-primary gap-1">
                             <IconPlus />
                             Add Staff
                         </Link>
                     </div>
-                   
                 </div>
 
                 <div className="datatables pagination-padding">
@@ -129,16 +123,14 @@ const ViewStaff = () => {
                                 title: 'Actions',
                                 sortable: false,
                                 textAlignment: 'center',
-                                render: ({ StaffId }) => (
+                                render: ({ StaffId }: any) => (
                                     <div className="flex gap-4 staff-center w-max mx-auto">
                                         <NavLink to="/apps/invoice/edit" className="flex hover:text-info">
                                             <IconEdit className="w-4.5 h-4.5" />
                                         </NavLink>
-                                        <NavLink to="/apps/invoice/preview" className="flex hover:text-primary">
-                                            <IconEye />
-                                        </NavLink>
+                                        <ViewStaffMember staffID={StaffId} />
                                         {/* <NavLink to="" className="flex"> */}
-                                        <button type="button" className="flex hover:text-danger" onClick={(e) => deleteRow(id)}>
+                                        <button type="button" className="flex text-danger hover:text-red-800" onClick={(e) => deleteRow(StaffId)}>
                                             <IconTrashLines />
                                         </button>
                                         {/* </NavLink> */}

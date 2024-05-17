@@ -4,9 +4,21 @@ import Select from 'react-select';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import Swal from 'sweetalert2';
-import { addNewStudent, addStudentToClasses, addStudentToPrograms, addStudentToWaitingLists } from '../../functions/api';
-import { Link, useNavigate } from 'react-router-dom';
-import { constFormateDateMMDDYYYY, formatDate } from '../../functions/shared';
+import {
+    addNewStudent,
+    addStudentToClasses,
+    addStudentToPrograms,
+    addStudentToWaitingLists,
+    dropProspect,
+    getClassesByProspectId,
+    getProgramsByProspectId,
+    getProspectById,
+    getWaitingListByProspectId,
+} from '../../functions/api';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { constFormateDateMMDDYYYY } from '../../functions/shared';
+import { formatWithTimeZone, handleGetTimeZoneOfUser } from '../../functions/dates';
+import { formatDate } from '@fullcalendar/core';
 
 const studentInfoInit = {
     studioId: '',
@@ -40,8 +52,8 @@ const alertsInit = {
     pipelineStep: false,
 };
 
-export default function AddStudent() {
-    const { waitingLists, pipelineSteps, programs, classes, marketingSources, suid, toActivate }: any = UserAuth();
+export default function ActivateStudent() {
+    const { waitingLists, pipelineSteps, programs, classes, marketingSources, suid }: any = UserAuth();
     const [alerts, setAlerts] = useState(alertsInit);
     const [studentInfo, setStudentInfo] = useState(studentInfoInit);
     const [programsForStudent, setProgramsForStudent] = useState([]);
@@ -49,9 +61,14 @@ export default function AddStudent() {
     const [selectedWaitingLists, setSelectedWaitingLists] = useState([]);
     const [options, setOptions] = useState([]);
 
+    const { uid } = useParams<{ uid: string }>();
+    const unHashTheID = (id: any) => {
+        return parseInt(id) / 123456789;
+    };
+
     const navigate = useNavigate();
 
-    console.log(toActivate, 'toActivate');
+    console.log(uid, 'uid');
 
     useEffect(() => {
         const newPrograms = programs?.map((program: any) => {
@@ -59,6 +76,88 @@ export default function AddStudent() {
         });
         setOptions(newPrograms);
     }, [programs]);
+
+    const getClassesForStudent = async (studentID: any) => {
+        try {
+            const response = await getClassesByProspectId(studentID);
+            if (response.recordset.length > 0) {
+                setSelectedClasses(response.recordset);
+            } else {
+                setSelectedClasses([]);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const getWaitingListsForStudent = async (studentID: any) => {
+        try {
+            const response = await getWaitingListByProspectId(studentID);
+
+            if (response.recordset.length > 0) {
+                setSelectedWaitingLists(response.recordset);
+            } else {
+                setSelectedWaitingLists([]);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const getProgramsForStudent = async (studentID: any) => {
+        try {
+            const response = await getProgramsByProspectId(studentID);
+            if (response.recordset.length > 0) {
+                const prosPrograms = response.recordset.map((item: any) => {
+                    return { value: item.ProgramId, label: item.Name };
+                });
+
+                setProgramsForStudent(prosPrograms);
+            } else {
+                setProgramsForStudent([]);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        getClassesForStudent(unHashTheID(uid));
+        getWaitingListsForStudent(unHashTheID(uid));
+        getProgramsForStudent(unHashTheID(uid));
+    }, [uid, suid]);
+
+    useEffect(() => {
+        const studentID: any = unHashTheID(uid);
+        // fetch student data
+        getProspectById(studentID).then((res) => {
+            console.log(res, 'student data');
+            const newStudentData = {
+                studioId: res.StudioId,
+                fName: res.FName || '',
+                lName: res.LName || '',
+                contact1: res.ParentName || '',
+                contact2: '',
+                phone: res.Phone || '',
+                phone2: '',
+                email: res.Email || '',
+                address: res.Address || '',
+                address2: '',
+                city: res.City || '',
+                state: res.State || '',
+                zip: res.Zip || '',
+                birthdate: res.birthdate || '',
+                marketingMethod: res.ContactMethod || '',
+                notes: res.Notes || '',
+                nextContactDate: res.NextContactDate || '',
+                currentPipelineStatus: '',
+                firstClassDate: res.FirstClassDate || '',
+                originalContactDate: res.EntryDate || '',
+                introDate: res.IntroDate || '',
+            };
+            setStudentInfo(newStudentData);
+        });
+    }, [uid, suid]);
 
     const handleSelectClass = (e: any, item: any) => {
         e.preventDefault();
@@ -69,7 +168,7 @@ export default function AddStudent() {
         }
     };
 
-    const handleDeselctClass = (e, item) => {
+    const handleDeselctClass = (e: any, item: any) => {
         e.preventDefault();
         setSelectedClasses(selectedClasses.filter((i) => i !== item));
     };
@@ -110,6 +209,8 @@ export default function AddStudent() {
 
     const handleAddStudent = async (e: any) => {
         e.preventDefault();
+        console.log(unHashTheID(uid))
+
 
         studentInfo.nextContactDate = formatDate(studentInfo.nextContactDate);
         studentInfo.birthdate = formatDate(studentInfo.birthdate);
@@ -138,33 +239,40 @@ export default function AddStudent() {
             scrollTop();
             return;
         } else {
-            addNewStudent(studentInfo).then((res) => {
-                console.log(res, 'new student');
-                console.log(programIds, 'programIds');
-                console.log(classIDs, 'classIDs');
-                console.log(waitingListIds, 'waitingListIds');
-                addStudentToPrograms(res.NewStudentId, programIds);
-                addStudentToClasses(res.NewStudentId, classIDs);
-                addStudentToWaitingLists(res.NewStudentId, waitingListIds);
-                showMessage('Student has been added successfully');
-                const newID = parseInt(res.NewStudentId) * parseInt(suid);
-                navigate(`/students/add-billing-account/${newID}`);
-            });
+            try {
+                const res = await addNewStudent(studentInfo);
+                if (res.NewStudentId) {
+                    addStudentToPrograms(res.NewStudentId, programIds);
+                    addStudentToClasses(res.NewStudentId, classIDs);
+                    addStudentToWaitingLists(res.NewStudentId, waitingListIds);
+                    const prosResponse = await dropProspect(unHashTheID(uid));
+                    console.log(prosResponse, 'prosResponse');
+                    showMessage('Student has been added successfully');
+                    const newID = parseInt(res.NewStudentId) * parseInt(suid);
+                    navigate(`/students/add-billing-account/${newID}`);
+                }
+            } catch (error) {
+                console.log(error);
+                showErrorMessage('Something went wrong');
+            }
         }
     };
 
-    console.log(studentInfo, 'studentInfo')
+   
 
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
                 <li>
                     <Link to="/students/view-students" className="text-primary hover:underline">
-                        Students
+                        Prospects
                     </Link>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>Add Student</span>
+                    <span>{} Name</span>
+                </li>
+                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
+                    <span>Activate Prospect</span>
                 </li>
             </ul>
             <div className="panel bg-gray-100 max-w-5xl mx-auto mt-4">
@@ -180,6 +288,7 @@ export default function AddStudent() {
                                 <input
                                     id="first"
                                     type="text"
+                                    value={studentInfo.fName}
                                     className={`form-input ${alerts.firstName && 'border-danger bg-red-50'} `}
                                     onChange={(e) => setStudentInfo({ ...studentInfo, fName: e.target.value })}
                                 />
@@ -190,6 +299,7 @@ export default function AddStudent() {
                                 <input
                                     id="last"
                                     type="text"
+                                    value={studentInfo.lName}
                                     className={`form-input ${alerts.lastName && 'border-danger bg-red-50'} `}
                                     onChange={(e) => setStudentInfo({ ...studentInfo, lName: e.target.value })}
                                 />
@@ -197,25 +307,26 @@ export default function AddStudent() {
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="contact1">Contact 1</label>
-                                <input id="contact1" type="text" className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, contact1: e.target.value })} />
+                                <input id="contact1" type="text" value={studentInfo.contact1} className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, contact1: e.target.value })} />
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="contact2">Contact 2</label>
-                                <input id="contact2" type="text" className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, contact2: e.target.value })} />
+                                <input id="contact2" type="text" value={studentInfo.contact2} className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, contact2: e.target.value })} />
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="phone">Mobile Phone</label>
-                                <input id="phone" type="text" className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, phone: e.target.value })} />
+                                <input id="phone" type="text" value={studentInfo.phone} className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, phone: e.target.value })} />
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="phone">Home Phone</label>
-                                <input id="phone" type="text" className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, phone2: e.target.value })} />
+                                <input id="phone" type="text" value={studentInfo.phone2} className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, phone2: e.target.value })} />
                             </div>
                             <div className="sm:col-span-2" onClick={() => setAlerts({ ...alerts, email: false })}>
                                 <label htmlFor="email">Email</label>
                                 <input
                                     id="email"
                                     type="text"
+                                    value={studentInfo.email}
                                     className={`form-input ${alerts.email && 'border-danger bg-red-50'} `}
                                     onChange={(e) => setStudentInfo({ ...studentInfo, email: e.target.value })}
                                 />
@@ -223,23 +334,44 @@ export default function AddStudent() {
                             </div>
                             <div className="sm:col-span-3">
                                 <label htmlFor="address">Address</label>
-                                <input id="address" type="text" className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, address: e.target.value })} />
+                                <input id="address" type="text" value={studentInfo.address} className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, address: e.target.value })} />
                             </div>
                             <div className="">
                                 <label htmlFor="address2">Address 2</label>
-                                <input id="address2" type="text" className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, address2: e.target.value })} />
+                                <input id="address2" type="text" value={studentInfo.address2} className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, address2: e.target.value })} />
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="city">City</label>
-                                <input id="city" type="text" placeholder="City" className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, city: e.target.value })} />
+                                <input
+                                    id="city"
+                                    type="text"
+                                    value={studentInfo.city}
+                                    placeholder="City"
+                                    className="form-input"
+                                    onChange={(e) => setStudentInfo({ ...studentInfo, city: e.target.value })}
+                                />
                             </div>
                             <div className="sm:col-span-1">
                                 <label htmlFor="state">State</label>
-                                <input id="state" type="text" placeholder="State" className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, state: e.target.value })} />
+                                <input
+                                    id="state"
+                                    type="text"
+                                    value={studentInfo.state}
+                                    placeholder="State"
+                                    className="form-input"
+                                    onChange={(e) => setStudentInfo({ ...studentInfo, state: e.target.value })}
+                                />
                             </div>
                             <div className="sm:col-span-1">
                                 <label htmlFor="zip">Zip</label>
-                                <input id="zip" type="text" placeholder="Zip" className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, zip: e.target.value })} />
+                                <input
+                                    id="zip"
+                                    type="text"
+                                    value={studentInfo.zip}
+                                    placeholder="Zip"
+                                    className="form-input"
+                                    onChange={(e) => setStudentInfo({ ...studentInfo, zip: e.target.value })}
+                                />
                             </div>
                         </div>
                     </form>
@@ -255,7 +387,7 @@ export default function AddStudent() {
                             <div className="sm:col-span-2">
                                 <label htmlFor="birthdate">Birthdate</label>
                                 <Flatpickr
-                                    value={studentInfo.birthdate}
+                                    value={formatWithTimeZone(studentInfo.birthdate, handleGetTimeZoneOfUser())}
                                     className="form-input"
                                     options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
                                     onChange={(date: any) => setStudentInfo({ ...studentInfo, birthdate: date })}
@@ -263,7 +395,12 @@ export default function AddStudent() {
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="marketingMethod">Marketing Source</label>
-                                <select id="marketingMethod" className="form-select text-white-dark" onChange={(e) => setStudentInfo({ ...studentInfo, marketingMethod: e.target.value })}>
+                                <select
+                                    id="marketingMethod"
+                                    className="form-select text-white-dark"
+                                    value={studentInfo.marketingMethod}
+                                    onChange={(e) => setStudentInfo({ ...studentInfo, marketingMethod: e.target.value })}
+                                >
                                     {marketingSources?.map((source: any) => (
                                         <option key={source.MethodId} value={source.MethodId}>
                                             {source.Name}
@@ -273,44 +410,51 @@ export default function AddStudent() {
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="entryDate">Entry Date</label>
-                                <Flatpickr
-                                    value={studentInfo.originalContactDate}
+                                <input
+                                    type="date"
+                                    value={studentInfo.originalContactDate ? studentInfo.originalContactDate.slice(0, 10) : ''}
                                     className="form-input"
-                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
-                                    onChange={(date: any) => setStudentInfo({ ...studentInfo, originalContactDate: date })}
+                                    onChange={(e) => setStudentInfo({ ...studentInfo, originalContactDate: e.target.value })}
                                 />
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="introDate">Intro Date</label>
-                                <Flatpickr
-                                    value={studentInfo.introDate}
+                                <input
+                                    type="date"
+                                    value={studentInfo.introDate ? studentInfo.introDate.slice(0, 10) : ''}
                                     className="form-input"
-                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
-                                    onChange={(date: any) => setStudentInfo({ ...studentInfo, introDate: date })}
+                                    onChange={(e) => setStudentInfo({ ...studentInfo, introDate: e.target.value })}
                                 />
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="firstClassDate">First Class Date</label>
-                                <Flatpickr
-                                    value={studentInfo.firstClassDate}
+                                <input
+                                    type="date"
+                                    value={studentInfo.firstClassDate ? studentInfo.firstClassDate.slice(0, 10) : ''}
                                     className="form-input"
-                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
-                                    onChange={(date: any) => setStudentInfo({ ...studentInfo, firstClassDate: date })}
+                                    onChange={(e: any) => setStudentInfo({ ...studentInfo, firstClassDate: e.target.value })}
                                 />
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="entryDate">Next Contact Date</label>
-                                <Flatpickr
-                                    value={studentInfo.nextContactDate}
+                                <input
+                                    type="date"
+                                    value={studentInfo.nextContactDate ? studentInfo.nextContactDate.slice(0, 10) : ''}
                                     className="form-input"
-                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
-                                    onChange={(date: any) => setStudentInfo({ ...studentInfo, nextContactDate: date })}
+                                    onChange={(e) => setStudentInfo({ ...studentInfo, nextContactDate: e.target.value })}
                                 />
                             </div>
 
                             <div className="sm:col-span-full">
                                 <label htmlFor="notes">Notes</label>
-                                <textarea id="notes" rows={4} placeholder="Notes" className="form-textarea" onChange={(e) => setStudentInfo({ ...studentInfo, notes: e.target.value })} />
+                                <textarea
+                                    id="notes"
+                                    rows={4}
+                                    placeholder="Notes"
+                                    value={studentInfo.notes}
+                                    className="form-textarea"
+                                    onChange={(e) => setStudentInfo({ ...studentInfo, notes: e.target.value })}
+                                />
                             </div>
                             <div className="sm:col-span-2 sm:row-span-2">
                                 <label htmlFor="waitingList">Waiting List</label>
@@ -346,6 +490,7 @@ export default function AddStudent() {
                                 <Select
                                     placeholder="Select an option"
                                     options={options}
+                                    value={programsForStudent}
                                     isMulti
                                     isSearchable={false}
                                     onChange={(e: any) => {

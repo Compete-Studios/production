@@ -33,16 +33,20 @@ import IconMenuMore from '../Icon/Menu/IconMenuMore';
 import { logout } from '../../firebase/auth';
 import AddStudentNote from '../../pages/Apps/AddStudentNote';
 import { UserAuth } from '../../context/AuthContext';
-import { searchByValue, searchByValues, searchProspectsByValue, searchProspectsByValues } from '../../functions/api';
+import { getIncomingUnreadTextMessages, searchByValue, searchByValues, searchProspectsByValue, searchProspectsByValues } from '../../functions/api';
 import Select from 'react-select';
+import { handleGetTimeZoneOfUser } from '../../functions/dates';
+import IconSettings from '../Icon/IconSettings';
 
 const Header = () => {
-    const { setSearchedStudentsAndProspects, suid, studioInfo, isMaster, masters, setSelectedSuid }: any = UserAuth();
+    const { setSearchedStudentsAndProspects, suid, studioInfo, isMaster, masters, setSelectedSuid, studioOptions }: any = UserAuth();
     const [searchItem, setSearchItem] = useState('');
     const [studioInitials, setStudioInitials] = useState('');
     const [options, setOptions] = useState<any>([]);
     const [selected, setSelected] = useState<any>(null);
+    const [incoming, setIncoming] = useState<any>([]);
     const location = useLocation();
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (isMaster) {
@@ -54,10 +58,32 @@ const Header = () => {
         }
     }, [masters]);
 
+    console.log(studioOptions, 'studioOptions');
+
+    const handleGetIncoming = async () => {
+        const data = {
+            studioId: suid,
+            startDate: '2024-05-12',
+            endDate: '2024-05-17',
+        };
+        try {
+            const res = await getIncomingUnreadTextMessages(data);
+            console.log(res, 'res');
+            setIncoming(res.recordset);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        handleGetIncoming();
+    }, []);
+
     const handleSelectStudio = (value: any) => {
         setSelected(value);
         setSelectedSuid(value.value);
         localStorage.setItem('suid', value.value);
+        navigate('/dashboard');
     };
 
     useEffect(() => {
@@ -126,29 +152,59 @@ const Header = () => {
         // },
     ]);
 
+    // generate how long ago the message was created ex. 4 hours ago, or 2 days ago or, 2 minutes ago
+
+    const getCreatedTimeFromTimeStamp = (timeStamp: any) => {
+        const date = new Date(timeStamp);
+        const now = new Date();
+        const diff = now.getTime() - date.getTime();
+        const seconds = Math.floor(diff / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+        const months = Math.floor(days / 30);
+        const years = Math.floor(months / 12);
+        if (years > 0) {
+            return years === 1 ? '1 year ago' : `${years} years ago`;
+        }
+        if (months > 0) {
+            return months === 1 ? '1 month ago' : `${months} months ago`;
+        }
+        if (days > 0) {
+            return days === 1 ? '1 day ago' : `${days} days ago`;
+        }
+        if (hours > 0) {
+            return hours === 1 ? '1 hour ago' : `${hours} hours ago`;
+        }
+        if (minutes > 0) {
+            return minutes === 1 ? '1 minute ago' : `${minutes} minutes ago`;
+        }
+        return 'Just now';
+    };
+
     const removeMessage = (value: number) => {
         setMessages(messages.filter((user: any) => user.id !== value));
     };
 
     const [notifications, setNotifications] = useState([
-        // {
-        //     id: 1,
-        //     profile: 'user-profile.jpeg',
-        //     message: '<strong className="text-sm mr-1">John Doe</strong>invite you to <strong>Prototyping</strong>',
-        //     time: '45 min ago',
-        // },
-        // {
-        //     id: 2,
-        //     profile: 'profile-34.jpeg',
-        //     message: '<strong className="text-sm mr-1">Adam Nolan</strong>mentioned you to <strong>UX Basics</strong>',
-        //     time: '9h Ago',
-        // },
-        // {
-        //     id: 3,
-        //     profile: 'profile-16.jpeg',
-        //     message: '<strong className="text-sm mr-1">Anna Morgan</strong>Upload a file',
-        //     time: '9h Ago',
-        // },
+        {
+            id: 1,
+            profile: 'user-profile.jpeg',
+            message: '<strong className="text-sm mr-1">John Doe</strong>invite you to <strong>Prototyping</strong>',
+            time: '45 min ago',
+        },
+        {
+            id: 2,
+            profile: 'profile-34.jpeg',
+            message: '<strong className="text-sm mr-1">Adam Nolan</strong>mentioned you to <strong>UX Basics</strong>',
+            time: '9h Ago',
+        },
+        {
+            id: 3,
+            profile: 'profile-16.jpeg',
+            message: '<strong className="text-sm mr-1">Anna Morgan</strong>Upload a file',
+            time: '9h Ago',
+        },
     ]);
 
     const [searchParams, setSearchParams] = useState({
@@ -199,8 +255,6 @@ const Header = () => {
         logout();
     };
 
-    const navigate = useNavigate();
-
     const handleSearchUsers = async (e: any) => {
         e.preventDefault();
         setSearchedStudentsAndProspects({ students: [], prospects: [] });
@@ -224,7 +278,7 @@ const Header = () => {
             });
             setSearchedStudentsAndProspects({ students, prospects });
         }
-        
+
         setSearch(false);
         navigate('/search');
     };
@@ -420,10 +474,12 @@ const Header = () => {
                                             <path d="M10 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM6 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" />
                                             <path d="M8 12a1 1 0 1 0 0-2 1 1 0 0 0 0 2M1.599 4.058a.5.5 0 0 1 .208.676A7 7 0 0 0 1 8c0 1.18.292 2.292.807 3.266a.5.5 0 0 1-.884.468A8 8 0 0 1 0 8c0-1.347.334-2.619.923-3.734a.5.5 0 0 1 .676-.208m12.802 0a.5.5 0 0 1 .676.208A8 8 0 0 1 16 8a8 8 0 0 1-.923 3.734.5.5 0 0 1-.884-.468A7 7 0 0 0 15 8c0-1.18-.292-2.292-.807-3.266a.5.5 0 0 1 .208-.676M3.057 5.534a.5.5 0 0 1 .284.648A5 5 0 0 0 3 8c0 .642.12 1.255.34 1.818a.5.5 0 1 1-.93.364A6 6 0 0 1 2 8c0-.769.145-1.505.41-2.182a.5.5 0 0 1 .647-.284m9.886 0a.5.5 0 0 1 .648.284C13.855 6.495 14 7.231 14 8s-.145 1.505-.41 2.182a.5.5 0 0 1-.93-.364C12.88 9.255 13 8.642 13 8s-.12-1.255-.34-1.818a.5.5 0 0 1 .283-.648" />
                                         </svg>
-                                        {/* <span className="flex absolute w-3 h-3 ltr:right-0 rtl:left-0 top-0">
-                                            <span className="animate-ping absolute ltr:-left-[3px] rtl:-right-[3px] -top-[3px] inline-flex h-full w-full rounded-full bg-success/50 opacity-75"></span>
-                                            <span className="relative inline-flex rounded-full w-[6px] h-[6px] bg-success"></span>
-                                        </span> */}
+                                        {incoming.length > 0 && (
+                                            <span className="flex absolute w-3 h-3 ltr:right-0 rtl:left-0 top-0">
+                                                <span className="animate-ping absolute ltr:-left-[3px] rtl:-right-[3px] -top-[3px] inline-flex h-full w-full rounded-full bg-success/50 opacity-75"></span>
+                                                <span className="relative inline-flex rounded-full w-[6px] h-[6px] bg-success"></span>
+                                            </span>
+                                        )}
                                     </span>
                                 }
                             >
@@ -431,18 +487,30 @@ const Header = () => {
                                     <li onClick={(e) => e.stopPropagation()}>
                                         <div className="flex items-center px-4 py-2 justify-between font-semibold">
                                             <h4 className="text-lg">Notification</h4>
-                                            {notifications.length ? <span className="badge bg-primary/80">{notifications.length}New</span> : ''}
+                                            {notifications.length ? <span className="badge bg-primary/80">{incoming.length} New</span> : ''}
                                         </div>
                                     </li>
                                     {notifications.length > 0 ? (
                                         <>
-                                            {notifications.map((notification: any) => {
+                                            {incoming?.map((notification: any) => {
                                                 return (
                                                     <li key={notification.id} className="dark:text-white-light/90" onClick={(e) => e.stopPropagation()}>
                                                         <div className="group flex items-center px-4 py-2">
-                                                            <div className="grid place-content-center rounded">
+                                                            {/* <div className="grid place-content-center rounded">
                                                                 <div className="w-12 h-12 relative">
                                                                     <img className="w-12 h-12 rounded-full object-cover" alt="profile" src={`/assets/images/${notification.profile}`} />
+                                                            
+                                                                    <span className="bg-success w-2 h-2 rounded-full block absolute right-[6px] bottom-0"></span>
+                                                                </div>
+                                                            </div> */}
+                                                            <div className="grid place-content-center rounded">
+                                                                <div className="w-12 h-12 relative">
+                                                                    <span className="inline-block h-12 w-12 overflow-hidden rounded-full bg-gray-100">
+                                                                        <svg className="h-full w-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                                                                            <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                                        </svg>
+                                                                    </span>
+
                                                                     <span className="bg-success w-2 h-2 rounded-full block absolute right-[6px] bottom-0"></span>
                                                                 </div>
                                                             </div>
@@ -450,10 +518,10 @@ const Header = () => {
                                                                 <div className="ltr:pr-3 rtl:pl-3">
                                                                     <h6
                                                                         dangerouslySetInnerHTML={{
-                                                                            __html: notification.message,
+                                                                            __html: notification.Body,
                                                                         }}
                                                                     ></h6>
-                                                                    <span className="text-xs block font-normal dark:text-gray-500">{notification.time}</span>
+                                                                    <span className="text-xs block font-normal dark:text-gray-500">{getCreatedTimeFromTimeStamp(notification.CreationDate)}</span>
                                                                 </div>
                                                                 <button
                                                                     type="button"
@@ -516,23 +584,29 @@ const Header = () => {
                                         </div>
                                     </li>
                                     <li>
-                                        <Link to="/users/profile" className="dark:hover:text-white">
+                                        <Link to="/studios/profile" className="dark:hover:text-white">
                                             <IconUser className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
                                             Profile
                                         </Link>
                                     </li>
-                                    <li>
+                                    {/* <li>
                                         <Link to="/apps/mailbox" className="dark:hover:text-white">
                                             <IconMail className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
                                             Inbox
                                         </Link>
-                                    </li>
+                                    </li> */}
                                     <li>
+                                        <Link to="/studios/account" className="dark:hover:text-white">
+                                            <IconSettings className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
+                                            Account
+                                        </Link>
+                                    </li>
+                                    {/* <li>
                                         <Link to="/auth/boxed-lockscreen" className="dark:hover:text-white">
                                             <IconLockDots className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
                                             Lock Screen
                                         </Link>
-                                    </li>
+                                    </li> */}
                                     <li className="border-t border-white-light dark:border-white-light/10">
                                         <button className="text-danger !py-3" onClick={handleLogOut}>
                                             <IconLogout className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 rotate-90 shrink-0" />

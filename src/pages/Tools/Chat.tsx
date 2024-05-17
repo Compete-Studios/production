@@ -92,6 +92,7 @@ const Chat = () => {
             setLoading(true);
             const response = await getTextLogsByStudioId(dataToSend);
             const rawChatList = response.recordset;
+            console.log('rawChatList:', rawChatList)
 
             if (response.recordset?.length === 0) {
                 return;

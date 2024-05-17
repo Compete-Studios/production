@@ -10,8 +10,7 @@ import { updateStudentNotes } from '../../functions/api';
 import Select from 'react-select';
 
 export default function AddStudentNote() {
-    const { suid } = UserAuth();
-    const [students, setStudents] = useState<any>([]);
+    const { students }: any = UserAuth();
     const [selectedStudent, setSelectedStudent] = useState<any>(null);
     const [newNotes, setNewNotes] = useState<string>('');
     const [initials, setInitials] = useState<string>('');
@@ -38,12 +37,7 @@ export default function AddStudentNote() {
         showMessage('Note Added Successfully');
     };
 
-    useEffect(() => {
-        fetch(`${REACT_API_BASE_URL}/studio-access/getStudentsByStudioId/${suid}/1`)
-            .then((response) => response.json())
-            .then((json) => setStudents(json.recordset));
-    }, []);
-
+    
     const handleAddNoteToTopOfNotes = async (e: any) => {
         e.preventDefault();
         // Concatenate the new note with the existing notes, with the new note on top

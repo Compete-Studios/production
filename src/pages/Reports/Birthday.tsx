@@ -66,6 +66,7 @@ const Birthdays = () => {
             }).filter((event: any) => !!event); //Filter out null values
 
             console.log('GET BIRTHDAYS RAN');
+            console.log('FORMATTED BIRTHDAYS:', formattedBirthdays);
             setBirthdays(formattedBirthdays);
 
         } catch (error) {

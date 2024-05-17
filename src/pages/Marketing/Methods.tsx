@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import IconTrashLines from '../../components/Icon/IconTrashLines';
 import { UserAuth } from '../../context/AuthContext';
-import AddEditClass from '../Classes/AddEditClass';
 import AddNewMethod from './AddNewMethod';
 export default function ViewClasses() {
     const { marketingSources }: any = UserAuth();
@@ -110,7 +109,7 @@ export default function ViewClasses() {
                                     textAlignment: 'center',
                                     render: ({ MethodId }) => (
                                         <div className="flex gap-4 items-center w-max mx-auto ">
-                                            <AddEditClass classId={MethodId} editClass={true} />
+                                           
                                             {/* <NavLink to="" className="flex"> */}
                                             <button type="button" className="flex hover:text-danger" onClick={(e) => deleteRow(MethodId)}>
                                                 <IconTrashLines />

@@ -26,10 +26,13 @@ export default function AuthContextProvider({ children }: any) {
     const [masters, setMasters] = useState([]);
     const [isMaster, setIsMaster] = useState(false);
     const [selectedSuid, setSelectedSuid] = useState<any>('');
-    const [metrics, setMetrics] = useState<any>([]);
     const [students, setStudents] = useState<any>([]);
     const [fbForms, setFBForms] = useState<any>([]);
     const [update, setUpdate] = useState(false);
+    const [toActivate, setToActivate] = useState<any>({
+        status: false,
+        prospect: null,
+    });
 
     const fetchData = async (url: any, setter: any) => {
         try {
@@ -240,7 +243,9 @@ export default function AuthContextProvider({ children }: any) {
                 selectedSuid,
                 setSelectedSuid,
                 students,
-                fbForms
+                fbForms,
+                toActivate, 
+                setToActivate
             }}
         >
             {children}

@@ -1,4 +1,4 @@
-import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
 import { db } from './firebase';
 
 export const saveFromToFirebase = async (data, id) => {
@@ -56,4 +56,31 @@ export const copyDocAndCreateNew = async () => {
     } else {
         return false;
     }
+};
+
+export const addMessage = async (message, uid) => {
+    const docRef = collection(db, 'messages', uid, 'notifications');
+    await addDoc(docRef, message);
+};
+
+export const listenForMessages = async (uid, callback) => {
+    const docRef = collection(db, 'messages', uid, 'notifications');
+    const unsubscribe = onSnapshot(docRef, (querySnapshot) => {
+        const messages = [];
+        querySnapshot.forEach((doc) => {
+            const docWithId = { ...doc.data(), id: doc.id };
+            messages.push(docWithId);
+        });
+        callback(messages);
+    });
+
+    return unsubscribe;
+};
+
+
+export const deleteMessage = async (uid, messageId) => {
+    console.log('deleting message', uid, messageId);
+    const docRef = doc(db, 'messages', uid, 'notifications', messageId);
+    const res = await deleteDoc(docRef);
+    console.log('res', res);
 };

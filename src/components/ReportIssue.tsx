@@ -4,14 +4,21 @@ import IconInfoTriangle from './Icon/IconInfoTriangle';
 import IconX from './Icon/IconX';
 import { showErrorMessage, showMessage } from '../functions/shared';
 import { UserAuth } from '../context/AuthContext';
-import { storeReportToFirebase } from '../firebase/firebaseFunctions';
+import { addMessage, storeReportToFirebase } from '../firebase/firebaseFunctions';
 
 export default function ReportIssue() {
-    const { studioInfo }: any = UserAuth();
+    const { studioInfo, suid }: any = UserAuth();
     const [issueModal, setIssueModal] = useState(false);
     const path = window.location.pathname;
     const [issue, setIssue] = useState('');
 
+    const message = {
+        id: 1,
+        image: '<span className="grid place-content-center w-9 h-9 rounded-full bg-success-light dark:bg-success text-success dark:text-success-light"><svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></span>',
+        title: 'Your Issue Has Been Reported!',
+        message: 'Thank you for your feedback. Our team will review and address it as soon as possible.',
+        time: new Date(),
+    }
     const handleIssueSubmit = async (e: any) => {
         e.preventDefault();
         const report = {
@@ -29,6 +36,7 @@ export default function ReportIssue() {
             return;
         } else {
             showMessage('Issue Submitted Successfully');
+            addMessage(message, suid);
             setIssueModal(false);
             setIssue('');
         }

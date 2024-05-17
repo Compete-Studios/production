@@ -144,6 +144,10 @@ const ViewStudent = () => {
         setUpdateNotes(false);
         showMessage('Notes Updated!');
     };
+    useEffect(() => {
+        const marketingSourceTemp = marketingSources?.find((source: any) => source.MethodId === parseInt(student?.MarketingMethod));
+        setDisplayedSource(marketingSourceTemp?.Name);
+    }, [student?.MarketingMethod]);
 
     const getStudentBarcode = async (studentID: any) => {
         try {

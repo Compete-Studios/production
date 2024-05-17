@@ -1,18 +1,14 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { setPageTitle } from '../../store/themeConfigSlice';
-import IconX from '../../components/Icon/IconX';
-import IconDownload from '../../components/Icon/IconDownload';
-import IconEye from '../../components/Icon/IconEye';
-import IconSend from '../../components/Icon/IconSend';
-import IconSave from '../../components/Icon/IconSave';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import Select from 'react-select';
 import { UserAuth } from '../../context/AuthContext';
 import { formatDate, showErrorMessage, showMessage } from '../../functions/shared';
 import { addStaffMember } from '../../functions/api';
+
 
 interface AddStaffProps {
     studioId: string;
@@ -52,7 +48,9 @@ const AddStaff = () => {
     const [options, setOptions] = useState([{ value: 'class1', label: 'Class 1' }]);
     const [classValues, setClassValues] = useState<any>([]);
 
+
     const navigate = useNavigate();
+
 
     useEffect(() => {
         const newClassObj = classes.map((st: any) => {

@@ -925,8 +925,19 @@ export const updateStudent = async (data) => {
 };
 
 export const updateStaffActivity = async (staffId, activityLevel) => {
+
     try {
-        const response = await fetchData(`staff-access/updateStaffActivity/${staffId}/${activityLevel}`, 'post');
+        const response = await fetchData(`staff-access/updateStaffActivity/${staffId}/${activityLevel}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const updateStaffMember = async (data) => {
+    try {
+        const response = await fetchData(`staff-access/updateStaffMember`, 'post', data);
         return response;
     } catch (error) {
         console.error(error);

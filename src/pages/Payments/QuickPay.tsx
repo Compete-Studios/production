@@ -21,9 +21,6 @@ export default function QuickPay() {
     });
 
 
-
-
-
     return (
         <div>
             <div className="panel max-w-5xl mx-auto">

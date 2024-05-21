@@ -18,20 +18,13 @@ export const login = async (userName, password) => {
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
-            // Check if the display name is not set
-            if (!userCredential.user.displayName) {
-                // Set display name using updateProfile
-                await updateProfile(userCredential.user, {
-                    displayName: userName,
-                });
-            }
+            await updateProfile(userCredential.user, {
+                displayName: userName,
+            });
 
-            if (!userCredential.user.photoURL) {
-                // Set display name using updateProfile
-                await updateProfile(userCredential.user, {
-                    photoURL: docSnap.data().studioID[0],
-                });
-            }
+            await updateProfile(userCredential.user, {
+                photoURL: docSnap.data().studioID[0],
+            });
             window.location.reload();
             // If the sign-in is successful, you can return the userCredential or user data here
             return docSnap.data().studioID[0];

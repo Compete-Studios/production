@@ -8,7 +8,7 @@ export const getBirthdaysByStudioId = async (studioId, index) => {
         console.error(error);
         throw error;
     }
-}
+};
 
 export const getStudentsByMonth = async (studioId, month) => {
     try {
@@ -18,7 +18,7 @@ export const getStudentsByMonth = async (studioId, month) => {
         console.error(error);
         throw error;
     }
-}
+};
 
 export const getDNSReportForReport = async (studioId, date) => {
     try {
@@ -28,7 +28,7 @@ export const getDNSReportForReport = async (studioId, date) => {
         console.error(error);
         throw error;
     }
-}
+};
 
 export const addNewStudent = async (formData) => {
     try {
@@ -193,7 +193,6 @@ export const dropProspect = async (prospectId) => {
 };
 
 export const dropProspectFromWaitingList = async (prospectId, waitingListId) => {
-   
     try {
         const response = await fetchData(`marketing-access/dropProspectFromWaitingList/${prospectId}/${waitingListId}`, 'get');
         return response;
@@ -283,6 +282,16 @@ export const getPaysimpleCustomerIdFromStudentId = async (customerID, studioID) 
     }
 };
 
+export const updatePaySimpleCustomer = async (data) => {
+    try {
+        const response = await fetchData(`paysimple-helper/updateCustomer`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const getPayments = async (studioId, startDate, endDate, status) => {
     try {
         const queryString = new URLSearchParams({
@@ -359,7 +368,6 @@ export const searchByValues = async (queryParams) => {
         throw error;
     }
 };
-
 
 export const searchProspectsByValue = async (queryParams) => {
     try {
@@ -695,7 +703,7 @@ export const getAttendanceByClassAndDate = async (classId, studentId, startDate,
         console.error(error);
         throw error;
     }
-}
+};
 
 export const getTextMessageThread = async (studioId, toNumber, fromNumber) => {
     const query = new URLSearchParams({
@@ -752,7 +760,6 @@ export const getTheClassScheduleByClassId = async (classId) => {
     }
 };
 
-
 export const updateAttendance = async (data) => {
     try {
         const response = await fetchData(`class-access/updateAttendance`, 'post', data);
@@ -776,7 +783,7 @@ export const getClassByClassId = async (classId) => {
 export const addRoom = async (data) => {
     try {
         const response = await fetchData(`class-access/addRoom`, 'post', data);
-     
+
         return response;
     } catch (error) {
         console.error(error);
@@ -925,7 +932,6 @@ export const updateStudent = async (data) => {
 };
 
 export const updateStaffActivity = async (staffId, activityLevel) => {
-
     try {
         const response = await fetchData(`staff-access/updateStaffActivity/${staffId}/${activityLevel}`, 'get');
         return response;
@@ -1347,7 +1353,6 @@ export const getProspectAttendanceByClassIdDate = async (classId, date, type) =>
     }
 };
 
-
 export const getWaiverByStudioId = async (studioId) => {
     try {
         const response = await fetchData(`waiver-access/getWaiverByStudioId/${studioId}`, 'get');
@@ -1377,7 +1382,6 @@ export const updateStudentByColumn = async (data) => {
         throw error;
     }
 };
-
 
 export const getIncomingUnreadTextMessages = async (data) => {
     try {

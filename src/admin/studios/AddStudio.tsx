@@ -7,7 +7,7 @@ import Swal from 'sweetalert2';
 import { addNewStudio, updateStudioOptions } from '../../functions/api';
 import { Link, useNavigate } from 'react-router-dom';
 import { constFormateDateMMDDYYYY, formatDate } from '../../functions/shared';
-import { co } from '@fullcalendar/core/internal-common';
+import { co, s } from '@fullcalendar/core/internal-common';
 
 const studioInfoInit = {
     studio_Name: '',
@@ -29,19 +29,22 @@ const studioInfoInit = {
 
 
 const alertsInit = {
+    studio_Name: false,
     contact_Email: false,
     contact_Name: false,
     contact_Number: false,
+    desired_UserName: false,
+    desored_Pswd: false,
 };
 
 export default function AddStudio() {
     //const { waitingLists, pipelineSteps, programs, classes, marketingSources, suid }: any = UserAuth();
     const [alerts, setAlerts] = useState(alertsInit);
     const [studioInfo, setstudioInfo] = useState(studioInfoInit);
-    const [programsForstudio, setProgramsForstudio] = useState([]);
-    const [selectedClasses, setSelectedClasses] = useState([]);
-    const [selectedWaitingLists, setSelectedWaitingLists] = useState([]);
-    const [options, setOptions] = useState([]);
+    
+
+    // These will probably need to be hard-coded, they are not taken from user input. Things like email/text limit, student enrollment limit, etc.  First set them, then use the route StudioAccess/updateStudioOptions to enter them into our DB.
+    const [studioOptions, setStudioOptions] = useState([]); 
 
     const navigate = useNavigate();
 
@@ -98,29 +101,21 @@ export default function AddStudio() {
             return;
         } 
         else {
-            addNewstudio(studioInfo).then((res) => {
+            addNewStudio(studioInfo).then((res) => {
                 console.log(res, 'new studio');
-                console.log(programIds, 'programIds');
-                console.log(classIDs, 'classIDs');
-                console.log(waitingListIds, 'waitingListIds');
-                addstudioToPrograms(res.NewstudioId, programIds);
-                addstudioToClasses(res.NewstudioId, classIDs);
-                addstudioToWaitingLists(res.NewstudioId, waitingListIds);
                 showMessage('studio has been added successfully');
-                const newID = parseInt(res.NewstudioId) * parseInt(suid);
+                const newID = parseInt(res.NewStudioId);
                 navigate(`/studios/add-billing-account/${newID}`);
             });
         }
     };
 
-    console.log(studioInfo, 'studioInfo')
-
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
                 <li>
-                    <Link to="/studios/view-studios" className="text-primary hover:underline">
-                        studios
+                    <Link to="/admin/studios" className="text-primary hover:underline">
+                        Studios
                     </Link>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
@@ -129,245 +124,156 @@ export default function AddStudio() {
             </ul>
             <div className="panel bg-gray-100 max-w-5xl mx-auto mt-4">
                 <div className="mb-5">
-                    <h5 className="font-semibold text-lg mb-4">studio Info</h5>
+                    <h5 className="font-semibold text-lg mb-4">Studio Info</h5>
                     <p>Use this option to add a new studio to the system. </p>
                 </div>
                 <div className="mb-5">
                     <form>
                         <div className="mb-5 grid grid-cols-1 sm:grid-cols-4 gap-4">
-                            <div className="sm:col-span-2" onClick={() => setAlerts({ ...alerts, firstName: false })}>
-                                <label htmlFor="first">First Name</label>
+                            <div className="sm:col-span-2" onClick={() => setAlerts({ ...alerts, contact_Name: false })}>
+                                <label htmlFor="first">Studio Name</label>
+                                <input
+                                    id="studioName"
+                                    type="text"
+                                    className={`form-input ${alerts.studio_Name && 'border-danger bg-red-50'} `}
+                                    onChange={(e) => setstudioInfo({ ...studioInfo, studio_Name: e.target.value })}
+                                />
+                                <p className="text-danger text-xs ml-1">{alerts.contact_Name && 'A contact name is required'}</p>
+                            </div>
+                            <div className="sm:col-span-2" onClick={() => setAlerts({ ...alerts, contact_Name: false })}>
+                                <label htmlFor="first">Contact Name</label>
                                 <input
                                     id="first"
                                     type="text"
-                                    className={`form-input ${alerts.firstName && 'border-danger bg-red-50'} `}
-                                    onChange={(e) => setstudioInfo({ ...studioInfo, fName: e.target.value })}
+                                    className={`form-input ${alerts.contact_Name && 'border-danger bg-red-50'} `}
+                                    onChange={(e) => setstudioInfo({ ...studioInfo, contact_Name: e.target.value })}
                                 />
-                                <p className="text-danger text-xs ml-1">{alerts.firstName && 'First name is required'}</p>
-                            </div>
-                            <div className="sm:col-span-2" onClick={() => setAlerts({ ...alerts, lastName: false })}>
-                                <label htmlFor="last">Last Name</label>
-                                <input
-                                    id="last"
-                                    type="text"
-                                    className={`form-input ${alerts.lastName && 'border-danger bg-red-50'} `}
-                                    onChange={(e) => setstudioInfo({ ...studioInfo, lName: e.target.value })}
-                                />
-                                <p className="text-danger text-xs ml-1">{alerts.lastName && 'Last name is required'}</p>
+                                <p className="text-danger text-xs ml-1">{alerts.contact_Name && 'A contact name is required'}</p>
                             </div>
                             <div className="sm:col-span-2">
-                                <label htmlFor="contact1">Contact 1</label>
-                                <input id="contact1" type="text" className="form-input" onChange={(e) => setstudioInfo({ ...studioInfo, contact1: e.target.value })} />
+                                <label htmlFor="phone">Phone</label>
+                                <input id="phone" type="text" className="form-input" onChange={(e) => setstudioInfo({ ...studioInfo, contact_Number: e.target.value })} />
                             </div>
-                            <div className="sm:col-span-2">
-                                <label htmlFor="contact2">Contact 2</label>
-                                <input id="contact2" type="text" className="form-input" onChange={(e) => setstudioInfo({ ...studioInfo, contact2: e.target.value })} />
-                            </div>
-                            <div className="sm:col-span-2">
-                                <label htmlFor="phone">Mobile Phone</label>
-                                <input id="phone" type="text" className="form-input" onChange={(e) => setstudioInfo({ ...studioInfo, phone: e.target.value })} />
-                            </div>
-                            <div className="sm:col-span-2">
-                                <label htmlFor="phone">Home Phone</label>
-                                <input id="phone" type="text" className="form-input" onChange={(e) => setstudioInfo({ ...studioInfo, phone2: e.target.value })} />
-                            </div>
-                            <div className="sm:col-span-2" onClick={() => setAlerts({ ...alerts, email: false })}>
+                            <div className="sm:col-span-2" onClick={() => setAlerts({ ...alerts, contact_Email: false })}>
                                 <label htmlFor="email">Email</label>
                                 <input
                                     id="email"
                                     type="text"
-                                    className={`form-input ${alerts.email && 'border-danger bg-red-50'} `}
-                                    onChange={(e) => setstudioInfo({ ...studioInfo, email: e.target.value })}
+                                    className={`form-input ${alerts.contact_Email && 'border-danger bg-red-50'} `}
+                                    onChange={(e) => setstudioInfo({ ...studioInfo, contact_Email: e.target.value })}
                                 />
-                                <p className="text-danger text-xs ml-1">{alerts.email && 'Email is required'}</p>
+                                <p className="text-danger text-xs ml-1">{alerts.contact_Email && 'Email is required'}</p>
                             </div>
                             <div className="sm:col-span-3">
                                 <label htmlFor="address">Address</label>
-                                <input id="address" type="text" className="form-input" onChange={(e) => setstudioInfo({ ...studioInfo, address: e.target.value })} />
-                            </div>
-                            <div className="">
-                                <label htmlFor="address2">Address 2</label>
-                                <input id="address2" type="text" className="form-input" onChange={(e) => setstudioInfo({ ...studioInfo, address2: e.target.value })} />
+                                <input id="address" type="text" className="form-input" onChange={(e) => setstudioInfo({ ...studioInfo, contact_Address: e.target.value })} />
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="city">City</label>
-                                <input id="city" type="text" placeholder="City" className="form-input" onChange={(e) => setstudioInfo({ ...studioInfo, city: e.target.value })} />
+                                <input id="city" type="text" placeholder="City" className="form-input" onChange={(e) => setstudioInfo({ ...studioInfo, contact_City: e.target.value })} />
                             </div>
                             <div className="sm:col-span-1">
                                 <label htmlFor="state">State</label>
-                                <input id="state" type="text" placeholder="State" className="form-input" onChange={(e) => setstudioInfo({ ...studioInfo, state: e.target.value })} />
+                                <input id="state" type="text" placeholder="State" className="form-input" onChange={(e) => setstudioInfo({ ...studioInfo, contact_State: e.target.value })} />
                             </div>
                             <div className="sm:col-span-1">
                                 <label htmlFor="zip">Zip</label>
-                                <input id="zip" type="text" placeholder="Zip" className="form-input" onChange={(e) => setstudioInfo({ ...studioInfo, zip: e.target.value })} />
+                                <input id="zip" type="text" placeholder="Zip" className="form-input" onChange={(e) => setstudioInfo({ ...studioInfo, contact_Zip: e.target.value })} />
                             </div>
+                        </div>
+                        <div className="mb-5 grid grid-cols-1 sm:grid-cols-4 gap-4">
+                            <div className="sm:col-span-2" onClick={() => setAlerts({ ...alerts, contact_Name: false })}>
+                                <label htmlFor="first">Username</label>
+                                <input
+                                    id="studioName"
+                                    type="text"
+                                    className={`form-input ${alerts.desired_UserName && 'border-danger bg-red-50'} `}
+                                    onChange={(e) => setstudioInfo({ ...studioInfo, desired_UserName: e.target.value })}
+                                />
+                                <p className="text-danger text-xs ml-1">{alerts.desired_UserName && 'A contact name is required'}</p>
+                            </div>
+                            <div className="sm:col-span-2" onClick={() => setAlerts({ ...alerts, contact_Name: false })}>
+                                <label htmlFor="first">Password</label>
+                                <input
+                                    id="first"
+                                    type="text"
+                                    className={`form-input ${alerts.desored_Pswd && 'border-danger bg-red-50'} `}
+                                    onChange={(e) => setstudioInfo({ ...studioInfo, desired_Pswd: e.target.value })}
+                                />
+                                <p className="text-danger text-xs ml-1">{alerts.contact_Name && 'A contact name is required'}</p>
+                            </div>
+                            <div className="sm:col-span-2">
+                                <label htmlFor="phone">Retype Password</label>
+                                <input id="phone" type="text" className="form-input" onChange={(e) => setstudioInfo({ ...studioInfo, desired_Pswd: e.target.value })} />
+                            </div>
+                           
                         </div>
                     </form>
                 </div>
             </div>
             <div className="panel bg-gray-100 max-w-5xl mx-auto mt-4">
                 <div className="mb-5">
-                    <h5 className="font-semibold text-lg mb-4">Additional Info</h5>
+                    <h5 className="font-semibold text-lg mb-4">Billing Acccount Info</h5>
                 </div>
                 <div className="mb-5">
-                    <form>
-                        <div className="mb-5 grid grid-cols-1 sm:grid-cols-4 gap-4">
-                            <div className="sm:col-span-2">
-                                <label htmlFor="birthdate">Birthdate</label>
-                                <Flatpickr
-                                    value={studioInfo.birthdate}
-                                    className="form-input"
-                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
-                                    onChange={(date: any) => setstudioInfo({ ...studioInfo, birthdate: date })}
-                                />
-                            </div>
-                            <div className="sm:col-span-2">
-                                <label htmlFor="marketingMethod">Marketing Source</label>
-                                <select id="marketingMethod" className="form-select text-white-dark" onChange={(e) => setstudioInfo({ ...studioInfo, marketingMethod: e.target.value })}>
-                                    {marketingSources?.map((source: any) => (
-                                        <option key={source.MethodId} value={source.MethodId}>
-                                            {source.Name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="sm:col-span-2">
-                                <label htmlFor="entryDate">Entry Date</label>
-                                <Flatpickr
-                                    value={studioInfo.originalContactDate}
-                                    className="form-input"
-                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
-                                    onChange={(date: any) => setstudioInfo({ ...studioInfo, originalContactDate: date })}
-                                />
-                            </div>
-                            <div className="sm:col-span-2">
-                                <label htmlFor="introDate">Intro Date</label>
-                                <Flatpickr
-                                    value={studioInfo.introDate}
-                                    className="form-input"
-                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
-                                    onChange={(date: any) => setstudioInfo({ ...studioInfo, introDate: date })}
-                                />
-                            </div>
-                            <div className="sm:col-span-2">
-                                <label htmlFor="firstClassDate">First Class Date</label>
-                                <Flatpickr
-                                    value={studioInfo.firstClassDate}
-                                    className="form-input"
-                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
-                                    onChange={(date: any) => setstudioInfo({ ...studioInfo, firstClassDate: date })}
-                                />
-                            </div>
-                            <div className="sm:col-span-2">
-                                <label htmlFor="entryDate">Next Contact Date</label>
-                                <Flatpickr
-                                    value={studioInfo.nextContactDate}
-                                    className="form-input"
-                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
-                                    onChange={(date: any) => setstudioInfo({ ...studioInfo, nextContactDate: date })}
-                                />
-                            </div>
-
-                            <div className="sm:col-span-full">
-                                <label htmlFor="notes">Notes</label>
-                                <textarea id="notes" rows={4} placeholder="Notes" className="form-textarea" onChange={(e) => setstudioInfo({ ...studioInfo, notes: e.target.value })} />
-                            </div>
-                            <div className="sm:col-span-2 sm:row-span-2">
-                                <label htmlFor="waitingList">Waiting List</label>
-                                {waitingLists?.map((list: any) => (
-                                    <label key={list.WaitingListId} className="flex items-center cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            className="form-checkbox bg-white dark:bg-[#1b2e4b]"
-                                            onChange={(e: any) => {
-                                                if (e.target.checked) {
-                                                    setSelectedWaitingLists([...selectedWaitingLists, list]);
-                                                } else {
-                                                    setSelectedWaitingLists(selectedWaitingLists.filter((item) => item !== list));
-                                                }
-                                            }}
-                                        />
-                                        <span className=" text-white-dark">{list.Title}</span>
-                                    </label>
-                                ))}
-                            </div>
-                            <div className="sm:col-span-2">
-                                <label htmlFor="pipelineStatus">Pipeline Status</label>
-                                <select id="pipelineStatus" className="form-select text-white-dark" onChange={(e) => setstudioInfo({ ...studioInfo, currentPipelineStatus: e.target.value })}>
-                                    {pipelineSteps?.map((step: any) => (
-                                        <option key={step.PipelineStepId} value={step.PipelineStepId}>
-                                            {step.StepName}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="sm:col-span-2">
-                                <label htmlFor="pipelineStatus">Programs</label>
-                                <Select
-                                    placeholder="Select an option"
-                                    options={options}
-                                    isMulti
-                                    isSearchable={false}
-                                    onChange={(e: any) => {
-                                        setProgramsForstudio(e);
-                                    }}
-                                />
-                            </div>
-                            <div className="sm:col-span-full">
-                                <label htmlFor="classes">Classes</label>
-                                <div className="col-span-full flex items-center border p-4 bg-primary/20 rounded-md border-com">
-                                    <div className="p-4 w-full h-72 overflow-y-auto  grow rounded-md border border-com mt-1 bg-white">
-                                        {classes &&
-                                            classes?.map((item: any) => (
-                                                <>
-                                                    {!selectedClasses?.includes(item) && (
-                                                        <>
-                                                            <div key={item.ClassId} className="text-xs cursor-pointer border-b w-full p-2" onClick={(e) => handleSelectClass(e, item)}>
-                                                                <span className="text-zinc-500 hover:text-zinc-900">{item.Name}</span>
-                                                            </div>
-                                                        </>
-                                                    )}
-                                                </>
-                                            ))}
-                                    </div>
-                                    <div className="text-center grow-0 flex items-center justify-center w-auto px-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-left-right" viewBox="0 0 16 16">
-                                            <path
-                                                fill-rule="evenodd"
-                                                d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5m14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5"
-                                            />
-                                        </svg>
-                                    </div>
-                                    <div className="p-4 w-full h-72 overflow-y-auto grow rounded-md border border-com mt-1 bg-white">
-                                        {selectedClasses?.map((item) => (
-                                            <>
-                                                <div
-                                                    key={item.ClassId}
-                                                    className="text-xs cursor-pointer text-primary hover:text-primary/80 font-bold border-b w-full p-2"
-                                                    onClick={(e) => {
-                                                        handleDeselctClass(e, item);
-                                                    }}
-                                                >
-                                                    <div className="mr-1 inline-block shrink-0">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-check-circle" viewBox="0 0 16 16">
-                                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                                                            <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05" />
-                                                        </svg>
-                                                    </div>
-                                                    {item.Name}
-                                                </div>
-                                            </>
-                                        ))}
-                                    </div>
-                                </div>
+                    {/* <form className="p-5">
+                        <div className="mb-5 flex items-center justify-between">
+                            <div className="text-right">
+                                <Link to={`/payments/${id}/${suid}/billing-accounts`} className="text-info hover:text-blue-800 ">
+                                    Use an existing billing account
+                                </Link>
+                                <button className="block text-secondary" onClick={autoFill}>
+                                    Click here if its the same as the student's info
+                                </button>
                             </div>
                         </div>
-                        <div className="flex">
-                            <button type="button" className="btn btn-primary ml-auto" onClick={(e) => handleAddstudio(e)}>
-                                Add studio
-                            </button>
+                        <div className="grid lg:grid-cols-6 gap-4">
+                            <div className="form-group lg:col-span-3">
+                                <label htmlFor="firstName">First Name</label>
+                                <input type="text" id="firstName" className="form-input" name="firstName" value={billingInfo.firstName} onChange={handleInputChange} />
+                            </div>
+                            <div className="form-group lg:col-span-3">
+                                <label htmlFor="lastName">Last Name</label>
+                                <input type="text" id="lastName" className="form-input" name="lastName" value={billingInfo.lastName} onChange={handleInputChange} />
+                            </div>
+                            <div className="form-group lg:col-span-4">
+                                <label htmlFor="address">Address</label>
+                                <input type="text" id="address" className="form-input" name="streetAddress1" value={billingInfo.streetAddress1} onChange={handleInputChange} />
+                            </div>
+                            <div className="form-group lg:col-span-2">
+                                <label htmlFor="address2">Address 2</label>
+                                <input type="text" id="address2" className="form-input" name="streetAddress2" value={billingInfo.streetAddress2} onChange={handleInputChange} />
+                            </div>
+                            <div className="form-group lg:col-span-3">
+                                <label htmlFor="city">City</label>
+                                <input type="text" id="city" className="form-input" name="city" value={billingInfo.city} onChange={handleInputChange} />
+                            </div>
+                            <div className="form-group lg:col-span-2">
+                                <label htmlFor="state">State</label>
+                                <input type="text" id="state" className="form-input" name="stateCode" value={billingInfo.stateCode} onChange={handleInputChange} />
+                            </div>
+                            <div className="form-group lg:col-span-1">
+                                <label htmlFor="zip">Zip</label>
+                                <input type="text" id="zip" className="form-input" name="zipCode" value={billingInfo.zipCode} onChange={handleInputChange} />
+                            </div>
+                            <div className="form-group lg:col-span-3">
+                                <label htmlFor="phone">Phone</label>
+                                <input type="text" id="phone" className="form-input" name="phone" value={billingInfo.phone} onChange={handleInputChange} />
+                            </div>
+                            <div className="form-group lg:col-span-3">
+                                <label htmlFor="email">Email</label>
+                                <input type="text" id="email" className="form-input" name="email" value={billingInfo.email} onChange={handleInputChange} />
+                            </div>
+                            <div className="form-group lg:col-span-full flex">
+                                <button type="submit" className="btn btn-primary ml-auto" onClick={addAccount}>
+                                    Add Billing Account
+                                </button>
+                            </div>
+                            <div className="lg:col-span-full mt-4">
+                                <p className="text-center">Once you've created this billing account you'll be able to attach a payment card or bank account to it.</p>
+                            </div>
                         </div>
-                    </form>
+                    </form> */}
                 </div>
             </div>
         </div>

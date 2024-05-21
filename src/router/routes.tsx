@@ -128,6 +128,14 @@ const AddProspectsToEmailList = lazy(() => import('../pages/Prospects/AddProspec
 const ActivateAsStudent = lazy(() => import('../pages/Prospects/ActivateAsStudent'));
 const ViewProspect = lazy(() => import('../pages/Prospects/ViewProspect'));
 
+//Admin components
+const ViewStudios = lazy(() => import('../admin/studios/ViewStudios'));
+const AddStudio = lazy(() => import('../admin/studios/AddStudio'));
+const StudioOverview = lazy(() => import('../admin/studios/StudioOverview'));
+const MasterStudios = lazy(() => import('../admin/studios/MasterStudios'));
+const SetMasterStudio = lazy(() => import('../admin/studios/SetMasterStudio'));
+
+
 
 const routes = [
     //Authentication
@@ -629,6 +637,34 @@ const routes = [
         path: '*',
         element: <Error />,
         layout: 'blank',
+    },
+
+    //admin
+    {
+        path: '/admin/studios',
+        element: <ViewStudios />,
+        layout: 'admin',
+    },
+    {
+        path: '/admin/add-studio',
+        element: <AddStudio />,
+        layout: 'admin',
+    },
+    {
+        path: '/admin/studio-overview/:id',
+        element: <StudioOverview />,
+        layout: 'admin',
+    },
+    {
+        path: '/admin/master-studios',
+        element: <MasterStudios />,
+        layout: 'admin',
+    },
+    
+    {
+        path: '/admin/set-master',
+        element: <SetMasterStudio />,
+        layout: 'admin',
     },
 ];
 

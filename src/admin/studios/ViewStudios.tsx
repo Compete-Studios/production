@@ -18,6 +18,7 @@ const ViewStudios = () => {
     useEffect(() => {
         setShowLoading(true);
         const role = "User";
+        console.log('BEGIN FETCH STUDIOS');
         fetch(`${REACT_API_BASE_URL}/admin-tools/getStudiosByRole/${role}`)
             .then((response) => response.json())
             .then((json) => setStudios(json.recordset));
@@ -105,7 +106,7 @@ const ViewStudios = () => {
                     </div>
                     <div className="flex sm:flex-row flex-col sm:items-center sm:gap-3 gap-4 w-full sm:w-auto">
                         <div className="flex gap-3">
-                            <Link to="/studios/add-studio" type="button" className="btn btn-primary">
+                            <Link to="/admin/add-studio" type="button" className="btn btn-primary">
                                 <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
                                 Add Studio
                             </Link>
@@ -143,19 +144,17 @@ const ViewStudios = () => {
                                             <td>
                                                 <div className="flex gap-4 items-center justify-center">
                                                     <Link
-                                                        to={`/studios/view-studio/${hashTheID(contact.Studio_Id)}/${hashTheID(suid)}`}
+                                                        to={`/admin/studio-overview/${contact.Studio_Id}`}
                                                         type="button"
                                                         className="btn btn-sm btn-outline-info"
 
                                                     >
                                                         View
                                                     </Link>
-                                                    {/* <Link to="/studios/edit-student" type="button" className="btn btn-sm btn-outline-primary" onClick={() => editUser(contact)}>
-                                                    Edit
-                                                </Link> */}
-                                                    <Link to="/studios/delete-studio" type="button" className="btn btn-sm btn-outline-danger" onClick={() => deleteUser(contact)}>
-                                                        Delete
-                                                    </Link>
+                                                    {<Link to="/admin/mimicStudio" type="button" className="btn btn-sm btn-outline-warning" onClick={() => editUser(contact)}>
+                                                    Mimic
+                                                </Link> }
+                                                    
                                                 </div>
                                             </td>
                                         </tr>

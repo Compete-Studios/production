@@ -1250,9 +1250,89 @@ export const addNewStudio = async (formData) => {
     }
 };
 
-export const updateStudioOptions = async (formData) => {
+export const updateStudioOptions = async (studioId, formData) => {
     try {
-        const response = await fetchData('studio-access/updateStudioOptions', 'post', formData);
+        const response = await fetchData(`studio-access/updateStudioOptions/${studioId}`, 'post', formData);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getStudioInfo = async (studioId) => {
+    try {
+        const response = await fetchData(`studio-access/getStudioInfo/${studioId}`, 'get');
+        return response.recordset[0];
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const updateStudioPaysimpleCredentials = async (formData) => {
+    try {
+        const response = await fetchData(`studio-access/updateStudioPaysimpleCredentials`, 'post', formData);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const updateStudioActivity = async (studioId, activityLevel) => {
+    try {
+        const response = await fetchData(`studio-access/updateStudioActivity/${studioId}/${activityLevel}`, 'post');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getMasterStudios = async () => {
+    try {
+        const response = await fetchData('admin-tools/getMasterStudios', 'get');
+        return response.recordset;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getSubStudiosForMaster = async (msId) => {
+    try {
+        const response = await fetchData(`admin-tools/getSubStudiosForMaster/${msId}`, 'get');
+        return response.recordset;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const setStudioAsMaster = async (studioId) => {
+    try {
+        const response = await fetchData(`admin-tools/setStudioAsMaster/${studioId}`, 'post');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const addStudioToItselfAsAMaster = async (msId) => {
+    try {
+        const response = await fetchData(`admin-tools/addStudioToItselfAsAMaster/${msId}`, 'post');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const addStudioToMasterStudioRoster = async (msId, studioId) => {
+    try {
+        const response = await fetchData(`admin-tools/addStudioToMasterStudioRoster/${msId}/${studioId}`, 'post');
         return response;
     } catch (error) {
         console.error(error);

@@ -505,7 +505,7 @@ export default function Schedules() {
                 <div className="panel bg-gray-100 animate-pulse h-full"></div>
             ) : (
                 <Suspense fallback={<div>Loading...</div>}>
-                    <div className="flex items-center justify-between whitespace-nowrap mt-12">
+                    <div className="hidden sm:flex items-center justify-between whitespace-nowrap mt-12">
                         <div className="flex items-center gap-4 sm:w-1/2 w-full">
                             <label htmlFor="scheduleDate">Next Contact Date</label>
                             <input

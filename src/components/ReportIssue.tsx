@@ -41,7 +41,7 @@ export default function ReportIssue() {
             setIssue('');
         }
     };
-    console.log('path', studioInfo);
+    
     return (
         <div>
             <div className="relative">

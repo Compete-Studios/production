@@ -293,7 +293,7 @@ const Sidebar = () => {
                                                 <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Text Messages')}</span>
                                             </div>
                                         </NavLink>
-                                    </li>
+                                    </li>                                    
                                     {/* <li className="nav-item">
                                         <NavLink to="/apps/mailbox" className="group">
                                             <div className="flex items-center">
@@ -318,6 +318,14 @@ const Sidebar = () => {
                                             </div>
                                         </NavLink>
                                     </li>
+                                    {/* <li className="nav-item">
+                                        <NavLink to="/marketing/landing-page-creator" className="group">
+                                            <div className="flex items-center">
+                                                <IconMenuTodo className="group-hover:!text-primary shrink-0" />
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Landing Page Maker')}</span>
+                                            </div>
+                                        </NavLink>
+                                    </li> */}
                                     
                                 </ul>
                             </li>

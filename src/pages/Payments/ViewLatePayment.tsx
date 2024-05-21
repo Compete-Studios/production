@@ -17,11 +17,8 @@ import { Fragment } from 'react';
 import { getPaysimpleCustomerIdFromStudentId, getStudentIdFromPaysimpleCustomerId, getStudentInfo, updateStudentNotes } from '../../functions/api';
 import { sendIndividualEmail } from '../../functions/emails';
 import { REACT_BASE_URL } from '../../constants';
-import IconSend from '../../components/Icon/IconSend';
-import IconEye from '../../components/Icon/IconEye';
 import { formatWithTimeZone, handleGetTimeZoneOfUser } from '../../functions/dates';
 import AddNoteModal from '../Students/AddNoteModal';
-import IconMail from '../../components/Icon/IconMail';
 import mastercardIcon from '../../assets/creditcardicons/mastercard.svg';
 import visaIcon from '../../assets/creditcardicons/visa.svg';
 import amexIcon from '../../assets/creditcardicons/amex.svg';
@@ -37,6 +34,10 @@ import TextFailedPayment from './TextFailedPayment';
 import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import IconNotes from '../../components/Icon/IconNotes';
+import PaymentInfoSlider from './PaymentInfoSlider';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import IconCopy from '../../components/Icon/IconCopy';
+import Hashids from 'hashids';
 
 interface Payment {
     PaymentDate: string;
@@ -49,8 +50,11 @@ export default function ViewLatePayment() {
         dispatch(setPageTitle('View Late Payment Info'));
     });
     const { id, stud }: any = useParams();
+    const hashids = new Hashids();
 
     const [loading, setLoading] = useState(true);
+    const [message1, setMessage1] = useState<any>('https://www.competestudio.pro/resolve-payment/0');
+
     const [paymentInfo, setPaymentInfo] = useState<any>({});
     const [mutablePaymentInfo, setMutablePaymentInfo] = useState<any>({});
     const [paymentIDInfo, setPaymentIDInfo] = useState<any>({});
@@ -208,6 +212,14 @@ export default function ViewLatePayment() {
         }
     };
 
+    useEffect(() => {
+        if (paymentIDInfo && suid && student?.Student_id) {
+            setMessage1(`${REACT_BASE_URL}payments/resolve-payment/${hashids.encode(paymentIDInfo?.Id, suid, student?.Student_id)}`);
+        } else {
+            console.log('Error getting payment info');
+        }
+    }, [paymentIDInfo, suid, student?.Student_id]);
+
     const getBillingInfo = async (paySimpleID: any, studioId: any) => {
         try {
             if (paySimpleID && suid) {
@@ -290,6 +302,8 @@ export default function ViewLatePayment() {
             alert('This is not your payment');
         }
     }, [stud, suid]);
+
+    console.log(paymentIDInfo, 'paymentIDInfo');
 
     const recipieptHTML = async (invoiceId: any) => {
         const htmlFOrEmail = `"<!DOCTYPE html>
@@ -474,6 +488,27 @@ export default function ViewLatePayment() {
                             <h4 className="text-lg font-semibold">Payment Information</h4>
                         </div>
                     </div>
+                    <div className="mt-5">
+                        <label>Payment Link</label>
+                    </div>
+                    <form className="flex items-center gap-3">
+                        <input type="text" value={message1} className="form-input" onChange={(e) => setMessage1(e.target.value)} />
+                        <div className="sm:flex space-y-2 sm:space-y-0 sm:space-x-2 rtl:space-x-reverse ">
+                            <CopyToClipboard
+                                text={message1}
+                                onCopy={(text, result) => {
+                                    if (result) {
+                                        showMessage('Link Copied to Clipboard');
+                                    }
+                                }}
+                            >
+                                <button type="button" className="btn btn-primary whitespace-nowrap gap-1">
+                                    <IconCopy />
+                                    Copy Payment Link
+                                </button>
+                            </CopyToClipboard>
+                        </div>
+                    </form>
                     <div className="mb-5 flex flex-col sm:flex-row">
                         <Tab.Group selectedIndex={defaultTab} onChange={setDefaultTab}>
                             <div className="w-full">
@@ -789,7 +824,8 @@ export default function ViewLatePayment() {
                                                                     <th>Date</th>
                                                                     <th>Billing Name</th>
                                                                     <th>Type</th>
-                                                                    <th className="text-right">Status</th>
+                                                                    <th>Status</th>
+                                                                    <th className="text-right">View</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
@@ -804,10 +840,10 @@ export default function ViewLatePayment() {
                                                                             <td>
                                                                                 {data.CustomerFirstName || student?.First_Name} {data.CustomerLastName || student?.Last_Name}
                                                                             </td>
-                                                                            <td className={`text-xs font-bold ${data.Id ? 'text-info' : 'text-primary'}`}>
+                                                                            <td className={`text-xs font-bold ${data.Id ? 'text-success' : 'text-dark'}`}>
                                                                                 {data.Id ? 'External Payment' : 'Internal Payment'}
                                                                             </td>
-                                                                            <td className="flex">
+                                                                            <td className="">
                                                                                 <span
                                                                                     className={`ml-auto badge whitespace-nowrap ${
                                                                                         data.Status === 'Settled'
@@ -823,6 +859,11 @@ export default function ViewLatePayment() {
                                                                                 >
                                                                                     {data.Status || 'Internal'}
                                                                                 </span>
+                                                                            </td>
+                                                                            <td className="flex">
+                                                                                <div className="ml-auto">
+                                                                                    <PaymentInfoSlider payID={data.Id} />
+                                                                                </div>
                                                                             </td>
                                                                         </tr>
                                                                     );

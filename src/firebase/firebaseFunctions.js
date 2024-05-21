@@ -1,5 +1,6 @@
 import { addDoc, collection, deleteDoc, doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
-import { db } from './firebase';
+import { db, storage } from './firebase';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
 export const saveFromToFirebase = async (data, id) => {
     try {
@@ -77,10 +78,35 @@ export const listenForMessages = async (uid, callback) => {
     return unsubscribe;
 };
 
-
 export const deleteMessage = async (uid, messageId) => {
     console.log('deleting message', uid, messageId);
     const docRef = doc(db, 'messages', uid, 'notifications', messageId);
     const res = await deleteDoc(docRef);
     console.log('res', res);
 };
+
+const uploadImage = async (file, id) => {
+    const storageRef = ref(storage, `profilePics/${id}`);
+    await uploadBytes(storageRef, file)
+      .then((snapshot) => {
+        console.log("Uploaded a blob or file!", snapshot);
+      })
+      .catch((error) => {
+        console.error("Error uploading file: ", error);
+      });
+    const url = await getDownloadURL(storageRef);
+    return url;
+  };
+
+export const createLandingPagePreview = async (data, image) => {
+    try {
+        const docRef = collection(db, 'landingPagePreviews');
+        const docID = await addDoc(docRef, data);
+        return docID.id;
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
+};
+
+

@@ -31,6 +31,11 @@ import AddProspectNotesModal from './AddProspectNotesModal';
 import IconEdit from '../../components/Icon/IconEdit';
 import SendQuickWaiver from '../Students/buttoncomponents/SendQuickWaiver';
 import IconInfoTriangle from '../../components/Icon/IconInfoTriangle';
+import IconPlus from '../../components/Icon/IconPlus';
+import IconPencilPaper from '../../components/Icon/IconPencilPaper';
+import Tippy from '@tippyjs/react';
+import AddCardModal from '../Students/AddCardModal';
+import AddBankModal from '../Students/AddBankModal';
 
 interface UpdateValues {
     [key: string]: any;
@@ -55,7 +60,7 @@ const updateValuesInit = {
 };
 
 const ViewProspect = () => {
-    const {  setToActivate, suid, marketingSources, waitingLists, studioInfo, prospectPipelineSteps }: any = UserAuth();
+    const { studioOptions, setUpdate, update, suid, marketingSources, waitingLists, studioInfo, prospectPipelineSteps }: any = UserAuth();
     const [billingLoading, setBillingLoading] = useState<boolean>(true);
     const [updateClasses, setUpdateClasses] = useState<boolean>(false);
     const [toUpdate, setToUpdate] = useState<UpdateValues>(updateValuesInit);
@@ -116,6 +121,7 @@ const ViewProspect = () => {
             console.log(error);
         }
     };
+    
 
     const getStudentBarcode = async (studentID: any) => {
         // try {
@@ -170,6 +176,10 @@ const ViewProspect = () => {
         }
     };
 
+      const handleGoToPayments= () => {
+        console.log('Go to payments');
+    };
+
     const getProgramsForStudent = async (studentID: any) => {
         try {
             const response = await getProgramsByProspectId(studentID);
@@ -219,7 +229,6 @@ const ViewProspect = () => {
     useEffect(() => {
         scrollTop();
     }, []);
-    
 
     const handleDeleteFromClass = (classID: any) => {
         showWarningMessage('Are you sure you want to remove this student from this class?', 'Remove Student From Class', 'Your student has been removed from the class')
@@ -310,6 +319,7 @@ const ViewProspect = () => {
         navigate(`/prospects/activate/${uid}`);
     };
 
+
     return (
         <div>
             <div className="sm:flex sm:items-center sm:justify-between">
@@ -367,7 +377,15 @@ const ViewProspect = () => {
                         <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left" onClick={(e: any) => handleActivate(e)}>
                             Activate As Student
                         </button>
-                        <SendQuickEmail student={student} name="Prospect" />
+                        <SendQuickEmail
+                            pipeline={prospectPipelineSteps.find((step: any) => step.PipelineStepId === parseInt(student?.CurrentPipelineStatus))}
+                            studioOptions={studioOptions}
+                            setUpdate={setUpdate}
+                            update={update}
+                            student={student}
+                            isProspect={true}
+                            name="Prospect"
+                        />
                         <SendQuickText student={student} name="Prospect" />
                         <SendQuickWaiver student={student} prospect={true} />
                         <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left">Create a Billing Account</button>
@@ -433,21 +451,6 @@ const ViewProspect = () => {
                                             <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z" />
                                         </svg>
                                         Classes
-                                    </button>
-                                )}
-                            </Tab>
-                            <Tab as={Fragment}>
-                                {({ selected }) => (
-                                    <button
-                                        className={`${
-                                            selected ? 'text-info !outline-none before:!w-full' : ''
-                                        } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="w-5 h-5 ltr:mr-2 rtl:ml-2" viewBox="0 0 16 16">
-                                            <path d="M14 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" />
-                                            <path d="M2 5.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5" />
-                                        </svg>
-                                        Billing
                                     </button>
                                 )}
                             </Tab>
@@ -926,9 +929,6 @@ const ViewProspect = () => {
                                         </div>
                                     </div>
                                 </div>
-                            </Tab.Panel>
-                            <Tab.Panel>
-                                <div className="pt-5"></div>
                             </Tab.Panel>
                         </Tab.Panels>
                     </Tab.Group>

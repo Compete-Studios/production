@@ -3,6 +3,7 @@ import { auth, db } from '../firebase/firebase';
 import { REACT_API_BASE_URL } from '../constants';
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
+import blanklogo from '../assets/blanklogo.png';
 
 const UserContext: any = createContext<any>(null);
 
@@ -24,10 +25,12 @@ export default function AuthContextProvider({ children }: any) {
     const [latePayementPipeline, setLatePayementPipeline] = useState([]);
     const [studioOptions, setStudioOptions] = useState<any>([]);
     const [masters, setMasters] = useState([]);
+    const [logo, setLogo] = useState(blanklogo);
     const [isMaster, setIsMaster] = useState(false);
     const [selectedSuid, setSelectedSuid] = useState<any>('');
     const [students, setStudents] = useState<any>([]);
     const [fbForms, setFBForms] = useState<any>([]);
+    const [layout, setLayout] = useState<any>({});
     const [update, setUpdate] = useState(false);
     const [toActivate, setToActivate] = useState<any>({
         status: false,
@@ -214,6 +217,7 @@ export default function AuthContextProvider({ children }: any) {
             unsubscribe(); // Clean up the onAuthStateChanged listener
         };
     }, [selectedSuid]);
+    
 
     return (
         <UserContext.Provider
@@ -245,7 +249,10 @@ export default function AuthContextProvider({ children }: any) {
                 students,
                 fbForms,
                 toActivate, 
-                setToActivate
+                setToActivate,
+                layout,
+                setLayout,
+                logo, setLogo
             }}
         >
             {children}

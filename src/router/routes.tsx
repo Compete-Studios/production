@@ -33,6 +33,8 @@ const ViewPayments = lazy(() => import('../pages/Payments/ViewPayments'));
 const PayInvoice = lazy(() => import('../pages/Payments/PayInvoice'));
 const ViewLatePayment = lazy(() => import('../pages/Payments/ViewLatePayment'));
 const ExisitingBillingAccounts = lazy(() => import('../pages/Payments/ExisitingBillingAccounts'));
+const ResolvePayment = lazy(() => import('../pages/Payments/ResolvePayment'));
+const ResolvePaymentTest = lazy(() => import('../pages/Payments/ResolvePaymentTest'));
 
 // Staff
 const ViewStaff = lazy(() => import('../pages/Staff/ViewStaff'));
@@ -96,7 +98,6 @@ const AddPipelineStep = lazy(() => import('../pages/Students/AddPipelineStep'));
 const AddPaymentSchedule = lazy(() => import('../pages/Students/AddPaymentSchedule'));
 const AddABillingAccount = lazy(() => import('../pages/Students/AddABillingAccount'));
 const FinishedAddingAccountOptions = lazy(() => import('../pages/Students/FinishedAddingAccountOptions'));
-const ViewPaymentMethods = lazy(() => import('../pages/Students/ViewPaymentMethods'));
 
 // Studios
 const PasswordReset = lazy(() => import('../pages/Studios/PasswordReset'));
@@ -129,6 +130,8 @@ const StudentsInPerformance = lazy(() => import('../pages/Marketing/StudentsInPe
 const EditNumbersInPerformance = lazy(() => import('../pages/Marketing/EditNumbersInPerformance'));
 const AddANumberInPerformance = lazy(() => import('../pages/Marketing/AddANumberInPerformance'));
 const EditPerformance = lazy(() => import('../pages/Marketing/EditPerformance'));
+const LandingPageCreator = lazy(() => import('../pages/Marketing/LandingPageCreator'));
+const LandingPagePreview = lazy(() => import('../pages/Marketing/LandingPagePreview'));
 
 // Tools
 const TodoList = lazy(() => import('../pages/Tools/TodoList'));
@@ -196,6 +199,16 @@ const routes = [
     {
         path: '/payments/:id/:suid/billing-accounts',
         element: <ExisitingBillingAccounts />,
+    },
+    {
+        path: '/payments/resolve-payment/:payID',
+        element: <ResolvePayment />,
+        layout: 'blank',
+    },
+    {
+        path: '/payments/resolve-payment-test',
+        element: <ResolvePaymentTest />,
+        layout: 'blank',
     },
     {
         path: '/payments/view-payment-info/:payID/:amyID',
@@ -411,10 +424,6 @@ const routes = [
         element: <StudentsQuickPay />,
     },
     {
-        path: '/students/viewpayment-methods',
-        element: <ViewPaymentMethods />,
-    },
-    {
         path: '/students/invoice/:id',
         element: <Invoice />,
     },
@@ -439,7 +448,7 @@ const routes = [
         element: <UpdateAdditionalInfo />,
     },
     {
-        path: '/students/view-payment-history',
+        path: '/students/view-payment-history/:paymentID',
         element: <ViewPaymentHistory />,
     },
     {
@@ -555,6 +564,16 @@ const routes = [
     {
         path: '/marketing/marketing-methods',
         element: <Methods />,
+    },
+    {
+        path: '/marketing/landing-page-creator',
+        element: <LandingPageCreator />,
+    },
+    {
+        path: '/marketing/landing-page-preview/:lpid',
+        element: <LandingPagePreview />,
+        layout: 'blank',
+
     },
     {
         path: '/marketing/edit-method',

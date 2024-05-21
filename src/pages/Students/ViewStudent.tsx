@@ -49,6 +49,9 @@ import { Tab } from '@headlessui/react';
 import SendQuickWaiver from './buttoncomponents/SendQuickWaiver';
 import IconEdit from '../../components/Icon/IconEdit';
 import IconEye from '../../components/Icon/IconEye';
+import ViewPaymentMethods from './ViewPaymentMethods';
+import BillingInfoUpdate from './components/BillingInfoUpdate';
+import Hashids from 'hashids';
 
 interface UpdateValues {
     [key: string]: any;
@@ -91,7 +94,10 @@ const ViewStudent = () => {
     const [rank, setRank] = useState<any>(null);
     const [hasCards, setHasCards] = useState<boolean>(false);
     const [paymentSchedules, setPaymentSchedules] = useState<any>([]);
+    const [selectedIndex, setSelectedIndex] = useState(1);
     const [pipeline, setPipeline] = useState<any>([]);
+    const [updateBilling, setUpdateBilling] = useState<boolean>(false);
+    const hashids = new Hashids();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Profile'));
@@ -318,10 +324,15 @@ const ViewStudent = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    const scrolltoBottom = () => {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    };
+
     useEffect(() => {
         scrollTop();
     }, []);
 
+   
     const handleDeleteFromClass = (classID: any) => {
         showWarningMessage('Are you sure you want to remove this student from this class?', 'Remove Student From Class', 'Your student has been removed from the class')
             .then((confirmed: boolean) => {
@@ -391,6 +402,11 @@ const ViewStudent = () => {
 
     const [hasedRefID, setHasedRefID] = useState<any>(null);
 
+    const handleUpdateBilling = (e: any) => {
+        e.preventDefault();
+        setUpdateBilling(!updateBilling);
+    };
+
     const handleTest = () => {
         console.log('testing');
     };
@@ -401,6 +417,10 @@ const ViewStudent = () => {
         const hashedStudent = parseInt(student?.Student_id) * 548756 * parseInt(suid);
         setHasedRefID(hashedStudent);
     }, [student]);
+
+    const payHistoryIds = hashids.encode(paySimpleInfo, (student?.Student_id));
+
+    console.log(paymentSchedules, 'payHistoryIds')
 
     return (
         <div>
@@ -425,7 +445,7 @@ const ViewStudent = () => {
             </div>
             <div className="lg:flex lg:items-start gap-4 mt-4">
                 {/* CONTACT INFO */}
-                <div className="panel p-0 lg:min-w-80 lg:max-w-96 divide-y divide-y-zinc-600 ">
+                <div className="hidden lg:block panel p-0 lg:min-w-80 lg:max-w-96 divide-y divide-y-zinc-600 ">
                     <div className="flex items-start justify-between mb-5 p-4">
                         <div>
                             <div className="font-semibold  text-2xl">
@@ -483,8 +503,23 @@ const ViewStudent = () => {
                     </div>
                 </div>
                 <div className="lg:w-full lg:mt-0 mt-8">
-                    <Tab.Group>
+                    <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
                         <Tab.List className="flex flex-wrap">
+                            <Tab as={Fragment}>
+                                {({ selected }) => (
+                                    <button
+                                        className={`${
+                                            selected ? 'text-info !outline-none before:!w-full' : ''
+                                        } relative -mb-[1px] flex lg:hidden  items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full `}
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="w-5 h-5 ltr:mr-2 rtl:ml-2" viewBox="0 0 16 16">
+                                            <path d="M5 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4m4-2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5M9 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4A.5.5 0 0 1 9 8m1 2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5" />
+                                            <path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zM1 4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H8.96q.04-.245.04-.5C9 10.567 7.21 9 5 9c-2.086 0-3.8 1.398-3.984 3.181A1 1 0 0 1 1 12z" />
+                                        </svg>
+                                        Student Card
+                                    </button>
+                                )}
+                            </Tab>
                             <Tab as={Fragment}>
                                 {({ selected }) => (
                                     <button
@@ -562,6 +597,65 @@ const ViewStudent = () => {
                         </Tab.List>
 
                         <Tab.Panels>
+                            <Tab.Panel>
+                                <div className="lg:hidden block panel p-0 lg:min-w-80 lg:max-w-96 divide-y divide-y-zinc-600 ">
+                                    <div className="flex items-start justify-between mb-5 p-4">
+                                        <div>
+                                            <div className="font-semibold  text-2xl">
+                                                {student?.First_Name} {student?.Last_Name}
+                                            </div>
+                                            <p className="font-normal text-sm">{student?.email}</p>
+                                            <p className="font-normal text-sm">{convertPhoneNumber(student?.Phone)}</p>
+                                            <p className="font-normal text-sm">{convertPhoneNumber(student?.Phone2)}</p>
+
+                                            <p className={`font-normal text-md mt-4 ${student?.activity ? 'text-success' : 'text-danger'}`}>{student?.activity ? 'Active' : 'Inactive'}</p>
+                                            <p className="font-normal text-xs ">Next Contact Date: {formatDate(student?.NextContactDate)}</p>
+                                            <p className="font-normal text-xs ">Created: {formatDate(student?.EntryDate)}</p>
+                                            <p className={`font-normal text-xs ${rank ? 'text-success' : 'text-danger'}`}>Rank: {rank ? rank : 'No rank set'}</p>
+                                            <p className={`font-normal text-xs ${barcode ? 'text-success' : 'text-danger'}`}>Barcode ID: {barcode ? barcode : 'No barcode set'}</p>
+                                            <p className={`font-normal text-xs`}>
+                                                Pipeline Step: <span className={`font-normal text-xs ${pipeline?.StepName ? 'text-success' : 'text-danger'}`}>{pipeline?.StepName}</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="p-4">
+                                        <div className="text-zinc-500 underline">Studio</div>
+                                        <div className="font-bold">{studioInfo?.Studio_Name}</div>
+                                        <div className="text-zinc-500 mt-2 underline">Classes</div>
+                                        <div className="font-bold flex flex-wrap">{classes.length > 0 ? classes.map((c: any) => c.Name).join(', ') : 'No classes'}</div>
+                                        <div className="text-zinc-500 mt-2 underline">Active Pay Schedules</div>
+                                        <div className="">
+                                            {paymentSchedules.map((data: any, index: any) => {
+                                                return (
+                                                    <>
+                                                        {' '}
+                                                        {data?.EndDate !== data?.StartDate && data.ScheduleStatus === 'Active' && (
+                                                            <div key={index} className="flex items-center text-xs gap-2 mt-2">
+                                                                <div className={`${data.ScheduleStatus === 'Active' ? 'text-success' : 'text-danger'}`}>{data.ScheduleStatus}</div>
+                                                                <div className="font-bold">${parseInt(data?.PaymentAmount)?.toFixed(2)}</div>
+                                                                <div>
+                                                                    {formatDate(data?.StartDate)} - {formatDate(data?.EndDate)}
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                    <div className="">
+                                        <StudentsQuickPay student={student} suid={suid} />
+                                        <button className="uppercase font-lg font-bold w-full hover:bg-success-light p-4 text-left" onClick={() => navigate(`/students/invoice/${hasedRefID}`)}>
+                                            Invoice
+                                        </button>
+                                        <SendQuickEmail student={student} name="Student" pipeline={pipeline} />
+                                        <SendQuickText student={student} name="Student" pipeline={pipeline} />
+                                        <SendQuickWaiver student={student} prospect={false} />
+                                        <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left">Clone Student</button>
+                                        <button className="uppercase font-lg font-bold w-full hover:bg-danger-light p-4 text-left">Delete Student</button>
+                                    </div>
+                                </div>
+                            </Tab.Panel>
                             <Tab.Panel>
                                 <div className="pt-5">
                                     {/* NOTES */}
@@ -1067,17 +1161,25 @@ const ViewStudent = () => {
                                 </div>
                             </Tab.Panel>
                             <Tab.Panel>
-                                <div className="pt-5 grid grid-cols-3 gap-4">
+                                <div className="pt-5 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 2xl:grid-cols-3 xl:grid-cols-1 gap-4">
                                     {/* BILLING INFO */}
                                     <div>
                                         <div className="panel p-0">
                                             <div className="flex items-center justify-between p-5">
                                                 <h5 className="font-semibold text-lg dark:text-white-light">Billing Info</h5>
-                                                <Tippy content="Update Billing Info">
-                                                    <Link to="/students/update-billing" className="ltr:ml-auto rtl:mr-auto text-info hover:text-blue-700 p-2 rounded-full">
-                                                        <IconPencilPaper />
-                                                    </Link>
-                                                </Tippy>
+                                                {updateBilling ? (
+                                                    <Tippy content="Update Billing Info">
+                                                        <button className="ltr:ml-auto rtl:mr-auto text-danger hover:text-red-700 p-2 " onClick={(e: any) => handleUpdateBilling(e)}>
+                                                            Discard
+                                                        </button>
+                                                    </Tippy>
+                                                ) : (
+                                                    <Tippy content="Update Billing Info">
+                                                        <button className="ltr:ml-auto rtl:mr-auto text-info hover:text-blue-700 p-2 rounded-full" onClick={(e: any) => handleUpdateBilling(e)}>
+                                                            <IconPencilPaper />
+                                                        </button>
+                                                    </Tippy>
+                                                )}
                                             </div>
                                             {billingLoading ? (
                                                 <div className="flex items-center justify-center h-56">
@@ -1096,59 +1198,24 @@ const ViewStudent = () => {
                                                         </div>
                                                     ) : (
                                                         <>
-                                                            <div className="mb-5 space-y-4 p-5">
-                                                                <p className="font-bold ">
-                                                                    Billing Name:{' '}
-                                                                    <span className="font-normal">
-                                                                        {billingInfo?.FirstName} {billingInfo?.LastName}
-                                                                    </span>
-                                                                </p>
-                                                                <p className="font-bold ">
-                                                                    Phone: <span className="font-normal">{convertPhone(billingInfo?.Phone)}</span>
-                                                                </p>
-                                                                <p className="font-bold ">
-                                                                    Email: <span className="font-normal">{billingInfo?.Email}</span>
-                                                                </p>
-                                                                <p className="font-bold ">
-                                                                    Address: <span className="font-normal">{billingInfo?.BillingAddress?.StreetAddress1}</span>
-                                                                </p>
-                                                                <p className="font-bold ">
-                                                                    City: <span className="font-normal">{billingInfo?.BillingAddress?.City}</span>
-                                                                </p>
-                                                                <p className="font-bold ">
-                                                                    State: <span className="font-normal">{billingInfo?.BillingAddress?.StateCode}</span>
-                                                                </p>
-                                                                <p className="font-bold ">
-                                                                    Zip: <span className="font-normal">{billingInfo?.BillingAddress?.ZipCode}</span>
-                                                                </p>
-                                                            </div>
+                                                            <BillingInfoUpdate billingInfo={billingInfo} updateBilling={updateBilling} setUpdateBilling={setUpdateBilling} />
                                                             <ul className="mt-7 ">
-                                                                {/* <li>
-                                                                    <Tippy content="Add Credit Card">
-                                                                        <Link
-                                                                            to="/students/viewpayment-methods"
-                                                                            className="uppercase font-lg font-bold w-full hover:bg-dark-light p-4 text-left flex items-center gap-4 whitespace-nowrap"
-                                                                        >
-                                                                            <svg
-                                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                                width="16"
-                                                                                height="16"
-                                                                                fill="currentColor"
-                                                                                className="bi bi-credit-card-2-front"
-                                                                                viewBox="0 0 16 16"
-                                                                            >
-                                                                                <path d="M14 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" />
-                                                                                <path d="M2 5.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5" />
-                                                                            </svg>
-                                                                            View Payment Methods
-                                                                        </Link>
-                                                                    </Tippy>
-                                                                </li> */}
+                                                                <li>
+                                                                    <ViewPaymentMethods payID={paySimpleInfo} />
+                                                                </li>
                                                                 <li>
                                                                     <AddCardModal inStudent={true} />
                                                                 </li>
                                                                 <li>
                                                                     <AddBankModal inStudent={true} />
+                                                                </li>
+                                                                <li>
+                                                                    <button
+                                                                        className="uppercase font-lg font-bold w-full hover:bg-success-light p-4 text-left flex items-center gap-3 whitespace-nowrap"
+                                                                        onClick={handleGoToPaymentSchedules}
+                                                                    >
+                                                                        <IconPlus /> Add Payment Schedule
+                                                                    </button>
                                                                 </li>
                                                             </ul>
                                                         </>
@@ -1158,7 +1225,7 @@ const ViewStudent = () => {
                                         </div>
                                     </div>
                                     {/* ACTIVE PAYMENT SCHEDULES */}
-                                    <div className="col-span-2">
+                                    <div className="col-span-2 row-span-full">
                                         {paymentsLoading ? (
                                             <div className="panel">
                                                 <div className="flex items-center justify-center h-56">
@@ -1166,9 +1233,17 @@ const ViewStudent = () => {
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div className="panel ">
-                                                <div className="mb-5">
-                                                    <h5 className="font-semibold text-lg dark:text-white-light">Active Payment Schedules</h5>
+                                            <div className="panel">
+                                                <div className="mb-5 flex items-center justify-between">
+                                                    <h5 className="font-semibold text-lg dark:text-white-light">Payment Schedules</h5>
+
+                                                    <div>
+                                                        <Link
+                                                        to={`/students/view-payment-history/${payHistoryIds}`}
+                                                         className="btn btn-danger btn-sm gap-x-2" >
+                                                            <IconCalendar /> View Payment History
+                                                        </Link>
+                                                    </div>
                                                 </div>
 
                                                 {!hasCards ? (
@@ -1182,7 +1257,7 @@ const ViewStudent = () => {
                                                     </div>
                                                 ) : (
                                                     <>
-                                                        <div className="table-responsive mb-5 pb-4">
+                                                        <div className="table-responsive ">
                                                             <table>
                                                                 <thead>
                                                                     <tr>
@@ -1222,37 +1297,6 @@ const ViewStudent = () => {
                                                                 </tbody>
                                                             </table>
                                                             <div className="flex mt-4 items-center justify-end"></div>
-                                                        </div>
-
-                                                        <div className="">
-                                                            {paymentSchedules?.length < 1 ? (
-                                                                <div className="text-right">
-                                                                    <button className="btn btn-primary btn-sm w-full" onClick={handleGoToPaymentSchedules}>
-                                                                        <IconPlus /> Add Payment Schedule
-                                                                    </button>
-                                                                </div>
-                                                            ) : (
-                                                                <div className="space-y-4">
-                                                                    <div className="flex">
-                                                                        <button
-                                                                            className="ml-auto gap-x-1 text-primary hover:text-emerald-800 justify-end items-center"
-                                                                            onClick={() => navigate('/students/view-active-payment-schedules')}
-                                                                        >
-                                                                            View All Schedules
-                                                                        </button>
-                                                                    </div>
-                                                                    <div>
-                                                                        <button className="btn btn-info gap-x-1 w-full" onClick={handleGoToPaymentSchedules}>
-                                                                            <IconDollarSignCircle /> Create a new Payment Schedule
-                                                                        </button>
-                                                                    </div>
-                                                                    <div>
-                                                                        <Link to="/students/view-payment-history" className="btn btn-danger btn-sm gap-x-2">
-                                                                            <IconCalendar /> View Payment History
-                                                                        </Link>
-                                                                    </div>
-                                                                </div>
-                                                            )}
                                                         </div>
                                                     </>
                                                 )}

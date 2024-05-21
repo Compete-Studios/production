@@ -31,7 +31,7 @@ const emailDataInit = {
     deliverytime: null,
 };
 
-export default function SendQuickEmail({ student, name, pipeline }: any) {
+export default function SendQuickEmail({ student, name, pipeline, isProspect = false }: any) {
     const { suid, studioOptions }: any = UserAuth();
     const [showEmailModal, setShowEmailModal] = useState<boolean>(false);
     const [emailData, setEmailData] = useState<EmailData>(emailDataInit);
@@ -132,7 +132,13 @@ export default function SendQuickEmail({ student, name, pipeline }: any) {
 
                                                 {/* Divider container */}
                                                 <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0">
-                                                    <SendMail pipeline={pipeline} studioOptions={studioOptions} student={student} setShowActionModal={setShowEmailModal} />
+                                                    <SendMail 
+                                                    pipeline={pipeline} 
+                                                    studioOptions={studioOptions} 
+                                                    student={student} 
+                                                    setShowActionModal={setShowEmailModal}
+                                                    isPrpospect={isProspect} 
+                                                    />
                                                 </div>
                                             </div>
                                         </form>

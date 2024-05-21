@@ -59,7 +59,7 @@ const Header = () => {
         }
     }, [masters]);
 
-    console.log(studioOptions, 'studioOptions');
+  
 
     const handleGetIncoming = async () => {
         const data = {

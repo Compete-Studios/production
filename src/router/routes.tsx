@@ -139,7 +139,7 @@ const Notes = lazy(() => import('../pages/Tools/Notes'));
 const PerformancePlanner = lazy(() => import('../pages/Tools/PerformancePlanner'));
 const Calendar = lazy(() => import('../pages/Tools/Calendar'));
 const Chat = lazy(() => import('../pages/Tools/Chat'));
-const Mailbox = lazy(() => import('../pages/Tools/Mailbox'));
+const Inbox = lazy(() => import('../pages/Tools/Inbox'));
 
 //Prospects
 const ViewProspects = lazy(() => import('../pages/Prospects/ViewProspects'));
@@ -155,6 +155,14 @@ const TextPipelineStep = lazy(() => import('../pages/Prospects/TextPipelineStep'
 const AddProspectsToEmailList = lazy(() => import('../pages/Prospects/AddProspectsToEmailList'));
 const ActivateAsStudent = lazy(() => import('../pages/Prospects/ActivateAsStudent'));
 const ViewProspect = lazy(() => import('../pages/Prospects/ViewProspect'));
+
+
+//Admin components
+const ViewStudios = lazy(() => import('../admin/studios/ViewStudios'));
+const AddStudio = lazy(() => import('../admin/studios/AddStudio'));
+const StudioOverview = lazy(() => import('../admin/studios/StudioOverview'));
+const MasterStudios = lazy(() => import('../admin/studios/MasterStudios'));
+const SetMasterStudio = lazy(() => import('../admin/studios/SetMasterStudio'));
 
 const routes = [
     //Authentication
@@ -707,7 +715,7 @@ const routes = [
     },
     {
         path: '/apps/mailbox',
-        element: <Mailbox />,
+        element: <Inbox />,
     },
     //oldRoutes
     {
@@ -719,6 +727,33 @@ const routes = [
         path: '/compete-forms/:sid/:hsid',
         element: <CompeteLegacyForms />,
         layout: 'blank',
+    },
+     //admin
+     {
+        path: '/admin/studios',
+        element: <ViewStudios />,
+        layout: 'admin',
+    },
+    {
+        path: '/admin/add-studio',
+        element: <AddStudio />,
+        layout: 'admin',
+    },
+    {
+        path: '/admin/studio-overview/:id',
+        element: <StudioOverview />,
+        layout: 'admin',
+    },
+    {
+        path: '/admin/master-studios',
+        element: <MasterStudios />,
+        layout: 'admin',
+    },
+    
+    {
+        path: '/admin/set-master',
+        element: <SetMasterStudio />,
+        layout: 'admin',
     },
 
     //errors

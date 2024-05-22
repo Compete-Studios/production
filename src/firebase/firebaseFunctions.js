@@ -1,6 +1,7 @@
-import { addDoc, collection, deleteDoc, doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDoc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
 import { db, storage } from './firebase';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { login, logout } from './auth';
 
 export const saveFromToFirebase = async (data, id) => {
     try {
@@ -107,6 +108,28 @@ export const createLandingPagePreview = async (data, image) => {
         console.log(error);
         return false;
     }
+};
+
+export const logoutForAdmin = async () => {
+    try {
+        await signOut(auth);
+        localStorage.removeItem('monthlyEmailLimit');
+        localStorage.removeItem('numberOfEmails');
+        localStorage.removeItem('numberOfTexts');
+        localStorage.removeItem('activeStudents');
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('suid');
+        return true;
+    } catch (error) {
+        return error.message;
+    }
+};
+
+export const updateStudioIDForAdmimMimic = async (studioID) => {  
+    const docRef = doc(db, 'users', "competeAdmin");
+    await updateDoc(docRef, {studioID: [studioID]});
+    await logoutForAdmin();
+    await login("competeAdmin", "9911competeADMIN!@#$");
 };
 
 

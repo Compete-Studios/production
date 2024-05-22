@@ -10,6 +10,7 @@ const UserContext: any = createContext<any>(null);
 export default function AuthContextProvider({ children }: any) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [suid, setSuid] = useState('');
+    const [isAdmin, setIsAdmin] = useState(false);
     const [classes, setClasses] = useState([]);
     const [staff, setStaff] = useState([]);
     const [pipelineSteps, setPipelineSteps] = useState([]);
@@ -207,6 +208,8 @@ export default function AuthContextProvider({ children }: any) {
             if (currentUser) {
                 setIsLoggedIn(true);
                 console.log('It ran again', currentUser.photoURL);
+                const adminPrivileges = currentUser.email === 'info@competestudio.pro' ? true : false;
+                setIsAdmin(adminPrivileges);
                 setSuid(suid ? suid : currentUser.photoURL);
                 getStudioInfo(suid ? suid : currentUser.photoURL, currentUser.photoURL);
             } else {
@@ -252,7 +255,9 @@ export default function AuthContextProvider({ children }: any) {
                 setToActivate,
                 layout,
                 setLayout,
-                logo, setLogo
+                logo, 
+                setLogo,
+                isAdmin,
             }}
         >
             {children}

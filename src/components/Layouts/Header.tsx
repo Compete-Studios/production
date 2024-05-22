@@ -40,7 +40,7 @@ import IconSettings from '../Icon/IconSettings';
 import { deleteMessage, listenForMessages } from '../../firebase/firebaseFunctions';
 
 const Header = () => {
-    const { setSearchedStudentsAndProspects, suid, studioInfo, isMaster, masters, setSelectedSuid, studioOptions }: any = UserAuth();
+    const { setSearchedStudentsAndProspects, suid, studioInfo, isMaster, masters, setSelectedSuid, isAdmin }: any = UserAuth();
     const [searchItem, setSearchItem] = useState('');
     const [studioInitials, setStudioInitials] = useState('');
     const [options, setOptions] = useState<any>([]);
@@ -363,6 +363,7 @@ const Header = () => {
                                 <IconSearch className="w-4.5 h-4.5 mx-auto dark:text-[#d0d2d6]" />
                             </button>
                         </div>
+                        {isAdmin && (<Link to="/admin/studios" className='text-xs text-info hover:text-blue-800'>Admin Dashboard</Link>)}
                         {isMaster && (
                             <Suspense fallback={<div>Loading...</div>}>
                                 <Select placeholder={selected?.label} options={options} isSearchable={false} className="hidden sm:block w-auto" onChange={handleSelectStudio} />

@@ -24,6 +24,8 @@ import IconMenuForms from '../Icon/Menu/IconMenuForms';
 import IconMenuCharts from '../Icon/Menu/IconMenuCharts';
 import IconMinusCircle from '../Icon/IconMinusCircle';
 import IconMenuTodo from '../Icon/Menu/IconMenuTodo';
+import IconBolt from '../Icon/IconBolt';
+import IconMenuMailbox from '../Icon/Menu/IconMenuMailbox';
 
 const Sidebar = () => {
     const { isMaster, masters, suid }: any = UserAuth();
@@ -128,6 +130,38 @@ const Sidebar = () => {
                                         </li> */}
                                         <li>
                                             <NavLink to="/students/student-pipeline">Student Pipeline</NavLink>
+                                        </li>
+                                    </ul>
+                                </AnimateHeight>
+                            </li>
+                            <li className="menu nav-item">
+                                <button type="button" className={`${currentMenu === 'marketing' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('marketing')}>
+                                    <div className="flex items-center">
+                                        <IconBolt fill={true} className="group-hover:!text-primary shrink-0" />
+                                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Marketing</span>
+                                    </div>
+
+                                    <div className={currentMenu !== 'marketing' ? 'rtl:rotate-90 -rotate-90' : ''}>
+                                        <IconCaretDown />
+                                    </div>
+                                </button>
+
+                                <AnimateHeight duration={300} height={currentMenu === 'marketing' ? 'auto' : 0}>
+                                    <ul className="sub-menu text-gray-500">
+                                        <li>
+                                            <NavLink to="/prospects/prospect-pipeline">Prospect Pipeline</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/prospects/view-prospects">Search Prospects</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/prospects/add-prospect">Add Prospect</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/marketing/capture-forms">Capture Forms</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/marketing/marketing-methods">Marketing Methods</NavLink>
                                         </li>
                                     </ul>
                                 </AnimateHeight>
@@ -249,43 +283,11 @@ const Sidebar = () => {
 
                             <h2 className="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
                                 <IconMinus className="w-4 h-5 flex-none hidden" />
-                                <span>{t('Marketing')}</span>
+                                <span>{t('Connect')}</span>
                             </h2>
 
                             <li className="nav-item">
-                                <ul>
-                                <li className="nav-item">
-                                        <NavLink to="/prospects/prospect-pipeline" className="group">
-                                            <div className="flex items-center">
-                                                <IconMenuElements className="group-hover:!text-primary shrink-0" />
-                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Prospect Pipeline</span>
-                                            </div>
-                                        </NavLink>
-                                    </li>
-                                    <li className="nav-item">
-                                        <NavLink to="/prospects/view-prospects" className="group">
-                                            <div className="flex items-center">
-                                                <IconMenuUsers className="group-hover:!text-primary shrink-0" />
-                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Search Prospects</span>
-                                            </div>
-                                        </NavLink>
-                                    </li>
-                                    <li className="nav-item">
-                                        <NavLink to="/prospects/add-prospect" className="group">
-                                            <div className="flex items-center">
-                                                <IconUserPlus className="group-hover:!text-primary shrink-0" />
-                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Add Prospect</span>
-                                            </div>
-                                        </NavLink>
-                                    </li>
-                                    <li className="nav-item">
-                                        <NavLink to="/marketing/capture-forms" className="group">
-                                            <div className="flex items-center">
-                                                <IconMenuForms className="group-hover:!text-primary shrink-0" />
-                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Capture Forms</span>
-                                            </div>
-                                        </NavLink>
-                                    </li>
+                                <ul>                               
                                     <li className="nav-item">
                                         <NavLink to="/apps/chat" className="group">
                                             <div className="flex items-center">
@@ -294,14 +296,14 @@ const Sidebar = () => {
                                             </div>
                                         </NavLink>
                                     </li>                                    
-                                    {/* <li className="nav-item">
+                                    <li className="nav-item">
                                         <NavLink to="/apps/mailbox" className="group">
                                             <div className="flex items-center">
                                                 <IconMenuMailbox className="group-hover:!text-primary shrink-0" />
                                                 <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('mailbox')}</span>
                                             </div>
                                         </NavLink>
-                                    </li> */}
+                                    </li>
                                     {/* <li className="nav-item">
                                         <NavLink to="/facebook-add-creator" className="group">
                                             <div className="flex items-center">
@@ -310,14 +312,7 @@ const Sidebar = () => {
                                             </div>
                                         </NavLink>
                                     </li> */}
-                                    <li className="nav-item">
-                                        <NavLink to="/marketing/marketing-methods" className="group">
-                                            <div className="flex items-center">
-                                                <IconMenuTables className="group-hover:!text-primary shrink-0" />
-                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Marketing Methods</span>
-                                            </div>
-                                        </NavLink>
-                                    </li>
+                               
                                     {/* <li className="nav-item">
                                         <NavLink to="/marketing/landing-page-creator" className="group">
                                             <div className="flex items-center">

@@ -163,6 +163,7 @@ const AddStudio = lazy(() => import('../admin/studios/AddStudio'));
 const StudioOverview = lazy(() => import('../admin/studios/StudioOverview'));
 const MasterStudios = lazy(() => import('../admin/studios/MasterStudios'));
 const SetMasterStudio = lazy(() => import('../admin/studios/SetMasterStudio'));
+const Issues = lazy(() => import('../admin/Issues'));
 
 const routes = [
     //Authentication
@@ -753,6 +754,12 @@ const routes = [
     {
         path: '/admin/set-master',
         element: <SetMasterStudio />,
+        layout: 'admin',
+    },
+
+    {
+        path: '/admin/issues',
+        element: <Issues />,
         layout: 'admin',
     },
 

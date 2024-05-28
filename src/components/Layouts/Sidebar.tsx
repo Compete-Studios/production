@@ -26,6 +26,7 @@ import IconMinusCircle from '../Icon/IconMinusCircle';
 import IconMenuTodo from '../Icon/Menu/IconMenuTodo';
 import IconBolt from '../Icon/IconBolt';
 import IconMenuMailbox from '../Icon/Menu/IconMenuMailbox';
+import IconFacebook from '../Icon/IconFacebook';
 
 const Sidebar = () => {
     const { isMaster, masters, suid }: any = UserAuth();
@@ -281,49 +282,42 @@ const Sidebar = () => {
                                 </AnimateHeight>
                             </li>
 
-                            <h2 className="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
+                            {/* <h2 className="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
                                 <IconMinus className="w-4 h-5 flex-none hidden" />
                                 <span>{t('Connect')}</span>
                             </h2>
 
                             <li className="nav-item">
                                 <ul>                               
-                                    <li className="nav-item">
-                                        <NavLink to="/apps/chat" className="group">
-                                            <div className="flex items-center">
-                                                <IconMenuChat className="group-hover:!text-primary shrink-0" />
-                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Text Messages')}</span>
-                                            </div>
-                                        </NavLink>
-                                    </li>                                    
+                                                                   
                                     <li className="nav-item">
                                         <NavLink to="/apps/mailbox" className="group">
                                             <div className="flex items-center">
                                                 <IconMenuMailbox className="group-hover:!text-primary shrink-0" />
-                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('mailbox')}</span>
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('View Emails')}</span>
                                             </div>
                                         </NavLink>
                                     </li>
-                                    {/* <li className="nav-item">
+                                    <li className="nav-item">
                                         <NavLink to="/facebook-add-creator" className="group">
                                             <div className="flex items-center">
-                                                <IconMenuMailbox className="group-hover:!text-primary shrink-0" />
-                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Facebook</span>
+                                                <IconFacebook fill={true} className="group-hover:!text-primary shrink-0" />
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Facebook Forms</span>
                                             </div>
                                         </NavLink>
-                                    </li> */}
+                                    </li>
                                
-                                    {/* <li className="nav-item">
+                                    <li className="nav-item">
                                         <NavLink to="/marketing/landing-page-creator" className="group">
                                             <div className="flex items-center">
                                                 <IconMenuTodo className="group-hover:!text-primary shrink-0" />
                                                 <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Landing Page Maker')}</span>
                                             </div>
                                         </NavLink>
-                                    </li> */}
+                                    </li>
                                     
                                 </ul>
-                            </li>
+                            </li> */}
 
                             <h2 className="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
                                 <IconMinus className="w-4 h-5 flex-none hidden" />
@@ -331,6 +325,14 @@ const Sidebar = () => {
                             </h2>
                             <li className="nav-item">
                                 <ul>
+                                <li className="nav-item">
+                                        <NavLink to="/apps/chat" className="group">
+                                            <div className="flex items-center">
+                                                <IconMenuChat className="group-hover:!text-primary shrink-0" />
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Text Messages')}</span>
+                                            </div>
+                                        </NavLink>
+                                    </li>    
                                     {/* <li className="nav-item">
                                         <NavLink to="/apps/todolist" className="group">
                                             <div className="flex items-center">
@@ -373,7 +375,7 @@ const Sidebar = () => {
                                         </NavLink>
                                     </li> */}
                                  
-                                    {!isMaster && (
+                                    {/* {!isMaster && (
                                         <li className="menu nav-item">
                                             <button type="button" className={`${currentMenu === 'master' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('master')}>
                                                 <div className="flex items-center">
@@ -400,7 +402,7 @@ const Sidebar = () => {
                                                 </ul>
                                             </AnimateHeight>
                                         </li>
-                                    )}
+                                    )} */}
                                 </ul>
                             </li>
 

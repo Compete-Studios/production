@@ -24,6 +24,7 @@ import IconMenuUsers from '../Icon/Menu/IconMenuUsers';
 import IconUserPlus from '../Icon/IconUserPlus';
 import { UserAuth } from '../../context/AuthContext';
 import IconMenuAuthentication from '../Icon/Menu/IconMenuAuthentication';
+import IconInfoCircle from '../Icon/IconInfoCircle';
 
 const AdminSidebar = () => {
     const { studioInfo, isMaster, masters, suid }: any = UserAuth();
@@ -135,10 +136,10 @@ const AdminSidebar = () => {
                                         </NavLink>
                                     </li>
                                     <li className="nav-item">
-                                        <NavLink to="/admin/studios" className="group">
+                                        <NavLink to="/admin/issues" className="group">
                                             <div className="flex items-center">
-                                                <IconMenuUsers className="group-hover:!text-primary shrink-0" />
-                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Another Item</span>
+                                                <IconInfoCircle fill={true} className="group-hover:!text-primary shrink-0" />
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Reported Issues</span>
                                             </div>
                                         </NavLink>
                                     </li>

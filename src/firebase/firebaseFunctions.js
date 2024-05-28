@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDoc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
 import { db, storage } from './firebase';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { login, logout } from './auth';
@@ -38,6 +38,28 @@ export const storeReportToFirebase = async (data) => {
         console.log(error);
         return false;
     }
+};
+
+export const getReportsFromFirebase = async () => {
+    try {
+        const docRef = collection(db, 'issues');
+        const querySnapshot = await getDocs(docRef);
+        const reports = [];
+        querySnapshot.forEach((doc) => {
+            const docWithId = { ...doc.data(), id: doc.id };
+            reports.push(docWithId);
+        });
+        return reports;
+    } catch (error) {
+        console.log(error);
+        return [];
+    }
+};
+
+export const updateReport = async (reportId, reportData) => {
+    const idString = reportId.toString();
+    const docRef = doc(db, 'issues', idString);
+    await updateDoc(docRef, reportData);
 };
 
 export const updateStudio = async (studioId, studioData) => {

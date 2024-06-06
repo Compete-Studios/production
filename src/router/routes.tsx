@@ -282,6 +282,7 @@ const routes = [
         path: '/reports/anticipated-payments',
         element: <AnticipatedPayments />
     },
+    
 
     //classes
     {

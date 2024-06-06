@@ -9,7 +9,7 @@ const AnticipatedPayments = () => {
     const { suid }: any = UserAuth();
     const [loading, setLoading] = useState(true);
     const [payments, setPayments] = useState<any>(null);
-    const [total, setTotal] = useState('0');
+    const [total, setTotal] = useState<any>(0);
 
     const dispatch = useDispatch();
     useEffect(() => {
@@ -17,43 +17,33 @@ const AnticipatedPayments = () => {
     });
 
     const currentDate = new Date();
-
-    // Create a date object representing the first day of the current month
-    const thisMonthStartDate = new Date(
-        currentDate.getFullYear(),
-        currentDate.getMonth(),
-        1
-    );
-
-    // Create a date object representing the last day of the current month
+    
     const thisMonthEndDate = new Date(
         currentDate.getFullYear(),
         currentDate.getMonth() + 1,
         0
     );
-
-    // Initialize the state with the formatted start and end dates
-    const [startDate, setStartDate] = useState(thisMonthStartDate);
+    const [startDate, setStartDate] = useState(currentDate);
     const [endDate, setEndDate] = useState(thisMonthEndDate);
 
 
     useEffect(() => {
-        //getPayments(startDate, endDate, suid);
-    }, [suid, startDate, endDate]);
+        getPayments(startDate, endDate, suid);
+    }, [suid]);
 
-    const getPayments = async (startDate: Date, endDate: Date, studioId: string) => {
+    const getPayments = async (startDate: any, endDate: any, studioId: string) => {
         setLoading(true);
-        console.log('BEGIN FETCHING PAYMENTS', startDate, endDate, studioId);
         try {
-            // const { data: activeSchedules } = await getAllActivePaymentSchedules(studioId);
-            // console.log('Data', activeSchedules);
-            // if (activeSchedules.Meta.HttpStatus === "OK" && activeSchedules.Meta.PagingDetails.TotalItems > 0) {
-            //     const filteredPayments = filterPaymentsByDate(activeSchedules.Response, startDate, endDate);
-            //     setPayments(filteredPayments);
-            //     calculateTotal(filteredPayments);
-            // } else {
-            //     setPayments([]);
-            // }
+            //Get all active payment schedules for the studio
+            const activeSchedules = await getAllActivePaymentSchedules(studioId);
+            //For all active schedules, filter out the ones that are within the given date range
+            if (activeSchedules.Meta.HttpStatus === "OK" && activeSchedules.Meta.PagingDetails.TotalItems > 0) {
+                const filteredPayments = filterPaymentsByDate(activeSchedules.Response, startDate, endDate);
+                setPayments(filteredPayments.filteredPayments);
+                setTotal(filteredPayments.totalAmount);
+            } else {
+                setPayments([]);
+            }
         } catch (error) {
             console.error(error);
             showErrorMessage(`Failed to fetch anticipated payments. Error: ${(error as Error).message}`);
@@ -62,33 +52,61 @@ const AnticipatedPayments = () => {
         }
     };
 
-    const filterPaymentsByDate = (payments: any[], start: Date, end: Date) => {
-        return payments.filter(payment => {
+    const filterPaymentsByDate = (payments: any[], start: any, end: any) => {
+        // Convert start and end to Date objects for comparison
+        const startDate = new Date(start);
+        const endDate = new Date(end);
+
+        let totalAmount = 0;
+
+        const filteredPayments = payments.filter(payment => {
             const paymentStartDate = new Date(payment.StartDate);
             const paymentEndDate = payment.EndDate ? new Date(payment.EndDate) : null;
+            const executionDay = payment.ExecutionFrequencyParameter;
 
-            if (!paymentEndDate && paymentStartDate < new Date(end)) return true;
+            // Check if the payment is active within the given range
+            const isActive = (!paymentEndDate && paymentStartDate <= endDate) ||
+                (paymentEndDate && paymentStartDate <= endDate && paymentEndDate >= startDate);
 
-            if (paymentEndDate && paymentStartDate < new Date(end) && paymentEndDate > new Date(start)) return true;
+            if (!isActive) {
+                return false;
+            }
 
-            return false;
+            // Check if the payment will run on the specified days within the date range
+            let current = new Date(startDate);
+            let paymentCount = 0;
+
+            while (current <= endDate) {
+                const month = current.getMonth();
+                const year = current.getFullYear();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const runDay = executionDay > daysInMonth ? daysInMonth : executionDay;
+
+                const runDate = new Date(year, month, runDay);
+                if (runDate >= startDate && runDate <= endDate) {
+                    paymentCount++;
+                }
+
+                // Move to the next month
+                current.setMonth(current.getMonth() + 1);
+            }
+
+            // Calculate the total amount for this payment
+            totalAmount += payment.PaymentAmount * paymentCount;
+
+            return paymentCount > 0;
         });
-    };
-
-    const calculateTotal = (payments: any[]) => {
-        const totalAmount = payments.reduce((acc, payment) => acc + (payment.Amount || 0), 0); // Assuming 'Amount' is the field for payment amount
-        setTotal(totalAmount);
+        
+        return {
+            filteredPayments,
+            totalAmount
+        };
     };
 
     const handleDateChange = async () => {
-        // const formattedStartDate = startDate.toISOString().split("T")[0];
-        // const formattedEndDate = endDate.toISOString().split("T")[0];
-
-        // Discard timezone info and other irrelevant stuff in the date
-        const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-        const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
-
-        await getPayments(start, end, suid);
+        const formattedStartDate = startDate.toISOString().split("T")[0];
+        const formattedEndDate = endDate.toISOString().split("T")[0];
+        await getPayments(formattedStartDate, formattedEndDate, suid);
     };
 
     return (
@@ -97,8 +115,9 @@ const AnticipatedPayments = () => {
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight flex items-center gap-2">Anticipated Payments</h2>
                     <p className="text-muted-foreground">
-                        The total payment amount expected in the given date range. This report is based on students with Active payment schedules.
+                        The ESTIMATED total payment amount expected in the given date range. This report is based on students with Active payment schedules.
                     </p>
+                    <p className="text-muted-foreground">It does not include things like intro program payments, paid-in-full schedules, or payments made in the studio.</p>
                 </div>
             </div>
             <div className="flex items-center gap-x-2">
@@ -140,32 +159,37 @@ const AnticipatedPayments = () => {
                 <p>Loading...</p>
             ) : payments && payments.length > 0 ? (
                 <div>
-                    <p>Total: ${total}</p>
+                    <h2 className="text-3xl font-bold mb-4">
+                        Anticipated Total: <span className="text-blue-500">${total}</span>
+                    </h2>
+                    <p>Estimated Number of Payments: {payments.length}</p>
                     <table>
                         <thead>
                             <tr>
-                                <th>Customer ID</th>
-                                <th> Customer Name</th>
-                                <th>Start Date</th>
-                                <th>End Date</th>
+                                <th>Billing Name</th>
                                 <th>Amount</th>
+                                <th>Most Recent Payment</th>
+                                <th>Next Payment</th>
+                                <th>Schedule Began</th>
+                                <th>Schedule Ends</th>
                             </tr>
                         </thead>
                         <tbody>
                             {payments.map((payment: any, index: number) => (
                                 <tr key={index}>
-                                    <td>{payment.CustomerId}</td>
-                                    <td> {payment.CustomerName}</td>
+                                    <td>{payment.CustomerFirstName} {payment.CustomerLastName}</td>
+                                    <td>{payment.PaymentAmount}</td>
+                                    <td>{new Date(payment.DateOfLastPaymentMade).toLocaleDateString()}</td>
+                                    <td>{new Date(payment.NextScheduleDate).toLocaleDateString()}</td>
                                     <td>{new Date(payment.StartDate).toLocaleDateString()}</td>
-                                    <td>{payment.EndDate ? new Date(payment.EndDate).toLocaleDateString() : 'N/A'}</td>
-                                    <td>{payment.Amount}</td>
+                                    <td>{payment.EndDate ? new Date(payment.EndDate).toLocaleDateString() : '-'}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
             ) : (
-                <p>No data available.</p>
+                <p>No active payment schedules found in the given date range.</p>
             )}
 
         </div>

@@ -120,7 +120,7 @@ const Snapshot = () => {
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight flex items-center gap-2">Studio Snapshot</h2>
                     <p className="text-muted-foreground">
-                        A look at your most important stats
+                        A look at your most important stats. Click on any category to see more details.
                     </p>
                 </div>
             </div>

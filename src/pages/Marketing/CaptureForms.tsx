@@ -1,19 +1,51 @@
 import { useEffect, useState } from 'react';
 import { UserAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { getRanksByStudioId, getUserFormsByStudioId } from '../../functions/api';
-import { showMessage } from '../../functions/shared';
+import { deleteForm, getUserFormsByStudioId } from '../../functions/api';
+import { showMessage, showWarningMessage } from '../../functions/shared';
 import { Loader } from '@mantine/core';
 import { REACT_BASE_URL } from '../../constants';
+import { deleteFormFromFirebase } from '../../firebase/firebaseFunctions';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '../../firebase/firebase';
 
 export default function CaptureForms() {
-    const { suid, fbForms }: any = UserAuth();
+    const { suid }: any = UserAuth();
+    const [fbForms, setFBForms] = useState<any>([]);
     const [loading, setLoading] = useState(true);
     const [forms, setForms] = useState([]);
+    const [update, setUpdate] = useState(false);
+    const [matchedFormIds, setMatchedFormIds] = useState<any>([]);
+
+    const getFromsFromFirebaseWithStudioID = async (suid: any) => {
+        const idToString = suid.toString();
+
+        if (!idToString) {
+            return;
+        }
+        try {
+            const q = query(collection(db, 'forms'), where('studioID', '==', idToString));
+            const querySnapshot = await getDocs(q);
+            const forms: any = [];
+            querySnapshot.forEach((doc: any) => {
+                const dacData = {
+                    id: doc.id,
+                    ...doc.data(),
+                };
+                forms.push(dacData);
+            });
+            setFBForms(forms);
+            const formsWithIDs = forms.map((form: any) => parseInt(form.oldFormID));
+            setMatchedFormIds(formsWithIDs);
+        } catch (error) {
+            console.error('Error getting documents: ', error);
+        }
+    };
 
     useEffect(() => {
         setLoading(true);
         try {
+            getFromsFromFirebaseWithStudioID(suid);
             getUserFormsByStudioId(suid).then((data) => {
                 setForms(data.recordset);
                 setLoading(false);
@@ -22,7 +54,7 @@ export default function CaptureForms() {
             console.error(error);
             setLoading(false);
         }
-    }, [suid]);
+    }, [suid, update]);
 
     const copyToClipboard = (text: any) => {
         navigator.clipboard.writeText(text);
@@ -37,6 +69,52 @@ export default function CaptureForms() {
 
     const handlePreview = (id: any) => {
         window.open(`${REACT_BASE_URL}/form/${id}`, '_blank');
+    };
+
+    const handleDeleteOldForm = (id: any) => {
+        showWarningMessage('Are you sure you want to delete this form?', 'Remove Form', 'Your Form has been removed successfully')
+            .then((confirmed: boolean) => {
+                if (confirmed) {
+                    deleteForm(id).then((response: any) => {
+                        console.log(response);
+                        if (response) {
+                            setUpdate(!update);
+                        } else {
+                            console.error('Failed to delete form');
+                        }
+                    });
+                } else {
+                    // User canceled the action
+                    console.log('User canceled');
+                }
+            })
+            .catch((error: any) => {
+                // Handle error if any
+                console.error('Error:', error);
+            });
+    };
+
+    const handleDeleteForm = (id: any) => {
+        showWarningMessage('Are you sure you want to delete this form?', 'Remove Form', 'Your Form has been removed successfully')
+            .then((confirmed: boolean) => {
+                if (confirmed) {
+                    deleteFormFromFirebase(id).then((response: any) => {
+                        console.log(response);
+                        if (response) {
+                            setUpdate(!update);
+                        } else {
+                            console.error('Failed to delete form');
+                        }
+                    });
+                } else {
+                    // User canceled the action
+                    console.log('User canceled');
+                }
+            })
+            .catch((error: any) => {
+                // Handle error if any
+                console.error('Error:', error);
+            });
     };
 
     return (
@@ -90,25 +168,29 @@ export default function CaptureForms() {
                                                             </button>
                                                         </td>
 
-                                                        <td>
+                                                        <td >
+                                                            <Link 
+                                                            to={`/marketing/capture-forms/stats/${list.id}`}
+                                                            className='text-info hover:text-blue-800 text-center w-full '>
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-bar-chart-line" viewBox="0 0 16 16">
                                                                 <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1zm1 12h2V2h-2zm-3 0V7H7v7zm-5 0v-3H2v3z" />
                                                             </svg>
+                                                            </Link>
                                                         </td>
                                                         <td className="flex items-center justify-end gap-2">
                                                             <button className="text-com hover:text-indigo-900" onClick={() => handlePreview(list.id)}>
                                                                 Preview
                                                             </button>
                                                             <button className="text-com hover:text-indigo-900">Edit</button>
-                                                            <a href="#" className="text-alert hover:text-alerthover">
+                                                            <button className="text-alert hover:text-alerthover" onClick={() => handleDeleteForm(list.id)}>
                                                                 Delete
-                                                            </a>
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                 ))}
 
                                                 {forms?.map((list: any) => (
-                                                    <tr key={list.FormId}>
+                                                    <tr key={list.FormId} className={`${matchedFormIds.includes(parseInt(list.FormId)) ? 'bg-red-100' : ''}`}>
                                                         <td>{list.FriendlyName}</td>
                                                         <td>
                                                             <button className="text-primary hover:text-primary/70" onClick={() => copyToClipboard(list.IFrameHTML)}>
@@ -118,9 +200,27 @@ export default function CaptureForms() {
                                                             </button>
                                                         </td>
 
-                                                        <td colSpan={2} className='text-danger text-right'>
-                                                           Please update this form to the new version by clicking on the edit button
-                                                           <button className="text-info hover:text-indigo-900 ml-2"> Edit Here</button>
+                                                        <td colSpan={2} className="text-right">
+                                                            {matchedFormIds.includes(parseInt(list.FormId)) ? (
+                                                                <div className="flex items-center justify-end text-danger">
+                                                                <div>This form is a legacy form. Please update your site with the new form</div>
+                                                                <button className="btn btn-danger btn-sm ml-2"
+                                                                    onClick={() => handleDeleteOldForm(list.FormId)}
+                                                                >
+                                                                    {' '}
+                                                                    Delete Form
+                                                                </button>
+                                                            </div>
+                                                                
+                                                            ) : (
+                                                                <div className="flex items-center justify-end">
+                                                                    <div className='text-warning'>Please update this form to the new version by clicking on the edit button</div>
+                                                                    <Link to={`/marketing/legacy/capture-forms/${list.FormId}`} className="text-info hover:text-indigo-900 ml-2">
+                                                                        {' '}
+                                                                        Edit Here
+                                                                    </Link>
+                                                                </div>
+                                                            )}
                                                         </td>
                                                     </tr>
                                                 ))}

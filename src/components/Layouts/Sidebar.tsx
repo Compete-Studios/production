@@ -40,16 +40,9 @@ const Sidebar = () => {
         setCurrentMenu((oldValue) => {
             return oldValue === value ? '' : value;
         });
-    };
+    };   
 
-   
 
-    const handleSetNewStudio = async (studioID: any) => {
-        const idString = studioID.toString();
-        const masterStudioString = suid.toString();
-        localStorage.setItem('suid', idString);
-        window.location.reload();          
-    }   
 
     useEffect(() => {
         const selector = document.querySelector('.sidebar ul a[href="' + window.location.pathname + '"]');

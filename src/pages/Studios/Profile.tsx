@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { UserAuth } from "../../context/AuthContext";
 import { updateStudioInDB } from "../../functions/api";
-import { updateStudio } from "../../firebase/firebaseFunctions";
 import { showMessage } from "../../functions/shared";
+import { Link } from "react-router-dom";
 
 export default function Profile() {
-  const { studioInfo, suid }: any = UserAuth();
+  const { studioInfo, suid, setStudioInfo }: any = UserAuth();
   const [loading, setLoading] = useState(false);
 
   const [contact_Name, setContact_Name] = useState("");
@@ -25,7 +25,7 @@ export default function Profile() {
       setContact_Number(studioInfo?.Contact_Number);
       setContact_Email(studioInfo?.Contact_Email);
       setContact_Name(studioInfo?.Contact_Name);
-      setContact_Address(studioInfo?.Constact_Address);
+      setContact_Address(studioInfo?.Contact_Address);
       setContact_City(studioInfo?.Contact_City);
       setContact_State(studioInfo?.Contact_State);
       setContact_Zip(studioInfo?.Contact_Zip);
@@ -58,10 +58,12 @@ export default function Profile() {
   const handleCreateUser = (e: any) => {
     e.preventDefault();
     setLoading(true);
-    updateStudio(suid, userDataforFB);
+    // updateStudio(suid, userDataforFB);
     updateStudioInDB(suid, userDataforDB);
     showMessage("Successfully updated!");
   };
+
+  console.log("studioInfo", studioInfo);
 
   return (
     <>
@@ -89,7 +91,12 @@ export default function Profile() {
               value={studio_Name}
               className="form-input"
               placeholder="Studio Name"
-              onChange={(e) => setStudio_Name(e.target.value)}
+              onChange={(e) => {
+                setStudio_Name(e.target.value)
+                setStudioInfo({ ...studioInfo, Studio_Name: e.target.value });
+              }
+
+              }
             />
           </div>
           <div className="mt-2 sm:col-span-4">
@@ -106,7 +113,10 @@ export default function Profile() {
               value={contact_Name}
               className="form-input"
               placeholder="First Name"
-              onChange={(e) => setContact_Name(e.target.value)}
+              onChange={(e) => {
+                setContact_Name(e.target.value)
+                setStudioInfo({ ...studioInfo, Contact_Name: e.target.value });
+              }}
             />
           </div>
           <div className="mt-2 sm:col-span-4">
@@ -123,7 +133,10 @@ export default function Profile() {
               value={contact_Number}
               className="form-input"
               placeholder="Phone Number"
-              onChange={(e) => setContact_Number(e.target.value)}
+              onChange={(e) => {
+                setContact_Number(e.target.value)
+                setStudioInfo({ ...studioInfo, Contact_Number: e.target.value });
+              }}
             />
           </div>
           <div className="mt-2 sm:col-span-4">
@@ -140,7 +153,11 @@ export default function Profile() {
               value={contact_Address}
               className="form-input"
               placeholder="Address"
-              onChange={(e) => setContact_Address(e.target.value)}
+              onChange={(e) => {
+                setContact_Address(e.target.value)
+                setStudioInfo({ ...studioInfo, Contact_Address: e.target.value });
+              }
+              }
             />
           </div>
           <div className="mt-2 sm:col-span-2">
@@ -157,7 +174,10 @@ export default function Profile() {
               value={contact_City}
               className="form-input"
               placeholder="City"
-              onChange={(e) => setContact_City(e.target.value)}
+              onChange={(e) => {
+                setContact_City(e.target.value)
+                setStudioInfo({ ...studioInfo, Contact_City: e.target.value }); 
+              }}
             />
           </div>
           <div className="mt-2">
@@ -172,6 +192,7 @@ export default function Profile() {
               value={contact_State}
               onChange={(value: any) => {
                 setContact_State(value);
+                setStudioInfo({ ...studioInfo, Contact_State: value });
               }}
             >
               <option value="AL">Alabama</option>
@@ -241,7 +262,10 @@ export default function Profile() {
               value={contact_Zip}
               className="form-input"
               placeholder="Zip Code"
-              onChange={(e) => setContact_Zip(e.target.value)}
+              onChange={(e) => {
+                setContact_Zip(e.target.value)
+                setStudioInfo({ ...studioInfo, Contact_Zip: e.target.value });
+              }}
             />
           </div>
 
@@ -271,6 +295,11 @@ export default function Profile() {
             >
               Update Profile
             </button>
+            <div  className="text-danger text-center w-full mt-2">
+            <Link to="/studios/password-reset/32">
+              Reset Password
+            </Link>
+            </div>
           </div>
         </div>
       </div>

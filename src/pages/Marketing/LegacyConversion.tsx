@@ -1,65 +1,31 @@
+import React, { Fragment, useEffect, useState } from 'react';
 import { RadioGroup, Tab } from '@headlessui/react';
-import { Fragment, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getUserFormInfo } from '../../functions/api';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import IconCircleCheck from '../../components/Icon/IconCircleCheck';
-import { saveFromToFirebase } from '../../firebase/firebaseFunctions';
 import { UserAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { Loader } from '@mantine/core';
+import IconCircleCheck from '../../components/Icon/IconCircleCheck';
 import { showErrorMessage, showMessage } from '../../functions/shared';
-
-const formInfoInit = {
-    StudioId: '',
-    FriendlyName: '',
-    CreationDate: '',
-    FormType: '',
-    FormStyle: '',
-    Name: '',
-    LastName: '',
-    Email: '',
-    Phone: '',
-    Address: '',
-    City: '',
-    State: '',
-    Zip: '',
-    Age: '',
-    Notes: '',
-    AdditionalInfo: '',
-    IncludeCaptcha: '',
-    SendEmailNotification: '',
-    BackgroundColor: '',
-    ButtonColor: '',
-    ProspectPipelineStep: '',
-    MarketingMethod: '',
-    NoteText: '',
-    SuccessURL: '',
-    SuccessMessage: '',
-    EmailToNotify: '',
-    ParentName: '',
-    DefaultSMS: '',
-    DefaultFromEmail: '',
-    DefaultEmailSubject: '',
-    DefaultEmailContent: '',
-};
-
+import { saveFromToFirebase } from '../../firebase/firebaseFunctions';
+import { Loader } from '@mantine/core';
 const formInfoSelected = {
     StudioId: false,
-    FriendlyName: true,
-    FormDescription: true,
+    FriendlyName: false,
+    FormDescription: false,
     CreationDate: false,
     FormType: false,
     FormStyle: false,
-    Name: true,
-    LastName: true,
-    Email: true,
-    Phone: true,
+    Name: false,
+    LastName: false,
+    Email: false,
+    Phone: false,
     Address: false,
     City: false,
     State: false,
     Zip: false,
     Age: false,
-    Notes: true,
+    Notes: false,
     AdditionalInfo: false,
     IncludeCaptcha: false,
     SendEmailNotification: false,
@@ -77,10 +43,6 @@ const formInfoSelected = {
     DefaultEmailSubject: false,
     DefaultEmailContent: false,
 };
-
-function classNames(...classes: any) {
-    return classes.filter(Boolean).join(' ');
-}
 
 const roundedOptions = [
     { name: 'None', rounded: 'rounded-none' },
@@ -109,8 +71,13 @@ const heightOptions = [
     { name: 'Tall', height: 'h-14' },
 ];
 
-export default function CreateCaptureForms() {
+function classNames(...classes: any) {
+    return classes.filter(Boolean).join(' ');
+}
+
+export default function LegacyConversion() {
     const { suid, prospectPipelineSteps }: any = UserAuth();
+    const [form, setForm] = useState<any>({});
     const [formInfo, setFormInfo] = useState(formInfoSelected);
     const [value, setValue] = useState('');
     const [formName, setFormName] = useState('');
@@ -120,9 +87,67 @@ export default function CreateCaptureForms() {
     const [heightOption, setHeightOption] = useState(heightOptions[0]);
     const [loading, setLoading] = useState(false);
     const [alertFormName, setAlertFormName] = useState(false);
-    const [pipelineStep, setPipelineStep] = useState('1' as any);
+    const [pipelineStep, setPipelineStep] = useState('' as any);
     const [sendEmail, setSendEmail] = useState(false);
     const [formHeadline, setFormHeadline] = useState('' as any);
+    const [defualtEmailSubject, setDefualtEmailSubject] = useState('' as any);
+    const { id } = useParams();
+
+    const handleGetForms = async () => {
+        try {
+            const response = await getUserFormInfo(id);
+            const data = await response;
+
+            setForm(data.recordset[0]);
+            setFormName(data.recordset[0].FriendlyName);
+            const newPipleLineID = parseInt(data.recordset[0].ProspectPipelineStep);
+            setPipelineStep(newPipleLineID);
+            setDefualtEmailSubject(data.recordset[0].DefaultEmailSubject);
+            setValue(data.recordset[0].DefaultEmailContent);
+            setSendEmail(data.recordset[0].SendEmailNotification === 1);
+            setFormInfo({
+                ...formInfo,
+                StudioId: true,
+                FriendlyName: false,
+                FormDescription: false,
+                CreationDate: true,
+                FormType: true,
+                FormStyle: true,
+                Name: data.recordset[0].Name === 1,
+                LastName: data.recordset[0].LastName === 1,
+                Email: data.recordset[0].Email === 1,
+                Phone: data.recordset[0].Phone === 1,
+                Address: data.recordset[0].Address === 1,
+                City: data.recordset[0].City === 1,
+                State: data.recordset[0].State === 1,
+                Zip: data.recordset[0].Zip === 1,
+                Age: data.recordset[0].Age === 1,
+                Notes: data.recordset[0].Notes === 1,
+                AdditionalInfo: data.recordset[0].AdditionalInfo === 1,
+                IncludeCaptcha: data.recordset[0].IncludeCaptcha === 1,
+                SendEmailNotification: data.recordset[0].SendEmailNotification === 1,
+                BackgroundColor: data.recordset[0].BackgroundColor === 1,
+                ButtonColor: data.recordset[0].ButtonColor === 1,
+                ProspectPipelineStep: data.recordset[0].ProspectPipelineStep === 1,
+                MarketingMethod: data.recordset[0].MarketingMethod === 1,
+                NoteText: data.recordset[0].NoteText === 1,
+                SuccessURL: data.recordset[0].SuccessURL === 1,
+                SuccessMessage: data.recordset[0].SuccessMessage === 1,
+                EmailToNotify: data.recordset[0].EmailToNotify === 1,
+                ParentName: data.recordset[0].ParentName === 1,
+                DefaultSMS: data.recordset[0].DefaultSMS === 1,
+                DefaultFromEmail: data.recordset[0].DefaultFromEmail === 1,
+                DefaultEmailSubject: data.recordset[0].DefaultEmailSubject === 1,
+                DefaultEmailContent: data.recordset[0].DefaultEmailContent === 1,
+            } as any);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        handleGetForms();
+    }, []);
 
     const formData = {
         formName,
@@ -136,7 +161,11 @@ export default function CreateCaptureForms() {
         studioID: suid,
         pipelineStep,
         sendEmail,
-        stats: []
+        defaultEmailSubject: defualtEmailSubject,
+        defaultEmailContent: value,
+        oldFormID: id,
+        isOldForm: true,
+        stats: [],
     };
 
     const navigate = useNavigate();
@@ -148,6 +177,12 @@ export default function CreateCaptureForms() {
             setAlertFormName(true);
             setLoading(false);
             return;
+        } else if(formInfo.FriendlyName && formHeadline === '') {
+            showErrorMessage('Form Headline is Required');
+            setLoading(false);
+        } else if(formInfo.FormDescription && formDescription === '') {
+            showErrorMessage('Form Description is Required');
+            setLoading(false);
         } else {
             const response = await saveFromToFirebase(formData);
             if (response) {
@@ -185,7 +220,7 @@ export default function CreateCaptureForms() {
                         className="ml-3 inline-flex items-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                         onClick={handleSaveForm}
                     >
-                        Save Form
+                        Save and Update Form
                     </button>
                 </div>
             </div>
@@ -243,6 +278,7 @@ export default function CreateCaptureForms() {
                                         type="text"
                                         className={`form-input w-full ${alertFormName && 'borderr bg-danger-light border-danger'}`}
                                         placeholder="Form Name"
+                                        value={formName}
                                         onChange={(e) => setFormName(e.target.value)}
                                         onClick={() => setAlertFormName(false)}
                                     />
@@ -252,7 +288,7 @@ export default function CreateCaptureForms() {
                                         Pipeline Step
                                     </label>
                                     <p className="text-gray-500 mb-2 text-xs">Select the pipeline step that you would like to add the prospect to when they fill out this form.</p>
-                                    <select id="pipelineStatus" className="form-select" onChange={(e) => setPipelineStep(e.target.value)}>
+                                    <select id="pipelineStatus" className="form-select" value={pipelineStep} onChange={(e) => setPipelineStep(e.target.value)}>
                                         {prospectPipelineSteps?.map((step: any) => (
                                             <option key={step.PipelineStepId} value={step.PipelineStepId}>
                                                 {step.StepName}
@@ -264,7 +300,7 @@ export default function CreateCaptureForms() {
                                     </label>
                                     <p className="text-gray-500 mb-2 text-xs">Would you like to receive an email notification when someone fills out the form?</p>
                                     <div className="flex items-center ">
-                                        <input type="checkbox" className="form-checkbox" onChange={() => setSendEmail(!sendEmail)} />
+                                        <input type="checkbox" checked={sendEmail} className="form-checkbox" onChange={() => setSendEmail(!sendEmail)} />
                                         <label htmlFor="form-name">Yes, Send Email Notification</label>
                                     </div>
                                     {sendEmail && (
@@ -272,7 +308,7 @@ export default function CreateCaptureForms() {
                                             <label htmlFor="response-subject" className="mt-6">
                                                 Response Email Subject
                                             </label>
-                                            <input type="text" className="form-input w-full" placeholder="Subject" />
+                                            <input type="text" value={defualtEmailSubject} className="form-input w-full" placeholder="Subject" />
                                             <label htmlFor="form-name" className="mt-6">
                                                 Response Email
                                             </label>
@@ -290,26 +326,35 @@ export default function CreateCaptureForms() {
                                     <p className="mb-4 text-xs">Select the values that you would like to collect from the prospect when they fill out the form.</p>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="col-span-full">
-                                            <label htmlFor="form-name" className="mt-2">
-                                                Form Headline
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className={`form-input w-full ${alertFormName && 'borderr bg-danger-light border-danger'}`}
-                                                placeholder="Form Headline"
-                                                onChange={(e) => setFormHeadline(e.target.value)}
-                                            />
-                                            <label htmlFor="form-name" className="mt-4">
-                                                Form Description
-                                            </label>
-                                            <textarea
-                                                rows={4}
-                                                name="description"
-                                                id="description"
-                                                className="form-textarea w-full"
-                                                placeholder={'Description of Form'}
-                                                onChange={(e) => setFormDescription(e.target.value)}
-                                            />
+                                            {formInfo.FriendlyName && (
+                                                <>
+                                                    <label htmlFor="form-name" className="mt-2">
+                                                        Form Headline
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        className={`form-input w-full ${alertFormName && 'borderr bg-danger-light border-danger'}`}
+                                                        placeholder="Form Headline"
+                                                        onChange={(e) => setFormHeadline(e.target.value)}
+                                                    />
+                                                </>
+                                            )}
+
+                                            {formInfo.FormDescription && (
+                                                <>
+                                                    <label htmlFor="form-name" className="mt-4">
+                                                        Form Description
+                                                    </label>
+                                                    <textarea
+                                                        rows={4}
+                                                        name="description"
+                                                        id="description"
+                                                        className="form-textarea w-full"
+                                                        placeholder={'Description of Form'}
+                                                        onChange={(e) => setFormDescription(e.target.value)}
+                                                    />
+                                                </>
+                                            )}
                                         </div>
                                         <button
                                             type="button"
@@ -338,7 +383,7 @@ export default function CreateCaptureForms() {
                                             } rounded-md h-20 w-full`}
                                             onClick={() => setFormInfo({ ...formInfo, FriendlyName: !formInfo.FriendlyName })}
                                         >
-                                            {formInfo?.FriendlyName && <IconCircleCheck />} Form Name
+                                            {formInfo?.FriendlyName && <IconCircleCheck />} Headline
                                         </button>
                                         <button
                                             type="button"

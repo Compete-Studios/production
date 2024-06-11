@@ -28,9 +28,10 @@ export default function AuthContextProvider({ children }: any) {
     const [masters, setMasters] = useState([]);
     const [logo, setLogo] = useState(blanklogo);
     const [isMaster, setIsMaster] = useState(false);
-    const [selectedSuid, setSelectedSuid] = useState<any>('');
+    const [selectedSuid, setSelectedSuid] = useState<any>(null);
     const [students, setStudents] = useState<any>([]);
     const [fbForms, setFBForms] = useState<any>([]);
+    const [masterStudio, setMasterStudio] = useState<any>(null);
     const [layout, setLayout] = useState<any>({});
     const [update, setUpdate] = useState(false);
     const [toActivate, setToActivate] = useState<any>({
@@ -106,37 +107,30 @@ export default function AuthContextProvider({ children }: any) {
 
     const getStudioInfo = async (suid: any, main: any) => {
         try {
-            const docRef = doc(db, 'studios', suid);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-                setStudioInfo(docSnap.data());
-            } else {
-                // doc.data() will be undefined in this case
-                console.log('No such document!');
+            const docSnap = await fetchRecordSet(`${REACT_API_BASE_URL}/studio-access/getStudioInfo/${suid}`, setStudioInfo);
+            let mainSnap = docSnap.recordset[0];
+            const mstrstudioResponse = await fetchRecordSet(`${REACT_API_BASE_URL}/studio-access/getStudioInfo/${main}`, setMasterStudio);
+            const mstr = mstrstudioResponse.recordset[0];
+    
+            if (main !== suid) {
+                mainSnap = await fetchRecordSet(`${REACT_API_BASE_URL}/studio-access/getStudioInfo/${suid}`, setStudioInfo)
             }
-            let mainSnap = null;
-            if (main === suid) {
-                mainSnap = docSnap;
-            } else {
-                const mainRef = doc(db, 'studios', main);
-                mainSnap = await getDoc(mainRef);
-            }
-            if (mainSnap.exists()) {
-                if (mainSnap.data().MasterStudio === 1) {
+    
+            if (mainSnap) {
+                if (mstr.MasterStudio === 1) {
                     setIsMaster(true);
                     getMasterStudioNumbers(main);
                 } else {
                     setIsMaster(false);
                 }
             } else {
-                // doc.data() will be undefined in this case
                 console.log('No such document!');
             }
         } catch (error) {
             console.error(error);
         }
     };
-
+    
     const getStudioNameById = async (id: any) => {
         try {
             const response = await fetchFromAPI(`studio-access/getStudioInfo/${id}`, {
@@ -170,57 +164,34 @@ export default function AuthContextProvider({ children }: any) {
         }
     };
 
-    const getFromsFromFirebaseWithStudioID = async (suid: any) => {
-        const idToString = suid.toString();
-
-        if (!idToString) {
-            return;
-        }
-        try {
-            const q = query(collection(db, 'forms'), where('studioID', '==', idToString));
-            const querySnapshot = await getDocs(q);
-            const forms: any = [];
-            querySnapshot.forEach((doc: any) => {
-                const dacData = {
-                    id: doc.id,
-                    ...doc.data(),
-                };
-                forms.push(dacData);
-            });
-            setFBForms(forms);
-        } catch (error) {
-            console.error('Error getting documents: ', error);
-        }
-    };
-
     useEffect(() => {
         setShowLoading(true);
         getData();
         getSCHDATA();
         setShowLoading(false);
-        getFromsFromFirebaseWithStudioID(suid);
     }, [suid, update]);
 
     useEffect(() => {
-        const suid = localStorage.getItem('suid');
-        console.log('It ran', suid);
+        // const suid = localStorage.getItem('suid');
+        // console.log('It ran', suid);
         const unsubscribe = onAuthStateChanged(auth, (currentUser: any) => {
             if (currentUser) {
                 setIsLoggedIn(true);
-                console.log('It ran again', currentUser.photoURL);
+                console.log('It ran again', selectedSuid);
                 const adminPrivileges = currentUser.email === 'info@competestudio.pro' ? true : false;
                 setIsAdmin(adminPrivileges);
-                setSuid(suid ? suid : currentUser.photoURL);
-                getStudioInfo(suid ? suid : currentUser.photoURL, currentUser.photoURL);
+
+                setSuid(selectedSuid ? selectedSuid : currentUser.photoURL);
+                getStudioInfo(selectedSuid ? selectedSuid : currentUser.photoURL, currentUser.photoURL);
             } else {
                 setIsLoggedIn(false);
+                setSuid('');
             }
         });
         return () => {
             unsubscribe(); // Clean up the onAuthStateChanged listener
         };
     }, [selectedSuid]);
-    
 
     return (
         <UserContext.Provider
@@ -242,6 +213,7 @@ export default function AuthContextProvider({ children }: any) {
                 showLoading,
                 prospectIntros,
                 studioInfo,
+                setStudioInfo,
                 scheduleID,
                 latePayementPipeline,
                 studioOptions,
@@ -251,11 +223,11 @@ export default function AuthContextProvider({ children }: any) {
                 setSelectedSuid,
                 students,
                 fbForms,
-                toActivate, 
+                toActivate,
                 setToActivate,
                 layout,
                 setLayout,
-                logo, 
+                logo,
                 setLogo,
                 isAdmin,
             }}

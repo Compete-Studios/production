@@ -1504,3 +1504,23 @@ export const addStudioToMasterStudioRoster = async (msId, studioId) => {
         throw error;
     }
 };
+
+export const getUserFormInfo = async (formId) => {
+    try {
+        const response = await fetchData(`forms/getUserFormInfo/${formId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const deleteForm = async (formId) => {
+    try {
+        const response = await fetchData(`forms/deleteForm/${formId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};

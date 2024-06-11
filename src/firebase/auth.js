@@ -1,6 +1,6 @@
-import { addDoc, arrayUnion, collection, doc, getDoc, setDoc } from 'firebase/firestore';
+import { addDoc, arrayUnion, collection, doc, getDoc, getDocs, query, setDoc, where } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebase';
-import { createUserWithEmailAndPassword, sendSignInLinkToEmail, signInWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendPasswordResetEmail, sendSignInLinkToEmail, signInWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth';
 import fetchData from '../functions/fetchdata';
 
 export const login = async (userName, password) => {
@@ -43,6 +43,44 @@ export const login = async (userName, password) => {
     }
 };
 
+export const emailLogin = async (email, password) => {
+    const userRef = collection(db, 'users');
+    const q = query(userRef, where('email', '==', email));
+    const querySnapshot = await getDocs(q);
+    const docSnap = querySnapshot.docs[0];
+    if (!docSnap.exists()) {
+        return { error: 'No user with that email' };
+    }
+    const userName = docSnap.id;
+    const suid = docSnap.data().studioID[0];
+
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+        await updateProfile(userCredential.user, {
+            displayName: userName,
+        });
+
+        await updateProfile(userCredential.user, {
+            photoURL: docSnap.data().studioID[0],
+        });
+        window.location.reload();
+        // If the sign-in is successful, you can return the userCredential or user data here
+        return docSnap.data().studioID[0];
+    } catch (error) {
+        // If an error occurs during sign-in, catch it and return the error message
+        if (error.code === 'auth/user-not-found') {
+            console.log('User not found');
+            console.log(email, password, suid);
+            const studio = await createStudioWithData(email, password, suid);
+            return studio;
+        }
+        return {
+            error: error.message === 'Firebase: Error (auth/wrong-password).' ? 'Incorrect Password' : error.message,
+        };
+    }
+};
+
 const createStudioWithData = async (email, password, suid) => {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -58,6 +96,15 @@ const createStudioWithData = async (email, password, suid) => {
         return {
             error: error.message,
         };
+    }
+};
+
+export const sendPasswordReset = async (email) => {
+    try {
+        const response = await sendPasswordResetEmail(auth, email);
+        return response;
+    } catch (error) {
+        return error.message;
     }
 };
 
@@ -124,32 +171,32 @@ export const createUser = async (email, password, userData) => {
                     photoURL: response.NewStudioId.toString(),
                 });
 
-                const userRef = doc(db, 'studios', response.NewStudioId.toString());
+                // const userRef = doc(db, 'studios', response.NewStudioId.toString());
 
-                // Set user data in the users collection
-                await setDoc(userRef, {
-                    uid: user.uid,
-                    email: user.email,
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                    Studio_Id: response.NewStudioId,
-                    Constact_Address: userData.contact_Address,
-                    Contact_City: userData.contact_City,
-                    Contact_Email: userData.contact_Email,
-                    Contact_Name: userData.contact_Name,
-                    Contact_Number: userData.contact_Number,
-                    Contact_State: userData.contact_State,
-                    Contact_Zip: userData.contact_Zip,
-                    Desired_Pswd: userData.desired_Pswd,
-                    Desired_UserName: userData.desired_UserName,
-                    Is_Activated: userData.is_Activated,
-                    Method_of_Contact: userData.method_of_Contact,
-                    PaysimpleCustomerId: userData.paysimpleCustomerId,
-                    Role: userData.role,
-                    Salt: userData.salt,
-                    Studio_Name: userData.studio_Name,
-                    User_Role: userData.userRole,
-                });
+                // // Set user data in the users collection
+                // await setDoc(userRef, {
+                //     uid: user.uid,
+                //     email: user.email,
+                //     createdAt: new Date(),
+                //     updatedAt: new Date(),
+                //     Studio_Id: response.NewStudioId,
+                //     Constact_Address: userData.contact_Address,
+                //     Contact_City: userData.contact_City,
+                //     Contact_Email: userData.contact_Email,
+                //     Contact_Name: userData.contact_Name,
+                //     Contact_Number: userData.contact_Number,
+                //     Contact_State: userData.contact_State,
+                //     Contact_Zip: userData.contact_Zip,
+                //     Desired_Pswd: userData.desired_Pswd,
+                //     Desired_UserName: userData.desired_UserName,
+                //     Is_Activated: userData.is_Activated,
+                //     Method_of_Contact: userData.method_of_Contact,
+                //     PaysimpleCustomerId: userData.paysimpleCustomerId,
+                //     Role: userData.role,
+                //     Salt: userData.salt,
+                //     Studio_Name: userData.studio_Name,
+                //     User_Role: userData.userRole,
+                // });
 
                 await setDoc(
                     doc(db, 'users', userData.desired_UserName),

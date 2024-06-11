@@ -16,6 +16,8 @@ const LoginBoxed = lazy(() => import('../pages/Authentication/LoginBoxed'));
 const RegisterBoxed = lazy(() => import('../pages/Authentication/RegisterBoxed'));
 const Error = lazy(() => import('../components/Error'));
 const HomeMain = lazy(() => import('../pages/Home/HomeMain'));
+const ResetPassword = lazy(() => import('../pages/Authentication/ResetPassword'));
+const EmailSent = lazy(() => import('../pages/Authentication/EmailSent'));
 
 // Payments
 const SearchPayments = lazy(() => import('../pages/Payments/SearchPayments'));
@@ -114,6 +116,8 @@ const DailySchedule = lazy(() => import('../pages/Marketing/DailySchedule'));
 const ViewEmails = lazy(() => import('../pages/Marketing/ViewEmails'));
 const ViewTextMessages = lazy(() => import('../pages/Marketing/ViewTextMessages'));
 const CaptureForms = lazy(() => import('../pages/Marketing/CaptureForms'));
+const CaptureFormStats = lazy(() => import('../pages/Marketing/CaptureFormStats'));
+const LegacyConversion = lazy(() => import('../pages/Marketing/LegacyConversion'));
 const Waivers = lazy(() => import('../pages/Marketing/Waivers'));
 const StudentPortal = lazy(() => import('../pages/Marketing/StudentPortal'));
 const ViewNewsLetters = lazy(() => import('../pages/Marketing/ViewNewsLetters'));
@@ -157,7 +161,6 @@ const AddProspectsToEmailList = lazy(() => import('../pages/Prospects/AddProspec
 const ActivateAsStudent = lazy(() => import('../pages/Prospects/ActivateAsStudent'));
 const ViewProspect = lazy(() => import('../pages/Prospects/ViewProspect'));
 
-
 //Admin components
 const ViewStudios = lazy(() => import('../admin/studios/ViewStudios'));
 const AddStudio = lazy(() => import('../admin/studios/AddStudio'));
@@ -171,6 +174,21 @@ const routes = [
     {
         path: '/auth/signin',
         element: <LoginBoxed />,
+        layout: 'blank',
+    },
+    {
+        path: '/auth/reset-password',
+        element: <ResetPassword />,
+        layout: 'blank',
+    },
+    {
+        path: '/auth/email-sent',
+        element: <EmailSent />,
+        layout: 'blank',
+    },
+    {
+        path: '/auth/error',
+        element: <Error />,
         layout: 'blank',
     },
     {
@@ -613,6 +631,14 @@ const routes = [
     {
         path: '/marketing/capture-forms',
         element: <CaptureForms />,
+    },
+    {
+        path: '/marketing/legacy/capture-forms/:id',
+        element: <LegacyConversion />,
+    },
+    {
+        path: '/marketing/capture-forms/stats/:id',
+        element: <CaptureFormStats />,
     },
     {
         path: '/marketing/waivers',

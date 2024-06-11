@@ -14,6 +14,17 @@ export const saveFromToFirebase = async (data, id) => {
     }
 };
 
+export const deleteFormFromFirebase = async (id) => {
+    try {
+        const docRef = doc(db, 'forms', id);
+        await deleteDoc(docRef);
+        return true;
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
+};
+
 export const getFormsFromFirebase = async (id) => {
     try {
         const docRef = doc(db, 'forms', id);
@@ -62,25 +73,25 @@ export const updateReport = async (reportId, reportData) => {
     await updateDoc(docRef, reportData);
 };
 
-export const updateStudio = async (studioId, studioData) => {
-    const idString = studioId.toString();
-    const docRef = doc(db, 'studios', idString);
-    await setDoc(docRef, studioData, { merge: true });
-};
+// export const updateStudio = async (studioId, studioData) => {
+//     const idString = studioId.toString();
+//     const docRef = doc(db, 'studios', idString);
+//     await setDoc(docRef, studioData, { merge: true });
+// };
 
-export const copyDocAndCreateNew = async () => {
-    const docRef = doc(db, 'studios', '534');
-    const docSnap = await getDoc(docRef);
+// export const copyDocAndCreateNew = async () => {
+//     const docRef = doc(db, 'studios', '534');
+//     const docSnap = await getDoc(docRef);
 
-    if (docSnap.exists()) {
-        const data = docSnap.data();
-        const docRef2 = doc(db, 'studios', '525');
-        await setDoc(docRef2, data);
-        return true;
-    } else {
-        return false;
-    }
-};
+//     if (docSnap.exists()) {
+//         const data = docSnap.data();
+//         const docRef2 = doc(db, 'studios', '525');
+//         await setDoc(docRef2, data);
+//         return true;
+//     } else {
+//         return false;
+//     }
+// };
 
 export const addMessage = async (message, uid) => {
     const docRef = collection(db, 'messages', uid, 'notifications');

@@ -1493,6 +1493,26 @@ export const addStudioToMasterStudioRoster = async (msId, studioId) => {
     }
 };
 
+export const getUserFormInfo = async (formId) => {
+    try {
+        const response = await fetchData(`forms/getUserFormInfo/${formId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const deleteForm = async (formId) => {
+    try {
+        const response = await fetchData(`forms/deleteForm/${formId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const getStudioSnapShot = async (startDate, endDate, suid) => {
     try {
         const response = await fetchData(`reports/getStudioSnapshot/${startDate}/${endDate}/${suid}`, 'get');
@@ -1582,6 +1602,8 @@ export const getStudentWithdrawals = async (startDate, endDate, suid) => {
         throw error;
     }
 };
+
+
 
 export const getAllActivePaymentSchedules = async (studioId) => {
     try {

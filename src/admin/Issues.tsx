@@ -135,7 +135,7 @@ export default function Issues() {
                                     <td className="max-w-[270px] font-semibold">{data.issue}</td>
                                     <td className="max-w-[170px] break-words ">{data.path}</td>
                                     <td>
-                                        <div className={`whitespace-nowrap capitalize ${data.status === 'done' ? 'text-success' : data.status === 'inProgress' ? 'text-warning' : 'text-danger'}`}>
+                                        <div className={`whitespace-nowrap text-center badge capitalize ${data.status === 'done' ? 'bg-success' : data.status === 'inProgress' ? 'bg-warning' : 'bg-danger'}`}>
                                             {data.status === 'done' ? 'Done' : data.status === 'inProgress' ? 'In Progress' : 'Reported'}
                                         </div>
                                     </td>

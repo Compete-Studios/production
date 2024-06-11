@@ -165,7 +165,7 @@ export default function ViewClasses() {
                 {initialRecords?.length === 0 && (
                     <div className="flex items-center justify-center h-40">
                         <div className="text-center">
-                            <p className="text-lg text-danger">No Students found</p>
+                            <p className="text-lg text-danger">No Classes found</p>
                             <div className="w-full">
                                 <AddNewClass color={false} />
                             </div>

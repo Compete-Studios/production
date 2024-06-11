@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { UserAuth } from "../../context/AuthContext";
 import { getClassesByStudentId, getDNSReportForReport } from "../../functions/api";
+import { showErrorMessage } from "../../functions/shared";
 
 const DNS = () => {
     const { students }: any = UserAuth();
@@ -67,7 +68,8 @@ const DNS = () => {
             setDnsData(studentsWithClasses);
         
         } catch (error) {
-            console.log('ERROR FETCHING DNS DATA:  ', error);
+            console.error(error);
+            showErrorMessage(`Error fetching students. Error: ${(error as Error).message}`);
         }finally{
             setLoading(false);
         }

@@ -263,13 +263,16 @@ const Sidebar = () => {
                                 <AnimateHeight duration={300} height={currentMenu === 'charts' ? 'auto' : 0}>
                                     <ul className="sub-menu text-gray-500">
                                         <li>
-                                            <NavLink to="/reports/dns-reports">DNS Reports</NavLink>
+                                            <NavLink to="/reports/dns-reports">DNS Report</NavLink>
                                         </li>
                                         <li>
-                                            <NavLink to="/reports/snapshot">Snapshot Reports</NavLink>
+                                            <NavLink to="/reports/snapshot">Studio Snapshot</NavLink>
                                         </li>
                                         <li>
-                                            <NavLink to="/reports/attendance-report">Attendance Reports</NavLink>
+                                            <NavLink to="/reports/attendance-report">Attendance Report</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/reports/anticipated-payments">Upcoming Payments</NavLink>
                                         </li>
                                     </ul>
                                 </AnimateHeight>

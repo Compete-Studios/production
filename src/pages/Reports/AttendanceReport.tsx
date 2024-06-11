@@ -59,7 +59,9 @@ const StudentAttendanceReport = () => {
         end.setHours(23, 59, 59, 999);
 
         let classMeetingDates = [];
-        const daysOfWeek = {
+        
+        // Get the numeric representation of the day of week
+        const daysOfWeek: { [key: string]: number } = {
             Sunday: 0,
             Monday: 1,
             Tuesday: 2,
@@ -69,8 +71,7 @@ const StudentAttendanceReport = () => {
             Saturday: 6,
         };
 
-        // Get the numeric representation of the day of week
-        const dayOfWeekNumber: any = daysOfWeek[dayOfWeek];
+        const dayOfWeekNumber: number = daysOfWeek[dayOfWeek];
         // Loop through each day
         for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
             if (date.getDay() === dayOfWeekNumber) {
@@ -85,7 +86,6 @@ const StudentAttendanceReport = () => {
         setLoading(true);
         const formattedStartDate = startDate.toISOString().split('T')[0];
         const formattedEndDate = endDate.toISOString().split('T')[0];
-        console.log('Fetching attendance data for date range:', formattedStartDate, formattedEndDate);
         try {
             // Fetch class schedules
             const schedulesPromises = classes.map((classItem: any) => getClassScheduleByClassIdFunc(classItem.ClassId));
@@ -213,7 +213,10 @@ const StudentAttendanceReport = () => {
                     </div>
                 </div>
                 <div className="flex justify-end">
-                    <button type="submit" className="btn btn-primary" onClick={handleDateChange}>
+                    <button 
+                    type="submit" 
+                    className="rounded-sm bg-blue-500 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 flex items-center" 
+                    onClick={handleDateChange}>
                         Update
                     </button>
                 </div>
@@ -222,7 +225,6 @@ const StudentAttendanceReport = () => {
                 <p>Compiling attendance data...this can take a moment...</p>
             ) : (
                 <div>
-                    {/* <h3 className="text-2xl font-bold tracking-tight flex items-center gap-2">Classes: </h3> */}
                     <div className="space-y-2 font-semibold">
                         {attendance?.map((classItem: any) => (
                             <div key={classItem.ClassId} className="border border-[#d3d3d3] rounded dark:border-[#1b2e4b]">

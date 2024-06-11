@@ -8,61 +8,12 @@ import IconBolt from '../components/Icon/IconBolt';
 import IconCircleCheck from '../components/Icon/IconCircleCheck';
 import Select from 'react-select';
 
-const tableData = [
-    {
-        id: 1,
-        name: 'John Doe',
-        email: 'johndoe@yahoo.com',
-        date: '10/08/2020',
-        sale: 120,
-        status: 'Complete',
-        register: '5 min ago',
-        progress: '40%',
-        position: 'Developer',
-        office: 'London',
-    },
-    {
-        id: 2,
-        name: 'Shaun Park',
-        email: 'shaunpark@gmail.com',
-        date: '11/08/2020',
-        sale: 400,
-        status: 'Pending',
-        register: '11 min ago',
-        progress: '23%',
-        position: 'Designer',
-        office: 'New York',
-    },
-    {
-        id: 3,
-        name: 'Alma Clarke',
-        email: 'alma@gmail.com',
-        date: '12/02/2020',
-        sale: 310,
-        status: 'In Progress',
-        register: '1 hour ago',
-        progress: '80%',
-        position: 'Accountant',
-        office: 'Amazon',
-    },
-    {
-        id: 4,
-        name: 'Vincent Carpenter',
-        email: 'vincent@gmail.com',
-        date: '13/08/2020',
-        sale: 100,
-        status: 'Canceled',
-        register: '1 day ago',
-        progress: '60%',
-        position: 'Data Scientist',
-        office: 'Canada',
-    },
-];
-
 export default function Issues() {
     const [issues, setIssues] = useState([]);
     const [showSelect, setShowSelect] = useState<number>(-1);
     const [optionToUpdate, setOptionToUpdate] = useState<any>(null);
+    const [filter, setFilter] = useState<string>('All');
+
     const options = [
         { value: 'Assign', label: 'Select' },
         { value: 'Bret', label: 'Bret' },
@@ -78,8 +29,6 @@ export default function Issues() {
     useEffect(() => {
         handleGetIssues();
     }, []);
-
-    console.log(issues);
 
     const convertFBNanoandSecToDate = (timestamp: any) => {
         const date = new Date(timestamp.seconds * 1000);
@@ -133,9 +82,31 @@ export default function Issues() {
         });
     };
 
+    const handleFilterChange = (filterValue: string) => {
+        setFilter(filterValue);
+    };
+
+    const filteredIssues = issues.filter((issue: any) => {
+        if (filter === 'All') return true;
+        if (filter === 'Unassigned' && !issue.assignedTo) return true;
+        if (filter === issue.assignedTo) return true;
+        if (filter === 'InProgress' && issue.status === 'inProgress') return true;
+        if (filter === 'Done' && issue.status === 'done') return true;
+        return false;
+    });
+
     return (
         <div>
             <h2 className="text-xl font-semibold">Issues</h2>
+            <div className="my-3">
+                <button className={`mr-2 px-4 py-2 ${filter === 'All' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`} onClick={() => handleFilterChange('All')}>All</button>
+                <button className={`mr-2 px-4 py-2 ${filter === 'Unassigned' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`} onClick={() => handleFilterChange('Unassigned')}>Unassigned</button>
+                <button className={`mr-2 px-4 py-2 ${filter === 'Bret' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`} onClick={() => handleFilterChange('Bret')}>Bret</button>
+                <button className={`mr-2 px-4 py-2 ${filter === 'Evan' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`} onClick={() => handleFilterChange('Evan')}>Evan</button>
+                <button className={`mr-2 px-4 py-2 ${filter === 'Mago' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`} onClick={() => handleFilterChange('Mago')}>Mago</button>
+                <button className={`mr-2 px-4 py-2 ${filter === 'InProgress' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`} onClick={() => handleFilterChange('InProgress')}>In Progress</button>
+                <button className={`mr-2 px-4 py-2 ${filter === 'Done' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`} onClick={() => handleFilterChange('Done')}>Done</button>
+            </div>
             <div className="table-responsive my-5">
                 <table>
                     <thead>
@@ -143,7 +114,6 @@ export default function Issues() {
                             <th>ID</th>
                             <th>Contact</th>
                             <th>Date</th>
-
                             <th className="max-w-[170px]">Issue</th>
                             <th>Path</th>
                             <th>Status</th>
@@ -152,7 +122,7 @@ export default function Issues() {
                         </tr>
                     </thead>
                     <tbody>
-                        {issues?.map((data: any, index) => {
+                        {filteredIssues?.map((data: any, index) => {
                             return (
                                 <tr key={data.id}>
                                     <td>{data.studioId}</td>
@@ -162,7 +132,6 @@ export default function Issues() {
                                         <div>{data.contactEmail}</div>
                                     </td>
                                     <td>{convertFBNanoandSecToDate(data.dateSubmitted)}</td>
-
                                     <td className="max-w-[270px] font-semibold">{data.issue}</td>
                                     <td className="max-w-[170px] break-words ">{data.path}</td>
                                     <td>
@@ -179,9 +148,9 @@ export default function Issues() {
                                                 </button>
                                             </div>
                                         ) : (
-                                            <button 
-                                            className={`${data.assignedTo ? "text-info" : "text-warning"} px-2 py-1 rounded-md `}
-                                            onClick={() => setShowSelect(index)}>
+                                            <button
+                                                className={`${data.assignedTo ? "text-info" : "text-warning"} px-2 py-1 rounded-md `}
+                                                onClick={() => setShowSelect(index)}>
                                                 {data.assignedTo ? data.assignedTo : 'Assign'}
                                             </button>
                                         )}

@@ -9,6 +9,7 @@ const Birthdays = lazy(() => import('../pages/Reports/Birthday'));
 const DNS = lazy(() => import('../pages/Reports/DNS'));
 const Snapshot = lazy(() => import('../pages/Reports/Snapshot'));
 const AttendanceReport = lazy(() => import('../pages/Reports/AttendanceReport'));
+const AnticipatedPayments = lazy(() => import('../pages/Reports/AnticipatedPayments'));
 
 // Authentication
 const LoginBoxed = lazy(() => import('../pages/Authentication/LoginBoxed'));
@@ -277,6 +278,11 @@ const routes = [
         path: '/reports/attendance-report',
         element: <AttendanceReport />,
     },
+    {
+        path: '/reports/anticipated-payments',
+        element: <AnticipatedPayments />
+    },
+    
 
     //classes
     {

@@ -1393,18 +1393,6 @@ export const getIncomingUnreadTextMessages = async (data) => {
     }
 };
 
-export const getStudioSnapShot = async (startDate, endDate, suid) => {
-    try {
-        const response = await fetchData(`marketing-access/getStudioSnapshot/${startDate}/${endDate}/${suid}`, 'get');
-        return response.recordset[0];
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
-};
-
-
-
 export const addNewStudio = async (formData) => {
     try {
         const response = await fetchData('studio-access/addStudio', 'post', formData);
@@ -1498,6 +1486,106 @@ export const addStudioToItselfAsAMaster = async (msId) => {
 export const addStudioToMasterStudioRoster = async (msId, studioId) => {
     try {
         const response = await fetchData(`admin-tools/addStudioToMasterStudioRoster/${msId}/${studioId}`, 'post');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getStudioSnapShot = async (startDate, endDate, suid) => {
+    try {
+        const response = await fetchData(`reports/getStudioSnapshot/${startDate}/${endDate}/${suid}`, 'get');
+        return response.recordset[0];
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getFirstContactStudents = async (startDate, endDate, suid) => {
+    try {
+        const response = await fetchData(`reports/getFirstContactStudents/${startDate}/${endDate}/${suid}`, 'get');
+        return response.recordset;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getFirstContactProspects = async (startDate, endDate, suid) => {
+    try {
+        const response = await fetchData(`reports/getFirstContactProspects/${startDate}/${endDate}/${suid}`, 'get');
+        return response.recordset;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getStudentIntros = async (startDate, endDate, suid) => {
+    try {
+        const response = await fetchData(`reports/getStudentIntros/${startDate}/${endDate}/${suid}`, 'get');
+        return response.recordset;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getProspectIntros = async (startDate, endDate, suid) => {
+    try {
+        const response = await fetchData(`reports/getProspectIntros/${startDate}/${endDate}/${suid}`, 'get');
+        return response.recordset;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getStudentFirstClasses = async (startDate, endDate, suid) => {
+    try {
+        const response = await fetchData(`reports/getStudentFirstClasses/${startDate}/${endDate}/${suid}`, 'get');
+        return response.recordset;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getProspectFirstClasses = async (startDate, endDate, suid) => {
+    try {
+        const response = await fetchData(`reports/getProspectFirstClasses/${startDate}/${endDate}/${suid}`, 'get');
+        return response.recordset;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getStudentEnrollments = async (startDate, endDate, suid) => {
+    try {
+        const response = await fetchData(`reports/getStudentEnrollments/${startDate}/${endDate}/${suid}`, 'get');
+        return response.recordset;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getStudentWithdrawals = async (startDate, endDate, suid) => {
+    try {
+        const response = await fetchData(`reports/getStudentWithdrawals/${startDate}/${endDate}/${suid}`, 'get');
+        return response.recordset;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getAllActivePaymentSchedules = async (studioId) => {
+    try {
+        const response = await fetchData(`paysimple-routes/getAllActivePaymentSchedules/${studioId}`, 'get');
         return response;
     } catch (error) {
         console.error(error);

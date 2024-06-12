@@ -89,7 +89,7 @@ export default function Issues() {
     const filteredIssues = issues.filter((issue: any) => {
         if (filter === 'All') return true;
         if (filter === 'Unassigned' && !issue.assignedTo) return true;
-        if (filter === issue.assignedTo) return true;
+        if (filter === issue.assignedTo && issue.status !== 'done') return true;
         if (filter === 'InProgress' && issue.status === 'inProgress') return true;
         if (filter === 'Done' && issue.status === 'done') return true;
         return false;

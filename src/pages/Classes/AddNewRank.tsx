@@ -42,7 +42,7 @@ export default function AddNewRank() {
             <div>
                 <button type="button" className="btn btn-primary gap-2 ltr:ml-auto rtl:mr-auto" onClick={() => setShowQuickPayModal(true)}>
                     <IconPlus />
-                    Add a Program
+                    Add a Rank
                 </button>
             </div>
             <Transition appear show={showQuickPayModal} as={Fragment}>

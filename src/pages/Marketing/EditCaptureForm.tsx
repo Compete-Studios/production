@@ -1,65 +1,31 @@
+import React, { Fragment, useEffect, useState } from 'react';
 import { RadioGroup, Tab } from '@headlessui/react';
-import { Fragment, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getUserFormInfo } from '../../functions/api';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import IconCircleCheck from '../../components/Icon/IconCircleCheck';
-import { saveFromToFirebase } from '../../firebase/firebaseFunctions';
 import { UserAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { Loader } from '@mantine/core';
+import IconCircleCheck from '../../components/Icon/IconCircleCheck';
 import { showErrorMessage, showMessage } from '../../functions/shared';
-
-const formInfoInit = {
-    StudioId: '',
-    FriendlyName: '',
-    CreationDate: '',
-    FormType: '',
-    FormStyle: '',
-    Name: '',
-    LastName: '',
-    Email: '',
-    Phone: '',
-    Address: '',
-    City: '',
-    State: '',
-    Zip: '',
-    Age: '',
-    Notes: '',
-    AdditionalInfo: '',
-    IncludeCaptcha: '',
-    SendEmailNotification: '',
-    BackgroundColor: '',
-    ButtonColor: '',
-    ProspectPipelineStep: '',
-    MarketingMethod: '',
-    NoteText: '',
-    SuccessURL: '',
-    SuccessMessage: '',
-    EmailToNotify: '',
-    ParentName: '',
-    DefaultSMS: '',
-    DefaultFromEmail: '',
-    DefaultEmailSubject: '',
-    DefaultEmailContent: '',
-};
-
+import { getForm, saveFromToFirebase, updateForm } from '../../firebase/firebaseFunctions';
+import { Loader } from '@mantine/core';
 const formInfoSelected = {
     StudioId: false,
-    FriendlyName: true,
-    FormDescription: true,
+    FriendlyName: false,
+    FormDescription: false,
     CreationDate: false,
     FormType: false,
     FormStyle: false,
-    Name: true,
-    LastName: true,
-    Email: true,
-    Phone: true,
+    Name: false,
+    LastName: false,
+    Email: false,
+    Phone: false,
     Address: false,
     City: false,
     State: false,
     Zip: false,
     Age: false,
-    Notes: true,
+    Notes: false,
     AdditionalInfo: false,
     IncludeCaptcha: false,
     SendEmailNotification: false,
@@ -77,10 +43,6 @@ const formInfoSelected = {
     DefaultEmailSubject: false,
     DefaultEmailContent: false,
 };
-
-function classNames(...classes: any) {
-    return classes.filter(Boolean).join(' ');
-}
 
 const roundedOptions = [
     { name: 'None', rounded: 'rounded-none' },
@@ -105,10 +67,10 @@ const colors = [
 ];
 
 const heightOptions = [
-    { name: 'Short', height: 'h-10', text: 'text-sm' },
-    { name: 'Medium', height: 'h-12', text: 'text-md' },
-    { name: 'Tall', height: 'h-14', text: 'text-base' },
-    { name: 'Extra Tall', height: 'h-20', text: 'text-2xl' },
+    { name: 'Short', height: 'h-10', text: 'text-sm'},
+    { name: 'Medium', height: 'h-12', text: 'text-md'},
+    { name: 'Tall', height: 'h-14', text: 'text-base'},
+    { name: 'Extra Tall', height: 'h-20', text: 'text-2xl'},
 ];
 
 const widthOptions = [
@@ -117,20 +79,44 @@ const widthOptions = [
     { name: 'Full', width: 'max-w-full' },
 ];
 
-export default function CreateCaptureForms() {
+function classNames(...classes: any) {
+    return classes.filter(Boolean).join(' ');
+}
+
+interface FormResponse {
+    formName: string;
+    pipelineStep: string;
+    defaultEmailSubject: string;
+    defaultEmailContent: string;
+    sendEmail: boolean;
+    formHeadline: string;
+    formInfo: any;
+    formDescription: string;
+    selectedWidth?: { name: string };
+    selectedColor?: { name: string };
+    mem?: { name: string };
+    heightOption?: { name: string };
+    successURL: string;
+    successMessage: string;
+    redirect: boolean;
+}
+
+export default function EditCaptureForm() {
     const { suid, prospectPipelineSteps }: any = UserAuth();
+    const [form, setForm] = useState<any>({});
     const [formInfo, setFormInfo] = useState(formInfoSelected);
     const [value, setValue] = useState('');
-    const [formName, setFormName] = useState('');
+    const [formName, setFormName] = useState<any>('');
     const [formDescription, setFormDescription] = useState('');
     const [selectedColor, setSelectedColor] = useState(colors[6]);
     const [mem, setMem] = useState(roundedOptions[2]);
     const [heightOption, setHeightOption] = useState(heightOptions[0]);
     const [loading, setLoading] = useState(false);
     const [alertFormName, setAlertFormName] = useState(false);
-    const [pipelineStep, setPipelineStep] = useState('1' as any);
+    const [pipelineStep, setPipelineStep] = useState('');
     const [sendEmail, setSendEmail] = useState(false);
-    const [formHeadline, setFormHeadline] = useState('' as any);
+    const [formHeadline, setFormHeadline] = useState('');
+    const [defualtEmailSubject, setDefualtEmailSubject] = useState('');
     const [selectedWidth, setSelectedWidth] = useState(widthOptions[1]);
     const [redirect, setRedirect] = useState(true);
     const [successURL, setSuccessURL] = useState('');
@@ -138,7 +124,46 @@ export default function CreateCaptureForms() {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [alertURL, setAlertURL] = useState(false);
     const [alertMessage, setAlertMessage] = useState(false);
-    const [defualtEmailSubject, setDefualtEmailSubject] = useState('');
+
+    const { id } = useParams();
+
+    const handleGetForms = async () => {
+        try {
+            const response = await getForm(id) as FormResponse;
+            console.log(response);
+            if (!response) {
+                return;
+            } else {
+                setForm(response);
+                setFormName(response.formName);
+                const newPipleLineID: any = parseInt(response.pipelineStep);
+                setPipelineStep(newPipleLineID);
+                setDefualtEmailSubject(response.defaultEmailSubject);
+                setValue(response.defaultEmailContent);
+                setSendEmail(response.sendEmail);
+                setFormHeadline(response.formHeadline);
+                setFormInfo(response.formInfo);
+                setFormDescription(response.formDescription);
+                const width: any = widthOptions.find((option) => option.name === response?.selectedWidth?.name);
+                setSelectedWidth(width || widthOptions[1]);
+                const color: any = colors.find((color) => color.name === response?.selectedColor?.name);
+                setSelectedColor(color);
+                const rounded: any = roundedOptions.find((option) => option.name === response?.mem?.name);
+                setMem(rounded);
+                const height: any = heightOptions.find((option) => option.name === response?.heightOption?.name);
+                setHeightOption(height);
+                setSuccessURL(response.successURL || '');
+                setSuccessMessage(response.successMessage || '');
+                setRedirect(response.redirect || true);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        handleGetForms();
+    }, []);
 
     const formData = {
         formName,
@@ -150,14 +175,13 @@ export default function CreateCaptureForms() {
         heightOption,
         studioID: suid,
         pipelineStep,
-        selectedWidth,
         sendEmail,
+        selectedWidth,
+        defaultEmailSubject: defualtEmailSubject,
+        defaultEmailContent: value,
         redirect,
         successURL,
-        successMessage,
-        stats: [],
-        defaultEmailSubject: defualtEmailSubject,
-        defaultEmailContent: value, 
+        successMessage,        
     };
 
     const navigate = useNavigate();
@@ -168,8 +192,13 @@ export default function CreateCaptureForms() {
             showErrorMessage('Form Name is Required');
             setAlertFormName(true);
             setLoading(false);
-            setSelectedIndex(0);
             return;
+        } else if (formInfo.FriendlyName && formHeadline === '') {
+            showErrorMessage('Form Headline is Required');
+            setLoading(false);
+        } else if (formInfo.FormDescription && formDescription === '') {
+            showErrorMessage('Form Description is Required');
+            setLoading(false);
         } else if (redirect && successURL === '') {
             showErrorMessage('Success URL is Required');
             setLoading(false);
@@ -183,13 +212,13 @@ export default function CreateCaptureForms() {
             setAlertMessage(true);
             return;
         } else {
-            const response = await saveFromToFirebase(formData);
+            const response = await updateForm(id, formData);
             if (response) {
                 setTimeout(() => {
                     setLoading(false);
                     showMessage('Form Saved Successfully!');
                     navigate('/marketing/capture-forms');
-                }, 5000);
+                }, 3000);
             } else {
                 alert('Error Saving Form');
                 setLoading(false);
@@ -219,15 +248,13 @@ export default function CreateCaptureForms() {
                         className="ml-3 inline-flex items-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                         onClick={handleSaveForm}
                     >
-                        Save Form
+                        Save and Update Form
                     </button>
                 </div>
             </div>
             <div className="grid sm:grid-cols-3 sm:gap-4 mt-8">
                 <div className="drop-shadow">
-                    <Tab.Group 
-                    selectedIndex={selectedIndex} onChange={setSelectedIndex}
-                    >
+                    <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
                         <Tab.List className="mt-3 flex flex-wrap border-b border-white-light dark:border-[#191e3a]">
                             <Tab as={Fragment}>
                                 {({ selected }) => (
@@ -299,7 +326,7 @@ export default function CreateCaptureForms() {
                                         Pipeline Step
                                     </label>
                                     <p className="text-gray-500 mb-2 text-xs">Select the pipeline step that you would like to add the prospect to when they fill out this form.</p>
-                                    <select id="pipelineStatus" className="form-select" onChange={(e) => setPipelineStep(e.target.value)}>
+                                    <select id="pipelineStatus" className="form-select" value={pipelineStep} onChange={(e) => setPipelineStep(e.target.value)}>
                                         {prospectPipelineSteps?.map((step: any) => (
                                             <option key={step.PipelineStepId} value={step.PipelineStepId}>
                                                 {step.StepName}
@@ -311,7 +338,7 @@ export default function CreateCaptureForms() {
                                     </label>
                                     <p className="text-gray-500 mb-2 text-xs">Would you like to receive an email notification when someone fills out the form?</p>
                                     <div className="flex items-center ">
-                                        <input type="checkbox" className="form-checkbox" onChange={() => setSendEmail(!sendEmail)} />
+                                        <input type="checkbox" checked={sendEmail} className="form-checkbox" onChange={() => setSendEmail(!sendEmail)} />
                                         <label htmlFor="form-name">Yes, Send Email Notification</label>
                                     </div>
                                     {sendEmail && (
@@ -319,7 +346,7 @@ export default function CreateCaptureForms() {
                                             <label htmlFor="response-subject" className="mt-6">
                                                 Response Email Subject
                                             </label>
-                                            <input type="text" className="form-input w-full" placeholder="Subject" />
+                                            <input type="text" value={defualtEmailSubject} className="form-input w-full" placeholder="Subject" />
                                             <label htmlFor="form-name" className="mt-6">
                                                 Response Email
                                             </label>
@@ -337,26 +364,37 @@ export default function CreateCaptureForms() {
                                     <p className="mb-4 text-xs">Select the values that you would like to collect from the prospect when they fill out the form.</p>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="col-span-full">
-                                            <label htmlFor="form-name" className="mt-2">
-                                                Form Headline
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className={`form-input w-full ${alertFormName && 'borderr bg-danger-light border-danger'}`}
-                                                placeholder="Form Headline"
-                                                onChange={(e) => setFormHeadline(e.target.value)}
-                                            />
-                                            <label htmlFor="form-name" className="mt-4">
-                                                Form Description
-                                            </label>
-                                            <textarea
-                                                rows={4}
-                                                name="description"
-                                                id="description"
-                                                className="form-textarea w-full"
-                                                placeholder={'Description of Form'}
-                                                onChange={(e) => setFormDescription(e.target.value)}
-                                            />
+                                            {formInfo.FriendlyName && (
+                                                <>
+                                                    <label htmlFor="form-name" className="mt-2">
+                                                        Form Headline
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        className={`form-input w-full ${alertFormName && 'borderr bg-danger-light border-danger'}`}
+                                                        value={formHeadline}
+                                                        placeholder="Form Headline"
+                                                        onChange={(e) => setFormHeadline(e.target.value)}
+                                                    />
+                                                </>
+                                            )}
+
+                                            {formInfo.FormDescription && (
+                                                <>
+                                                    <label htmlFor="form-name" className="mt-4">
+                                                        Form Description
+                                                    </label>
+                                                    <textarea
+                                                        rows={4}
+                                                        name="description"
+                                                        id="description"
+                                                        value={formDescription}
+                                                        className="form-textarea w-full"
+                                                        placeholder={'Description of Form'}
+                                                        onChange={(e) => setFormDescription(e.target.value)}
+                                                    />
+                                                </>
+                                            )}
                                         </div>
                                         <button
                                             type="button"
@@ -385,7 +423,7 @@ export default function CreateCaptureForms() {
                                             } rounded-md h-20 w-full`}
                                             onClick={() => setFormInfo({ ...formInfo, FriendlyName: !formInfo.FriendlyName })}
                                         >
-                                            {formInfo?.FriendlyName && <IconCircleCheck />} Form Name
+                                            {formInfo?.FriendlyName && <IconCircleCheck />} Headline
                                         </button>
                                         <button
                                             type="button"
@@ -524,7 +562,7 @@ export default function CreateCaptureForms() {
                                     <div className="mt-8">
                                         <RadioGroup value={mem} onChange={setMem} className="mt-2">
                                             <RadioGroup.Label className="block text-sm font-medium leading-6 text-gray-900">Roundness Level</RadioGroup.Label>
-                                            <div className="mt-4 grid grid-cols-3 gap-3">
+                                            <div className="mt-4 grid 2xl:grid-cols-6 grid-cols-3 gap-3">
                                                 {roundedOptions.map((option) => (
                                                     <RadioGroup.Option
                                                         key={option.name}
@@ -557,7 +595,7 @@ export default function CreateCaptureForms() {
                                                             classNames(
                                                                 active ? 'ring-2 ring-primary ring-offset-2' : '',
                                                                 checked ? 'bg-primary text-white hover:primary/90' : 'ring-1 ring-inset ring-gray-300 bg-white text-gray-900 hover:bg-gray-50',
-                                                                `flex items-center justify-center ${option.height} py-3 px-3 font-semibold sm:flex-1 cursor-pointer focus:outline-none`
+                                                                `flex items-center justify-center ${option.height} py-3 px-3 font-semibold text-xs sm:flex-1 cursor-pointer focus:outline-none`
                                                             )
                                                         }
                                                     >
@@ -649,7 +687,7 @@ export default function CreateCaptureForms() {
                     </Tab.Group>
                 </div>
                 <div className="sm:col-span-2">
-                    <div className={`p-5 ${selectedColor?.bg} ${mem.rounded} ${selectedWidth.width} shadow shadow-zinc-400 grid mx-auto grid-cols-1 sm:grid-cols-6 gap-4`}>
+                    <div className={`p-5 ${selectedColor?.bg} ${mem.rounded} ${selectedWidth.width} shadow shadow-zinc-400 grid max-w-2xl mx-auto grid-cols-1 sm:grid-cols-6 gap-4`}>
                         {formInfo.FriendlyName && (
                             <div className="sm:col-span-full">
                                 <div className="text-2xl font-semibold text-center">{formHeadline || 'Headline'}</div>
@@ -661,13 +699,7 @@ export default function CreateCaptureForms() {
                             <div className={`${formInfo.Name && formInfo.LastName ? 'sm:col-span-3' : 'sm:col-span-full'}`}>
                                 <label htmlFor="first-name">First name</label>
                                 <div className="mt-2">
-                                    <input
-                                        type="text"
-                                        name="first-name"
-                                        id="first-name"
-                                        autoComplete="given-name"
-                                        className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`}
-                                    />
+                                    <input type="text" name="first-name" id="first-name" autoComplete="given-name" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
                                 </div>
                             </div>
                         )}
@@ -676,13 +708,7 @@ export default function CreateCaptureForms() {
                             <div className={`${formInfo.Name && formInfo.LastName ? 'sm:col-span-3' : 'sm:col-span-full'}`}>
                                 <label htmlFor="last-name">Last name</label>
                                 <div className="mt-2">
-                                    <input
-                                        type="text"
-                                        name="last-name"
-                                        id="last-name"
-                                        autoComplete="family-name"
-                                        className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`}
-                                    />
+                                    <input type="text" name="last-name" id="last-name" autoComplete="family-name" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
                                 </div>
                             </div>
                         )}
@@ -709,13 +735,7 @@ export default function CreateCaptureForms() {
                             <div className="sm:col-span-full">
                                 <label htmlFor="street-address">Mailing address</label>
                                 <div className="mt-2">
-                                    <input
-                                        type="text"
-                                        name="street-address"
-                                        id="street-address"
-                                        autoComplete="street-address"
-                                        className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text} `}
-                                    />
+                                    <input type="text" name="street-address" id="street-address" autoComplete="street-address" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
                                 </div>
                             </div>
                         )}
@@ -724,13 +744,7 @@ export default function CreateCaptureForms() {
                             <div className={`${formInfo.State && formInfo.Zip ? 'sm:col-span-3' : formInfo.State || formInfo.Zip ? 'col-span-3' : 'sm:col-span-full'}`}>
                                 <label htmlFor="city">City</label>
                                 <div className="mt-2">
-                                    <input
-                                        type="text"
-                                        name="city"
-                                        id="city"
-                                        autoComplete="address-level2"
-                                        className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`}
-                                    />
+                                    <input type="text" name="city" id="city" autoComplete="address-level2" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
                                 </div>
                             </div>
                         )}
@@ -739,13 +753,7 @@ export default function CreateCaptureForms() {
                             <div className={`${formInfo.City && formInfo.Zip ? 'sm:col-span-1' : 'sm:col-span-3'}`}>
                                 <label htmlFor="region">State</label>
                                 <div className="mt-2">
-                                    <input
-                                        type="text"
-                                        name="region"
-                                        id="region"
-                                        autoComplete="address-level1"
-                                        className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`}
-                                    />
+                                    <input type="text" name="region" id="region" autoComplete="address-level1" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
                                 </div>
                             </div>
                         )}
@@ -754,13 +762,7 @@ export default function CreateCaptureForms() {
                             <div className={`${formInfo.City && formInfo.State ? 'sm:col-span-2' : 'sm:col-span-3'}`}>
                                 <label htmlFor="postal-code">ZIP / Postal code</label>
                                 <div className="mt-2">
-                                    <input
-                                        type="text"
-                                        name="postal-code"
-                                        id="postal-code"
-                                        autoComplete="postal-code"
-                                        className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`}
-                                    />
+                                    <input type="text" name="postal-code" id="postal-code" autoComplete="postal-code" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
                                 </div>
                             </div>
                         )}
@@ -769,13 +771,7 @@ export default function CreateCaptureForms() {
                             <div className="sm:col-span-3">
                                 <label htmlFor="first-name">Parent Name</label>
                                 <div className="mt-2">
-                                    <input
-                                        type="text"
-                                        name="first-name"
-                                        id="first-name"
-                                        autoComplete="given-name"
-                                        className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`}
-                                    />
+                                    <input type="text" name="first-name" id="first-name" autoComplete="given-name" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
                                 </div>
                             </div>
                         )}
@@ -784,13 +780,7 @@ export default function CreateCaptureForms() {
                             <div className="sm:col-span-3">
                                 <label htmlFor="first-name">Age Of Student</label>
                                 <div className="mt-2">
-                                    <input
-                                        type="text"
-                                        name="first-name"
-                                        id="first-name"
-                                        autoComplete="given-name"
-                                        className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`}
-                                    />
+                                    <input type="text" name="first-name" id="first-name" autoComplete="given-name" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
                                 </div>
                             </div>
                         )}

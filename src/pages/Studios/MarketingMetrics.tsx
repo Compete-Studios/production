@@ -167,7 +167,7 @@ export default function MarketingMetrics() {
             </div> */}
             <div className="panel h-full ">
                 <div className="flex items-center justify-between dark:text-white-light mb-5">
-                    <h5 className="font-semibold text-lg">Studio Information {typeof(suid)} { typeof(selectedSuid)} </h5>
+                    <h5 className="font-semibold text-lg">Studio Information </h5>
                     <p className="text-xs text-white-dark dark:text-gray-500">{formatDate(new Date())}</p>
                 </div>
                 <div>

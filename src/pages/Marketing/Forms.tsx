@@ -57,12 +57,12 @@ export default function Forms() {
             introDate: '',
             birthdate: '',
         };
-        console.log(prospectInfoData);
         const response = await addProspect(prospectInfoData);
-        if (response?.recordset?.[0]?.NewProspectId) {
-            showMessage('Prospect Added Successfully');
+        console.log(response);
+        if (response?.output?.NewProspectId || response?.recordset?.[0]?.NewProspectId) {
+            showMessage('Form Submitted Successfully');
         } else {
-            showErrorMessage('Error Adding Prospect');
+            showErrorMessage('Error Submitting Form');
         }
         // if (formInfo.email && form?.sendEmail) {
         //     const emailData = {

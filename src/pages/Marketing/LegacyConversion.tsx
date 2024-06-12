@@ -60,17 +60,24 @@ const colors = [
     { name: 'Primary', bgColor: 'bg-primary', selectedColor: 'ring-primary', btn: 'btn-primary', bg: 'bg-primary-light' },
     { name: 'Secondary', bgColor: 'bg-secondary', selectedColor: 'ring-secondary', btn: 'btn-secondary', bg: 'bg-secondary-light' },
     { name: 'Info', bgColor: 'bg-info', selectedColor: 'ring-info', btn: 'btn-info', bg: 'bg-info-light' },
+    { name: 'Gray', bgColor: 'bg-gray-100', selectedColor: 'ring-gray-400', btn: 'bg-gray-800 hover:bg-gray-950 text-white', bg: 'bg-gray-200' },
     { name: 'Dark', bgColor: 'bg-dark', selectedColor: 'ring-dark', btn: 'btn-dark', bg: 'bg-dark-light' },
     { name: 'Black', bgColor: 'bg-black', selectedColor: 'ring-black', btn: 'bg-zinc-800 hover:bg-zinc-950 text-white', bg: 'bg-black-light' },
-    { name: 'White', bgColor: 'bg-white', selectedColor: 'ring-white', btn: 'bg-zinc-800 hover:bg-zinc-950 text-white', bg: 'bg-white' },
+    { name: 'White', bgColor: 'bg-white', selectedColor: 'ring-gray-100', btn: 'bg-zinc-800 hover:bg-zinc-950 text-white', bg: 'bg-white' },
 ];
 
 const heightOptions = [
-    { name: 'Short', height: 'h-10' },
-    { name: 'Medium', height: 'h-12' },
-    { name: 'Tall', height: 'h-14' },
+    { name: 'Short', height: 'h-10', text: 'text-sm' },
+    { name: 'Medium', height: 'h-12', text: 'text-md' },
+    { name: 'Tall', height: 'h-14', text: 'text-base' },
+    { name: 'Extra Tall', height: 'h-20', text: 'text-2xl' },
 ];
 
+const widthOptions = [
+    { name: 'Small', width: 'max-w-xl' },
+    { name: 'Normal', width: 'max-w-2xl' },
+    { name: 'Full', width: 'max-w-full' },
+];
 function classNames(...classes: any) {
     return classes.filter(Boolean).join(' ');
 }
@@ -90,6 +97,13 @@ export default function LegacyConversion() {
     const [pipelineStep, setPipelineStep] = useState('' as any);
     const [sendEmail, setSendEmail] = useState(false);
     const [formHeadline, setFormHeadline] = useState('' as any);
+    const [selectedWidth, setSelectedWidth] = useState(widthOptions[1]);
+    const [redirect, setRedirect] = useState(true);
+    const [successURL, setSuccessURL] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
+    const [selectedIndex, setSelectedIndex] = useState(0);
+    const [alertURL, setAlertURL] = useState(false);
+    const [alertMessage, setAlertMessage] = useState(false);
     const [defualtEmailSubject, setDefualtEmailSubject] = useState('' as any);
     const { id } = useParams();
 
@@ -105,6 +119,7 @@ export default function LegacyConversion() {
             setDefualtEmailSubject(data.recordset[0].DefaultEmailSubject);
             setValue(data.recordset[0].DefaultEmailContent);
             setSendEmail(data.recordset[0].SendEmailNotification === 1);
+            setSuccessURL(data.recordset[0].SuccessURL);
             setFormInfo({
                 ...formInfo,
                 StudioId: true,
@@ -154,18 +169,19 @@ export default function LegacyConversion() {
         formHeadline,
         formDescription,
         formInfo,
-        value,
         selectedColor,
         mem,
         heightOption,
         studioID: suid,
         pipelineStep,
+        selectedWidth,
         sendEmail,
-        defaultEmailSubject: defualtEmailSubject,
-        defaultEmailContent: value,
-        oldFormID: id,
-        isOldForm: true,
+        redirect,
+        successURL,
+        successMessage,
         stats: [],
+        defaultEmailSubject: defualtEmailSubject,
+        defaultEmailContent: value, 
     };
 
     const navigate = useNavigate();
@@ -183,6 +199,18 @@ export default function LegacyConversion() {
         } else if(formInfo.FormDescription && formDescription === '') {
             showErrorMessage('Form Description is Required');
             setLoading(false);
+        } else if (redirect && successURL === '') {
+            showErrorMessage('Success URL is Required');
+            setLoading(false);
+            setSelectedIndex(3);
+            setAlertURL(true);
+            return;
+        } else if (!redirect && successMessage === '') {
+            showErrorMessage('Success Message is Required');
+            setLoading(false);
+            setSelectedIndex(3);
+            setAlertMessage(true);
+            return;
         } else {
             const response = await saveFromToFirebase(formData);
             if (response) {
@@ -226,7 +254,7 @@ export default function LegacyConversion() {
             </div>
             <div className="grid sm:grid-cols-3 sm:gap-4 mt-8">
                 <div className="drop-shadow">
-                    <Tab.Group>
+                    <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
                         <Tab.List className="mt-3 flex flex-wrap border-b border-white-light dark:border-[#191e3a]">
                             <Tab as={Fragment}>
                                 {({ selected }) => (
@@ -255,6 +283,16 @@ export default function LegacyConversion() {
                     dark:hover:border-b-black -mb-[1px] block border border-transparent p-3.5 py-2 hover:text-primary`}
                                     >
                                         Style
+                                    </button>
+                                )}
+                            </Tab>
+                            <Tab as={Fragment}>
+                                {({ selected }) => (
+                                    <button
+                                        className={`${selected ? '!border-white-light !border-b-white  text-primary bg-white !outline-none dark:!border-[#191e3a] dark:!border-b-black' : ''}
+                    dark:hover:border-b-black -mb-[1px] block border border-transparent p-3.5 py-2 hover:text-primary`}
+                                    >
+                                        Submission
                                     </button>
                                 )}
                             </Tab>
@@ -497,7 +535,7 @@ export default function LegacyConversion() {
                                 <div className="p-5 bg-white">
                                     <RadioGroup value={selectedColor} onChange={setSelectedColor}>
                                         <RadioGroup.Label className="block text-sm font-medium leading-6 text-gray-900">Choose a Theme Color</RadioGroup.Label>
-                                        <div className="mt-4 grid 2xl:grid-cols-9 grid-cols-3 gap-3">
+                                        <div className="mt-4 grid 2xl:grid-cols-5 grid-cols-3 gap-3">
                                             {colors.map((color) => (
                                                 <RadioGroup.Option
                                                     key={color.name}
@@ -567,13 +605,87 @@ export default function LegacyConversion() {
                                             </div>
                                         </RadioGroup>
                                     </div>
+                                    <div className="mt-8">
+                                        <RadioGroup value={selectedWidth} onChange={setSelectedWidth} className="mt-2">
+                                            <RadioGroup.Label className="block text-sm font-medium leading-6 text-gray-900">Width</RadioGroup.Label>
+                                            <div className="flex items-center gap-3">
+                                                {widthOptions.map((option) => (
+                                                    <RadioGroup.Option
+                                                        key={option.name}
+                                                        value={option}
+                                                        className={({ active, checked }) =>
+                                                            classNames(
+                                                                active ? 'ring-2 ring-primary ring-offset-2' : '',
+                                                                checked ? 'bg-primary text-white hover:primary/90' : 'ring-1 ring-inset ring-gray-300 bg-white text-gray-900 hover:bg-gray-50',
+                                                                `flex items-center justify-center ${option.width} py-3 px-3 font-semibold text-xs sm:flex-1 cursor-pointer focus:outline-none`
+                                                            )
+                                                        }
+                                                    >
+                                                        <RadioGroup.Label as="span" className="text-sm">
+                                                            {option.name}
+                                                        </RadioGroup.Label>
+                                                    </RadioGroup.Option>
+                                                ))}
+                                            </div>
+                                        </RadioGroup>
+                                    </div>
+                                </div>
+                            </Tab.Panel>
+                            <Tab.Panel>
+                                <div className="p-5 bg-white">
+                                    <h4 className=" text-2xl font-semibold">Form Submission</h4>
+                                    <p className="mb-4 text-xs">
+                                        Select the type of submission you would like to have when someone fills out the form. You can choose to have the form redirect to a URL, or display a
+                                        success message.
+                                        </p>
+                                    <label className="inline-flex">
+                                        <input 
+                                        type="radio" 
+                                        checked={redirect}
+                                        name="default_radio" 
+                                        className="form-radio text-success" 
+                                        onChange={() => setRedirect(true)}
+                                        />
+                                        <span>Success URL</span>
+                                    </label>
+                                    <input 
+                                    type="text" 
+                                    className={`form-input w-full ${(alertURL && redirect) && 'borderr bg-danger-light border-danger'}`}
+                                    placeholder="Success URL" 
+                                    value={successURL}
+                                    onChange={(e) => setSuccessURL(e.target.value)}
+                                    onClick={() => setAlertURL(false)}
+                                    />
+                                    {(alertURL && redirect) && <p className="text-danger text-xs">Selected URL is Required</p>}
+                                    <label className="inline-flex mt-6">
+                                        <input 
+                                        type="radio" 
+                                        name="default_radio" 
+                                        checked={!redirect}
+                                        className="form-radio text-secondary" 
+                                        onChange={() => setRedirect(false)}
+                                        />
+                                        <span>Success Message</span>
+                                    </label>
+                                    <textarea 
+                                    rows={4} 
+                                    name="description" 
+                                    id="description" 
+                                    className={`form-input w-full ${(alertMessage && !redirect) && 'borderr bg-danger-light border-danger'}`}
+                                    value={successMessage}
+                                    placeholder={'Success Message'} 
+                                    onChange={(e) => setSuccessMessage(e.target.value)}
+                                    onClick={() => setAlertMessage(false)}
+                                    />
+                                    {(alertMessage && !redirect) && <p className="text-danger text-xs">Success Message is Required</p>}
+                                    
                                 </div>
                             </Tab.Panel>
                         </Tab.Panels>
                     </Tab.Group>
                 </div>
                 <div className="sm:col-span-2">
-                    <div className={`p-5 ${selectedColor?.bg} ${mem.rounded} shadow shadow-zinc-400 grid max-w-2xl mx-auto grid-cols-1 sm:grid-cols-6 gap-4`}>
+                    <div className={`p-5 ${selectedColor?.bg} ${mem.rounded} ${selectedWidth.width} shadow shadow-zinc-400 grid max-w-2xl mx-auto grid-cols-1 sm:grid-cols-6 gap-4`}>
                         {formInfo.FriendlyName && (
                             <div className="sm:col-span-full">
                                 <div className="text-2xl font-semibold text-center">{formHeadline || 'Headline'}</div>
@@ -585,7 +697,7 @@ export default function LegacyConversion() {
                             <div className={`${formInfo.Name && formInfo.LastName ? 'sm:col-span-3' : 'sm:col-span-full'}`}>
                                 <label htmlFor="first-name">First name</label>
                                 <div className="mt-2">
-                                    <input type="text" name="first-name" id="first-name" autoComplete="given-name" className={`form-input w-full ${mem.rounded} ${heightOption?.height}`} />
+                                    <input type="text" name="first-name" id="first-name" autoComplete="given-name" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
                                 </div>
                             </div>
                         )}
@@ -594,7 +706,7 @@ export default function LegacyConversion() {
                             <div className={`${formInfo.Name && formInfo.LastName ? 'sm:col-span-3' : 'sm:col-span-full'}`}>
                                 <label htmlFor="last-name">Last name</label>
                                 <div className="mt-2">
-                                    <input type="text" name="last-name" id="last-name" autoComplete="family-name" className={`form-input w-full ${mem.rounded} ${heightOption?.height}`} />
+                                    <input type="text" name="last-name" id="last-name" autoComplete="family-name" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
                                 </div>
                             </div>
                         )}
@@ -603,7 +715,7 @@ export default function LegacyConversion() {
                             <div className={formInfo.Phone ? 'sm:col-span-3' : 'sm:col-span-full'}>
                                 <label htmlFor="email">Email address</label>
                                 <div className="mt-2">
-                                    <input id="email" name="email" type="email" autoComplete="email" className={`form-input w-full ${mem.rounded} ${heightOption?.height}`} />
+                                    <input id="email" name="email" type="email" autoComplete="email" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
                                 </div>
                             </div>
                         )}
@@ -612,7 +724,7 @@ export default function LegacyConversion() {
                             <div className={formInfo.Email ? 'sm:col-span-3' : 'sm:col-span-full'}>
                                 <label htmlFor="phone">Phone</label>
                                 <div className="mt-2">
-                                    <input id="phone" name="phone" type="tel" autoComplete="phone" className={`form-input w-full ${mem.rounded} ${heightOption?.height}`} />
+                                    <input id="phone" name="phone" type="tel" autoComplete="phone" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
                                 </div>
                             </div>
                         )}
@@ -621,7 +733,7 @@ export default function LegacyConversion() {
                             <div className="sm:col-span-full">
                                 <label htmlFor="street-address">Mailing address</label>
                                 <div className="mt-2">
-                                    <input type="text" name="street-address" id="street-address" autoComplete="street-address" className={`form-input w-full ${mem.rounded} ${heightOption?.height}`} />
+                                    <input type="text" name="street-address" id="street-address" autoComplete="street-address" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
                                 </div>
                             </div>
                         )}
@@ -630,7 +742,7 @@ export default function LegacyConversion() {
                             <div className={`${formInfo.State && formInfo.Zip ? 'sm:col-span-3' : formInfo.State || formInfo.Zip ? 'col-span-3' : 'sm:col-span-full'}`}>
                                 <label htmlFor="city">City</label>
                                 <div className="mt-2">
-                                    <input type="text" name="city" id="city" autoComplete="address-level2" className={`form-input w-full ${mem.rounded} ${heightOption?.height}`} />
+                                    <input type="text" name="city" id="city" autoComplete="address-level2" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
                                 </div>
                             </div>
                         )}
@@ -639,7 +751,7 @@ export default function LegacyConversion() {
                             <div className={`${formInfo.City && formInfo.Zip ? 'sm:col-span-1' : 'sm:col-span-3'}`}>
                                 <label htmlFor="region">State</label>
                                 <div className="mt-2">
-                                    <input type="text" name="region" id="region" autoComplete="address-level1" className={`form-input w-full ${mem.rounded} ${heightOption?.height}`} />
+                                    <input type="text" name="region" id="region" autoComplete="address-level1" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
                                 </div>
                             </div>
                         )}
@@ -648,7 +760,7 @@ export default function LegacyConversion() {
                             <div className={`${formInfo.City && formInfo.State ? 'sm:col-span-2' : 'sm:col-span-3'}`}>
                                 <label htmlFor="postal-code">ZIP / Postal code</label>
                                 <div className="mt-2">
-                                    <input type="text" name="postal-code" id="postal-code" autoComplete="postal-code" className={`form-input w-full ${mem.rounded} ${heightOption?.height}`} />
+                                    <input type="text" name="postal-code" id="postal-code" autoComplete="postal-code" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
                                 </div>
                             </div>
                         )}
@@ -657,7 +769,7 @@ export default function LegacyConversion() {
                             <div className="sm:col-span-3">
                                 <label htmlFor="first-name">Parent Name</label>
                                 <div className="mt-2">
-                                    <input type="text" name="first-name" id="first-name" autoComplete="given-name" className={`form-input w-full ${mem.rounded} ${heightOption?.height}`} />
+                                    <input type="text" name="first-name" id="first-name" autoComplete="given-name" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
                                 </div>
                             </div>
                         )}
@@ -666,7 +778,7 @@ export default function LegacyConversion() {
                             <div className="sm:col-span-3">
                                 <label htmlFor="first-name">Age Of Student</label>
                                 <div className="mt-2">
-                                    <input type="text" name="first-name" id="first-name" autoComplete="given-name" className={`form-input w-full ${mem.rounded} ${heightOption?.height}`} />
+                                    <input type="text" name="first-name" id="first-name" autoComplete="given-name" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
                                 </div>
                             </div>
                         )}
@@ -689,7 +801,7 @@ export default function LegacyConversion() {
                             </div>
                         )}
 
-                        <button className={`btn ${selectedColor?.btn}  ${heightOption?.height} ${mem?.rounded} sm:col-span-full`}>Submit</button>
+                        <button className={`btn ${selectedColor?.btn}  ${heightOption?.height} ${heightOption.text} ${mem?.rounded} sm:col-span-full`}>Submit</button>
                     </div>
                 </div>
             </div>

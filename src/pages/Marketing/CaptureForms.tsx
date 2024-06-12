@@ -2,12 +2,18 @@ import { useEffect, useState } from 'react';
 import { UserAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { deleteForm, getUserFormsByStudioId } from '../../functions/api';
-import { showMessage, showWarningMessage } from '../../functions/shared';
+import { showWarningMessage } from '../../functions/shared';
 import { Loader } from '@mantine/core';
 import { REACT_BASE_URL } from '../../constants';
 import { deleteFormFromFirebase } from '../../firebase/firebaseFunctions';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
+import IconEye from '../../components/Icon/IconEye';
+import IconNotesEdit from '../../components/Icon/IconNotesEdit';
+import IconTrashLines from '../../components/Icon/IconTrashLines';
+import ViewFormIFrame from './ViewFormIFrame';
 
 export default function CaptureForms() {
     const { suid }: any = UserAuth();
@@ -56,19 +62,9 @@ export default function CaptureForms() {
         }
     }, [suid, update]);
 
-    const copyToClipboard = (text: any) => {
-        navigator.clipboard.writeText(text);
-        showMessage('Copied successfully!');
-    };
-
-    const copyNewFromToClipboard = (id: any) => {
-        const iFrame = `<iframe src="${REACT_BASE_URL}/form/${id}" width="100%" height="100%" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>`;
-        navigator.clipboard.writeText(iFrame);
-        showMessage('Copied successfully!');
-    };
-
+    
     const handlePreview = (id: any) => {
-        window.open(`${REACT_BASE_URL}/form/${id}`, '_blank');
+        window.open(`${REACT_BASE_URL}form/${id}`, '_blank');
     };
 
     const handleDeleteOldForm = (id: any) => {
@@ -161,63 +157,66 @@ export default function CaptureForms() {
                                                     <tr key={list.id}>
                                                         <td>{list.formName}</td>
                                                         <td>
-                                                            <button className="text-primary hover:text-primary/70" onClick={() => copyNewFromToClipboard(list.id)}>
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-code-slash" viewBox="0 0 16 16">
-                                                                    <path d="M10.478 1.647a.5.5 0 1 0-.956-.294l-4 13a.5.5 0 0 0 .956.294zM4.854 4.146a.5.5 0 0 1 0 .708L1.707 8l3.147 3.146a.5.5 0 0 1-.708.708l-3.5-3.5a.5.5 0 0 1 0-.708l3.5-3.5a.5.5 0 0 1 .708 0m6.292 0a.5.5 0 0 0 0 .708L14.293 8l-3.147 3.146a.5.5 0 0 0 .708.708l3.5-3.5a.5.5 0 0 0 0-.708l-3.5-3.5a.5.5 0 0 0-.708 0" />
-                                                                </svg>
-                                                            </button>
+                                                           
+                                                            <ViewFormIFrame formList={list} />
                                                         </td>
 
-                                                        <td >
-                                                            <Link 
-                                                            to={`/marketing/capture-forms/stats/${list.id}`}
-                                                            className='text-info hover:text-blue-800 text-center w-full '>
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-bar-chart-line" viewBox="0 0 16 16">
-                                                                <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1zm1 12h2V2h-2zm-3 0V7H7v7zm-5 0v-3H2v3z" />
-                                                            </svg>
+                                                        <td>
+                                                            <Link to={`/marketing/capture-forms/stats/${list.id}`} className="text-info hover:text-blue-800 text-center w-full ">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-bar-chart-line" viewBox="0 0 16 16">
+                                                                    <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1zm1 12h2V2h-2zm-3 0V7H7v7zm-5 0v-3H2v3z" />
+                                                                </svg>
                                                             </Link>
                                                         </td>
                                                         <td className="flex items-center justify-end gap-2">
-                                                            <button className="text-com hover:text-indigo-900" onClick={() => handlePreview(list.id)}>
-                                                                Preview
-                                                            </button>
-                                                            <button className="text-com hover:text-indigo-900">Edit</button>
-                                                            <button className="text-alert hover:text-alerthover" onClick={() => handleDeleteForm(list.id)}>
-                                                                Delete
-                                                            </button>
+                                                            <Tippy content="Preview Form">
+                                                                <button className="text-info hover:text-blue-800" onClick={() => handlePreview(list.id)}>
+                                                                    <IconEye />
+                                                                </button>
+                                                            </Tippy>
+                                                            <Tippy content="Edit Form">
+                                                                <Link to={`/marketing/capture-forms/edit/${list.id}`} className="text-primary hover:text-emerald-800">
+                                                                    <IconNotesEdit />
+                                                                </Link>
+                                                            </Tippy>
+                                                            <Tippy content="Delete Form">
+                                                                <button className="text-danger hover:text-red-800" onClick={() => handleDeleteForm(list.id)}>
+                                                                    <IconTrashLines />
+                                                                </button>
+                                                            </Tippy>
                                                         </td>
                                                     </tr>
                                                 ))}
 
                                                 {forms?.map((list: any) => (
-                                                    <tr key={list.FormId} className={`${matchedFormIds.includes(parseInt(list.FormId)) ? 'bg-red-100' : ''}`}>
+                                                    <tr key={list.FormId} className={`${matchedFormIds.includes(parseInt(list.FormId)) ? 'bg-danger text-white' : 'bg-cs'}`}>
                                                         <td>{list.FriendlyName}</td>
                                                         <td>
-                                                            <button className="text-primary hover:text-primary/70" onClick={() => copyToClipboard(list.IFrameHTML)}>
+                                                            {/* <button className="text-primary hover:text-primary/70" onClick={() => copyToClipboard(list.IFrameHTML)}>
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-code-slash" viewBox="0 0 16 16">
                                                                     <path d="M10.478 1.647a.5.5 0 1 0-.956-.294l-4 13a.5.5 0 0 0 .956.294zM4.854 4.146a.5.5 0 0 1 0 .708L1.707 8l3.147 3.146a.5.5 0 0 1-.708.708l-3.5-3.5a.5.5 0 0 1 0-.708l3.5-3.5a.5.5 0 0 1 .708 0m6.292 0a.5.5 0 0 0 0 .708L14.293 8l-3.147 3.146a.5.5 0 0 0 .708.708l3.5-3.5a.5.5 0 0 0 0-.708l-3.5-3.5a.5.5 0 0 0-.708 0" />
                                                                 </svg>
-                                                            </button>
+                                                            </button> */}
                                                         </td>
 
                                                         <td colSpan={2} className="text-right">
                                                             {matchedFormIds.includes(parseInt(list.FormId)) ? (
-                                                                <div className="flex items-center justify-end text-danger">
-                                                                <div>This form is a legacy form. Please update your site with the new form</div>
-                                                                <button className="btn btn-danger btn-sm ml-2"
-                                                                    onClick={() => handleDeleteOldForm(list.FormId)}
-                                                                >
-                                                                    {' '}
-                                                                    Delete Form
-                                                                </button>
-                                                            </div>
-                                                                
+                                                                <div className="flex items-center justify-end text-white">
+                                                                    <div>This form is a legacy form. Please update your site with the new form you created</div>
+                                                                    <button
+                                                                        className="btn btn-danger hover:bg-red-700 border outline outline-1 outline-white btn-sm ml-2 flex items-center gap-1"
+                                                                        onClick={() => handleDeleteOldForm(list.FormId)}
+                                                                    >
+                                                                        <IconTrashLines />
+                                                                        Delete Form
+                                                                    </button>
+                                                                </div>
                                                             ) : (
                                                                 <div className="flex items-center justify-end">
-                                                                    <div className='text-warning'>Please update this form to the new version by clicking on the edit button</div>
-                                                                    <Link to={`/marketing/legacy/capture-forms/${list.FormId}`} className="text-info hover:text-indigo-900 ml-2">
+                                                                    <div className="text-warning"></div>
+                                                                    <Link to={`/marketing/legacy/capture-forms/${list.FormId}`} className="text-info hover:text-blue-900 ml-2">
                                                                         {' '}
-                                                                        Edit Here
+                                                                        Please update this form to the new version by clicking here
                                                                     </Link>
                                                                 </div>
                                                             )}

@@ -9,12 +9,13 @@ import { REACT_API_BASE_URL } from '../../constants';
 import { convertPhone, hashTheID } from '../../functions/shared';
 import IconUserPlus from '../../components/Icon/IconUserPlus';
 import IconPlus from '../../components/Icon/IconPlus';
-import { copyDocAndCreateNew } from '../../firebase/firebaseFunctions';
 
 const ViewStudents = () => {
     const { suid, students }: any = UserAuth();
     const [showLoading, setShowLoading] = useState(false);
     const [activeOnly, setActiveOnly] = useState(true);
+
+    console.log(students);
 
     const dispatch = useDispatch();
     useEffect(() => {
@@ -99,7 +100,7 @@ const ViewStudents = () => {
             <div className="flex items-center justify-between flex-wrap gap-4">
                 <div>
                     <h2 className="text-xl">Students</h2>
-                    <p>*Students with a highlighted background need to renew payments.</p>
+                    {/* <p>*Students with a highlighted background need to renew payments.</p> */}
                 </div>
                 <div className="flex sm:flex-row flex-col sm:items-center sm:gap-3 gap-4 w-full sm:w-auto">
                     <div className="flex gap-3">

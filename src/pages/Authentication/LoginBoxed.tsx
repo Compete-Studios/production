@@ -36,7 +36,6 @@ const LoginBoxed = () => {
                 const data = {
                     username: userName,
                     email: email,
-                    password: password,
                     remember: rememberCrudentials,
                 };
                 localStorage.setItem('loginData', JSON.stringify(data));
@@ -47,7 +46,6 @@ const LoginBoxed = () => {
                 const data = {
                     username: userName,
                     email: email,
-                    password: password,
                     remember: rememberCrudentials,
                 };
                 localStorage.setItem('loginData', JSON.stringify(data));

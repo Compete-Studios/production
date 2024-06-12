@@ -117,6 +117,7 @@ const ViewEmails = lazy(() => import('../pages/Marketing/ViewEmails'));
 const ViewTextMessages = lazy(() => import('../pages/Marketing/ViewTextMessages'));
 const CaptureForms = lazy(() => import('../pages/Marketing/CaptureForms'));
 const CaptureFormStats = lazy(() => import('../pages/Marketing/CaptureFormStats'));
+const EditCaptureForm = lazy(() => import('../pages/Marketing/EditCaptureForm'));
 const LegacyConversion = lazy(() => import('../pages/Marketing/LegacyConversion'));
 const Waivers = lazy(() => import('../pages/Marketing/Waivers'));
 const StudentPortal = lazy(() => import('../pages/Marketing/StudentPortal'));
@@ -635,6 +636,10 @@ const routes = [
     {
         path: '/marketing/legacy/capture-forms/:id',
         element: <LegacyConversion />,
+    },
+    {
+        path: '/marketing/capture-forms/edit/:id',
+        element: <EditCaptureForm />,
     },
     {
         path: '/marketing/capture-forms/stats/:id',

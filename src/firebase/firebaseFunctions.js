@@ -40,6 +40,32 @@ export const getFormsFromFirebase = async (id) => {
     }
 };
 
+export const getForm = async (id) => {
+    try {
+        const docRef = doc(db, 'forms', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return docSnap.data();
+        } else {
+            return {}
+        }
+    } catch (error) {
+        console.log(error);
+        return [];
+    }
+};
+
+export const updateForm = async (id, data) => {
+    try {
+        const docRef = doc(db, 'forms', id);
+        await updateDoc(docRef, data);
+        return true;
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
+};
+
 export const storeReportToFirebase = async (data) => {
     try {
         const docRef = collection(db, 'issues');

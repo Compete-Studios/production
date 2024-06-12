@@ -24,8 +24,6 @@ export default function ViewInvoices() {
     const [prospectInvoices, setProspectInvoices] = useState<any>([]);
     const [loading, setLoading] = useState(false);
 
-    console.log(prospectInvoices);
-
     const handleGetStudentInvoices = async () => {
         try {
             const response = await getInvoicesByStudioId(suid, startDate, endDate);
@@ -216,7 +214,7 @@ export default function ViewInvoices() {
                                                 <td className="text-center flex items-center justify-center gap-x-2">
                                                     <div>
                                                         <Tippy content="View Invoice">
-                                                        <Link to={`/payments/view-invoice/${hashTheID(data.InvoiceId)}/${hashTheID(suid)}`} type="button">
+                                                            <Link to={`/payments/view-invoice/${hashTheID(data.InvoiceId)}/${hashTheID(suid)}`} type="button">
                                                                 <IconEye className="m-auto text-info hover:text-blue-900" />
                                                             </Link>
                                                         </Tippy>

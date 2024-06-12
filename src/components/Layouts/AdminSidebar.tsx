@@ -136,6 +136,14 @@ const AdminSidebar = () => {
                                         </NavLink>
                                     </li>
                                     <li className="nav-item">
+                                        <NavLink to="/admin/sprint" className="group">
+                                            <div className="flex items-center">
+                                                <IconMenuScrumboard className="group-hover:!text-primary shrink-0" />
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Current Sprint</span>
+                                            </div>
+                                        </NavLink>
+                                    </li>
+                                    <li className="nav-item">
                                         <NavLink to="/admin/issues" className="group">
                                             <div className="flex items-center">
                                                 <IconInfoCircle fill={true} className="group-hover:!text-primary shrink-0" />

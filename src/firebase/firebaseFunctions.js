@@ -47,7 +47,7 @@ export const getForm = async (id) => {
         if (docSnap.exists()) {
             return docSnap.data();
         } else {
-            return {}
+            return {};
         }
     } catch (error) {
         console.log(error);
@@ -99,6 +99,32 @@ export const updateReport = async (reportId, reportData) => {
     await updateDoc(docRef, reportData);
 };
 
+export const getSprint = async (id) => {
+    try {
+        const docRef = doc(db, 'sprints', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return docSnap.data().cards;
+        } else {
+            return {};
+        }
+    } catch (error) {
+        console.log(error);
+        return [];
+    }
+};
+
+export const updateSprint = async (id, data) => {
+    try {
+        const docRef = doc(db, 'sprints', id);
+        await updateDoc(docRef, { cards: data });
+        return true;
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
+};
+
 // export const updateStudio = async (studioId, studioData) => {
 //     const idString = studioId.toString();
 //     const docRef = doc(db, 'studios', idString);
@@ -148,15 +174,15 @@ export const deleteMessage = async (uid, messageId) => {
 const uploadImage = async (file, id) => {
     const storageRef = ref(storage, `profilePics/${id}`);
     await uploadBytes(storageRef, file)
-      .then((snapshot) => {
-        console.log("Uploaded a blob or file!", snapshot);
-      })
-      .catch((error) => {
-        console.error("Error uploading file: ", error);
-      });
+        .then((snapshot) => {
+            console.log('Uploaded a blob or file!', snapshot);
+        })
+        .catch((error) => {
+            console.error('Error uploading file: ', error);
+        });
     const url = await getDownloadURL(storageRef);
     return url;
-  };
+};
 
 export const createLandingPagePreview = async (data, image) => {
     try {
@@ -184,11 +210,9 @@ export const logoutForAdmin = async () => {
     }
 };
 
-export const updateStudioIDForAdmimMimic = async (studioID) => {  
-    const docRef = doc(db, 'users', "competeAdmin");
-    await updateDoc(docRef, {studioID: [studioID]});
+export const updateStudioIDForAdmimMimic = async (studioID) => {
+    const docRef = doc(db, 'users', 'competeAdmin');
+    await updateDoc(docRef, { studioID: [studioID] });
     await logoutForAdmin();
-    await login("competeAdmin", "9911competeADMIN!@#$");
+    await login('competeAdmin', '9911competeADMIN!@#$');
 };
-
-

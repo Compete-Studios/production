@@ -55,12 +55,11 @@ const ViewRoster = () => {
         setClassData(classes.find((d: any) => d.ClassId === parseInt(classId ?? '')));
     }, [classId, classes]);
 
-   
     const handleGetClassStaff = async () => {
         try {
             const res = await getStaffByClassId(classId);
             if (res) {
-               const activeStaff = staff.filter((d: any) => res.map((d: any) => d.StaffId[0]).includes(d.StaffId));
+                const activeStaff = staff.filter((d: any) => res.map((d: any) => d.StaffId[0]).includes(d.StaffId));
                 setClassStaff(activeStaff);
             } else {
                 setClassStaff([]);
@@ -206,29 +205,30 @@ const ViewRoster = () => {
                 <div className="flex items-center justify-between flex-wrap gap-4 mt-4">
                     <div>
                         <h2 className="text-xl font-bold">Roster for {classData?.Name}</h2>
-                        <div className="text-sm text-gray-500 dark:text-gray-400 mb-4 flex items-center gap-1">
+                        <div className="text-sm text-gray-500dark:text-gray-400 mb-4 gap-1">
                             Instructors:
-                            <div className='flex flex-wrap'>
-                            {classStaff?.length > 0 ? (
-                                classStaff?.map((d: any, index: any) => (
-                                    <div className='block'>
-                                    <span key={index} className="font-bold text-info">                                      
-                                        {d.FirstName} {d.LastName}{classStaff?.length > 1 && ','} 
-                                    </span>
+                            <div className="flex flex-wrap">
+                                {classStaff?.length > 0 ? (
+                                    classStaff?.map((d: any, index: any) => (
+                                        <div className="block">
+                                            <span key={index} className="font-bold text-info">
+                                                {d.FirstName} {d.LastName}
+                                                {classStaff?.length > 1 && ','}
+                                            </span>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="font-bold text-danger flex items-center gap-1">
+                                        {' '}
+                                        No Assigned Instructor
+                                        <Tippy content="Assign Instructor">
+                                            <button>
+                                                <IconUserPlus className="ltr:mr-2 rtl:ml-2 text-info" />
+                                            </button>
+                                        </Tippy>
                                     </div>
-                                ))
-                            ) : (
-                                <div className="font-bold text-danger flex items-center gap-1">
-                                    {' '}
-                                    No Assigned Instructor
-                                    <Tippy content="Assign Instructor">
-                                    <button>
-                                        <IconUserPlus className="ltr:mr-2 rtl:ml-2 text-info" />
-                                    </button>
-                                    </Tippy>
-                                </div>
-                            )}
-                           </div>
+                                )}
+                            </div>
                         </div>
                         {classSchedule.map((d: any) => (
                             <div className="text-sm text-gray-500 dark:text-gray-400 font-bold">
@@ -240,7 +240,7 @@ const ViewRoster = () => {
                         ))}
                     </div>
 
-                    <div className="flex sm:flex-row flex-col sm:items-center justify-end sm:gap-3 gap-4 w-full sm:w-auto mt-3">
+                    {/* <div className="flex sm:flex-row flex-col sm:items-center justify-end sm:gap-3 gap-4 w-full sm:w-auto mt-3">
                         <button type="button" className="btn btn-primary" onClick={() => editUser()}>
                             <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
                             Add Student
@@ -250,10 +250,30 @@ const ViewRoster = () => {
                             <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
                             Add Prospect
                         </button>
-                    </div>
+                    </div> */}
                 </div>
-                <div className="flex items-start mt-5 gap-4">
-                    <div className="w-full">
+                <div className="panel xl:hidden sm:flex sm:items-center sm:gap-2 sm:space-y-0 space-y-3">
+                    <button type="button" className="btn btn-warning gap-2 w-full">
+                        <IconPrinter />
+                        Print Roster
+                    </button>
+                    <button type="button" className="btn btn-info gap-2 w-full">
+                        <IconSend />
+                        Email Class
+                    </button>
+
+                    <button className="btn btn-secondary gap-2 w-full">
+                        <IconMessage />
+                        Text CLass
+                    </button>
+
+                    <button className="btn btn-success gap-2 w-full">
+                        <IconDollarSignCircle />
+                        Bulk Pay
+                    </button>
+                </div>
+                <div className="lg:flex items-start mt-5 gap-4">
+                    <div className="grow">
                         <div className="flex items-center justify-between flex-wrap gap-4 p-5">
                             <h2 className="text-xl">Students Enrolled</h2>
                             <div>
@@ -289,21 +309,8 @@ const ViewRoster = () => {
                                         {filteredItems?.map((contact: any) => {
                                             return (
                                                 <tr key={contact.Student_ID}>
-                                                    <td>
-                                                        <div className="flex items-center w-max">
-                                                            {/* {contact.path && (
-                                                        <div className="w-max">
-                                                            <img src={`/assets/images/${contact.path}`} className="h-8 w-8 rounded-full object-cover ltr:mr-2 rtl:ml-2" alt="avatar" />
-                                                        </div>
-                                                    )} */}
-
-                                                            {!contact.path && !contact.Name && (
-                                                                <div className="border border-gray-300 dark:border-gray-800 rounded-full p-2 ltr:mr-2 rtl:ml-2">
-                                                                    <IconUser className="w-4.5 h-4.5" />
-                                                                </div>
-                                                            )}
-                                                            <div>{contact.Name}</div>
-                                                        </div>
+                                                    <td className="max-w-[200px]">
+                                                        <div>{contact.Name}</div>
                                                     </td>
                                                     <td className="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">{contact.Phone}</td>
                                                     <td className="hidden px-3 py-4 text-sm text-gray-500 sm:table-cell">{contact.email}</td>
@@ -473,7 +480,7 @@ const ViewRoster = () => {
                             </Transition>
                         </div>
                     </div>
-                    <div className="panel space-y-3 sticky top-20">
+                    <div className="panel space-y-3 hidden xl:block xl:sticky xl:top-20 flex-none">
                         <button type="button" className="btn btn-warning gap-2 w-44">
                             <IconPrinter />
                             Print Roster

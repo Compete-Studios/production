@@ -2,7 +2,7 @@ import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import IconX from '../../components/Icon/IconX';
 import IconPlus from '../../components/Icon/IconPlus';
-import { addProgram } from '../../functions/api';
+import { addProgram, addRank } from '../../functions/api';
 import { showMessage } from '../../functions/shared';
 import { UserAuth } from '../../context/AuthContext';
 
@@ -15,12 +15,12 @@ export default function AddNewRank() {
         description: '',
     });
 
-    const handleAddProgram = async () => {
+    const handleAddRank = async () => {
         programData.studioId = suid;
         try {
-            const response = await addProgram(programData);
+            const response = await addRank(programData);
             if (response.status === 200) {
-                showMessage('Room added successfully');
+                showMessage('Rank added successfully');
                 setProgramData({
                     studioId: '',
                     name: '',
@@ -29,11 +29,11 @@ export default function AddNewRank() {
                 setShowQuickPayModal(false);
                 setUpdate(!update);
             } else {
-                showMessage('Failed to add program', 'error');
+                showMessage('Failed to add rank', 'error');
             }
         } catch (error) {
             console.error(error);
-            showMessage('Failed to add program', 'error');
+            showMessage('Failed to add rank', 'error');
         }
     };
 
@@ -69,10 +69,10 @@ export default function AddNewRank() {
                                     >
                                         <IconX />
                                     </button>
-                                    <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">Program Information</div>
+                                    <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">Rank Information</div>
                                     <div className="p-5 space-y-4">
                                         <div>
-                                            <label htmlFor="roomname">Program Name</label>
+                                            <label htmlFor="roomname">Rank Name</label>
                                             <input
                                                 type="text"
                                                 id="roomname"
@@ -94,8 +94,8 @@ export default function AddNewRank() {
                                             />
                                         </div>
                                         <div className="flex">
-                                            <button type="button" className="ml-auto btn btn-primary" onClick={handleAddProgram}>
-                                                Add Program
+                                            <button type="button" className="ml-auto btn btn-primary" onClick={handleAddRank}>
+                                                Add Rank
                                             </button>
                                         </div>
                                     </div>

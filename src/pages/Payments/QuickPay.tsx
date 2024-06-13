@@ -52,7 +52,6 @@ export default function QuickPay() {
     };
 
     const createNewCustomer = async () => {
-        console.log('Creating new customer...');
         const data = {
             studioId: suid,
             firstName: payDetails.firstName,
@@ -61,7 +60,6 @@ export default function QuickPay() {
         };
         try {
             const response = await createNewPaySimpleCustomer(data);
-            console.log('createNewCustomer response:', response);
             if (response && response.Response) {
                 const customerId = response.Response.Id;
                 return customerId;
@@ -163,7 +161,6 @@ export default function QuickPay() {
 
 
     const handleRunPayment = async () => {
-        console.log('Running payment...');
         try {
             const customerId = await createNewCustomer();
             if (customerId && customerId > 0) {

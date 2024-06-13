@@ -51,8 +51,6 @@ export default function AddStudent() {
 
     const navigate = useNavigate();
 
-    console.log(toActivate, 'toActivate');
-
     useEffect(() => {
         const newPrograms = programs?.map((program: any) => {
             return { value: program.ProgramId, label: program.Name };
@@ -72,6 +70,20 @@ export default function AddStudent() {
     const handleDeselctClass = (e, item) => {
         e.preventDefault();
         setSelectedClasses(selectedClasses.filter((i) => i !== item));
+    };
+
+    const handleSelectProgram = (e: any, item: any) => {
+        e.preventDefault();
+        if (programsForStudent.includes(item)) {
+            setProgramsForStudent(programsForStudent.filter((i) => i !== item));
+        } else {
+            setProgramsForStudent([...programsForStudent, item]);
+        }
+    };
+
+    const handleDeselctProgram = (e, item) => {
+        e.preventDefault();
+        setProgramsForStudent(programsForStudent.filter((i) => i !== item));
     };
 
     const showErrorMessage = (msg = '') => {
@@ -119,7 +131,7 @@ export default function AddStudent() {
         studentInfo.studioId = suid;
 
         const classIDs = selectedClasses.map((item: any) => item.ClassId);
-        const programIds = programsForStudent.map((item: any) => item.value);
+        const programIds = programsForStudent.map((item: any) => item.ProgramId);
         const waitingListIds = selectedWaitingLists.map((item: any) => item.WaitingListId);
 
         if (studentInfo?.fName === '') {
@@ -153,7 +165,7 @@ export default function AddStudent() {
         }
     };
 
-    console.log(studentInfo, 'studentInfo')
+    console.log(programsForStudent, 'programsForStudent')
 
     return (
         <div>
@@ -312,7 +324,17 @@ export default function AddStudent() {
                                 <label htmlFor="notes">Notes</label>
                                 <textarea id="notes" rows={4} placeholder="Notes" className="form-textarea" onChange={(e) => setStudentInfo({ ...studentInfo, notes: e.target.value })} />
                             </div>
-                            <div className="sm:col-span-2 sm:row-span-2">
+                            <div className="sm:col-span-2">
+                                <label htmlFor="pipelineStatus">Pipeline Status</label>
+                                <select id="pipelineStatus" className="form-select text-white-dark" onChange={(e) => setStudentInfo({ ...studentInfo, currentPipelineStatus: e.target.value })}>
+                                    {pipelineSteps?.map((step: any) => (
+                                        <option key={step.PipelineStepId} value={step.PipelineStepId}>
+                                            {step.StepName}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="sm:col-span-2">
                                 <label htmlFor="waitingList">Waiting List</label>
                                 {waitingLists?.map((list: any) => (
                                     <label key={list.WaitingListId} className="flex items-center cursor-pointer">
@@ -331,29 +353,57 @@ export default function AddStudent() {
                                     </label>
                                 ))}
                             </div>
+                           
+                 
                             <div className="sm:col-span-2">
-                                <label htmlFor="pipelineStatus">Pipeline Status</label>
-                                <select id="pipelineStatus" className="form-select text-white-dark" onChange={(e) => setStudentInfo({ ...studentInfo, currentPipelineStatus: e.target.value })}>
-                                    {pipelineSteps?.map((step: any) => (
-                                        <option key={step.PipelineStepId} value={step.PipelineStepId}>
-                                            {step.StepName}
-                                        </option>
-                                    ))}
-                                </select>
+                                <label htmlFor="classes">Programs</label>
+                                <div className="col-span-full flex items-center border p-4 bg-info/20 rounded-md border-com">
+                                    <div className="p-4 w-full h-72 overflow-y-auto  grow rounded-md border border-com mt-1 bg-white">
+                                        {programs &&
+                                            programs?.map((item: any) => (
+                                                <>
+                                                    {!programsForStudent?.includes(item) && (
+                                                        <>
+                                                            <div key={item.ProgramId} className="text-xs cursor-pointer border-b w-full p-2" onClick={(e) => handleSelectProgram(e, item)}>
+                                                                <span className="text-zinc-500 hover:text-zinc-900">{item.Name}</span>
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </>
+                                            ))}
+                                    </div>
+                                    <div className="text-center grow-0 flex items-center justify-center w-auto px-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-left-right" viewBox="0 0 16 16">
+                                            <path
+                                                fill-rule="evenodd"
+                                                d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5m14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <div className="p-4 w-full h-72 overflow-y-auto grow rounded-md border border-com mt-1 bg-white">
+                                        {programsForStudent?.map((item) => (
+                                            <>
+                                                <div
+                                                    key={item.ProgramId}
+                                                    className="text-xs cursor-pointer text-info hover:text-info/80 font-bold border-b w-full p-2"
+                                                    onClick={(e) => {
+                                                        handleDeselctProgram(e, item);
+                                                    }}
+                                                >
+                                                    <div className="mr-1 inline-block shrink-0">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-check-circle" viewBox="0 0 16 16">
+                                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                                                            <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05" />
+                                                        </svg>
+                                                    </div>
+                                                    {item.Name}
+                                                </div>
+                                            </>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
                             <div className="sm:col-span-2">
-                                <label htmlFor="pipelineStatus">Programs</label>
-                                <Select
-                                    placeholder="Select an option"
-                                    options={options}
-                                    isMulti
-                                    isSearchable={false}
-                                    onChange={(e: any) => {
-                                        setProgramsForStudent(e);
-                                    }}
-                                />
-                            </div>
-                            <div className="sm:col-span-full">
                                 <label htmlFor="classes">Classes</label>
                                 <div className="col-span-full flex items-center border p-4 bg-primary/20 rounded-md border-com">
                                     <div className="p-4 w-full h-72 overflow-y-auto  grow rounded-md border border-com mt-1 bg-white">

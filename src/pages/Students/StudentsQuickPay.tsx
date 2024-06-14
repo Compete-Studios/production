@@ -28,7 +28,7 @@ export default function StudentsQuickPay({ student, suid, title = 'Quick Pay', i
     const [billingInfo, setBillingInfo] = useState<CreditCard[] | null>(null);
     const [cardToUse, setCardToUse] = useState<CreditCard | null>(null);
     const [notes, setNotes] = useState<string | null>('');
-    const [amount, setAmount] = useState(null);
+    const [amount, setAmount] = useState<any>(null);
     const [invoice, setInvoice] = useState<any>(invoiceID);
 
     const showErrorMessage = (msg = '') => {

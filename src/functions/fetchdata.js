@@ -22,6 +22,20 @@ axiosInstance.interceptors.request.use(async (config) => {
   return Promise.reject(error);
 });
 
+// const fetchData = async (endpoint, method = 'get', data = null) => {
+//   try {
+//     const response = await axiosInstance({
+//       url: endpoint,
+//       method,
+//       data
+//     });
+//     return response.data;
+//   } catch (error) {
+//     console.error(error);
+//     throw error;
+//   }
+// };
+
 const fetchData = async (endpoint, method = 'get', data = null) => {
   try {
     const response = await axiosInstance({
@@ -31,9 +45,22 @@ const fetchData = async (endpoint, method = 'get', data = null) => {
     });
     return response.data;
   } catch (error) {
-    console.error(error);
-    throw error;
-  }
+        if (error.response) {
+            // Request made and server responded with a status code
+            // that falls out of the range of 2xx
+            console.error('Axios error response data:', error.response.data);
+            throw error.response.data;  // Pass the error response data
+        } else if (error.request) {
+            // The request was made but no response was received
+            console.error('Axios error request:', error.request);
+            throw new Error('No response received from server.');
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            console.error('Axios error message:', error.message);
+            throw new Error(error.message);
+        }
+    }
 };
+
 
 export default fetchData;

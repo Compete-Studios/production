@@ -13,6 +13,7 @@ import AddNewRank from './AddNewRank';
 export default function Ranks() {
     const { suid }: any = UserAuth();
     const [ranks, setRanks] = useState<any>([]);
+    const [update, setUpdate] = useState(false);
 
     const navigate = useNavigate();
 
@@ -29,7 +30,7 @@ export default function Ranks() {
 
     useEffect(() => {
         getStudioRanks();
-    }, [suid]);
+    }, [suid, update]);
 
 
     const handleDeleteRoome = async (RankID: any) => {
@@ -65,7 +66,7 @@ export default function Ranks() {
                 <h2 className="text-xl">Ranks</h2>
 
                 <div className="gap-2 ltr:ml-auto rtl:mr-auto">
-                    <AddNewRank />
+                    <AddNewRank update={update} setUpdate={setUpdate}/>
                 </div>
             </div>
             <div className="table-responsive ">

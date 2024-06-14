@@ -6,8 +6,8 @@ import { addProgram, addRank } from '../../functions/api';
 import { showMessage } from '../../functions/shared';
 import { UserAuth } from '../../context/AuthContext';
 
-export default function AddNewRank() {
-    const { suid, update, setUpdate }: any = UserAuth();
+export default function AddNewRank({update, setUpdate}: any) {
+    const { suid }: any = UserAuth();
     const [showQuickPayModal, setShowQuickPayModal] = useState(false);
     const [programData, setProgramData] = useState({
         studioId: '',

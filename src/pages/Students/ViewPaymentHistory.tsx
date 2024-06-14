@@ -5,6 +5,7 @@ import { formatWithTimeZone, handleGetTimeZoneOfUser } from '../../functions/dat
 import { Link, useParams } from 'react-router-dom';
 import Hashids from 'hashids';
 import { hashTheID } from '../../functions/shared';
+import PaymentInfoSlider from '../Payments/PaymentInfoSlider';
 
 export default function ViewPaymentHistory() {
     const { suid, students }: any = UserAuth();
@@ -86,27 +87,26 @@ export default function ViewPaymentHistory() {
                         </Link>
                     </li>
                     <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                        <span >
-                           Payment History
-                        </span>
+                        <span>Payment History</span>
                     </li>
                 </ul>
             </div>
 
-            <div className="panel mt-5">
+            <div className="panel p-0 mt-5">
                 <div className="flex-auto">
-                    <h5 className="mb-4 text-xl font-medium">Payment History</h5>
+                    <h5 className="text-xl font-medium p-5">Payment History</h5>
                     <div className="table-responsive rouned-lg mb-5">
                         <table className="panel border rounded-lg">
-                            <thead>
-                                <tr>
-                                    <th>Amount</th>
-                                    <th>Date</th>
-                                    <th>Billing Name</th>
-                                    <th>Type</th>
-                                    <th className="text-right">Status</th>
-                                </tr>
-                            </thead>
+                        <thead>
+                                                                <tr>
+                                                                    <th>Amount</th>
+                                                                    <th>Date</th>
+                                                                    <th>Billing Name</th>
+                                                                    <th>Type</th>
+                                                                    <th>Status</th>
+                                                                    <th className="text-right">View</th>
+                                                                </tr>
+                                                            </thead>
                             <tbody>
                                 {paymentHistory?.map((data: any) => {
                                     return (
@@ -117,7 +117,7 @@ export default function ViewPaymentHistory() {
                                                 {data.CustomerFirstName || ''} {data.CustomerLastName || ''}
                                             </td>
                                             <td className={`text-xs font-bold ${data.Id ? 'text-info' : 'text-primary'}`}>{data.Id ? 'External Payment' : 'Internal Payment'}</td>
-                                            <td className="flex">
+                                            <td >
                                                 <span
                                                     className={`ml-auto badge whitespace-nowrap ${
                                                         data.Status === 'Settled'
@@ -133,6 +133,11 @@ export default function ViewPaymentHistory() {
                                                 >
                                                     {data.Status || 'Internal'}
                                                 </span>
+                                            </td>
+                                            <td className="flex">
+                                                <div className="ml-auto">
+                                                    <PaymentInfoSlider payID={data.Id} />
+                                                </div>
                                             </td>
                                         </tr>
                                     );

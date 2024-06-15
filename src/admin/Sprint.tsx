@@ -17,83 +17,28 @@ import IconX from '../components/Icon/IconX';
 import { getSprint, updateSprint } from '../firebase/firebaseFunctions';
 import IconInfoCircle from '../components/Icon/IconInfoCircle';
 import AddTaskGuidline from './AddTaskGuidline';
+import Select from 'react-select';
+
+const options = [
+    { value: 'Assign', label: 'Select' },
+    { value: 'Bret', label: 'Bret' },
+    { value: 'Evan', label: 'Evan' },
+    { value: 'Mago', label: 'Mago' },
+];
 
 const Sprint = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Scrumboard'));
     });
-    const [sprintCards, setSprintCards] = useState<any>([
-        {
-            id: 1,
-            title: 'Backlog',
-            tasks: [
-                {
-                    projectId: 1,
-                    id: 1,
-                    title: 'Creating a new Portfolio on Dribble',
-                    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.',
-                    image: true,
-                    date: ' 08 Aug, 2020',
-                    tags: ['designing'],
-                },
-                {
-                    projectId: 1,
-                    id: 2,
-                    title: 'Singapore Team Meet',
-                    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.',
-                    date: ' 09 Aug, 2020',
-                    tags: ['meeting'],
-                },
-            ],
-        },
-        {
-            id: 2,
-            title: 'In Progress',
-            tasks: [
-                {
-                    projectId: 2,
-                    id: 3,
-                    title: 'Plan a trip to another country',
-                    description: '',
-                    date: ' 10 Sep, 2020',
-                },
-            ],
-        },
-        {
-            id: 3,
-            title: 'Testing',
-            tasks: [
-                {
-                    projectId: 3,
-                    id: 4,
-                    title: 'Dinner with Kelly Young',
-                    description: '',
-                    date: ' 08 Aug, 2020',
-                },
-                {
-                    projectId: 3,
-                    id: 5,
-                    title: 'Launch New SEO Wordpress Theme ',
-                    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-                    date: ' 09 Aug, 2020',
-                },
-            ],
-        },
-        {
-            id: 4,
-            title: 'Complete',
-            tasks: [],
-        },
-    ]);
-
-    const [testSprints, setTestSprints] = useState<any>([]);
+    const [sprintCards, setSprintCards] = useState<any>([]);
+    const [assignedToOption, setAssignedToOption] = useState<any>(options[0]);
 
     const handleGetSprint = async (id: string) => {
         const res = await getSprint(id);
         console.log(res);
         setSprintCards(res);
-    };  
+    };
 
     useEffect(() => {
         handleGetSprint('1');
@@ -121,6 +66,7 @@ const Sprint = () => {
         description: '',
         tags: '',
         date: '',
+        assignedTo: assignedToOption.label,
     });
 
     const [selectedTask, setSelectedTask] = useState<any>(null);
@@ -198,6 +144,8 @@ const Sprint = () => {
     };
 
     const addEditTask = (projectId: any, task: any = null) => {
+        const assignedOption = options.find((d: any) => d.label === task?.assignedTo);
+        setAssignedToOption(assignedOption || options[0]);
         setParamsTask({
             projectId: projectId,
             id: null,
@@ -205,16 +153,17 @@ const Sprint = () => {
             description: '',
             tags: '',
             date: '',
+            assignedTo: assignedToOption.label,
         });
         if (task) {
             let data = JSON.parse(JSON.stringify(task));
             data.projectId = projectId;
             data.tags = data.tags ? data.tags.toString() : '';
+            data.assignedTo = assignedToOption.label;
             setParamsTask(data);
         }
         setIsAddTaskModal(true);
     };
-    
 
     const saveTask = () => {
         if (!paramsTask.title) {
@@ -229,6 +178,7 @@ const Sprint = () => {
             task.title = paramsTask.title;
             task.description = paramsTask.description;
             task.tags = paramsTask.tags?.length > 0 ? paramsTask.tags.split(',') : [];
+            task.assignedTo = assignedToOption.label;
         } else {
             //add task
             let maxId = 0;
@@ -246,6 +196,7 @@ const Sprint = () => {
                 description: paramsTask.description,
                 date: dd + ' ' + monthNames[mm] + ', ' + yyyy,
                 tags: paramsTask.tags?.length > 0 ? paramsTask.tags.split(',') : [],
+                assignedTo: assignedToOption.label,
             };
             setParamsTask(project.tasks.push(task));
         }
@@ -270,15 +221,15 @@ const Sprint = () => {
         setIsDeleteModal(false);
     };
 
-
-
     return (
-        <div>
-            <div className='flex items-start justify-between'>
-            <div>
-                <h1 className="text-2xl font-semibold">Scrumboard</h1>
-                <h3 className="text-base font-normal text-gray-500">Sprint: 1 <span className='font-bold'>Jun 10, 2024 - June 21, 2024</span></h3>
-                {/* <button
+        <div className="pb-36">
+            <div className="flex items-start justify-between">
+                <div>
+                    <h1 className="text-2xl font-semibold">Scrumboard</h1>
+                    <h3 className="text-base font-normal text-gray-500">
+                        Sprint: 1 <span className="font-bold">Jun 10, 2024 - June 21, 2024</span>
+                    </h3>
+                    {/* <button
                     type="button"
                     className="btn btn-primary flex"
                     onClick={() => {
@@ -288,10 +239,10 @@ const Sprint = () => {
                     <IconPlus className="w-5 h-5 ltr:mr-3 rtl:ml-3" />
                     Add Project
                 </button> */}
-            </div>
-            <div>
-            <AddTaskGuidline />
-            </div>
+                </div>
+                <div>
+                    <AddTaskGuidline />
+                </div>
             </div>
             {/* project list  */}
             <div className="relative pt-5 ">
@@ -356,18 +307,33 @@ const Sprint = () => {
                                         className="connect-sorting-content min-h-[150px]"
                                     >
                                         {project.tasks.map((task: any) => {
-                                            console.log(project)
                                             return (
                                                 <div className="sortable-list " key={project.id + '' + task.id}>
                                                     <div className="shadow bg-[#f4f4f4] dark:bg-white-dark/20 p-3 pb-5 rounded-md mb-5 space-y-3 cursor-move">
                                                         {task.image ? <img src="/assets/images/carousel1.jpeg" alt="images" className="h-32 w-full object-cover rounded-md" /> : ''}
                                                         <div className="text-base font-medium">{task.title}</div>
+                                                        <div className="w-1/2">
+                                                            <span className={`badge ${task.assignedTo === 'Bret' ? 'bg-info' : task.assignedTo === 'Evan' ? 'bg-warning' : 'bg-danger'} rounded-full`}>
+                                                                {task.assignedTo || 'Unassigned'}
+                                                            </span>
+                                                        </div>
                                                         <p className="break-all">{task.description}</p>
                                                         <div className="flex gap-2 items-center flex-wrap">
                                                             {task.tags?.length ? (
                                                                 task.tags.map((tag: any, i: any) => {
                                                                     return (
-                                                                        <div key={i} className={`btn px-2 py-1 flex ${(tag === ' Bug' || tag === 'Bug') ? "btn-outline-danger" : (tag === ' UI' || tag === 'UI') ? "btn-outline-warning" : (tag === ' Critical' || tag === 'Critical') ? "btn-danger" : "btn-outline-primary"} `}>
+                                                                        <div
+                                                                            key={i}
+                                                                            className={`btn btn-sm px-2 py-1 text-xs flex ${
+                                                                                tag === ' Bug' || tag === 'Bug'
+                                                                                    ? 'btn-outline-danger'
+                                                                                    : tag === ' UI' || tag === 'UI'
+                                                                                    ? 'btn-outline-warning'
+                                                                                    : tag === ' Critical' || tag === 'Critical'
+                                                                                    ? 'btn-danger'
+                                                                                    : 'btn-outline-primary'
+                                                                            } `}
+                                                                        >
                                                                             <IconTag className="shrink-0" />
                                                                             <span className="ltr:ml-2 rtl:mr-2">{tag}</span>
                                                                         </div>
@@ -481,9 +447,15 @@ const Sprint = () => {
                                     <form onSubmit={saveTask}>
                                         <div className="grid gap-5">
                                             <div>
-                                                <label htmlFor="taskTitle">Name</label>
-                                                <input id="title" value={paramsTask.title} onChange={addTaskData} type="text" className="form-input" placeholder="Enter Name" />
-                                            </div>                                            
+                                                <label htmlFor="taskTitle">Ticket Title</label>
+                                                <input id="title" value={paramsTask.title} onChange={addTaskData} type="text" className="form-input" placeholder="Enter Ticket Title" />
+                                            </div>
+                                            <div>
+                                                <div className="w-full">
+                                                    <label htmlFor="assign">Assigned To:</label>
+                                                    <Select value={assignedToOption} className="w-full" options={options} onChange={(option) => setAssignedToOption(option)} isSearchable={false} />
+                                                </div>
+                                            </div>
                                             <div>
                                                 <label htmlFor="taskTag">Tag</label>
                                                 <input id="tags" value={paramsTask.tags} onChange={addTaskData} type="text" className="form-input" placeholder="Enter Tag" />

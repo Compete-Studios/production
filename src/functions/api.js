@@ -1607,7 +1607,7 @@ export const getStudentWithdrawals = async (startDate, endDate, suid) => {
 
 export const getAllActivePaymentSchedules = async (studioId) => {
     try {
-        const response = await fetchData(`paysimple-routes/getAllActivePaymentSchedules/${studioId}`, 'get');
+        const response = await fetchData(`paysimple-helper/getAllActivePaymentSchedules/${studioId}`, 'get');
         return response;
     } catch (error) {
         console.error(error);

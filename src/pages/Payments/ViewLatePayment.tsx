@@ -71,7 +71,7 @@ export default function ViewLatePayment() {
     const [fromEmail, setFromEmail] = useState('');
     const [newNote, setNewNote] = useState('');
     const [currentPipeline, setCurrentPipeline] = useState('');
-    const [mutablePipelineStep, setMutablePipelineStep] = useState('');
+    const [mutablePipelineStep, setMutablePipelineStep] = useState<number>(0);
     const [paysimplehistory, setPaysimpleHistory] = useState<any>([]);
     const [internalHistory, setInternalHistory] = useState<any>([]);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
@@ -302,9 +302,7 @@ export default function ViewLatePayment() {
             alert('This is not your payment');
         }
     }, [stud, suid]);
-
-    console.log(paymentIDInfo, 'paymentIDInfo');
-
+    
     const recipieptHTML = async (invoiceId: any) => {
         const htmlFOrEmail = `"<!DOCTYPE html>
         <html>
@@ -711,6 +709,19 @@ export default function ViewLatePayment() {
                                                                     </div>
                                                                 );
                                                             })}
+                                                            <div>
+                                                                <label htmlFor="completed" className="flex items-center cursor-pointer hover:bg-gray-100 p-1">
+                                                                    <input
+                                                                        type="radio"
+                                                                        name="pipeline"
+                                                                        className="form-radio"
+                                                                        value={mutablePipelineStep}
+                                                                        checked={mutablePipelineStep === 0}
+                                                                        onChange={() => setMutablePipelineStep(0)}
+                                                                    />
+                                                                    <span>No Status/Ignore</span>
+                                                                </label>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div className="absolute bottom-0 right-0 left-0">

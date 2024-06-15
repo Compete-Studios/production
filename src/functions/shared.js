@@ -146,6 +146,37 @@ export const showWarningMessage = (msg = '', text = '', confirmed = '', title = 
     });
 };
 
+export const statusCSS = (status) => {
+    switch (status) {
+        case 'Pending':
+            return 'text-blue-800';
+        case 'Chargeback':
+            return 'text-red-800';
+        case 'Posted':
+            return 'text-success';
+        case 'Authorized':
+            return 'text-success';
+        case 'Failed':
+            return 'text-danger';
+        case 'RefundSettled':
+            return 'text-purple-800';
+        case 'Returned':
+            return ' text-orange-800';
+        case 'Reversed':
+            return ' text-red-800';
+        case 'Reversensf':
+            return ' text-red-800';
+        case 'Reverseposted':
+            return ' text-red-800';
+        case 'Settled':
+            return 'text-info';
+        case 'Voided':
+            return ' text-red-800';
+        default:
+            return 'text-gray-800';
+    }
+};
+
 export const showCreationAlert = async (type) => {
     return new Promise((resolve, reject) => {
         const toast = Swal.mixin({

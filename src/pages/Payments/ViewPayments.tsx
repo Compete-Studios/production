@@ -22,9 +22,7 @@ export default function ViewPayments() {
     const handleGetTimeZoneOfUser = () => {
         const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         return timeZone;
-    };
-
-    console.log(convertToUserLocalDate(new Date(), handleGetTimeZoneOfUser()))
+    };    
 
     useEffect(() => {
         try {

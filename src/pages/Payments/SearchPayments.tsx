@@ -8,10 +8,10 @@ import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import { getPayments } from '../../functions/api';
 import { UserAuth } from '../../context/AuthContext';
-import { formatDate, hashThePayID } from '../../functions/shared';
+import { formatDate, hashThePayID, statusCSS } from '../../functions/shared';
 import IconEye from '../../components/Icon/IconEye';
 import { Link } from 'react-router-dom';
-import PaymentInfoSlider from './PaymentInfoSlider';
+import Hashids from 'hashids';
 
 const rowData: any = [];
 const SearchPayments = () => {
@@ -20,6 +20,7 @@ const SearchPayments = () => {
     useEffect(() => {
         dispatch(setPageTitle('Search Payments'));
     });
+    const hashids = new Hashids();
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
@@ -36,36 +37,7 @@ const SearchPayments = () => {
     const [payments, setPayments] = useState<any>([]);
     const [settledPayments, setSettledPayments] = useState<any>(0);
 
-    const statusCSS = (status: string) => {
-        switch (status) {
-            case 'Pending':
-                return 'text-blue-800';
-            case 'Chargeback':
-                return 'text-red-800';
-            case 'Posted':
-                return 'text-success';
-            case 'Authorized':
-                return 'text-success';
-            case 'Failed':
-                return 'text-red-800';
-            case 'RefundSettled':
-                return 'text-purple-800';
-            case 'Returned':
-                return ' text-orange-800';
-            case 'Reversed':
-                return ' text-red-800';
-            case 'Reversensf':
-                return ' text-red-800';
-            case 'Reverseposted':
-                return ' text-red-800';
-            case 'Settled':
-                return 'text-success';
-            case 'Voided':
-                return ' text-red-800';
-            default:
-                return 'text-gray-800';
-        }
-    };
+    
 
     const handleCountSettledPayments = (payments: any) => {
         const totalSettledPayments = payments.filter((payment: any) => payment.Status === 'Settled');
@@ -135,16 +107,14 @@ const SearchPayments = () => {
     };
 
     const handleSearch = async () => {
-        
-        const searchStartDate = handleConvertDateToYYYYMMDD(startDate)
-        const searchEndDate = handleConvertDateToYYYYMMDD(endDate)
+        const searchStartDate = handleConvertDateToYYYYMMDD(startDate);
+        const searchEndDate = handleConvertDateToYYYYMMDD(endDate);
         const searchData = {
             suid,
             searchStartDate,
             searchEndDate,
             status,
         };
-        console.log(searchData, 'searchData')
         try {
             getPayments(suid, searchStartDate, searchEndDate, status).then((response) => {
                 if (response.Response && response.Response.length === 0) {
@@ -183,7 +153,7 @@ const SearchPayments = () => {
             });
     }, []);
 
-    console.log(payments, 'payments')
+    console.log(payments, 'payments');
 
     return (
         <div>
@@ -213,10 +183,7 @@ const SearchPayments = () => {
                             </div>
                             <div className="md:flex-auto flex-1">
                                 <label className="form-label">Status</label>
-                                <select className="form-select"
-                                    value={status}
-                                    onChange={(e) => setStatus(e.target.value)}
-                                >
+                                <select className="form-select" value={status} onChange={(e) => setStatus(e.target.value)}>
                                     <option value="">All</option>
                                     <option value="pending">Pending</option>
                                     <option value="chargeback">Chargeback</option>
@@ -234,9 +201,7 @@ const SearchPayments = () => {
                             </div>
                             <div className="md:flex-auto flex-1">
                                 <label className="form-label text-transparent ">search</label>
-                                <button type="button" className="btn btn-primary w-full"
-                                    onClick={handleSearch}
-                                >
+                                <button type="button" className="btn btn-primary w-full" onClick={handleSearch}>
                                     Search
                                 </button>
                             </div>
@@ -301,13 +266,27 @@ const SearchPayments = () => {
                                 {
                                     accessor: 'action',
                                     title: 'Payment Info',
+                                    titleStyle: { textAlign: 'right' },
                                     sortable: false,
-                                    render: ({ Id, Amount }: any) => (
-                                        <div className="flex items-center justify-center gap-2">
-                                            {/* <Link to={`/payments/view-payment-info/${hashThePayID(Id, suid, Amount)}/${Math.floor(Amount) * 12}`}>
-                                                <IconEye className="text-info hover:text-blue-800" />
-                                            </Link> */}
-                                            <PaymentInfoSlider payID={Id} />
+                                    render: ({ Id, Status }: any) => (
+                                        <div className="flex items-center justify-end gap-2">
+                                            {Status === 'Failed' ? (
+                                                <Link
+                                                    to={`/payments/view-late-payment/${suid}/${Id}`}
+                                                    className="text-info hover:text-blue-800 flex items-center gap-1"
+                                                >
+                                                    <IconEye /> View Payment
+                                                </Link>
+                                            ) : (
+                                                <Link
+                                                    to={`/payments/view-payment-info/${hashids.encode(Id)}/${hashids.encode(suid)}`}
+                                                    className="text-info hover:text-blue-800 flex items-center gap-1"
+                                                >
+                                                    <IconEye /> View Payment
+                                                </Link>
+                                            )}
+
+                                            {/* <PaymentInfoSlider payID={Id} /> */}
                                         </div>
                                     ),
                                 },

@@ -418,9 +418,7 @@ const ViewStudent = () => {
         setHasedRefID(hashedStudent);
     }, [student]);
 
-    const payHistoryIds = hashids.encode(paySimpleInfo, (student?.Student_id));
-
-    console.log(paymentSchedules, 'payHistoryIds')
+    const payHistoryIds = hashids.encode(paySimpleInfo, (student?.Student_id));   
 
     return (
         <div>
@@ -466,11 +464,15 @@ const ViewStudent = () => {
                         </div>
                     </div>
                     <div className="p-4">
-                        <div className="text-zinc-500 underline">Studio</div>
-                        <div className="font-bold">{studioInfo?.Studio_Name}</div>
-                        <div className="text-zinc-500 mt-2 underline">Classes</div>
+                   
+                        <button className="text-zinc-500 mt-2 underline hover:text-info"
+                        onClick={() => {setSelectedIndex(4)}}
+                        >Classes</button>
                         <div className="font-bold flex flex-wrap">{classes.length > 0 ? classes.map((c: any) => c.Name).join(', ') : 'No classes'}</div>
-                        <div className="text-zinc-500 mt-2 underline">Active Pay Schedules</div>
+                        <button 
+                        className="text-zinc-500 mt-2 underline hover:text-info"
+                        onClick={() => {setSelectedIndex(5)}}
+                        >Active Pay Schedules</button>
                         <div className="">
                             {paymentSchedules.map((data: any, index: any) => {
                                 return (

@@ -118,19 +118,7 @@ const LoginBoxed = () => {
                                 {error && <Error message={errorMessage} handleClear={handleClear} />}
                                 <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
                                     <Tab.List className="mt-3 flex flex-wrap">
-                                        <Tab as={Fragment}>
-                                            {({ selected }) => (
-                                                <button
-                                                    className={`${
-                                                        selected ? 'text-info !outline-none before:!w-full' : ''
-                                                    } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full gap-x-1`}
-                                                >
-                                                    <IconMail />
-                                                    Email
-                                                </button>
-                                            )}
-                                        </Tab>
-                                        <Tab as={Fragment}>
+                                    <Tab as={Fragment}>
                                             {({ selected }) => (
                                                 <button
                                                     className={`${
@@ -144,24 +132,23 @@ const LoginBoxed = () => {
                                                 </button>
                                             )}
                                         </Tab>
+                                        <Tab as={Fragment}>
+                                            {({ selected }) => (
+                                                <button
+                                                    className={`${
+                                                        selected ? 'text-info !outline-none before:!w-full' : ''
+                                                    } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full gap-x-1`}
+                                                >
+                                                    <IconMail />
+                                                    Email
+                                                </button>
+                                            )}
+                                        </Tab>
+                                       
                                     </Tab.List>
 
                                     <Tab.Panels>
-                                        <Tab.Panel>
-                                            <div className="relative text-white-dark">
-                                                <input
-                                                    id="email"
-                                                    type="text"
-                                                    value={email}
-                                                    placeholder="Enter Email"
-                                                    className="form-input ps-10 placeholder:text-white-dark h-12"
-                                                    onChange={(e) => setEmail(e.target.value)}
-                                                />
-                                                <span className="absolute start-4 top-1/2 -translate-y-1/2">
-                                                    <IconMail fill={true} />
-                                                </span>
-                                            </div>
-                                        </Tab.Panel>
+                                       
                                         <Tab.Panel>
                                             <div className="relative text-white-dark">
                                                 <input
@@ -176,6 +163,21 @@ const LoginBoxed = () => {
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-person-fill-lock" viewBox="0 0 16 16">
                                                         <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0m-9 8c0 1 1 1 1 1h5v-1a2 2 0 0 1 .01-.2 4.49 4.49 0 0 1 1.534-3.693Q8.844 9.002 8 9c-5 0-6 3-6 4m7 0a1 1 0 0 1 1-1v-1a2 2 0 1 1 4 0v1a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1zm3-3a1 1 0 0 0-1 1v1h2v-1a1 1 0 0 0-1-1" />
                                                     </svg>
+                                                </span>
+                                            </div>
+                                        </Tab.Panel>
+                                        <Tab.Panel>
+                                            <div className="relative text-white-dark">
+                                                <input
+                                                    id="email"
+                                                    type="text"
+                                                    value={email}
+                                                    placeholder="Enter Email"
+                                                    className="form-input ps-10 placeholder:text-white-dark h-12"
+                                                    onChange={(e) => setEmail(e.target.value)}
+                                                />
+                                                <span className="absolute start-4 top-1/2 -translate-y-1/2">
+                                                    <IconMail fill={true} />
                                                 </span>
                                             </div>
                                         </Tab.Panel>

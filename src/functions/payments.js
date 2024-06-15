@@ -10,16 +10,15 @@ export const runPaymentForCustomer = async (paymentData) => {
     }
 };
 
-// ****FOR TESTING****
-// export const runPaymentForCustomer = async (paymentData) => {
-//     try {
-//         const response = await fetchData(`paysimple-test/runPayment`, 'post', paymentData);
-//         return response;
-//     } catch (error) {
-//         console.error(error);
-//         throw error;
-//     }
-// };
+export const runPaymentForQuickPay= async (paymentData) => {
+    try {
+        const response = await fetchData(`paysimple-helper/runPaymentForQuickPay`, 'post',  paymentData);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
 
 export const createNewPaySimpleCustomer = async (customerData) => {
     try {
@@ -31,20 +30,19 @@ export const createNewPaySimpleCustomer = async (customerData) => {
     }
 };
 
-// ****FOR TESTING****
-// export const createNewPaySimpleCustomer = async (customerData) => {
-//     try {
-//         const response = await fetchData(`paysimple-test/createNewCustomer`, 'post', customerData);
-//         return response;
-//     } catch (error) {
-//         console.error(error);
-//         throw error;
-//     }
-// };
 
 export const addCreditCardToCustomer = async (customerData) => {
     try {
         const response = await fetchData(`paysimple-helper/addCreditCardToCustomer`, 'post', customerData);
+        return response;
+    } catch (error) {
+        throw error;  
+    }
+};
+
+export const addCreditCardToCustomerForQuickPay = async (customerData) => {
+    try {
+        const response = await fetchData(`paysimple-helper/addCreditCardToCustomerForQuickPay`, 'post', customerData);
         return response;
     } catch (error) {
         throw error;  

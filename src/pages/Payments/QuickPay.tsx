@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch } from "react-redux";
+import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import 'flatpickr/dist/flatpickr.css';
-import { addCreditCardToCustomer, runPaymentForCustomer, createNewPaySimpleCustomer, addPaymentNotes } from '../../functions/payments';
+import { runPaymentForCustomer, createNewPaySimpleCustomer, addPaymentNotes, addCreditCardToCustomerForQuickPay, runPaymentForQuickPay } from '../../functions/payments';
 import { showMessage, showErrorMessage } from '../../functions/shared';
 import { UserAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import IconLock from '../../components/Icon/IconLock';
+import IconCreditCard from '../../components/Icon/IconCreditCard';
 
 interface PayDetails {
     studioId: number;
@@ -23,7 +26,8 @@ interface PayDetails {
 export default function QuickPay() {
     const { suid }: any = UserAuth();
     const [notes, setNotes] = useState<string>('');
-    
+    const [loading, setLoading] = useState<boolean>(false);
+
     const [payDetails, setPayDetails] = useState<PayDetails>({
         studioId: 0,
         paymentAccountId: 0,
@@ -42,6 +46,29 @@ export default function QuickPay() {
     useEffect(() => {
         dispatch(setPageTitle('Quickpay'));
     });
+
+    const navigate = useNavigate();
+
+    const handleCardChange = (event: any) => {
+        const { value } = event.target;
+
+        // Remove all non-digit characters
+        const digitsOnly = value.replace(/\D/g, '');
+
+        // Limit the number of digits to 16
+        const limitedDigits = digitsOnly.slice(0, 16);
+
+        // Remove spaces from the formatted value to store in the state
+        const cardNumber = limitedDigits;
+
+        // Add a space after every four digits for display
+        const formattedValue = cardNumber.replace(/(.{4})/g, '$1 ');
+
+        setPayDetails({ ...payDetails, cardNumber: cardNumber });
+
+        // Update the input value
+        event.target.value = formattedValue.trim();
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
@@ -77,6 +104,7 @@ export default function QuickPay() {
                     errorMessage = (error as any).message;
                 }
             }
+            setLoading(false);
             throw new Error(`Error adding card to customer: ${errorMessage}`);
         }
     };
@@ -91,7 +119,7 @@ export default function QuickPay() {
         };
 
         try {
-            const response = await addCreditCardToCustomer(data);
+            const response = await addCreditCardToCustomerForQuickPay(data);
 
             if (response && response.Response) {
                 const accountId = response.Response.Id;
@@ -110,6 +138,7 @@ export default function QuickPay() {
                     errorMessage = (error as any).message;
                 }
             }
+            setLoading(false);
             throw new Error(`Error adding card to customer: ${errorMessage}`);
         }
     };
@@ -118,10 +147,12 @@ export default function QuickPay() {
         const updatedPayDetails = {
             ...payDetails,
             studioId: suid,
-            paymentAccountId: accountId
+            paymentAccountId: accountId,
         };
         try {
-            const response = await runPaymentForCustomer(updatedPayDetails);
+            const res = await runPaymentForQuickPay(updatedPayDetails);
+
+            const response = res.Response;
 
             // Successful payment
             if (response && response.Status === 'Authorized') {
@@ -131,6 +162,7 @@ export default function QuickPay() {
                 showMessage('Payment Successful');
                 // After successful payment, add payment notes
                 addPaymentNotes(paymentId, notes);
+                navigate('/payments');
             }
             // Failed/declined payment
             else if (response && response.Status === 'Failed' && response.FailureData) {
@@ -155,12 +187,13 @@ export default function QuickPay() {
                 }
             }
             console.error(`Error running payment: ${errorMessage}`);
+            setLoading(false);
             throw new Error(`Error running payment: ${errorMessage}`);
         }
     };
 
-
     const handleRunPayment = async () => {
+        setLoading(true);
         try {
             const customerId = await createNewCustomer();
             if (customerId && customerId > 0) {
@@ -176,21 +209,21 @@ export default function QuickPay() {
         } catch (error) {
             console.log('Error in handleRunPayment:', error);
             showErrorMessage((error as Error).message);
+            setLoading(false);
         }
     };
 
-
     return (
         <div>
-            <div className="panel max-w-5xl mx-auto">
-                <div className="mb-5">
-                    <h5 className="font-semibold text-lg mb-4">Payment Info</h5>
+            <div className="panel rounded-b-lg p-0 max-w-xl mx-auto shadow-lg">
+                <div className=" bg-zinc-100 p-5 rounded-t-lg shadow border-b ">
+                    <h5 className="font-semibold text-lg mb-4">One Time Payment</h5>
                     <p>
-                        Use this option to run a quick <span className="text-primary">one-time payment </span>that won't be attached to any specific student record.{' '}
-                        <span className="text-danger">To run a payment that is attached to a student, visit that student info page and click the "QuickPay" button in the top right corner.</span>
+                        Use this option to run a quick <span className="font-bold">one-time payment </span>that won't be attached to any specific student record.{' '}
+                        <span className="text-danger block">To run a payment that is attached to a student, visit that student info page and click the "QuickPay" button in the top right corner.</span>
                     </p>
                 </div>
-                <div className="mb-5">
+                <div className="mb-5 p-5 bg-zinc-50 rounded-b-lg">
                     <form>
                         <div className="mb-5 grid grid-cols-1 sm:grid-cols-4 gap-4">
                             <div className="sm:col-span-2">
@@ -201,19 +234,31 @@ export default function QuickPay() {
                                 <label htmlFor="lastName">Last Name</label>
                                 <input id="lastName" type="text" placeholder="Last Name" className="form-input" value={payDetails.lastName} onChange={handleChange} />
                             </div>
-                            <div className="sm:col-span-2">
+                            <div className="sm:col-span-full">
                                 <label htmlFor="email">Email</label>
                                 <input id="emailForReceipt" type="text" placeholder="email@email.com" className="form-input" value={payDetails.emailForReceipt} onChange={handleChange} />
                             </div>
                         </div>
                         <div className="mb-5 grid grid-cols-1 sm:grid-cols-4 gap-4">
-                            <div className="sm:col-span-2">
+                            <div className="sm:col-span-full">
                                 <label htmlFor="cardNumber">Card Number</label>
-                                <input id="cardNumber" type="text" placeholder="Card Number" className="form-input" value={payDetails.cardNumber} onChange={handleChange} />
+                                <div className="relative mt-2 rounded-md shadow-sm">
+                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                        <IconCreditCard fill={true} className="h-5 w-5 text-zinc-400" aria-hidden="true" />
+                                    </div>
+                                    <input
+                                        id="cardNumber"
+                                        type="text"
+                                        placeholder="Card Number"
+                                        className="form-input pl-10"
+                                        value={payDetails.cardNumber.replace(/(.{4})/g, '$1 ').trim()}
+                                        onChange={handleCardChange}
+                                    />
+                                </div>
                             </div>
-                            <div>
+                            <div className="">
                                 <label htmlFor="expiryMonth">Card Expiry Month</label>
-                                <select id="expiryMonth" className="form-select text-white-dark" value={payDetails.expiryMonth} onChange={handleChange}>
+                                <select id="expiryMonth" className="form-select " value={payDetails.expiryMonth} onChange={handleChange}>
                                     <option value="01">01</option>
                                     <option value="02">02</option>
                                     <option value="03">03</option>
@@ -230,7 +275,7 @@ export default function QuickPay() {
                             </div>
                             <div>
                                 <label htmlFor="expiryYear">Card Expiry Year</label>
-                                <select id="expiryYear" className="form-select text-white-dark" value={payDetails.expiryYear} onChange={handleChange}>
+                                <select id="expiryYear" className="form-select " value={payDetails.expiryYear} onChange={handleChange}>
                                     <option value="2024">2024</option>
                                     <option value="2025">2025</option>
                                     <option value="2026">2026</option>
@@ -245,13 +290,12 @@ export default function QuickPay() {
                                     <option value="2035">2035</option>
                                 </select>
                             </div>
-                        </div>
-                        <div className="mb-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
+
+                            <div className="sm:col-span-2">
                                 <label htmlFor="billingZip">Billing Zip</label>
                                 <input id="billingZip" type="text" placeholder="Billing Zip" className="form-input" value={payDetails.billingZip} onChange={handleChange} />
                             </div>
-                            <div>
+                            <div className="col-span-full">
                                 <label htmlFor="amount">Amount</label>
                                 <div className="flex">
                                     <div className="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-white-light dark:border-[#17263c] dark:bg-[#1b2e4b]">
@@ -260,18 +304,24 @@ export default function QuickPay() {
                                     <input id="amount" type="text" placeholder="0.00" className="form-input ltr:rounded-l-none rtl:rounded-r-none" value={payDetails.amount} onChange={handleChange} />
                                 </div>
                             </div>
-                            <div>
+                            <div className="col-span-full">
                                 <label htmlFor="notes">Notes</label>
-                                <textarea
-                                    id="notes"
-                                    rows={3}
-                                    className="form-textarea"
-                                    onChange={(e) => setNotes(e.target.value)}
-                                ></textarea>
+                                <textarea id="notes" rows={4} className="form-textarea" onChange={(e) => setNotes(e.target.value)}></textarea>
                             </div>
                         </div>
-                        <button type="button" className="btn btn-primary" onClick={handleRunPayment}>
-                            Run Payment
+                        <button type="button" className="btn btn-primary btn-lg ml-auto" onClick={handleRunPayment}
+                        disabled={loading}
+                        >
+                            {loading ? (
+                                <>
+                                    <span className="animate-spin border-2 border-white border-l-transparent rounded-full w-5 h-5 ltr:mr-4 rtl:ml-4 inline-block align-middle"></span>
+                                    <div>Processing Payment</div>
+                                </>
+                            ) : (
+                                <>
+                                    <div>Run Payment</div>
+                                </>
+                            )}
                         </button>
                     </form>
                 </div>

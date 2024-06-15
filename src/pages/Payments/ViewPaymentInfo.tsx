@@ -36,7 +36,6 @@ export default function ViewPaymentInfo() {
 
     const paymentID: any = hashids.decode(payID)[0];
     const studID: any = hashids.decode(amyID)[0];
-    
 
     // useEffect(() => {
     //     if (parseInt(studID) !== parseInt(suid)) showMessage('You are not authorized to view this page');
@@ -383,9 +382,7 @@ export default function ViewPaymentInfo() {
                         {paymentInfo?.Status === 'Posted' && (
                             <div className="text-center mt-4 text-success">This payment is awaiting authorization. It can be refunded after it has left this status or has settled.</div>
                         )}
-                        {paymentInfo?.Status === 'RefundSettled' && (
-                            <div className="text-center mt-4 text-info">This payment is a refund and has settled.</div>
-                        )}
+                        {paymentInfo?.Status === 'RefundSettled' && <div className="text-center mt-4 text-info">This payment is a refund and has settled.</div>}
 
                         <div className="flex items-center gap-4 mt-4">
                             <div className="w-full">
@@ -414,55 +411,11 @@ export default function ViewPaymentInfo() {
                                     Refund Payment
                                 </button>
                             ) : (
-                                <Tippy content="Payment must be authorized to void">
-                                    <button className="btn btn-secondary w-full" onClick={() => handleVoidPayment()} disabled>
-                                        Void Payment
-                                    </button>
-                                </Tippy>
+                                <button className="btn btn-secondary w-full" onClick={() => handleVoidPayment()} disabled>
+                                    Void Payment
+                                </button>
                             )}
-                        </div>
-                        {/* {emailReciept && (
-                            <div className="mt-4 space-y-4">
-                                <h3 className="text-lg font-semibold">Email Reciept</h3>
-                                <div>
-                                    <label htmlFor="acno" className="block text-sm font-medium text-gray-700 dark:text-white">
-                                        From Email
-                                    </label>
-                                    <select id="acno" name="acno" className="form-select flex-1" value={fromEmail} onChange={(e) => setFromEmail(e.target.value)}>
-                                        <option value="" disabled>
-                                            Select Email
-                                        </option>
-                                        <option value={studioOptions?.EmailFromAddress}>{studioOptions?.EmailFromAddress}</option>
-                                        <option value={studioOptions?.EmailFromAddress2}>{studioOptions?.EmailFromAddress2}</option>
-                                        <option value={studioOptions?.EmailFromAddress3}>{studioOptions?.EmailFromAddress3}</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-white">
-                                        To
-                                    </label>
-                                    <input id="to" type="text" className="form-input" placeholder="Enter To" value={toEmail} onChange={(e) => setToEmail(e.target.value)} />
-                                </div>
-                                <div>
-                                    <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-white">
-                                        Any notes you would like to add to the receipt?
-                                    </label>
-                                    <textarea
-                                        id="notes"
-                                        name="notes"
-                                        rows={3}
-                                        className="form-textarea mt-1 block w-full shadow-sm  focus:ring-primary focus:border-primary sm:text-sm border-gray-300 rounded-md"
-                                        value={notes}
-                                        onChange={(e) => setNotes(e.target.value)}
-                                    />
-                                </div>
-                                <div className="flex">
-                                    <button className="btn btn-primary ml-auto gap-x-2" onClick={handleSendEmail}>
-                                        Send Email <IconSend />
-                                    </button>
-                                </div>
-                            </div>
-                        )} */}
+                        </div>                       
                     </div>
                 </div>
             </div>

@@ -8,15 +8,16 @@ import visaIcon from '../../assets/creditcardicons/visa.svg';
 import amexIcon from '../../assets/creditcardicons/amex.svg';
 import discoverIcon from '../../assets/creditcardicons/discover.svg';
 import genericIcon from '../../assets/creditcardicons/generic.svg';
-import { getAllCustomerPaymentAccounts, getPaymentByID, voidAPayment } from '../../functions/payments';
+import { addPaymentNotes, getAllCustomerPaymentAccounts, getPaymentByID, getPaymentNotes, voidAPayment } from '../../functions/payments';
 import { REACT_BASE_URL } from '../../constants';
 import { formatDate } from 'date-fns';
 import { sendIndividualEmail } from '../../functions/emails';
-import { hashTheID, showErrorMessage, showMessage, showWarningMessage } from '../../functions/shared';
+import { hashTheID, showErrorMessage, showMessage, showWarningMessage, statusCSS } from '../../functions/shared';
 import { Link } from 'react-router-dom';
 import IconSend from '../../components/Icon/IconSend';
 import { formatWithTimeZone, handleGetTimeZoneOfUser } from '../../functions/dates';
 import IconEye from '../../components/Icon/IconEye';
+import BaseEmail from '../Tools/BaseEmail';
 
 export default function PaymentInfoSlider({ payID }: any) {
     const { suid, studioInfo, studioOptions }: any = UserAuth();
@@ -30,6 +31,8 @@ export default function PaymentInfoSlider({ payID }: any) {
     const [notes, setNotes] = useState<any>('');
     const [fromEmail, setFromEmail] = useState<any>('');
     const [toEmail, setToEmail] = useState<any>('');
+    const [newNote, setNewNote] = useState<any>('');
+    const [paymentNotes, setPaymentNotes] = useState<any>('');
 
     const cardIcons: any = {
         Visa: visaIcon,
@@ -40,6 +43,7 @@ export default function PaymentInfoSlider({ payID }: any) {
     };
 
     const handleGetCustomerInfo = async (customerID: any) => {
+        console.log('customerID', customerID);
         try {
             getStudentIdFromPaysimpleCustomerId(customerID).then((res) => {
                 if (res.recordset) {
@@ -99,6 +103,15 @@ export default function PaymentInfoSlider({ payID }: any) {
         handleGetPaymeingInfo();
     }, []);
 
+    const handleGetNotes = async () => {
+        const paymentNotes = await getPaymentNotes(paymentInfo?.Id);
+        setPaymentNotes(paymentNotes[0].Notes);
+    };
+
+    useEffect(() => {
+        handleGetNotes();
+    }, [paymentInfo]);
+
     useEffect(() => {
         if (customerPaymentAccount.length > 0) {
             const card = customerPaymentAccount.find((card: any) => card.Id === paymentInfo.AccountId);
@@ -106,7 +119,22 @@ export default function PaymentInfoSlider({ payID }: any) {
         }
     }, [customerPaymentAccount, paymentInfo.AccountId]);
 
-    const recipieptHTML = async (invoiceId: any) => {
+    const handleAddNote = async () => {
+        if (!newNote) return showErrorMessage('Please add a note');
+        try {
+            const newNotes = `${paymentNotes}\n${newNote}`; // Create a new string with the new note appended
+            const res = await addPaymentNotes(paymentInfo.Id, newNotes);
+            if (res) {
+                console.log(res);
+                setPaymentNotes(newNotes); // Update the paymentNotes state with the new string
+                setNewNote('');
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const recipieptHTML = async () => {
         const htmlFOrEmail = `"<!DOCTYPE html>
         <html>
         <head>
@@ -166,7 +194,7 @@ export default function PaymentInfoSlider({ payID }: any) {
     const subjectForEmail = `Receipt #${payID} from ${studioInfo?.Studio_Name}`;
 
     const handleSendEmail = async () => {
-        const htmlData = await recipieptHTML(payID);
+        const htmlData = await recipieptHTML();
         const data = {
             studioId: suid,
             email: {
@@ -190,7 +218,7 @@ export default function PaymentInfoSlider({ payID }: any) {
     };
 
     const handlePrintReceipt = async () => {
-        const htmlData = await recipieptHTML(payID);
+        const htmlData = await recipieptHTML();
         const printWindow = window.open('', '_blank');
         printWindow?.document.open();
         printWindow?.document.write(htmlData);
@@ -247,6 +275,14 @@ export default function PaymentInfoSlider({ payID }: any) {
         }
     };
 
+    const mockEmail = {
+        to: 'bret@techbret.com',
+        from: studioOptions?.EmailFromAddress,
+        subject: subjectForEmail,
+        html: '',
+        deliverytime: null,
+    };
+
     return (
         <>
             <button className="text-info hover:text-blue-800 flex items-center gap-1" onClick={() => setOpen(true)}>
@@ -272,7 +308,7 @@ export default function PaymentInfoSlider({ payID }: any) {
                                         <div className="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl">
                                             <div className="px-4 sm:px-6">
                                                 <div className="flex items-start justify-between">
-                                                    <Dialog.Title className="text-base font-semibold leading-6 text-gray-900">Payment Information for #{payID}</Dialog.Title>
+                                                    <Dialog.Title className="text-base font-semibold leading-6 text-gray-900">Payment Information</Dialog.Title>
                                                     <div className="ml-3 flex h-7 items-center">
                                                         <button
                                                             type="button"
@@ -286,83 +322,48 @@ export default function PaymentInfoSlider({ payID }: any) {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="relative mt-6 flex-1 px-4 sm:px-6">
-                                                <div>
-                                                    <div className="flex items-center justify-between">
-                                                        <h2 className="text-xl">Payment Information</h2>
-                                                        <Link to="/payments/late-payment-pipeline" className="text-primary">
-                                                            View your payment pipeline
-                                                        </Link>
-                                                    </div>
-                                                    <div className='py-6'>
-                                                        <dt className="font-medium ">Card information</dt>
-                                                        <dd className="relative block bg-gradient-to-r from-cyan-200 via-teal-300 to-cyan-300 w-full rounded-lg hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-white p-4">
-                                                            <img src={cardIcons[creditCard?.Issuer ?? 'Generic']} alt="Visa" className="w-12 h-auto" />
-                                                            <p className="sr-only">{creditCard?.Issuer}</p>
-
-                                                            <div className="mt-4">
-                                                                <div className="flex items-center justify-between">
-                                                                    <div>
-                                                                        <label className="text-sm text-zinc-500">Card Number</label>
-                                                                        <div className="text-lg text-zinc-950 font-semibold -mt-2">{creditCard?.CreditCardNumber}</div>
-                                                                    </div>
-                                                                    <div>
-                                                                        <label className="text-sm text-zinc-500">Expires</label>
-                                                                        <div className="text-lg font-semibold text-zinc-950 -mt-2">{creditCard?.ExpirationDate}</div>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="flex items-center justify-between mt-4">
-                                                                    <div>
-                                                                        <label className="text-sm text-zinc-500">Card Holder</label>
-                                                                        <div className="text-xl font-bold text-zinc-950 -mt-2">{creditCard?.AccountHolderName}</div>
-                                                                    </div>
-                                                                  
-                                                                </div>
+                                            <div className="relative flex-1 px-4 sm:px-6">
+                                                <div className="py-6">
+                                                    <div className="bg-gray-100 dark:bg-gray-800 px-4 py-6 sm:rounded-lg sm:px-6 lg:flex lg:items-start lg:justify-between lg:px-8 ">
+                                                        <dl className="w-full divide-y divide-gray-200 text-sm ">
+                                                            <div className="flex items-center justify-between pb-4">
+                                                                <dt className="">Student</dt>
+                                                                {student?.First_Name || student?.Last_Name ? (
+                                                                    <dd className="font-medium ">
+                                                                        {' '}
+                                                                        <Link
+                                                                            to={`/students/view-student/${hashTheID(student.Student_id)}/${hashTheID(suid)}`}
+                                                                            className="text-info font-bold hover:text-blue-800 whitespace-nowrap "
+                                                                        >
+                                                                            {student?.First_Name} {student?.Last_Name}
+                                                                        </Link>
+                                                                    </dd>
+                                                                ) : (
+                                                                    <dd className="font-medium ">No Student Found</dd>
+                                                                )}
                                                             </div>
-                                                        </dd>
-                                                    </div>
-                                                    <div className="bg-gray-100 dark:bg-gray-800 px-4 py-6 sm:rounded-lg sm:px-6 lg:flex lg:items-start lg:justify-between lg:px-8 lg:py-8">
-                                                        <dl className="w-full grid grid-cols-2 gap-6 text-sm sm:grid-cols-2 md:gap-x-8 ">
-                                                            <div>
-                                                                <dt className="font-medium ">Billing Information</dt>
-                                                                <dd className="mt-3">
-                                                                        Student:{' '}
-                                                                        <span>
-                                                                            {' '}
-                                                                            <Link
-                                                                                to={`/students/view-student/${hashTheID(student.Student_id)}/${hashTheID(suid)}`}
-                                                                                className="text-info font-bold hover:text-blue-800 "
-                                                                            >
-                                                                                {student?.First_Name} {student?.Last_Name}
-                                                                            </Link>
-                                                                        
-                                                                    </span>
-                                                                    <span className="block mt-2">
-                                                                        Billing Account:{' '}
-                                                                        <span>
-                                                                            {' '}
-                                                                            <Link to="/students/update-billing" className="text-info font-bold hover:text-blue-800">
-                                                                                {paymentInfo?.CustomerFirstName} {paymentInfo?.CustomerLastName}
-                                                                            </Link>
-                                                                        </span>{' '}
-                                                                    </span>
-                                                                    <span className="block mt-8">
-                                                                        Status:{' '}
-                                                                        <span>
-                                                                            {' '}
-                                                                            <Link to="/students/update-billing" className="text-info font-bold hover:text-blue-800">
-                                                                                {paymentInfo?.Status}
-                                                                            </Link>
-                                                                        </span>{' '}
-                                                                    </span>
+                                                            <div className="flex items-center justify-between py-4">
+                                                                <dt className="">Billing Account</dt>
+                                                                <dd className="font-medium ">
+                                                                    <Link to="/students/update-billing" className="text-info font-bold hover:text-blue-800">
+                                                                        {paymentInfo?.CustomerFirstName} {paymentInfo?.CustomerLastName}
+                                                                    </Link>
                                                                 </dd>
                                                             </div>
-                                                        </dl>
-
-                                                        <dl className="mt-8 w-full divide-y divide-gray-200 text-sm lg:mt-0">
-                                                            <div className="flex items-center justify-between pb-4">
+                                                            <div className="flex items-center justify-between py-4">
+                                                                <dt className="">Status</dt>
+                                                                <dd className={`font-medium ${statusCSS(paymentInfo?.Status)}`}>{paymentInfo?.Status}</dd>
+                                                            </div>
+                                                            <div className="flex items-center justify-between py-4">
+                                                                <dt className="">Card Info</dt>
+                                                                <dd className="font-bold flex items-center gap-x-1">
+                                                                    <img src={cardIcons[creditCard?.Issuer ?? 'Generic']} alt="Visa" className="w-8 h-auto" />
+                                                                    {creditCard?.CreditCardNumber}{' '}
+                                                                </dd>
+                                                            </div>
+                                                            <div className="flex items-center justify-between py-4">
                                                                 <dt className="">Can Void Until</dt>
-                                                                <dd className="font-medium ">{}</dd>
+                                                                <dd className="font-medium ">{formatWithTimeZone(new Date(paymentInfo?.CanVoidUntil), handleGetTimeZoneOfUser)}</dd>
                                                             </div>
                                                             <div className="flex items-center justify-between py-4">
                                                                 <dt className="">Transaction ID</dt>
@@ -372,74 +373,107 @@ export default function PaymentInfoSlider({ payID }: any) {
                                                                 <dt className="">Authorization Code</dt>
                                                                 <dd className="font-medium ">{paymentInfo?.ProviderAuthCode}</dd>
                                                             </div>
+                                                            <div className="flex items-center justify-between py-4">
+                                                                <dt className="">Payment Schedule Id</dt>
+                                                                <dd className="font-medium ">{paymentInfo?.RecurringScheduleId}</dd>
+                                                            </div>
+
                                                             <div className="flex items-center justify-between pt-4 text-2xl">
                                                                 <dt className="font-medium text-gray-900 dark:text-white">Amount</dt>
                                                                 <dd className="font-medium text-success">${paymentInfo?.Amount?.toFixed(2)}</dd>
                                                             </div>
                                                         </dl>
                                                     </div>
+                                                    {paymentInfo?.Status === 'Posted' && (
+                                                        <div className="text-center mt-4 text-success">
+                                                            This payment is awaiting authorization. It can be refunded after it has left this status or has settled.
+                                                        </div>
+                                                    )}
+                                                    {paymentInfo?.Status === 'RefundSettled' && <div className="text-center mt-4 text-info">This payment is a refund and has settled.</div>}
+
                                                     <div className="flex items-center gap-4 mt-4">
-                                                        <button className="btn btn-info w-full" onClick={() => setEmailReciept(!emailReciept)}>
-                                                            Email Reciept
-                                                        </button>
+                                                        <div className="w-full">
+                                                            <BaseEmail
+                                                                email={mockEmail}
+                                                                emailhtml={recipieptHTML()}
+                                                                setNotes={setNotes}
+                                                                notes={notes}
+                                                                title={'Email Reciept'}
+                                                                additional="Any notes you would like to add to the receipt?"
+                                                            />
+                                                        </div>
                                                         <button className="btn btn-primary w-full" onClick={() => handlePrintReceipt()}>
                                                             Print Reciept
                                                         </button>
-                                                        <button
-                                                            className="btn btn-secondary w-full"
-                                                            onClick={() => handleVoidPayment()}
-                                                            disabled={
-                                                                paymentInfo?.Status === 'Voided' ||
-                                                                paymentInfo?.Status === 'Declined' ||
-                                                                paymentInfo?.Status === 'Refunded' ||
-                                                                paymentInfo?.Status === 'Voided'
-                                                            }
-                                                        >
-                                                            Void Payment
-                                                        </button>
+                                                        {paymentInfo?.Status === 'Authorized' ? (
+                                                            <button
+                                                                className="btn btn-secondary w-full"
+                                                                onClick={() => handleVoidPayment()}
+                                                                disabled={
+                                                                    paymentInfo?.Status === 'Settled' ||
+                                                                    paymentInfo?.Status === 'Declined' ||
+                                                                    paymentInfo?.Status === 'Refunded' ||
+                                                                    paymentInfo?.Status === 'Voided'
+                                                                }
+                                                            >
+                                                                Void Payment
+                                                            </button>
+                                                        ) : paymentInfo?.Status === 'Settled' ? (
+                                                            <button className="btn btn-danger w-full" onClick={() => handleVoidPayment()}>
+                                                                Refund Payment
+                                                            </button>
+                                                        ) : (
+                                                            <button className="btn btn-secondary w-full" onClick={() => handleVoidPayment()} disabled>
+                                                                Void Payment
+                                                            </button>
+                                                        )}
                                                     </div>
-                                                    {/* {emailReciept && (
-                                                        <div className="mt-4 space-y-4">
-                                                            <h3 className="text-lg font-semibold">Email Reciept</h3>
-                                                            <div>
-                                                                <label htmlFor="acno" className="block text-sm font-medium text-gray-700 dark:text-white">
-                                                                    From Email
-                                                                </label>
-                                                                <select id="acno" name="acno" className="form-select flex-1" value={fromEmail} onChange={(e) => setFromEmail(e.target.value)}>
-                                                                    <option value="" disabled>
-                                                                        Select Email
-                                                                    </option>
-                                                                    <option value={studioOptions?.EmailFromAddress}>{studioOptions?.EmailFromAddress}</option>
-                                                                    <option value={studioOptions?.EmailFromAddress2}>{studioOptions?.EmailFromAddress2}</option>
-                                                                    <option value={studioOptions?.EmailFromAddress3}>{studioOptions?.EmailFromAddress3}</option>
-                                                                </select>
-                                                            </div>
-                                                            <div>
-                                                                <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-white">
-                                                                    To
-                                                                </label>
-                                                                <input id="to" type="text" className="form-input" placeholder="Enter To" value={toEmail} onChange={(e) => setToEmail(e.target.value)} />
-                                                            </div>
-                                                            <div>
-                                                                <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-white">
-                                                                    Any notes you would like to add to the receipt?
-                                                                </label>
-                                                                <textarea
-                                                                    id="notes"
-                                                                    name="notes"
-                                                                    rows={3}
-                                                                    className="form-textarea mt-1 block w-full shadow-sm  focus:ring-primary focus:border-primary sm:text-sm border-gray-300 rounded-md"
-                                                                    value={notes}
-                                                                    onChange={(e) => setNotes(e.target.value)}
-                                                                />
-                                                            </div>
-                                                            <div className="flex">
-                                                                <button className="btn btn-primary ml-auto gap-x-2" onClick={handleSendEmail}>
-                                                                    Send Email <IconSend />
-                                                                </button>
-                                                            </div>
+                                                    <div className="panel p-0 relative">
+                                                        <div className="p-5 pb-20">
+                                                            <h2 className="text-xl">Late Payment Notes</h2>
+                                                            {paymentNotes !== '' && (
+                                                                <div className="p-3 bg-dark-light/50 dark:bg-dark mt-2 border rounded-sm">
+                                                                    {paymentNotes?.split('\n').map((note: any, index: any) => {
+                                                                        return (
+                                                                            <div key={index} className={`${note?.length > 1 && 'p-2 border-b border-dashed border-zinc-400 dark:border-gray-700'} `}>
+                                                                                <p>{note}</p>
+                                                                            </div>
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                            )}
+
+                                                            <textarea
+                                                                className="form-textarea w-full h-20 mt-4"
+                                                                placeholder="Add a note"
+                                                                value={newNote}
+                                                                onChange={(e) => setNewNote(e.target.value)}
+                                                            />
+                                                            {!newNote && <p className="text-danger text-xs text-center">*To add a new note begin typing</p>}
                                                         </div>
-                                                    )} */}
+                                                        <div className="absolute bottom-0 right-0 left-0">
+                                                            <button
+                                                                className="cursor-pointer w-full p-5 border-t rounded-b-lg text-center font-semibold text-success hover:bg-success/10 whitespace-nowrap
+                                                    disabled:text-zinc-300 disabled:bg-dark-light
+                                                    "
+                                                                onClick={handleAddNote}
+                                                                disabled={!newNote}
+                                                            >
+                                                                Save New Note
+                                                            </button>
+                                                        </div>
+                                                        <div className="absolute bottom-0 right-0 left-0">
+                                                            <button
+                                                                className="cursor-pointer w-full p-5 border-t rounded-b-lg text-center font-semibold text-success hover:bg-success/10 whitespace-nowrap
+                                                    disabled:text-zinc-300 disabled:bg-dark-light
+                                                    "
+                                                                onClick={handleAddNote}
+                                                                disabled={!newNote}
+                                                            >
+                                                                Save New Note
+                                                            </button>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

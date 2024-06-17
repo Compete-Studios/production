@@ -30,7 +30,9 @@ const LoginBoxed = () => {
     const submitForm = async (e: any) => {
         e.preventDefault();
         let response = null;
-        if (selectedIndex === 1) {
+        const doesUsernameContainAt = userName.includes('@');
+        console.log(doesUsernameContainAt);
+        if (!doesUsernameContainAt) {
             response = await login(userName, password);
             if (rememberCrudentials) {
                 const data = {
@@ -41,11 +43,10 @@ const LoginBoxed = () => {
                 localStorage.setItem('loginData', JSON.stringify(data));
             }
         } else {
-            response = await emailLogin(email, password);
+            response = await emailLogin(userName, password);
             if (rememberCrudentials) {
                 const data = {
                     username: userName,
-                    email: email,
                     remember: rememberCrudentials,
                 };
                 localStorage.setItem('loginData', JSON.stringify(data));
@@ -116,73 +117,24 @@ const LoginBoxed = () => {
                             </div>
                             <form className="space-y-5 dark:text-white" onSubmit={(e) => submitForm(e)}>
                                 {error && <Error message={errorMessage} handleClear={handleClear} />}
-                                <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
-                                    <Tab.List className="mt-3 flex flex-wrap">
-                                    <Tab as={Fragment}>
-                                            {({ selected }) => (
-                                                <button
-                                                    className={`${
-                                                        selected ? 'text-info !outline-none before:!w-full' : ''
-                                                    } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full gap-x-1`}
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-person-fill-lock" viewBox="0 0 16 16">
-                                                        <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0m-9 8c0 1 1 1 1 1h5v-1a2 2 0 0 1 .01-.2 4.49 4.49 0 0 1 1.534-3.693Q8.844 9.002 8 9c-5 0-6 3-6 4m7 0a1 1 0 0 1 1-1v-1a2 2 0 1 1 4 0v1a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1zm3-3a1 1 0 0 0-1 1v1h2v-1a1 1 0 0 0-1-1" />
-                                                    </svg>
-                                                    Username
-                                                </button>
-                                            )}
-                                        </Tab>
-                                        <Tab as={Fragment}>
-                                            {({ selected }) => (
-                                                <button
-                                                    className={`${
-                                                        selected ? 'text-info !outline-none before:!w-full' : ''
-                                                    } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full gap-x-1`}
-                                                >
-                                                    <IconMail />
-                                                    Email
-                                                </button>
-                                            )}
-                                        </Tab>
-                                       
-                                    </Tab.List>
-
-                                    <Tab.Panels>
-                                       
-                                        <Tab.Panel>
-                                            <div className="relative text-white-dark">
-                                                <input
-                                                    id="username"
-                                                    type="text"
-                                                    value={userName}
-                                                    placeholder="Enter Username"
-                                                    className="form-input ps-10 placeholder:text-white-dark h-12"
-                                                    onChange={(e) => setUserName(e.target.value)}
-                                                />
-                                                <span className="absolute start-4 top-1/2 -translate-y-1/2">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-person-fill-lock" viewBox="0 0 16 16">
-                                                        <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0m-9 8c0 1 1 1 1 1h5v-1a2 2 0 0 1 .01-.2 4.49 4.49 0 0 1 1.534-3.693Q8.844 9.002 8 9c-5 0-6 3-6 4m7 0a1 1 0 0 1 1-1v-1a2 2 0 1 1 4 0v1a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1zm3-3a1 1 0 0 0-1 1v1h2v-1a1 1 0 0 0-1-1" />
-                                                    </svg>
-                                                </span>
-                                            </div>
-                                        </Tab.Panel>
-                                        <Tab.Panel>
-                                            <div className="relative text-white-dark">
-                                                <input
-                                                    id="email"
-                                                    type="text"
-                                                    value={email}
-                                                    placeholder="Enter Email"
-                                                    className="form-input ps-10 placeholder:text-white-dark h-12"
-                                                    onChange={(e) => setEmail(e.target.value)}
-                                                />
-                                                <span className="absolute start-4 top-1/2 -translate-y-1/2">
-                                                    <IconMail fill={true} />
-                                                </span>
-                                            </div>
-                                        </Tab.Panel>
-                                    </Tab.Panels>
-                                </Tab.Group>
+                                <div>
+                                    <label htmlFor="email">Email or Username</label>
+                                    <div className="relative text-white-dark">
+                                        <input
+                                            id="username"
+                                            type="text"
+                                            value={userName}
+                                            placeholder="Enter Username or Email Address"
+                                            className="form-input ps-10 placeholder:text-white-dark h-12"
+                                            onChange={(e) => setUserName(e.target.value)}
+                                        />
+                                        <span className="absolute start-4 top-1/2 -translate-y-1/2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-person-fill-lock" viewBox="0 0 16 16">
+                                                <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0m-9 8c0 1 1 1 1 1h5v-1a2 2 0 0 1 .01-.2 4.49 4.49 0 0 1 1.534-3.693Q8.844 9.002 8 9c-5 0-6 3-6 4m7 0a1 1 0 0 1 1-1v-1a2 2 0 1 1 4 0v1a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1zm3-3a1 1 0 0 0-1 1v1h2v-1a1 1 0 0 0-1-1" />
+                                            </svg>
+                                        </span>
+                                    </div>
+                                </div>
 
                                 <div>
                                     <label htmlFor="Password">Password</label>

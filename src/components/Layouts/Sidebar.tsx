@@ -40,9 +40,7 @@ const Sidebar = () => {
         setCurrentMenu((oldValue) => {
             return oldValue === value ? '' : value;
         });
-    };   
-
-
+    };
 
     useEffect(() => {
         const selector = document.querySelector('.sidebar ul a[href="' + window.location.pathname + '"]');
@@ -67,8 +65,6 @@ const Sidebar = () => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location]);
-
-  
 
     return (
         <div className={semidark ? 'dark' : ''}>
@@ -217,7 +213,9 @@ const Sidebar = () => {
                                             <NavLink to="/payments/quick-pay">Quick Pay</NavLink>
                                         </li>
                                         <li>
-                                            <NavLink to="/payments/late-payment-pipeline" className="whitespace-nowrap">Late Payment Pipeline</NavLink>
+                                            <NavLink to="/payments/late-payment-pipeline" className="whitespace-nowrap">
+                                                Late Payment Pipeline
+                                            </NavLink>
                                         </li>
                                         <li>
                                             <NavLink to="/payments/view-invoices">View Invoices</NavLink>
@@ -321,14 +319,22 @@ const Sidebar = () => {
                             </h2>
                             <li className="nav-item">
                                 <ul>
-                                <li className="nav-item">
+                                    <li className="nav-item">
+                                        <NavLink to="/marketing/view-emails" className="group">
+                                            <div className="flex items-center">
+                                                <IconMenuMailbox className="group-hover:!text-primary shrink-0" />
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('View Emails')}</span>
+                                            </div>
+                                        </NavLink>
+                                    </li>
+                                    <li className="nav-item">
                                         <NavLink to="/apps/chat" className="group">
                                             <div className="flex items-center">
                                                 <IconMenuChat className="group-hover:!text-primary shrink-0" />
                                                 <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Text Messages')}</span>
                                             </div>
                                         </NavLink>
-                                    </li>    
+                                    </li>
                                     {/* <li className="nav-item">
                                         <NavLink to="/apps/todolist" className="group">
                                             <div className="flex items-center">
@@ -370,7 +376,7 @@ const Sidebar = () => {
                                             </div>
                                         </NavLink>
                                     </li> */}
-                                 
+
                                     {/* {!isMaster && (
                                         <li className="menu nav-item">
                                             <button type="button" className={`${currentMenu === 'master' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('master')}>

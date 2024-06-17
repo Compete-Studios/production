@@ -39,3 +39,14 @@ export const getMonthlyLimit = async (studioId) => {
         throw error;
     }
 };
+
+export const getEmailLogsByStudioId = async (data) => {
+    console.log(data);
+    try {
+        const response = await fetchData(`email/getEmailLogsByStudioId`, 'get', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};

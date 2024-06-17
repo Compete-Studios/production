@@ -34,6 +34,7 @@ export default function AuthContextProvider({ children }: any) {
     const [masterStudio, setMasterStudio] = useState<any>(null);
     const [layout, setLayout] = useState<any>({});
     const [update, setUpdate] = useState(false);
+    const [inactiveStudents, setInactiveStudents] = useState<any>([]);
     const [toActivate, setToActivate] = useState<any>({
         status: false,
         prospect: null,
@@ -105,17 +106,19 @@ export default function AuthContextProvider({ children }: any) {
         }
     };
 
+   
+
     const getStudioInfo = async (suid: any, main: any) => {
         try {
             const docSnap = await fetchRecordSet(`${REACT_API_BASE_URL}/studio-access/getStudioInfo/${suid}`, setStudioInfo);
             let mainSnap = docSnap.recordset[0];
             const mstrstudioResponse = await fetchRecordSet(`${REACT_API_BASE_URL}/studio-access/getStudioInfo/${main}`, setMasterStudio);
             const mstr = mstrstudioResponse.recordset[0];
-    
+
             if (main !== suid) {
-                mainSnap = await fetchRecordSet(`${REACT_API_BASE_URL}/studio-access/getStudioInfo/${suid}`, setStudioInfo)
+                mainSnap = await fetchRecordSet(`${REACT_API_BASE_URL}/studio-access/getStudioInfo/${suid}`, setStudioInfo);
             }
-    
+
             if (mainSnap) {
                 if (mstr.MasterStudio === 1) {
                     setIsMaster(true);
@@ -130,7 +133,7 @@ export default function AuthContextProvider({ children }: any) {
             console.error(error);
         }
     };
-    
+
     const getStudioNameById = async (id: any) => {
         try {
             const response = await fetchFromAPI(`studio-access/getStudioInfo/${id}`, {
@@ -230,6 +233,7 @@ export default function AuthContextProvider({ children }: any) {
                 logo,
                 setLogo,
                 isAdmin,
+                inactiveStudents,
             }}
         >
             {children}

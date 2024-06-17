@@ -51,7 +51,6 @@ const TextAllStaff = lazy(() => import('../pages/Staff/TextAllStaff'));
 const AddToEmailLIst = lazy(() => import('../pages/Staff/AddToEmailLIst'));
 const SearchStaff = lazy(() => import('../pages/Staff/SearchStaff'));
 
-
 // Classes
 const ViewClasses = lazy(() => import('../pages/Classes/ViewClasses'));
 const ViewRoster = lazy(() => import('../pages/Classes/ViewRoster'));
@@ -170,6 +169,7 @@ const MasterStudios = lazy(() => import('../admin/studios/MasterStudios'));
 const SetMasterStudio = lazy(() => import('../admin/studios/SetMasterStudio'));
 const Issues = lazy(() => import('../admin/Issues'));
 const Sprint = lazy(() => import('../admin/Sprint'));
+const ManageStudioAccounts = lazy(() => import('../admin/ManageStudioAccounts'));
 
 const routes = [
     //Authentication
@@ -300,9 +300,8 @@ const routes = [
     },
     {
         path: '/reports/anticipated-payments',
-        element: <AnticipatedPayments />
+        element: <AnticipatedPayments />,
     },
-    
 
     //classes
     {
@@ -608,7 +607,6 @@ const routes = [
         path: '/marketing/landing-page-preview/:lpid',
         element: <LandingPagePreview />,
         layout: 'blank',
-
     },
     {
         path: '/marketing/edit-method',
@@ -767,8 +765,8 @@ const routes = [
         element: <CompeteLegacyForms />,
         layout: 'blank',
     },
-     //admin
-     {
+    //admin
+    {
         path: '/admin/studios',
         element: <ViewStudios />,
         layout: 'admin',
@@ -788,7 +786,7 @@ const routes = [
         element: <MasterStudios />,
         layout: 'admin',
     },
-    
+
     {
         path: '/admin/set-master',
         element: <SetMasterStudio />,
@@ -804,6 +802,12 @@ const routes = [
     {
         path: '/admin/sprint',
         element: <Sprint />,
+        layout: 'admin',
+    },
+
+    {
+        path: '/admin/crudentials',
+        element: <ManageStudioAccounts />,
         layout: 'admin',
     },
 

@@ -14,7 +14,7 @@ import { createEvent } from '../../firebase/auth';
 import { UserAuth } from '../../context/AuthContext';
 
 const Calendar = () => {
-    const { suid } : any = UserAuth();
+    const { suid, inactiveStudents } : any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Calendar'));
@@ -26,6 +26,8 @@ const Calendar = () => {
         return str;
         // return dt.getMonth() < 10 ? '0' + month : month;
     };
+
+    console.log('inactiveStudents', inactiveStudents);
 
     const [events, setEvents] = useState<any>([
         {

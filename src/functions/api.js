@@ -389,6 +389,36 @@ export const searchProspectsByValues = async (queryParams) => {
     }
 };
 
+export const searchProspectsByPhone = async (queryParams) => {
+    try {
+        const response = await fetchData(`student-access/searchProspectsByPhoneNumber`, 'post', queryParams);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const searchStudentsByPhone = async (queryParams) => {
+    try {
+        const response = await fetchData(`student-access/searchStudentsByPhone`, 'post', queryParams);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const searchStaffByPhone = async (queryParams) => {
+    try {
+        const response = await fetchData(`staff-access/searchStaffByPhone`, 'post', queryParams);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const getPaymentPipelineStepsByStudioId = async (studioId) => {
     try {
         const response = await fetchData(`student-access/getPaymentPipelineStepsByStudioId/${studioId}`, 'get');

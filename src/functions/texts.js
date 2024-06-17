@@ -20,3 +20,13 @@ export const getTextLogsByStudioId = async (data) => {
         throw error;
     }
 };
+
+export const getTextLogsByStudioIdPhone = async (data) => {
+    try {
+        const response = await fetchData(`text-helper/getTextLogsByStudioIdAndPhone`, "post", data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};

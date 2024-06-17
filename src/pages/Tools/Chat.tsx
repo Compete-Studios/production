@@ -31,9 +31,10 @@ import IconLoader from '../../components/Icon/IconLoader';
 import { constFormateDateMMDDYYYY } from '../../functions/shared';
 import IconX from '../../components/Icon/IconX';
 import { formatDate } from 'date-fns';
+import { searchProspectsByPhone, searchStaffByPhone, searchStudentsByPhone } from '../../functions/api';
 
 const Chat = () => {
-    const { suid, studioOptions, studioInfo, students }: any = UserAuth();
+    const { suid, studioOptions, studioInfo, students, staff }: any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Chat'));
@@ -53,12 +54,13 @@ const Chat = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [limitOfMessages, setLimitOfMessages] = useState<number>(100);
     //start date is 7 days ago
-    const [startDate, setStartDate] = useState<string>(new Date(new Date().setDate(new Date().getDate() - 7)).toISOString().split('T')[0]);
+    const [startDate, setStartDate] = useState<string>(new Date(new Date().setDate(new Date().getDate() - 2)).toISOString().split('T')[0]);
     const [endDate, setEndDate] = useState<string>(new Date().toISOString().split('T')[0]);
 
-    //format
+    // const [startDate, setStartDate] = useState<string>('2022-12-01');
+    // const [endDate, setEndDate] = useState<string>('2022-12-5');
 
-   
+    //format
 
     const getCreatedTimeFromTimeStamp = (timeStamp: any) => {
         const date = new Date(timeStamp);
@@ -79,79 +81,137 @@ const Chat = () => {
         return `${hours}:${paddedMinutes} ${ampm}`;
     };
 
-    const getTextLog = async () => {
-        const formatStartDate = constFormateDateMMDDYYYY(startDate);
-        const formatEndDate = constFormateDateMMDDYYYY(endDate);
-        const dataToSend = {
-            studioId: suid,
-            startDate: formatStartDate,
-            endDate: formatEndDate,
-        };
-
+    const checkStudent = async (phoneNumber: string) => {
         try {
-            setLoading(true);
-            const response = await getTextLogsByStudioId(dataToSend);
-            const rawChatList = response.recordset;
-            console.log('rawChatList:', rawChatList)
-
-            if (response.recordset?.length === 0) {
-                return;
+            const queryData = {
+                studioId: suid,
+                number: phoneNumber,
+            };
+    
+            // Check if the phone number belongs to a staff member
+            const staffResponse = await searchStaffByPhone(queryData);
+            if (staffResponse.recordset.length > 0) {
+                return {
+                    name: staffResponse.recordset[0].FirstName,
+                    type: 'staff',
+                };
             }
-
-            // Initialize an object to store messages by phone number
-            const messageThreads: any = {};
-
-            // Helper function to remove "+1" prefix from phone number
-            // Helper function to remove "+1" prefix and leading whitespace from phone number
-            const removePlusOne = (phoneNumber: string) => phoneNumber.replace(/^(\+?1|\+1|\b1)/, '').trim();
-
-            // Iterate through each chat message
-            rawChatList.forEach((chat: any) => {
-                let phoneNumber: any = chat.FromNumber === studioOptions?.TextFromNumber ? chat.ToNumber : chat.FromNumber;
-
-                // Remove "+1" prefix from the phone number
-                phoneNumber = removePlusOne(phoneNumber);
-
-                // If this phone number is not yet in the messageThreads object, create an entry for it
-                if (!messageThreads[phoneNumber]) {
-                    messageThreads[phoneNumber] = {
-                        userId: phoneNumber,
-                        name: students.find((student: any) => student.Phone === phoneNumber)?.Name || phoneNumber,
-                        path: 'profile-16.jpeg',
-                        time: getCreatedTimeFromTimeStamp(chat.CreationDate),
-                        preview: chat.Body,
-                        messages: [], // Initialize messages array for this phone number
-                        active: false,
-                    };
-                }
-
-                // Push the current message into the messages array for this phone number
-                messageThreads[phoneNumber].messages.push({
-                    fromUserId: removePlusOne(chat.FromNumber),
-                    toUserId: removePlusOne(chat.ToNumber),
-                    text: chat.Body,
-                });
-            });
-
-            // Convert the messageThreads object into an array of message threads
-            const newOrganizedChatList = Object.values(messageThreads);
-
-            setTextLog((prevLogs) => [...prevLogs, ...newOrganizedChatList]);
+    
+            // Check if the phone number belongs to a student
+            const studentResponse = await searchStudentsByPhone(queryData);
+            if (studentResponse.recordset.length > 0) {
+                return {
+                    name: studentResponse.recordset[0].First_Name,
+                    type: studentResponse.recordset[0].activity === 1 ? 'student' : 'inactive',
+                };
+            }
+    
+            // Check if the phone number belongs to a prospect
+            const prospectResponse = await searchProspectsByPhone(queryData);
+            if (prospectResponse.recordset.length > 0) {
+                return {
+                    name: prospectResponse.recordset[0].FName,
+                    type: 'prospect',
+                };
+            }
+    
+            // If not found in any category, return unknown
+            return {
+                name: phoneNumber,
+                type: 'unknown',
+            };
         } catch (error) {
             console.error('Error:', error);
-        } finally {
-            setLoading(false);
+            return {
+                name: phoneNumber,
+                type: 'error',
+            };
         }
     };
+    
 
-    useEffect(() => {
-        getTextLog();
-    }, [suid]);
+    // const getTextLog = async () => {
+    //     const formatStartDate = constFormateDateMMDDYYYY(startDate);
+    //     const formatEndDate = constFormateDateMMDDYYYY(endDate);
+    //     const dataToSend = {
+    //         studioId: suid,
+    //         startDate: formatStartDate,
+    //         endDate: formatEndDate,
+    //     };
+
+    //     try {
+    //         setLoading(true);
+    //         const response = await getTextLogsByStudioId(dataToSend);
+    //         const rawChatList = response.recordset;
+    //         console.log('rawChatList:', rawChatList);
+
+    //         if (response.recordset?.length === 0) {
+    //             return;
+    //         }
+
+    //         // Initialize an object to store messages by phone number
+    //         const messageThreads: any = {};
+
+    //         // Helper function to remove "+1" prefix from phone number
+    //         const removePlusOne = (phoneNumber: string) => phoneNumber.replace(/^(\+?1|\+1|\b1)/, '').trim();
+
+    //         // Create an array of promises for resolving checkStudent
+    //         const promises = rawChatList.map(async (chat: any) => {
+    //             let phoneNumber: any = chat.FromNumber === studioOptions?.TextFromNumber ? chat.ToNumber : chat.FromNumber;
+
+    //             // Remove "+1" prefix from the phone number
+    //             phoneNumber = removePlusOne(phoneNumber);
+
+    //             // Await the result of checkStudent
+    //             const nameObject = await checkStudent(phoneNumber);
+    //             const textingname: any = nameObject.name;
+    //             const textingtype: any = nameObject.type;
+
+    //             // If this phone number is not yet in the messageThreads object, create an entry for it
+    //             if (!messageThreads[phoneNumber]) {
+    //                 messageThreads[phoneNumber] = {
+    //                     userId: phoneNumber,
+    //                     name: textingname,
+    //                     path: 'profile-16.jpeg',
+    //                     time: getCreatedTimeFromTimeStamp(chat.CreationDate),
+    //                     preview: chat.Body,
+    //                     messages: [], // Initialize messages array for this phone number
+    //                     active: false,
+    //                     type: textingtype,
+    //                 };
+    //             }
+
+    //             // Push the current message into the messages array for this phone number
+    //             messageThreads[phoneNumber].messages.push({
+    //                 fromUserId: removePlusOne(chat.FromNumber),
+    //                 toUserId: removePlusOne(chat.ToNumber),
+    //                 text: chat.Body,
+    //             });
+    //         });
+
+    //         // Wait for all promises to resolve
+    //         await Promise.all(promises);
+
+    //         // Convert the messageThreads object into an array of message threads
+    //         const newOrganizedChatList = Object.values(messageThreads);
+
+    //         setTextLog((prevLogs) => [...prevLogs, ...newOrganizedChatList]);
+    //     } catch (error) {
+    //         console.error('Error:', error);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
+
+    // useEffect(() => {
+    //     getTextLog();
+    // }, [suid]);
+  
 
     useEffect(() => {
         setFilteredItems(() => {
             return textLog.filter((d) => {
-                return d.name.toLowerCase().includes(searchUser.toLowerCase());
+                return d.name?.toLowerCase().includes(searchUser?.toLowerCase());
             });
         });
     }, [searchUser, textLog]);
@@ -205,36 +265,36 @@ const Chat = () => {
                             </div>
                         </div>
                     </div>
-                    {updateDates ? (<div className="space-y-4">
-                        <div className='flex'>
-                            <button type="button" className="text-danger flex items-center ml-auto" onClick={() => setUpdateDates(false)}>
-                              <IconX />  Close
-                            </button>
+                    {updateDates ? (
+                        <div className="space-y-4">
+                            <div className="flex">
+                                <button type="button" className="text-danger flex items-center ml-auto" onClick={() => setUpdateDates(false)}>
+                                    <IconX /> Close
+                                </button>
+                            </div>
+                            <div>
+                                <label>Start Date</label>
+                                <input type="date" className="form-input" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                            </div>
+                            <div>
+                                <label>End Date</label>
+                                <input type="date" className="form-input" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+                            </div>
+                            <div className="flex">
+                                <button type="button" className="btn btn-primary ml-auto" onClick={getTextLog}>
+                                    Search
+                                </button>
+                            </div>
                         </div>
-                        <div>
-                            <label>Start Date</label>
-                            <input type="date" className="form-input" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-                        </div>
-                        <div>
-                            <label>End Date</label>
-                            <input type="date" className="form-input" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-                        </div>
-                        <div className='flex'>
-                            
-                            <button type="button" className="btn btn-primary ml-auto" onClick={getTextLog}>
-                                Search
-                            </button>
-                        </div>
-                    </div>) : (
+                    ) : (
                         <div className="flex items-center justify-between">
                             {formatDate(new Date(startDate), 'MM/dd/yyyy')} - {formatDate(new Date(endDate), 'MM/dd/yyyy')}
                             <button type="button" className="text-primary" onClick={() => setUpdateDates(true)}>
-                                
                                 Update Dates
                             </button>
                         </div>
                     )}
-                    
+
                     <div className="relative">
                         <input type="text" className="form-input peer ltr:pr-9 rtl:pl-9" placeholder="Searching..." value={searchUser} onChange={(e) => setSearchUser(e.target.value)} />
                         <div className="absolute ltr:right-2 rtl:left-2 top-1/2 -translate-y-1/2 peer-focus:text-primary">
@@ -243,7 +303,12 @@ const Chat = () => {
                     </div>
                     <div className="h-px w-full border-b border-white-light dark:border-[#1b2e4b]"></div>
                     <div className="!mt-0">
-                        <PerfectScrollbar className="chat-users relative h-full min-h-[100px] sm:h-[calc(100vh_-_300px)] space-y-0.5 ltr:pr-3.5 rtl:pl-3.5 ltr:-mr-3.5 rtl:-ml-3.5 border-b">
+                        {loading ? (
+                            <div className="max-w-full mx-auto h-screen animate-pulse">
+                            <div className="panel bg-zinc-200 flex w-full h-full "></div>
+                            
+                        </div>
+                        ) : (<PerfectScrollbar className="chat-users relative h-full min-h-[100px] sm:h-[calc(100vh_-_300px)] space-y-0.5 ltr:pr-3.5 rtl:pl-3.5 ltr:-mr-3.5 rtl:-ml-3.5 border-b">
                             {filteredItems?.map((person: any, index: any) => {
                                 return (
                                     <div key={index}>
@@ -259,17 +324,33 @@ const Chat = () => {
                                                     <div className="flex-shrink-0 relative">
                                                         {/* <img src={`/assets/images/${person.path}`} className="rounded-full h-12 w-12 object-cover" alt="" /> */}
 
+                                                        <span
+                                                            className={`flex justify-center items-center w-10 h-10 text-center rounded-full object-cover text-base text-white ${
+                                                                person.type === 'student'
+                                                                    ? 'bg-info'
+                                                                    : person.type === 'prospect'
+                                                                    ? 'bg-primary'
+                                                                    : person.type === 'inactive'
+                                                                    ? 'bg-danger'
+                                                                    : person.type === 'staff'
+                                                                    ? 'bg-secondary'
+                                                                    : 'bg-warning'
+                                                            }`}
+                                                        >
+                                                            {person.name[0]}
+                                                        </span>
+                                                        {/* 
                                                         {person.active && (
                                                             <div>
                                                                 <div className="absolute bottom-0 ltr:right-0 rtl:left-0">
                                                                     <div className="w-4 h-4 bg-success rounded-full"></div>
                                                                 </div>
                                                             </div>
-                                                        )}
+                                                        )} */}
                                                     </div>
                                                     <div className="mx-3 ltr:text-left rtl:text-right">
                                                         <p className="mb-1 font-semibold">{person.name}</p>
-                                                        <p className="text-xs text-white-dark truncate max-w-[185px]">{person.preview}</p>
+                                                        <p className="text-xs text-white-dark truncate max-w-[100px]">{person.preview}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -280,7 +361,8 @@ const Chat = () => {
                                     </div>
                                 );
                             })}
-                        </PerfectScrollbar>
+                        </PerfectScrollbar>)}
+                        
                     </div>
                 </div>
                 <div className={`bg-black/60 z-[5] w-full h-full absolute rounded-md hidden ${isShowChatMenu ? '!block xl:!hidden' : ''}`} onClick={() => setIsShowChatMenu(!isShowChatMenu)}></div>
@@ -412,9 +494,21 @@ const Chat = () => {
                                     <div className="relative flex-none">
                                         {/* <img src={`/assets/images/${selectedUser.path}`} className="rounded-full w-10 h-10 sm:h-12 sm:w-12 object-cover" alt="" /> */}
 
-                                        <div className="absolute bottom-0 ltr:right-0 rtl:left-0">
+                                        <span className={`${
+                                                                selectedUser.type === 'student'
+                                                                    ? 'bg-info'
+                                                                    : selectedUser.type === 'prospect'
+                                                                    ? 'bg-primary'
+                                                                    : selectedUser.type === 'inactive'
+                                                                    ? 'bg-danger'
+                                                                    : selectedUser.type === 'staff'
+                                                                    ? 'bg-secondary'
+                                                                    : 'bg-warning'
+                                                            } flex justify-center items-center w-10 h-10 text-center rounded-full object-cover text-base text-white`}>{selectedUser.name[0]}</span>
+
+                                        {/* <div className="absolute bottom-0 ltr:right-0 rtl:left-0">
                                             <div className="w-4 h-4 bg-success rounded-full"></div>
-                                        </div>
+                                        </div> */}
                                     </div>
                                     <div className="mx-3">
                                         <p className="font-semibold">{selectedUser.name}</p>

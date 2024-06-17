@@ -40,8 +40,6 @@ const AdminSidebar = () => {
         });
     };
 
-
-
     // const handleSetNewStudio = async (studioID: any) => {
     //     const idString = studioID.toString();
     //     const masterStudioString = suid.toString();
@@ -72,8 +70,6 @@ const AdminSidebar = () => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location]);
-
-
 
     return (
         <div className={semidark ? 'dark' : ''}>
@@ -135,6 +131,10 @@ const AdminSidebar = () => {
                                             </div>
                                         </NavLink>
                                     </li>
+                                    <h2 className="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
+                                        <IconMinus className="w-4 h-5 flex-none hidden" />
+                                        <span>Devops</span>
+                                    </h2>
                                     <li className="nav-item">
                                         <NavLink to="/admin/sprint" className="group">
                                             <div className="flex items-center">
@@ -151,9 +151,21 @@ const AdminSidebar = () => {
                                             </div>
                                         </NavLink>
                                     </li>
+                                    <h2 className="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
+                                        <IconMinus className="w-4 h-5 flex-none hidden" />
+                                        <span>Tools</span>
+                                    </h2>
+                                    <li className="nav-item">
+                                        <NavLink to="/admin/crudentials" className="group">
+                                            <div className="flex items-center">
+                                                <IconMenuScrumboard className="group-hover:!text-primary shrink-0" />
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Manage User Accounts</span>
+                                            </div>
+                                        </NavLink>
+                                    </li>
                                 </ul>
                             </li>
-                            <li className="menu nav-item">
+                            {/* <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'students' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('students')}>
                                     <div className="flex items-center">
                                         <IconMenuUsers className="group-hover:!text-primary shrink-0" />
@@ -175,7 +187,7 @@ const AdminSidebar = () => {
                                         </li>
                                     </ul>
                                 </AnimateHeight>
-                            </li>
+                            </li> */}
                         </ul>
                     </PerfectScrollbar>
                 </div>

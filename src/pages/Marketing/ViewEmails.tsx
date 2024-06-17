@@ -3,8 +3,10 @@ import 'tippy.js/dist/tippy.css';
 import IconEye from '../../components/Icon/IconEye';
 import { useEffect, useState } from 'react';
 import { UserAuth } from '../../context/AuthContext';
-import { getEmailLogsByStudioId } from '../../functions/emails';
+import { getAllEmailLogsByStudioId, getEmailLogsByStudioId } from '../../functions/emails';
 import { constFormateDateMMDDYYYY } from '../../functions/shared';
+import { formatWithTimeZone, handleGetTimeZoneOfUser } from '../../functions/dates';
+import IconCircleCheck from '../../components/Icon/IconCircleCheck';
 
 const tableData = [
     {
@@ -60,8 +62,12 @@ const tableData = [
 export default function ViewEmails() {
     const { suid }: any = UserAuth();
     const [emails, setEmails] = useState([]);
-    const [startDate, setStartDate] = useState<string>(new Date(new Date().setDate(new Date().getDate() - 2)).toISOString().split('T')[0]);
+    const [startDate, setStartDate] = useState<string>(new Date(new Date().setDate(new Date().getDate() - 6)).toISOString().split('T')[0]);
     const [endDate, setEndDate] = useState<string>(new Date().toISOString().split('T')[0]);
+    const [numberOfEmails, setNumberOfEmails] = useState<number>(0);
+    const [monthlyAllotment, setMonthlyAllotment] = useState<number>(0);
+    // const startDate = '2024-06-10'
+    // const endDate = '2024-06-16'
 
     const handleGetEmails = async () => {
         const formatStartDate = constFormateDateMMDDYYYY(startDate);
@@ -72,7 +78,7 @@ export default function ViewEmails() {
             endDate: formatEndDate,
         };
         try {
-            const res = await getEmailLogsByStudioId(bodyData);
+            const res = await getAllEmailLogsByStudioId(bodyData);
             setEmails(res.recordset);
             console.log(res.recordset, 'res');
         } catch (error) {
@@ -84,61 +90,88 @@ export default function ViewEmails() {
         handleGetEmails();
     }, [startDate, endDate]);
 
-    console.log(emails);
+    useEffect(() => {
+        const totalEmails: any = localStorage.getItem('numberOfEmails');
+        const totalAllotment: any = localStorage.getItem('monthlyEmailLimit');
+        setNumberOfEmails(totalEmails);
+        setMonthlyAllotment(totalAllotment);
+    }, [emails]);
 
     return (
-        <div className="table-responsive mb-5">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Recipient</th>
-                        <th>Date Sent</th>
-                        <th>Sent</th>
-                        <th>Opened</th>
-                        <th>Clicked</th>
-                        <th>Bounced</th>
-                        <th>Spam</th>
-                        <th className="text-center">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {tableData.map((data) => {
-                        return (
-                            <tr key={data.id}>
-                                <td>
-                                    <div className="whitespace-nowrap">{data.name}</div>
-                                </td>
-                                <td>{data.date}</td>
-                                <td>{data.sale}</td>
-                                <td>
-                                    <div
-                                        className={`whitespace-nowrap ${
-                                            data.status === 'completed'
-                                                ? 'text-success'
-                                                : data.status === 'Pending'
-                                                ? 'text-secondary'
-                                                : data.status === 'In Progress'
-                                                ? 'text-info'
-                                                : data.status === 'Canceled'
-                                                ? 'text-danger'
-                                                : 'text-success'
-                                        }`}
-                                    >
-                                        {data.status}
-                                    </div>
-                                </td>
-                                <td className="text-center">
-                                    <Tippy content="Delete">
-                                        <button type="button">
-                                            <IconEye />
-                                        </button>
-                                    </Tippy>
-                                </td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-800">Search Email History</h1>
+          <p className="text-sm text-gray-500">Your studio has created {numberOfEmails} emails this month and your monthly allottment of emails is {monthlyAllotment}.</p>
+            <div className="table-responsive mt-12 mb-5">
+                <table className='panel table-hover'>
+                    <thead>
+                        <tr>
+                            <th>Recipient</th>
+                            <th>Date Sent</th>
+                            <th>Sent</th>
+                            <th>Opened</th>
+                            <th>Clicked</th>
+                            <th>Bounced</th>
+                            <th>Spam</th>
+                            <th className="text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {emails?.map((data: any) => {
+                            return (
+                                <tr key={data.MailgunGUID}>
+                                    <td>
+                                        <div className="whitespace-nowrap">{data.ToEmail}</div>
+                                    </td>
+                                    <td>{formatWithTimeZone(data.SendDate, handleGetTimeZoneOfUser())}</td>
+                                    <td>
+                                        {data.SendDate && (
+                                            <>
+                                                <IconCircleCheck fill={true} className="text-success" />
+                                            </>
+                                        )}
+                                    </td>
+                                    <td>
+                                        {data.Opened && (
+                                            <>
+                                                <IconCircleCheck fill={true} className="text-success" />
+                                            </>
+                                        )}
+                                    </td>
+                                    <td>
+                                        {data.Clicked && (
+                                            <>
+                                                <IconCircleCheck fill={true} className="text-success" />
+                                            </>
+                                        )}
+                                    </td>
+                                    <td>
+                                        {data.Bounced && (
+                                            <>
+                                                <IconCircleCheck fill={true} className="text-success" />
+                                            </>
+                                        )}
+                                    </td>
+                                    <td>
+                                        {data.Spam && (
+                                            <>
+                                                <IconCircleCheck fill={true} className="text-success" />
+                                            </>
+                                        )}
+                                    </td>
+
+                                    <td className="text-right">
+                                        <Tippy content="View Details">
+                                            <button type="button" className="text-info">
+                                                <IconEye />
+                                            </button>
+                                        </Tippy>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }

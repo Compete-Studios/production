@@ -29,10 +29,6 @@ export default function MarketingMetrics() {
     const [monthlyTextLimit, setMonthlyTextLimit] = useState(0);
     const [numberOfActiveStudents, setNumberOfActiveStudents] = useState(0);
 
-    console.log('studioInfo', studioInfo)
-
-   
-
     useEffect(() => {
         if (studioOptions) {
             setMonthlyTextLimit(studioOptions?.MonthlyTextVolume);
@@ -42,7 +38,7 @@ export default function MarketingMetrics() {
     const getAlltheEmails = async () => {
         const firstDateOfThisMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
         const lastDateOfThisMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
-        
+
         const data = {
             studioId: suid,
             startDate: formatForEmails(firstDateOfThisMonth),
@@ -123,9 +119,6 @@ export default function MarketingMetrics() {
         getCountOfActiveStudents();
     }, [suid]);
 
-    console.log('numberOfEmails', numberOfEmails);
-    console.log('monthlyEmailLimit', monthlyEmailLimit);
-
     return (
         <div className="grid sm:grid-cols-2 xl:grid-cols-2 gap-6 mb-6">
             {/* <div className="panel h-auto sm:col-span-2 xl:col-span-1 pb-0">
@@ -194,7 +187,7 @@ export default function MarketingMetrics() {
                     </p>
                 </div>
             </div>
-            {(!loadingEmails && !loadingEmailCount && !loadingTexts && !loadingActiveStudents) ? (
+            {!loadingEmails && !loadingEmailCount && !loadingTexts && !loadingActiveStudents ? (
                 <div className="panel h-full ">
                     <div className="flex items-center justify-between dark:text-white-light mb-5">
                         <h5 className="font-semibold text-lg">Marketing Summary</h5>

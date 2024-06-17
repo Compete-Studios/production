@@ -154,7 +154,6 @@ const ManageStudioAccounts = () => {
                                 <th>Account Status</th>
                                 <th>Name</th>
                                 <th>Email</th>
-
                                 <th className="!text-center">Actions</th>
                             </tr>
                         </thead>
@@ -171,7 +170,7 @@ const ManageStudioAccounts = () => {
                                         <td>{contact.Contact_Email}</td>
 
                                         <td>
-                                            <div className="flex gap-4 items-center justify-center">
+                                            {contact?.hasAccount && (<div className="flex gap-4 items-center justify-center">
                                                 <button type="button" className="btn btn-sm btn-outline-info" onClick={() => handleResetPassword("bret@techbret.com")}>
                                                     Reset Password
                                                 </button>
@@ -179,7 +178,8 @@ const ManageStudioAccounts = () => {
                                                 <button type="button" className="btn btn-sm btn-outline-danger" onClick={() => handleMimic(contact.Studio_Id)}>
                                                     Disable Account
                                                 </button>
-                                            </div>
+                                            </div>)}
+                                            
                                         </td>
                                     </tr>
                                 );

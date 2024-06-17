@@ -1,4 +1,4 @@
-import fetchData from "./fetchdata";
+import fetchData from './fetchdata';
 
 export const sendIndividualEmail = async (emailData) => {
     try {
@@ -44,6 +44,16 @@ export const getEmailLogsByStudioId = async (data) => {
     console.log(data);
     try {
         const response = await fetchData(`email/getEmailLogsByStudioId`, 'get', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getAllEmailLogsByStudioId = async (data) => {
+    try {
+        const response = await fetchData(`email/getAllEmailLogsByStudioId`, 'post', data);
         return response;
     } catch (error) {
         console.error(error);

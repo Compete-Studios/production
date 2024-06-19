@@ -1,6 +1,7 @@
 import fetchData from "./fetchdata";
 
 export const runPaymentForCustomer = async (paymentData) => {
+    console.log('runPaymentForCustomer paymentData:', paymentData);
     try {
         const response = await fetchData(`paysimple-helper/runPayment`, 'post',  paymentData);
         return response;
@@ -313,3 +314,23 @@ export const updateLatePaymentDateStepID = async (paymentData) => {
         throw error;
     }
 }
+
+export const showAPaymentWasRetried = async (paymentData) => {
+    try {
+        const response = await fetchData(`late-payment-pipeline/showAPaymentWasRetried`, 'post', paymentData);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
+export const addLatePayment = async (paymentData) => {
+    try {
+        const response = await fetchData(`late-payment-pipeline/addLatePayment`, 'post', paymentData);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};

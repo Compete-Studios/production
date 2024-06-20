@@ -324,7 +324,7 @@ export default function CreateCaptureForms() {
                                                 Response Email
                                             </label>
                                             <p className="text-gray-500 mb-2 text-xs">This is the email that will be sent to the prospect when they fill out the form.</p>
-                                            <div className="">
+                                            <div>
                                                 <ReactQuill theme="snow" value={value} onChange={setValue} />
                                             </div>
                                         </>

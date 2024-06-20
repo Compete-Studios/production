@@ -121,7 +121,6 @@ const ViewProspect = () => {
             console.log(error);
         }
     };
-    
 
     const getStudentBarcode = async (studentID: any) => {
         // try {
@@ -176,7 +175,7 @@ const ViewProspect = () => {
         }
     };
 
-      const handleGoToPayments= () => {
+    const handleGoToPayments = () => {
         console.log('Go to payments');
     };
 
@@ -318,7 +317,6 @@ const ViewProspect = () => {
         e.preventDefault();
         navigate(`/prospects/activate/${uid}`);
     };
-
 
     return (
         <div>
@@ -837,6 +835,22 @@ const ViewProspect = () => {
                                                 </label>
                                             );
                                         })}
+                                        <div>
+                                            <label htmlFor="completed" className="flex items-center cursor-pointer hover:bg-gray-100 p-1">
+                                                <input
+                                                    type="radio"
+                                                    name="pipeline"
+                                                    className="form-radio"
+                                                    value={student?.CurrentPipelineStatus}
+                                                    checked={student?.CurrentPipelineStatus === 0}
+                                                    onChange={() => {
+                                                        setStudent({ ...student, CurrentPipelineStatus: 0 });
+                                                        setToUpdate({ ...toUpdate, currentPipelineStatus: true });
+                                                    }}
+                                                />
+                                                <span>No Status/Ignore</span>
+                                            </label>
+                                        </div>
                                     </div>
                                     {toUpdate?.currentPipelineStatus && (
                                         <button

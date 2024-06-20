@@ -27,6 +27,10 @@ import IconMenuTodo from '../Icon/Menu/IconMenuTodo';
 import IconBolt from '../Icon/IconBolt';
 import IconMenuMailbox from '../Icon/Menu/IconMenuMailbox';
 import IconFacebook from '../Icon/IconFacebook';
+import IconMail from '../Icon/IconMail';
+import IconMenuNotes from '../Icon/Menu/IconMenuNotes';
+import IconNotesEdit from '../Icon/IconNotesEdit';
+import IconSearch from '../Icon/IconSearch';
 
 const Sidebar = () => {
     const { isMaster, masters, suid }: any = UserAuth();
@@ -324,6 +328,38 @@ const Sidebar = () => {
                                             <div className="flex items-center">
                                                 <IconMenuMailbox className="group-hover:!text-primary shrink-0" />
                                                 <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('View Emails')}</span>
+                                            </div>
+                                        </NavLink>
+                                    </li>
+                                    <li className="nav-item">
+                                        <NavLink to="/marketing/view-news-letters" className="group">
+                                            <div className="flex items-center">
+                                                <IconMenuNotes className="group-hover:!text-primary shrink-0" />
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('View Newsletters')}</span>
+                                            </div>
+                                        </NavLink>
+                                    </li>
+                                    <li className="nav-item">
+                                        <NavLink to="/marketing/email-lists" className="group">
+                                            <div className="flex items-center">
+                                                <IconMenuForms className="group-hover:!text-primary shrink-0" />
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Emailing Lists')}</span>
+                                            </div>
+                                        </NavLink>
+                                    </li>
+                                    <li className="nav-item">
+                                        <NavLink to="/marketing/capture-forms" className="group">
+                                            <div className="flex items-center">
+                                                <IconMenuTodo className="group-hover:!text-primary shrink-0" />
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Capture Forms')}</span>
+                                            </div>
+                                        </NavLink>
+                                    </li>
+                                    <li className="nav-item">
+                                        <NavLink to="/tools/advanced-search" className="group">
+                                            <div className="flex items-center">
+                                                <IconSearch className="group-hover:!text-primary shrink-0" />
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Advanced Search')}</span>
                                             </div>
                                         </NavLink>
                                     </li>

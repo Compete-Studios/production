@@ -1644,3 +1644,13 @@ export const getAllActivePaymentSchedules = async (studioId) => {
         throw error;
     }
 };
+
+export const searchAll = async (searchData) => {
+    try {
+        const response = await fetchData(`student-access/searchStudentProspectsAndStaffByValues`, 'post', searchData);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};

@@ -129,7 +129,7 @@ export default function Issues() {
                 <table>
                     <thead>
                         <tr>
-                            <th className='text-left'>Status</th>
+                            <th className="text-left">Status</th>
                             <th>Date</th>
                             <th>Contact</th>
                             <th>Issue</th>
@@ -140,7 +140,7 @@ export default function Issues() {
                         {filteredIssues?.map((data: any, index) => {
                             return (
                                 <tr key={data.id}>
-                                    <td className=''>
+                                    <td className="">
                                         <div
                                             className={`text-center flex items-center justify-center ml-4 w-3 h-3 rounded-full capitalize ${
                                                 data.status === 'done' ? 'bg-success' : data.status === 'inProgress' ? 'bg-warning' : 'bg-danger'
@@ -158,8 +158,18 @@ export default function Issues() {
                                         <div className="font-semibold">{data.issue}</div>
                                         <div className="break-words text-xs mt-2">{data.path}</div>
                                     </td>
-                                    <td>
-                                        <td className="text-right">
+                                    <td className='text-right flex items-center gap-x-1'>
+                                        <Tippy content="Mark as In Progress">
+                                            <button type="button" onClick={() => markInProgress(data.id)}>
+                                                <IconBolt className="w-5 h-5 text-yellow-500" />
+                                            </button>
+                                        </Tippy>
+                                        <Tippy content="Mark as done">
+                                            <button type="button" onClick={() => markDone(data.id)}>
+                                                <IconCircleCheck className="w-5 h-5 text-green-500" />
+                                            </button>
+                                        </Tippy>
+                                        <div className="text-right">
                                             {data?.assignedTo ? (
                                                 <div className="flex items-center gap-2">
                                                     <div></div>
@@ -172,7 +182,7 @@ export default function Issues() {
                                             ) : (
                                                 <IssueToTaskModal docData={data} cards={sprintCards} setIssues={setIssues} />
                                             )}
-                                        </td>
+                                        </div>
                                     </td>
                                 </tr>
                             );

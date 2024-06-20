@@ -342,7 +342,7 @@ const Header = () => {
                                     <input
                                         type="text"
                                         className="form-input ltr:pl-9 rtl:pr-9 ltr:sm:pr-4 rtl:sm:pl-4 ltr:pr-9 rtl:pl-9 peer sm:bg-transparent bg-gray-100 placeholder:tracking-widest"
-                                        placeholder="Search..."
+                                        placeholder="Quick Search..."
                                         value={searchItem}
                                         onChange={(e) => setSearchItem(e.target.value)}
                                     />

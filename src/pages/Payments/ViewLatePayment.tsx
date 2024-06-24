@@ -257,6 +257,8 @@ export default function ViewLatePayment() {
         showMessage('Notes Updated!');
     };
 
+    
+
     useEffect(() => {
         if (customerPaymentAccount.length > 0) {
             const card = customerPaymentAccount.find((card: any) => card.Id === paymentIDInfo.AccountId);

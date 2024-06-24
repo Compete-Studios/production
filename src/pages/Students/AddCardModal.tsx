@@ -11,6 +11,7 @@ import IconInfoCircle from '../../components/Icon/IconInfoCircle';
 import Swal from 'sweetalert2';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
+import { UserAuth } from '../../context/AuthContext';
 
 interface CreditCard {
     ccNumber: string;
@@ -18,6 +19,7 @@ interface CreditCard {
     expDate: string;
     billingZip: string;
     isDefault: boolean;
+    studioId?: number;
 }
 
 export default function AddCardModal({ student, paySimpleID, cards, update, setUpdate, inStudent = false }: any) {
@@ -25,6 +27,7 @@ export default function AddCardModal({ student, paySimpleID, cards, update, setU
     useEffect(() => {
         dispatch(setPageTitle('Add Bank Card'));
     });
+    const { suid }: any = UserAuth();
     const [modal, setModal] = useState<boolean>(false);
     const [month, setMonth] = useState<string>('');
     const [year, setYear] = useState<string>('');
@@ -35,7 +38,10 @@ export default function AddCardModal({ student, paySimpleID, cards, update, setU
         expDate: '',
         billingZip: '',
         isDefault: true,
+        studioId: suid,
     });
+
+    console.log('paySimpleID', paySimpleID);
 
     const convertToMMYYYY = (month: string, year: string) => {
         return `${month}/${year}`;
@@ -90,6 +96,7 @@ export default function AddCardModal({ student, paySimpleID, cards, update, setU
     };
 
     const handleAddCreditCard = async () => {
+        console.log(creditCardData)
         try {
             const response = await addCreditCardToCustomer(creditCardData);
             console.log(response)

@@ -35,6 +35,7 @@ export default function AuthContextProvider({ children }: any) {
     const [layout, setLayout] = useState<any>({});
     const [update, setUpdate] = useState(false);
     const [inactiveStudents, setInactiveStudents] = useState<any>([]);
+    const [emailList, setEmailList] = useState<any>([]);
     const [toActivate, setToActivate] = useState<any>({
         status: false,
         prospect: null,
@@ -234,6 +235,8 @@ export default function AuthContextProvider({ children }: any) {
                 setLogo,
                 isAdmin,
                 inactiveStudents,
+                emailList,
+                setEmailList,
             }}
         >
             {children}

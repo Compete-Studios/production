@@ -165,7 +165,7 @@ export default function AddStudent() {
         }
     };
 
-    console.log(programsForStudent, 'programsForStudent')
+    
 
     return (
         <div>

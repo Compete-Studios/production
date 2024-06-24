@@ -60,3 +60,34 @@ export const getAllEmailLogsByStudioId = async (data) => {
         throw error;
     }
 };
+
+export const sendEmailToClass = async (emailData) => {
+    try {
+        const response = await fetchData(`class-access/sendEmailToClass`, 'post', emailData);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+
+export const getNewsletterLogsByStudioId = async (data) => {
+    try {
+        const response = await fetchData(`email/getNewsletterLogsByStudioId`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getAllEmailingListsByStudioId = async (studioID) => {
+    try {
+        const response = await fetchData(`email/GetAllEmailingListsByStudioId/${studioID}`, 'get',);
+        return response.lists;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};

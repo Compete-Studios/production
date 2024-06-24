@@ -148,6 +148,7 @@ const PerformancePlanner = lazy(() => import('../pages/Tools/PerformancePlanner'
 const Calendar = lazy(() => import('../pages/Tools/Calendar'));
 const Chat = lazy(() => import('../pages/Tools/Chat'));
 const Inbox = lazy(() => import('../pages/Tools/Inbox'));
+const AdvancedSearch = lazy(() => import('../pages/Tools/AdvancedSearch'));
 
 //Prospects
 const ViewProspects = lazy(() => import('../pages/Prospects/ViewProspects'));
@@ -680,7 +681,7 @@ const routes = [
         element: <ViewEmailListInfo />,
     },
     {
-        path: '/marketing/create-news-letter',
+        path: '/marketing/create-news-letter/:id/:type',
         element: <CreateNewsLetter />,
     },
     {
@@ -764,6 +765,11 @@ const routes = [
     {
         path: '/apps/mailbox',
         element: <Inbox />,
+    },
+
+    {
+        path: '/tools/advanced-search',
+        element: <AdvancedSearch />,
     },
     //oldRoutes
     {

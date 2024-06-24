@@ -13,9 +13,7 @@ import IconPlus from '../../components/Icon/IconPlus';
 const ViewStudents = () => {
     const { suid, students }: any = UserAuth();
     const [showLoading, setShowLoading] = useState(false);
-    const [activeOnly, setActiveOnly] = useState(true);
-
-    console.log(students);
+    const [activeOnly, setActiveOnly] = useState(true);    
 
     const dispatch = useDispatch();
     useEffect(() => {
@@ -170,6 +168,9 @@ const ViewStudents = () => {
                         </div>
                     </div>
                 )}
+            </div>
+            <div className='mt-4 flex items-center gap-x-2'>
+                <Link to={`/marketing/create-news-letter/0/students`}  className='btn btn-info'>Email this List</Link>
             </div>
         </div>
     );

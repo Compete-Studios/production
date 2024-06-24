@@ -1,6 +1,7 @@
 import { useState, Fragment, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import Swal from 'sweetalert2';
+import Hashids from 'hashids';
 import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import IconUserPlus from '../../components/Icon/IconUserPlus';
@@ -22,8 +23,9 @@ const ViewRoster = () => {
     const { suid, classes, staff }: any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Contacts'));
+        dispatch(setPageTitle('View Roster'));
     });
+    const hashids = new Hashids();
     const [addContactModal, setAddContactModal] = useState<any>(false);
     const [studentRoster, setStudentRoster] = useState<any>([]);
     const [prospectRoster, setProspectRoster] = useState<any>([]);
@@ -31,6 +33,7 @@ const ViewRoster = () => {
     const [classStaff, setClassStaff] = useState<any>([]);
     const [classSchedule, setClassSchedule] = useState<any>([{}]);
     const [value, setValue] = useState<any>('list');
+    const [hashedID, setHashedID] = useState<any>('');
 
     const [defaultParams] = useState({
         id: null,
@@ -54,6 +57,12 @@ const ViewRoster = () => {
     useEffect(() => {
         setClassData(classes.find((d: any) => d.ClassId === parseInt(classId ?? '')));
     }, [classId, classes]);
+
+    useEffect(() => {
+        if (classId) {
+            setHashedID(hashids.encode(classId));
+        }
+    }, [classId]);
 
     const handleGetClassStaff = async () => {
         try {
@@ -257,10 +266,10 @@ const ViewRoster = () => {
                         <IconPrinter />
                         Print Roster
                     </button>
-                    <button type="button" className="btn btn-info gap-2 w-full">
+                    <Link to={`/marketing/create-news-letter/${hashedID}/class`} type="button" className="btn btn-info gap-2 w-full">
                         <IconSend />
                         Email Class
-                    </button>
+                    </Link>
 
                     <button className="btn btn-secondary gap-2 w-full">
                         <IconMessage />
@@ -485,10 +494,10 @@ const ViewRoster = () => {
                             <IconPrinter />
                             Print Roster
                         </button>
-                        <button type="button" className="btn btn-info gap-2 w-44">
+                        <Link to={`/marketing/create-news-letter/${hashedID}/class`} type="button" className="btn btn-info gap-2 w-44">
                             <IconSend />
                             Email Class
-                        </button>
+                        </Link>
 
                         <button className="btn btn-secondary gap-2 w-44">
                             <IconMessage />

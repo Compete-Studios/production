@@ -63,7 +63,14 @@ export default function ViewEmails() {
     const { suid }: any = UserAuth();
     const [emails, setEmails] = useState([]);
     const [startDate, setStartDate] = useState<string>(new Date(new Date().setDate(new Date().getDate() - 6)).toISOString().split('T')[0]);
-    const [endDate, setEndDate] = useState<string>(new Date().toISOString().split('T')[0]);
+    const getTomorrowDate = () => {
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+      return tomorrow.toISOString().split('T')[0];
+  };
+  
+  const [endDate, setEndDate] = useState<string>(getTomorrowDate());;
     const [numberOfEmails, setNumberOfEmails] = useState<number>(0);
     const [monthlyAllotment, setMonthlyAllotment] = useState<number>(0);
     // const startDate = '2024-06-10'
@@ -97,9 +104,10 @@ export default function ViewEmails() {
         setMonthlyAllotment(totalAllotment);
     }, [emails]);
 
+
     return (
         <div>
-          <h1 className="text-2xl font-semibold text-gray-800">Search Email History</h1>
+          <h1 className="text-2xl font-semibold text-gray-800">Search Email History </h1>
           <p className="text-sm text-gray-500">Your studio has created {numberOfEmails} emails this month and your monthly allottment of emails is {monthlyAllotment}.</p>
             <div className="table-responsive mt-12 mb-5">
                 <table className='panel table-hover'>

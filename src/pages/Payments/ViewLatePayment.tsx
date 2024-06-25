@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { convertPhone, hashTheID, showErrorMessage, showMessage, unHashTheID } from '../../functions/shared';
+import { convertPhone, hashTheID, showErrorMessage, showMessage, showWarningMessage, unHashTheID } from '../../functions/shared';
 import { UserAuth } from '../../context/AuthContext';
 import {
     addPaymentNotes,
@@ -13,7 +13,7 @@ import {
     runPaymentForCustomer,
     updateLatePaymentDateStepID,
     addLatePayment,
-    showAPaymentWasRetried
+    showAPaymentWasRetried,
 } from '../../functions/payments';
 import { Tab } from '@headlessui/react';
 import { Fragment } from 'react';
@@ -260,8 +260,6 @@ export default function ViewLatePayment() {
         showMessage('Notes Updated!');
     };
 
-    
-
     useEffect(() => {
         if (customerPaymentAccount.length > 0) {
             const card = customerPaymentAccount.find((card: any) => card.Id === paymentIDInfo.AccountId);
@@ -307,7 +305,7 @@ export default function ViewLatePayment() {
             alert('This is not your payment');
         }
     }, [stud, suid]);
-    
+
     const recipieptHTML = async (invoiceId: any) => {
         const htmlFOrEmail = `"<!DOCTYPE html>
         <html>
@@ -446,78 +444,92 @@ export default function ViewLatePayment() {
         }
 
         const newPaymentInfo = {
-            Amount: paymentInfo?.Amount,
+            amount: paymentInfo?.Amount,
             paymentAccountId: creditCard.Id,
             emailForReceipt: toEmail,
+            studioId: suid,
         };
 
-        try {
-            // Run the payment on the same card
-            const res = await runPaymentForCustomer(newPaymentInfo);
-            const response = res.Response;
+        showWarningMessage('Are you sure you want to retry this payment?', 'Retry Payment', 'Payment has been retried successfully', 'Retrying Payment')
+            .then(async (confirmed: boolean) => {
+                if (confirmed) {
+                    try {
+                        // Run the payment on the same card
+                        console.log(newPaymentInfo, 'newPaymentInfo');
+                        const res = await runPaymentForCustomer(newPaymentInfo);
+                        const response = res.Response;
 
-            // Successful payment
-            if (response && response.Status === 'Authorized') {
-                const newPaymentId = response.Id;
-                
-                // Add the new payment to our db in LatePAyments table
-                const newPayment = {
-                    studioId: suid,
-                    paysimpleTransactionId: newPaymentId,
-                    retriedTransactionId: 0,
-                    ignoreThisPayment: false,
-                    paysimpleCustomerId: response.CustomerId,
-                    customerName: `${response.CustomerFirstName} ${response.CustomerLastName}`,
-                    amount: response.Amount,
-                    date: response.PaymentDate,
-                };
+                        // Successful payment
+                        if (response && response.Status === 'Authorized') {
+                            const newPaymentId = response.Id;
 
-                await addLatePayment(newPayment);
+                            // Add the new payment to our db in LatePAyments table
+                            const newPayment = {
+                                studioId: suid,
+                                paysimpleTransactionId: newPaymentId,
+                                retriedTransactionId: 0,
+                                ignoreThisPayment: false,
+                                paysimpleCustomerId: response.CustomerId,
+                                customerName: `${response.CustomerFirstName} ${response.CustomerLastName}`,
+                                amount: response.Amount,
+                                date: response.PaymentDate,
+                            };
 
-                // Record that the retry happened
-                const notes = `This payment is a retry of Paysimple payment: ${originalPaymentId}, which occurred on ${formatWithTimeZone(new Date(), handleGetTimeZoneOfUser())} for the amount of $${paymentInfo.Amount}.`;
+                            await addLatePayment(newPayment);
 
-                const retryData = {
-                    originalPaymentId: originalPaymentId,
-                    newPaymentId: newPaymentId,
-                    retryTime: response.PaymentDate,
-                    notes: notes,
-                };
+                            // Record that the retry happened
+                            const notes = `This payment is a retry of Paysimple payment: ${originalPaymentId}, which occurred on ${formatWithTimeZone(
+                                new Date(),
+                                handleGetTimeZoneOfUser()
+                            )} for the amount of $${paymentInfo.Amount}.`;
 
-                await showAPaymentWasRetried(retryData);
+                            const retryData = {
+                                originalPaymentId: originalPaymentId,
+                                newPaymentId: newPaymentId,
+                                retryTime: response.PaymentDate,
+                                notes: notes,
+                            };
 
-                showMessage('Retry Payment Successful. You will be redirected to the new payment momentarily.');
-                setTimeout(() => {
-                    navigate(`/payments/view-late-payment/${suid}/${newPaymentId}`);
-                }, 3000);
-            }
-            // Failed/declined payment
-            else if (response && response.Status === 'Failed' && response.FailureData) {
-                showErrorMessage(`Error running payment: ${response.FailureData.Description} - ${response.FailureData.MerchantActionText}`);
-            }
-            // API returned error in Meta.Errors
-            else if (response && response.Meta && response.Meta.Errors) {
-                 const errorMessages = response.Meta.Errors.ErrorMessages.map((error: any) => error.Message).join('; ');
-                showErrorMessage(`Error running payment: ${errorMessages}`);
-            }
-            // Unexpected response structure
-            else {
-                showErrorMessage('Unexpected error occurred: Invalid response structure');
-            }
-        } catch (error) {
-            let errorMessage = 'Unexpected error occurred';
-            if (typeof error === 'object' && error !== null) {
-                if ('message' in error) {
-                    errorMessage = (error as any).message;
-                } else if ('error' in error) {
-                    errorMessage = (error as any).error;
+                            await showAPaymentWasRetried(retryData);
+
+                            showMessage('Retry Payment Successful. You will be redirected to the new payment momentarily.');
+                            setTimeout(() => {
+                                navigate(`/payments/view-late-payment/${suid}/${newPaymentId}`);
+                            }, 3000);
+                        }
+                        // Failed/declined payment
+                        else if (response && response.Status === 'Failed' && response.FailureData) {
+                            showErrorMessage(`Error running payment: ${response.FailureData.Description} - ${response.FailureData.MerchantActionText}`);
+                        }
+                        // API returned error in Meta.Errors
+                        else if (response && response.Meta && response.Meta.Errors) {
+                            const errorMessages = response.Meta.Errors.ErrorMessages.map((error: any) => error.Message).join('; ');
+                            showErrorMessage(`Error running payment: ${errorMessages}`);
+                        }
+                        // Unexpected response structure
+                        else {
+                            showErrorMessage('Unexpected error occurred: Invalid response structure');
+                        }
+                    } catch (error) {
+                        let errorMessage = 'Unexpected error occurred';
+                        if (typeof error === 'object' && error !== null) {
+                            if ('message' in error) {
+                                errorMessage = (error as any).message;
+                            } else if ('error' in error) {
+                                errorMessage = (error as any).error;
+                            }
+                        }
+                        console.error(`Error running payment: ${errorMessage}`);
+                        showErrorMessage(`Error running payment: ${errorMessage}`);
+                    }
+                } else {
+                    console.log('User canceled');
                 }
-            }
-            console.error(`Error running payment: ${errorMessage}`);
-            showErrorMessage(`Error running payment: ${errorMessage}`);
-        }
+            })
+            .catch((error: any) => {
+                console.error('Error:', error);
+            });
     };
-
 
     // const overallLoading = loadingData.student || loadingData.paymentInfo || loadingData.paymentIDInfo || loadingData.customerPaymentAccount || loadingData.paymentNotes || loadingData.billingInfo;
     const [overallLoading, setOverallLoading] = useState(true);

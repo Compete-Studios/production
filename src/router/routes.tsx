@@ -1,15 +1,18 @@
 import { lazy } from 'react';
 import Forms from '../pages/Marketing/Forms';
+import path from 'path';
 
 const Overview = lazy(() => import('../pages/Overview'));
 const CompeteLegacyForms = lazy(() => import('../pages/Forms/CompeteLegacyForms'));
 
 // Reports
+const AllReports = lazy(() => import('../pages/Reports/AllReports'));
 const Birthdays = lazy(() => import('../pages/Reports/Birthday'));
 const DNS = lazy(() => import('../pages/Reports/DNS'));
 const Snapshot = lazy(() => import('../pages/Reports/Snapshot'));
 const AttendanceReport = lazy(() => import('../pages/Reports/AttendanceReport'));
 const AnticipatedPayments = lazy(() => import('../pages/Reports/AnticipatedPayments'));
+const StudentsToRenew = lazy(() => import('../pages/Reports/StudentsToRenew'));
 
 // Authentication
 const LoginBoxed = lazy(() => import('../pages/Authentication/LoginBoxed'));
@@ -290,6 +293,10 @@ const routes = [
 
     //reports
     {
+        path: '/reports/all-reports',
+        element: <AllReports />,
+    },
+    {
         path: '/reports/birthday',
         element: <Birthdays />,
     },
@@ -308,6 +315,10 @@ const routes = [
     {
         path: '/reports/anticipated-payments',
         element: <AnticipatedPayments />,
+    },
+    {
+        path: '/reports/students-to-renew',
+        element: <StudentsToRenew />,
     },
 
     //classes

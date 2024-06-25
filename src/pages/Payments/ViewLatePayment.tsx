@@ -10,7 +10,10 @@ import {
     getLatePayment,
     getPaymentByID,
     getPaymentNotes,
+    runPaymentForCustomer,
     updateLatePaymentDateStepID,
+    addLatePayment,
+    showAPaymentWasRetried
 } from '../../functions/payments';
 import { Tab } from '@headlessui/react';
 import { Fragment } from 'react';
@@ -434,6 +437,88 @@ export default function ViewLatePayment() {
         navigate(`/students/${newID}/finish-billing-setup-options`);
     };
 
+    const handleRetryPayment = async () => {
+        // Get the original payment ID before anything else
+        const originalPaymentId = paymentInfo?.PaysimpleTransactionId;
+        if (!originalPaymentId) {
+            showErrorMessage('No payment ID found. Cannot retry payment.');
+            return;
+        }
+
+        const newPaymentInfo = {
+            Amount: paymentInfo?.Amount,
+            paymentAccountId: creditCard.Id,
+            emailForReceipt: toEmail,
+        };
+
+        try {
+            // Run the payment on the same card
+            const res = await runPaymentForCustomer(newPaymentInfo);
+            const response = res.Response;
+
+            // Successful payment
+            if (response && response.Status === 'Authorized') {
+                const newPaymentId = response.Id;
+                
+                // Add the new payment to our db in LatePAyments table
+                const newPayment = {
+                    studioId: suid,
+                    paysimpleTransactionId: newPaymentId,
+                    retriedTransactionId: 0,
+                    ignoreThisPayment: false,
+                    paysimpleCustomerId: response.CustomerId,
+                    customerName: `${response.CustomerFirstName} ${response.CustomerLastName}`,
+                    amount: response.Amount,
+                    date: response.PaymentDate,
+                };
+
+                await addLatePayment(newPayment);
+
+                // Record that the retry happened
+                const notes = `This payment is a retry of Paysimple payment: ${originalPaymentId}, which occurred on ${formatWithTimeZone(new Date(), handleGetTimeZoneOfUser())} for the amount of $${paymentInfo.Amount}.`;
+
+                const retryData = {
+                    originalPaymentId: originalPaymentId,
+                    newPaymentId: newPaymentId,
+                    retryTime: response.PaymentDate,
+                    notes: notes,
+                };
+
+                await showAPaymentWasRetried(retryData);
+
+                showMessage('Retry Payment Successful. You will be redirected to the new payment momentarily.');
+                setTimeout(() => {
+                    navigate(`/payments/view-late-payment/${suid}/${newPaymentId}`);
+                }, 3000);
+            }
+            // Failed/declined payment
+            else if (response && response.Status === 'Failed' && response.FailureData) {
+                showErrorMessage(`Error running payment: ${response.FailureData.Description} - ${response.FailureData.MerchantActionText}`);
+            }
+            // API returned error in Meta.Errors
+            else if (response && response.Meta && response.Meta.Errors) {
+                 const errorMessages = response.Meta.Errors.ErrorMessages.map((error: any) => error.Message).join('; ');
+                showErrorMessage(`Error running payment: ${errorMessages}`);
+            }
+            // Unexpected response structure
+            else {
+                showErrorMessage('Unexpected error occurred: Invalid response structure');
+            }
+        } catch (error) {
+            let errorMessage = 'Unexpected error occurred';
+            if (typeof error === 'object' && error !== null) {
+                if ('message' in error) {
+                    errorMessage = (error as any).message;
+                } else if ('error' in error) {
+                    errorMessage = (error as any).error;
+                }
+            }
+            console.error(`Error running payment: ${errorMessage}`);
+            showErrorMessage(`Error running payment: ${errorMessage}`);
+        }
+    };
+
+
     // const overallLoading = loadingData.student || loadingData.paymentInfo || loadingData.paymentIDInfo || loadingData.customerPaymentAccount || loadingData.paymentNotes || loadingData.billingInfo;
     const [overallLoading, setOverallLoading] = useState(true);
 
@@ -475,7 +560,7 @@ export default function ViewLatePayment() {
                         <div className="flex items-center flex-wrap gap-2 mt-4 xl:mt-0">
                             <EmailFailedPayment suid={suid} PaymentPipelineStepId={currentPipeline} student={student} btn={true} />
                             <TextFailedPayment suid={suid} PaymentPipelineStepId={currentPipeline} student={student} btn={true} />
-                            <button className="btn btn-warning gap-1 sm:w-auto w-full">
+                            <button className="btn btn-warning gap-1 sm:w-auto w-full" onClick={handleRetryPayment}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                     <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2.5 1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm0 3a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zm0 2a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1zm3 0a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1zm3 0a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1zm3 0a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1z" />
                                 </svg>

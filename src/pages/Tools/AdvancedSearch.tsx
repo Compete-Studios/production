@@ -72,9 +72,9 @@ export default function AdvancedSearch() {
         let combinedResults = [];
 
         if (classID) {
-            const filteredStudents = students.filter((student) => studentRoster.some((rosterStudent) => rosterStudent.Student_ID === student.Student_id));
-            const filteredProspects = prospects.filter((prospect) => prospectRoster.some((rosterProspect) => rosterProspect.ProspectId === prospect.ProspectId));
-            const filteredStaff = staff.filter((staffMember) => classStaff.some((classStaffMember) => classStaffMember.StaffId === staffMember.StaffId));
+            const filteredStudents = students.filter((student: any) => studentRoster.some((rosterStudent: any) => rosterStudent.Student_ID === student.Student_id));
+            const filteredProspects = prospects.filter((prospect: any) => prospectRoster.some((rosterProspect: any) => rosterProspect.ProspectId === prospect.ProspectId));
+            const filteredStaff = staff.filter((staffMember: any) => classStaff.some((classStaffMember: any) => classStaffMember.StaffId === staffMember.StaffId));
 
             combinedResults = [...filteredStudents, ...filteredProspects, ...filteredStaff];
         } else {
@@ -91,7 +91,7 @@ export default function AdvancedSearch() {
     const handleGetClassStaff = async () => {
         try {
             const res = await getStaffByClassId(classID);
-            const modifiedRes = res.map((staff) => ({
+            const modifiedRes = res.map((staff: any) => ({
                 ...staff,
                 StaffId: staff.StaffId[0], // Set StaffId to the first element of the StaffId array
             }));
@@ -247,7 +247,7 @@ export default function AdvancedSearch() {
                     <div>
                         <label>Class</label>
                         <select className="form-select" value={classID} onChange={(e) => setClassID(e.target.value)}>
-                            <option value={null}>Select Option</option>
+                            <option value={""}>Select Option</option>
                             {classes?.map((classData: any, index: any) => (
                                 <option key={index} value={classData.ClassId}>
                                     {classData.Name}

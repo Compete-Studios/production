@@ -22,14 +22,14 @@ interface Schedule {
 }
 
 export default function AddPaymentSchedule() {
-    const { suid } = UserAuth();
+    const { suid }: any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Create Payment Schedule'));
     });
     const [studentID, setStudentID] = useState<number>(0);
     const [scheduleInfo, setScheduleInfo] = useState<Schedule>({
-        studioId: 0,
+        studioId: suid,
         paymentAccountId: 0,
         amount: 0,
         startDate: '',

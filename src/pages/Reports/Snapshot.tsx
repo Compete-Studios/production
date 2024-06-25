@@ -31,7 +31,11 @@ const Snapshot = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Snapshot'));
-    });
+    }, [dispatch]);
+
+    useEffect(() => {
+        handleDateChange();
+    }, []);
 
     const currentDate = new Date();
     const thisMonthStartDate = new Date(
@@ -51,7 +55,6 @@ const Snapshot = () => {
         try {
             setLoading(true);
             const snapshot: Snapshot = await getStudioSnapShot(startDate, endDate, suid);
-            console.log(snapshot);
             setSnapshot(snapshot);
         } catch (error) {
             console.log(error);
@@ -109,10 +112,6 @@ const Snapshot = () => {
             setLoading(false);
         }
     };
-
-    useEffect(() => {
-        handleDateChange();
-    }, []);
 
     return (
         <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">

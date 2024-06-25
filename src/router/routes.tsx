@@ -1,15 +1,18 @@
 import { lazy } from 'react';
 import Forms from '../pages/Marketing/Forms';
+import path from 'path';
 
 const Overview = lazy(() => import('../pages/Overview'));
 const CompeteLegacyForms = lazy(() => import('../pages/Forms/CompeteLegacyForms'));
 
 // Reports
+const AllReports = lazy(() => import('../pages/Reports/AllReports'));
 const Birthdays = lazy(() => import('../pages/Reports/Birthday'));
 const DNS = lazy(() => import('../pages/Reports/DNS'));
 const Snapshot = lazy(() => import('../pages/Reports/Snapshot'));
 const AttendanceReport = lazy(() => import('../pages/Reports/AttendanceReport'));
 const AnticipatedPayments = lazy(() => import('../pages/Reports/AnticipatedPayments'));
+const StudentsToRenew = lazy(() => import('../pages/Reports/StudentsToRenew'));
 
 // Authentication
 const LoginBoxed = lazy(() => import('../pages/Authentication/LoginBoxed'));
@@ -38,6 +41,7 @@ const ViewLatePayment = lazy(() => import('../pages/Payments/ViewLatePayment'));
 const ExisitingBillingAccounts = lazy(() => import('../pages/Payments/ExisitingBillingAccounts'));
 const ResolvePayment = lazy(() => import('../pages/Payments/ResolvePayment'));
 const ResolvePaymentTest = lazy(() => import('../pages/Payments/ResolvePaymentTest'));
+const ThankYou = lazy(() => import('../pages/Payments/ThankYou'));
 
 // Staff
 const ViewStaff = lazy(() => import('../pages/Staff/ViewStaff'));
@@ -237,6 +241,11 @@ const routes = [
         layout: 'blank',
     },
     {
+        path: '/payments/thank-you',
+        element: <ThankYou />,
+        layout: 'blank',
+    },
+    {
         path: '/payments/resolve-payment-test',
         element: <ResolvePaymentTest />,
         layout: 'blank',
@@ -284,6 +293,10 @@ const routes = [
 
     //reports
     {
+        path: '/reports/all-reports',
+        element: <AllReports />,
+    },
+    {
         path: '/reports/birthday',
         element: <Birthdays />,
     },
@@ -302,6 +315,10 @@ const routes = [
     {
         path: '/reports/anticipated-payments',
         element: <AnticipatedPayments />,
+    },
+    {
+        path: '/reports/students-to-renew',
+        element: <StudentsToRenew />,
     },
 
     //classes

@@ -4,6 +4,7 @@ import IconX from '../../components/Icon/IconX';
 import { UserAuth } from '../../context/AuthContext';
 import { sendEmailToClass } from '../../functions/emails';
 import { showErrorMessage, showMessage } from '../../functions/shared';
+import { useNavigate } from 'react-router-dom';
 
 export default function PreviewNewsLetter({ emailData, htmlValue, listOfNewMembers }: any) {
     const { suid }: any = UserAuth();
@@ -45,6 +46,8 @@ export default function PreviewNewsLetter({ emailData, htmlValue, listOfNewMembe
         //     subject: emailData.subject,
         //     html: htmlValue,
         // };
+
+        const navigate = useNavigate();
        
         
         sendEmailToClass(data).then((res) => {
@@ -52,6 +55,7 @@ export default function PreviewNewsLetter({ emailData, htmlValue, listOfNewMembe
             if (res.status === 200) {
                 showMessage('Email Sent Successfully');
                 setNewsModal(false);
+                navigate('/marketing/view-emails');
             } else {
                 showErrorMessage('Email Failed to Send, Please Try Again');
                 setNewsModal(false);

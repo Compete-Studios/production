@@ -188,6 +188,27 @@ export const voidAPayment = async (paymentData) => {
 //     }
 // };
 
+export const getAllActivePaymentSchedules = async (studioId) => {
+    try {
+        const response = await fetchData(`paysimple-test/getAllActivePaymentSchedules/${studioId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getInternalPaymentSchedulesByStudioId = async (studioId) => {
+    // This gets all INTERNAL payment schedules (stored in our db, not Paysimple)
+    try {
+        const response = await fetchData(`payments/getInternalPaymentSchedulesByStudioId/${studioId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const addInternalPayment = async (paymentData) => {
     try {
         const response = await fetchData(`payments/addInternalPayment`, 'post', paymentData);

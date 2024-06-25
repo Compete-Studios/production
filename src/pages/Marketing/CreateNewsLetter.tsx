@@ -3,8 +3,6 @@ import { UserAuth } from '../../context/AuthContext';
 import Hashids from 'hashids';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { sendEmailToClass } from '../../functions/emails';
-import { showErrorMessage, showMessage } from '../../functions/shared';
 import { Link, useParams } from 'react-router-dom';
 import { getProspectsByClassId, getStaffByClassId, getStudentsByClassId } from '../../functions/api';
 import PreviewNewsLetter from './PreviewNewsLetter';

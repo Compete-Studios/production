@@ -41,6 +41,7 @@ const ViewLatePayment = lazy(() => import('../pages/Payments/ViewLatePayment'));
 const ExisitingBillingAccounts = lazy(() => import('../pages/Payments/ExisitingBillingAccounts'));
 const ResolvePayment = lazy(() => import('../pages/Payments/ResolvePayment'));
 const ResolvePaymentTest = lazy(() => import('../pages/Payments/ResolvePaymentTest'));
+const ThankYou = lazy(() => import('../pages/Payments/ThankYou'));
 
 // Staff
 const ViewStaff = lazy(() => import('../pages/Staff/ViewStaff'));
@@ -237,6 +238,11 @@ const routes = [
     {
         path: '/payments/resolve-payment/:payID',
         element: <ResolvePayment />,
+        layout: 'blank',
+    },
+    {
+        path: '/payments/thank-you',
+        element: <ThankYou />,
         layout: 'blank',
     },
     {

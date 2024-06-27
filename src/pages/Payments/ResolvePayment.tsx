@@ -1,6 +1,6 @@
 import Hashids from 'hashids';
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import IconLock from '../../components/Icon/IconLock';
 import IconCircleCheck from '../../components/Icon/IconCircleCheck';
 import { getStudentIdFromPaysimpleCustomerId, getStudentInfo } from '../../functions/api';
@@ -13,11 +13,13 @@ interface CreditCard {
     expDate: string;
     billingZip: string;
     isDefault: boolean;
+    studioId?: number;
 }
 
 export default function ResolvePayment() {
     const hashids = new Hashids();
     const { payID }: any = useParams();
+    const [stud, setStud] = useState<number>(0);
     const [student, setStudent] = useState<any>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [paymentIDInfo, setPaymentIDInfo] = useState<any>(null);
@@ -25,7 +27,7 @@ export default function ResolvePayment() {
     const [year, setYear] = useState<string>('2024');
     const [customerID, setCustomerID] = useState<number>(0);
     const [creditCard, setCreditCard] = useState<any>(null);
-    const [cardLoading, setCardLoading] = useState<boolean>(true);
+    const [cardLoading, setCardLoading] = useState<boolean>(false);
     const [customerPaymentAccount, setCustomerPaymentAccount] = useState<any[]>([]);
     const [creditCardData, setCreditCardData] = useState<CreditCard>({
         ccNumber: '',
@@ -33,7 +35,10 @@ export default function ResolvePayment() {
         expDate: '',
         billingZip: '',
         isDefault: true,
+        studioId: 0,
     });
+
+    const navigate = useNavigate();
 
     const convertToMMYYYY = (month: string, year: string) => {
         return `${month}/${year}`;
@@ -65,7 +70,7 @@ export default function ResolvePayment() {
     };
 
     useEffect(() => {
-        console.log('month', month, 'year', year);
+        
         setCreditCardData({
             ...creditCardData,
             customerId: customerID,
@@ -76,6 +81,7 @@ export default function ResolvePayment() {
     const handleGetStudent = async (studentId: number) => {
         try {
             const res = await getStudentInfo(studentId);
+            setCreditCardData({ ...creditCardData, studioId: res.Studio_ID });
             setStudent(res);
         } catch (error) {
             console.error(error);
@@ -120,6 +126,7 @@ export default function ResolvePayment() {
         const studioId = decoded[1];
         const studentId = decoded[2];
         handleGetStudent(studentId);
+        setStud(studioId);
         handleGetPaymentInfo(paymentId, studioId);
     }, [payID]);
 
@@ -127,9 +134,12 @@ export default function ResolvePayment() {
         const paymentData = {
             paymentAccountId: id,
             amount: paymentIDInfo?.Amount,
+            studioId: stud,
         };
+        
         try {
             const response = await runPaymentForCustomer(paymentData);
+            
             if (response?.Response?.Status === 'Authorized') {
                 setCreditCardData({
                     ccNumber: '',
@@ -137,9 +147,11 @@ export default function ResolvePayment() {
                     expDate: '',
                     billingZip: '',
                     isDefault: false,
+                    studioId: 0,
                 });
                 setCardLoading(false);
                 showMessage('Payment has been processed successfully');
+                navigate('/payments/thank-you');
             } else {
                 const errorMessage = response?.Response?.FailureData?.MerchantActionText || 'An error occurred while processing the payment';
                 showErrorMessage(errorMessage);
@@ -176,8 +188,9 @@ export default function ResolvePayment() {
         } else {
             try {
                 const response = await addCreditCardToCustomer(creditCardData);
+              
                 if (response.status === 200) {
-                    runPayment(response?.Id);
+                    runPayment(response?.cardData?.Id);
                 }
             } catch (error: any) {
                 if (error.response && error.response.status === 400) {
@@ -209,6 +222,8 @@ export default function ResolvePayment() {
             setLoading(false);
         }, 1000);
     }, []);
+
+    
 
     return (
         <>
@@ -246,7 +261,7 @@ export default function ResolvePayment() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="panel p-0">
+                                <div className="panel p-0 mt-4">
                                     <h4 className="text-2xl font-bold bg-danger-light rounded-t-lg p-5"> Failed Payment Information</h4>
                                     <div className="p-5">
                                         <div className="text-lg flex items-center justify-between">
@@ -360,8 +375,18 @@ export default function ResolvePayment() {
                                 </dl>
                                 <div className="flex items-center justify-between py-4 mt-12">
                                     <button className="w-full p-4 btn btn-secondary btn-lg" onClick={handleAddCreditCard}>
-                                        <IconLock className="w-6 h-6 mr-2" />
-                                        Add Card and Pay Now
+                                        {cardLoading ? (
+                                            <>
+                                                {' '}
+                                                <span className="animate-spin border-2 border-white border-l-transparent rounded-full w-5 h-5 ltr:mr-4 rtl:ml-4 inline-block align-middle"></span>
+                                                Processing
+                                            </>
+                                        ) : (
+                                            <>
+                                                <IconLock className="w-6 h-6 mr-2" />
+                                                Add Card and Pay Now
+                                            </>
+                                        )}
                                     </button>
                                 </div>
                                 <div className="py-4 w-full text-center">

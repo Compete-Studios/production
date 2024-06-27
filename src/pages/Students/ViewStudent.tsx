@@ -1200,7 +1200,7 @@ const ViewStudent = () => {
                                                                     <ViewPaymentMethods payID={paySimpleInfo} />
                                                                 </li>
                                                                 <li>
-                                                                    <AddCardModal inStudent={true} />
+                                                                    <AddCardModal inStudent={true} paySimpleID={paySimpleInfo} />
                                                                 </li>
                                                                 <li>
                                                                     <AddBankModal inStudent={true} />

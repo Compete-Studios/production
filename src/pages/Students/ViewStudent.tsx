@@ -45,6 +45,7 @@ import AddStudentToProgram from '../Classes/AddStudenToProgram';
 import AddStudentToWaitingList from '../Classes/AddStudentToWaitingList';
 import SendQuickText from './buttoncomponents/SendQuickText';
 import SendQuickEmail from './buttoncomponents/SendQuickEmail';
+import DeleteStudent from './buttoncomponents/DeleteStudent';
 import ViewStudentActionItem from './ViewStudentActionItem';
 import { Tab } from '@headlessui/react';
 import SendQuickWaiver from './buttoncomponents/SendQuickWaiver';
@@ -441,6 +442,11 @@ const ViewStudent = () => {
         }
     };
 
+    //This function used when deleting a student
+    const handleStudentUpdate = (updatedStudent: any) => {
+        setStudent(updatedStudent);
+    };
+
     return (
         <div>
             <div className="sm:flex sm:items-center sm:justify-between">
@@ -531,7 +537,15 @@ const ViewStudent = () => {
                         <SendQuickText student={student} name="Student" pipeline={pipeline} />
                         <SendQuickWaiver student={student} prospect={false} />
                         <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left">Clone Student</button>
-                        <button className="uppercase font-lg font-bold w-full hover:bg-danger-light p-4 text-left">Delete Student</button>
+                        <DeleteStudent
+                            student={student}
+                            billingInfo={paySimpleInfo}
+                            paymentSchedules={paymentSchedules}
+                            classes={classes}
+                            programs={programs}
+                            waitingLists={waitingLists}
+                            onStudentUpdate={handleStudentUpdate}
+                        />
                     </div>
                 </div>
                 <div className="lg:w-full lg:mt-0 mt-8">

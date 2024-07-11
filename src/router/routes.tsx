@@ -1,6 +1,14 @@
 import { lazy } from 'react';
 import Forms from '../pages/Marketing/Forms';
 import path from 'path';
+import SpaceDashboard from '../pages/Spaces/SpaceDashboard';
+import Bookings from '../pages/Spaces/Bookings';
+import Renters from '../pages/Spaces/Renters';
+import Documents from '../pages/Spaces/Documents';
+import Messages from '../pages/Spaces/Messages';
+import SpaceList from '../pages/Spaces/SpaceList';
+import AddSpace from '../pages/Spaces/AddSpace';
+import ViewSpace from '../pages/Spaces/ViewSpace';
 
 const Overview = lazy(() => import('../pages/Overview'));
 const CompeteLegacyForms = lazy(() => import('../pages/Forms/CompeteLegacyForms'));
@@ -832,6 +840,40 @@ const routes = [
         path: '/admin/crudentials',
         element: <ManageStudioAccounts />,
         layout: 'admin',
+    },
+
+    //space-sharing
+    {
+        path: '/space-sharing/spaces',
+        element: <SpaceDashboard />,
+    },
+    {
+        path: '/space-sharing/bookings',
+        element: <Bookings />,
+    },
+    {
+        path: '/space-sharing/renters',
+        element: <Renters />,
+    },
+    {
+        path: '/space-sharing/documents',
+        element: <Documents />,
+    },
+    {
+        path: '/space-sharing/messages',
+        element: <Messages />,
+    },
+    {
+        path: '/space-sharing/space-list',
+        element: <SpaceList />,
+    },
+    {
+        path: '/space-sharing/post-space',
+        element: <AddSpace />,
+    },
+    {
+        path: '/space-sharing/space/:id',
+        element: <ViewSpace />,
     },
 
     //errors

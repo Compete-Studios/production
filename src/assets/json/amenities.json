@@ -1,0 +1,1325 @@
+{
+  "amenities": [
+    {
+      "value": "Air conditioning"
+    },
+    {
+      "value": "Wifi"
+    },
+    {
+      "value": "High-speed internet"
+    },
+    {
+      "value": "Ethernet connection"
+    },
+    {
+      "value": "Printer"
+    },
+    {
+      "value": "Scanner"
+    },
+    {
+      "value": "Copier"
+    },
+    {
+      "value": "Fax machine"
+    },
+    {
+      "value": "Phone line"
+    },
+    {
+      "value": "Conference room"
+    },
+    {
+      "value": "Meeting room"
+    },
+    {
+      "value": "Whiteboard"
+    },
+    {
+      "value": "Projector"
+    },
+    {
+      "value": "Screen"
+    },
+    {
+      "value": "Video conferencing equipment"
+    },
+    {
+      "value": "Audio conferencing equipment"
+    },
+    {
+      "value": "Kitchenette"
+    },
+    {
+      "value": "Kitchen appliances (refrigerator, microwave, stove, oven, dishwasher)"
+    },
+    {
+      "value": "Coffee machine"
+    },
+    {
+      "value": "Water dispenser"
+    },
+    {
+      "value": "Lounge area"
+    },
+    {
+      "value": "Break room"
+    },
+    {
+      "value": "Reception area"
+    },
+    {
+      "value": "Waiting area"
+    },
+    {
+      "value": "Mailbox"
+    },
+    {
+      "value": "Mail forwarding service"
+    },
+    {
+      "value": "Storage space"
+    },
+    {
+      "value": "Lockers"
+    },
+    {
+      "value": "Secure access system"
+    },
+    {
+      "value": "Elevator"
+    },
+    {
+      "value": "Wheelchair accessibility"
+    },
+    {
+      "value": "On-site parking"
+    },
+    {
+      "value": "Covered parking"
+    },
+    {
+      "value": "Bike parking"
+    },
+    {
+      "value": "Shower facilities"
+    },
+    {
+      "value": "Fitness center"
+    },
+    {
+      "value": "Yoga studio"
+    },
+    {
+      "value": "Meditation room"
+    },
+    {
+      "value": "Dance floor"
+    },
+    {
+      "value": "Performance space"
+    },
+    {
+      "value": "Art gallery"
+    },
+    {
+      "value": "Exhibition space"
+    },
+    {
+      "value": "Music studio"
+    },
+    {
+      "value": "Soundproofing"
+    },
+    {
+      "value": "Recording equipment"
+    },
+    {
+      "value": "Instrument storage"
+    },
+    {
+      "value": "Project room"
+    },
+    {
+      "value": "Darkroom"
+    },
+    {
+      "value": "Photography studio"
+    },
+    {
+      "value": "Green screen"
+    },
+    {
+      "value": "Virtual reality equipment"
+    },
+    {
+      "value": "Gaming console"
+    },
+    {
+      "value": "Board games"
+    },
+    {
+      "value": "Outdoor space (patio, garden, balcony)"
+    },
+    {
+      "value": "Barbecue grill"
+    },
+    {
+      "value": "Smoking area"
+    },
+    {
+      "value": "Pet-friendly"
+    },
+    {
+      "value": "Childcare services"
+    },
+    {
+      "value": "Pet-sitting services"
+    },
+    {
+      "value": "Cleaning services"
+    },
+    {
+      "value": "On-site management"
+    },
+    {
+      "value": "Security"
+    },
+    {
+      "value": "Fire alarm system"
+    },
+    {
+      "value": "Sprinkler system"
+    },
+    {
+      "value": "Emergency exit"
+    },
+    {
+      "value": "First aid kit"
+    },
+    {
+      "value": "Automatic defibrillator"
+    },
+    {
+      "value": "Handicap accessible restroom"
+    },
+    {
+      "value": "Gender-neutral restroom"
+    },
+    {
+      "value": "Water fountain"
+    },
+    {
+      "value": "Vending machines"
+    },
+    {
+      "value": "Snack bar"
+    },
+    {
+      "value": "Restaurant"
+    },
+    {
+      "value": "Food delivery service"
+    },
+    {
+      "value": "Personal chef service"
+    },
+    {
+      "value": "Event planning services"
+    },
+    {
+      "value": "Event catering services"
+    },
+    {
+      "value": "Audio/visual equipment rental"
+    },
+    {
+      "value": "Stage lighting"
+    },
+    {
+      "value": "Props and set pieces"
+    },
+    {
+      "value": "Wardrobe and costume storage"
+    },
+    {
+      "value": "Makeup and dressing room"
+    },
+    {
+      "value": "Green room"
+    },
+    {
+      "value": "VIP lounge"
+    },
+    {
+      "value": "Hospitality suite"
+    },
+    {
+      "value": "On-site accommodations"
+    },
+    {
+      "value": "Hotel services"
+    },
+    {
+      "value": "Laundry facilities"
+    },
+    {
+      "value": "Dry cleaning service"
+    },
+    {
+      "value": "Beauty salon"
+    },
+    {
+      "value": "Barber shop"
+    },
+    {
+      "value": "Nail salon"
+    },
+    {
+      "value": "Massage therapy"
+    },
+    {
+      "value": "Yoga classes"
+    },
+    {
+      "value": "Meditation classes"
+    },
+    {
+      "value": "Pilates classes"
+    },
+    {
+      "value": "Zumba classes"
+    },
+    {
+      "value": "Cooking classes"
+    },
+    {
+      "value": "Art classes"
+    },
+    {
+      "value": "Coffee machine"
+    },
+    {
+      "value": "Water dispenser"
+    },
+    {
+      "value": "Lounge area"
+    },
+    {
+      "value": "Break room"
+    },
+    {
+      "value": "Reception area"
+    },
+    {
+      "value": "Waiting area"
+    },
+    {
+      "value": "Mailbox"
+    },
+    {
+      "value": "Mail forwarding service"
+    },
+    {
+      "value": "Storage space"
+    },
+    {
+      "value": "Lockers"
+    },
+    {
+      "value": "Secure access system"
+    },
+    {
+      "value": "Wheelchair accessibility"
+    },
+    {
+      "value": "On-site parking"
+    },
+    {
+      "value": "Covered parking"
+    },
+    {
+      "value": "Bike parking"
+    },
+    {
+      "value": "Shower facilities"
+    },
+    {
+      "value": "Fitness center"
+    },
+    {
+      "value": "Yoga studio"
+    },
+    {
+      "value": "Meditation room"
+    },
+    {
+      "value": "Dance floor"
+    },
+    {
+      "value": "Performance space"
+    },
+    {
+      "value": "Art gallery"
+    },
+    {
+      "value": "Exhibition space"
+    },
+    {
+      "value": "Music studio"
+    },
+    {
+      "value": "Soundproofing"
+    },
+    {
+      "value": "Recording equipment"
+    },
+    {
+      "value": "Instrument storage"
+    },
+    {
+      "value": "Project room"
+    },
+    {
+      "value": "Darkroom"
+    },
+    {
+      "value": "Photography studio"
+    },
+    {
+      "value": "Green screen"
+    },
+    {
+      "value": "Virtual reality equipment"
+    },
+    {
+      "value": "Gaming console"
+    },
+    {
+      "value": "Board games"
+    },
+    {
+      "value": "Outdoor space (patio, garden, balcony)"
+    },
+    {
+      "value": "Barbecue grill"
+    },
+    {
+      "value": "Smoking area"
+    },
+    {
+      "value": "Pet-friendly"
+    },
+    {
+      "value": "Childcare services"
+    },
+    {
+      "value": "Pet-sitting services"
+    },
+    {
+      "value": "Cleaning services"
+    },
+    {
+      "value": "On-site management"
+    },
+    {
+      "value": "Security"
+    },
+    {
+      "value": "Fire alarm system"
+    },
+    {
+      "value": "Sprinkler system"
+    },
+    {
+      "value": "Emergency exit"
+    },
+    {
+      "value": "First aid kit"
+    },
+    {
+      "value": "Automatic defibrillator"
+    },
+    {
+      "value": "Handicap accessible restroom"
+    },
+    {
+      "value": "Gender-neutral restroom"
+    },
+    {
+      "value": "Water fountain"
+    },
+    {
+      "value": "Vending machines"
+    },
+    {
+      "value": "Snack bar"
+    },
+    {
+      "value": "Restaurant"
+    },
+    {
+      "value": "Food delivery service"
+    },
+    {
+      "value": "Personal chef service"
+    },
+    {
+      "value": "Event planning services"
+    },
+    {
+      "value": "Terrace"
+    },
+    {
+      "value": "Shared garden"
+    },
+    {
+      "value": "Pool"
+    },
+    {
+      "value": "Hot tub"
+    },
+    {
+      "value": "Sauna"
+    },
+    {
+      "value": "Steam room"
+    },
+    {
+      "value": "Movie theater"
+    },
+    {
+      "value": "Music room"
+    },
+    {
+      "value": "Art studio"
+    },
+    {
+      "value": "Workshop space"
+    },
+    {
+      "value": "Storage space"
+    },
+    {
+      "value": "Mailroom"
+    }
+  ],
+  "Churches": [
+    {
+      "value": "Seating"
+    },
+    {
+      "value": "Sound system"
+    },
+    {
+      "value": "A/V equipment"
+    },
+    {
+      "value": "Lighting"
+    },
+    {
+      "value": "Climate control"
+    },
+    {
+      "value": "Restrooms"
+    },
+    {
+      "value": "Parking"
+    },
+    {
+      "value": "Accessibility"
+    },
+    {
+      "value": "Kitchen facilities"
+    },
+    {
+      "value": "Storage space"
+    }
+  ],
+  "Dance Studio": [
+    {
+      "value": "Mirrors"
+    },
+    {
+      "value": "Dance floor"
+    },
+    {
+      "value": "Sound system"
+    },
+    {
+      "value": "Ballet barres"
+    },
+    {
+      "value": "Changing rooms"
+    },
+    {
+      "value": "Restrooms"
+    },
+    {
+      "value": "Climate control"
+    },
+    {
+      "value": "Lighting"
+    },
+    {
+      "value": "Parking"
+    },
+    {
+      "value": "Accessibility"
+    }
+  ],
+  
+  "Martial Arts Studio": [
+    {
+      "value": "Mats"
+    },
+    {
+      "value": "Punching bags"
+    },
+    {
+      "value": "Training dummies"
+    },
+    {
+      "value": "Mirrors"
+    },
+    {
+      "value": "Sound system"
+    },
+    {
+      "value": "Changing rooms"
+    },
+    {
+      "value": "Restrooms"
+    },
+    {
+      "value": "Climate control"
+    },
+    {
+      "value": "Lighting"
+    },
+    {
+      "value": "Parking"
+    },
+    {
+      "value": "Water fountains"
+    },
+    {
+      "value": "Accessibility"
+    }
+  ],
+  "Fitness Studio": [
+    {
+      "value": "Cardio equipment"
+    },
+    {
+      "value": "Treadmills"
+    },
+    {
+      "value": "Ellipticals"
+    },
+    {
+      "value": "Stationary bikes"
+    },
+    {
+      "value": "Strength training equipment"
+    },
+    {
+      "value": "Weight machines"
+    },
+    {
+      "value": "Dumbbells"
+    },
+    {
+      "value": "Barbells"
+    },
+    {
+      "value": "Mats"
+    },
+    {
+      "value": "Sound system"
+    },
+    {
+      "value": "Changing rooms"
+    },
+    {
+      "value": "Restrooms"
+    },
+    {
+      "value": "Climate control"
+    },
+    {
+      "value": "Lighting"
+    },
+    {
+      "value": "Parking"
+    },
+    {
+      "value": "Accessibility"
+    }
+  ],
+  "Yoga Studio": [
+    {
+      "value": "Yoga mats"
+    },
+    {
+      "value": "Blocks"
+    },
+    {
+      "value": "Straps"
+    },
+    {
+      "value": "Blankets"
+    },
+    {
+      "value": "Mirrors"
+    },
+    {
+      "value": "Sound system"
+    },
+    {
+      "value": "Changing rooms"
+    },
+    {
+      "value": "Restrooms"
+    },
+    {
+      "value": "Climate control"
+    },
+    {
+      "value": "Lighting"
+    },
+    {
+      "value": "Parking"
+    },
+    {
+      "value": "Accessibility"
+    }
+  ],
+  "Art Studio": [
+    {
+      "value": "Work tables or easels"
+    },
+    {
+      "value": "Easels"
+    },
+    {
+      "value": "Good lighting"
+    },
+    {
+      "value": "Natural light"
+    },
+    {
+      "value": "Storage space for supplies"
+    },
+    {
+      "value": "Sinks and running water"
+    },
+    {
+      "value": "Adequate ventilation and air circulation"
+    },
+    {
+      "value": "Climate control"
+    },
+    {
+      "value": "Restrooms"
+    },
+    {
+      "value": "Access to electricity/outlets"
+    },
+    {
+      "value": "Accessibility for people with disabilities"
+    }
+  ],
+  "Music Studio": [
+    {
+      "value": "Soundproof rooms"
+    },
+    {
+      "value": "Musical instrument"
+    },
+    {
+      "value": "Tripods and other camera supports"
+    },
+    {
+      "value": "Guitar"
+    },
+    {
+      "value": "Piano"
+    },
+    {
+      "value": "Recording equipment"
+    },
+    {
+      "value": "Headphones"
+    },
+    {
+      "value": "Microphones"
+    },
+    {
+      "value": "Sound system"
+    },
+    {
+      "value": "Storage space for equipment"
+    },
+    {
+      "value": "Climate control"
+    },
+    {
+      "value": "Lighting"
+    },
+    {
+      "value": "Restrooms"
+    },
+    {
+      "value": "Accessibility"
+    }
+  ],
+  "Photography Studio": [
+    {
+      "value": "Backdrops and props"
+    },
+    {
+      "value": "Lighting equipment"
+    },
+    {
+      "value": "Strobes"
+    },
+    {
+      "value": "Softboxes"
+    },
+    {
+      "value": "Reflectors"
+    },
+    {
+      "value": "Cameras"
+    },
+    {
+      "value": "Lenses"
+    },
+    {
+      "value": "Photography gear"
+    },
+    {
+      "value": "Tripods"
+    },
+    {
+      "value": "Computer workstations"
+    },
+    {
+      "value": "High-speed internet"
+    },
+    {
+      "value": "Printing equipment"
+    },
+    {
+      "value": "Climate control"
+    },
+    {
+      "value": "Restrooms"
+    },
+    {
+      "value": "Accessibility"
+    }
+  ],
+  "Crafting Studio": [
+    {
+      "value": "Work tables"
+    },
+    {
+      "value": "Workbenches"
+    },
+    {
+      "value": "Lighting, including natural light"
+    },
+    {
+      "value": "Natural light"
+    },
+    {
+      "value": "Storage space for supplies"
+    },
+    {
+      "value": "Sinks and running water"
+    },
+    {
+      "value": "Adequate ventilation and air circulation"
+    },
+    {
+      "value": "Climate control"
+    },
+    {
+      "value": "Restrooms"
+    },
+    {
+      "value": "Access to electricity/outlets"
+    },
+    {
+      "value": "Accessibility"
+    }
+  ],
+  "Offices": [
+    {
+      "value": "High-speed internet"
+    },
+    {
+      "value": "Workstations"
+    },
+    {
+      "value": "Meeting rooms"
+    },
+    {
+      "value": "Phone system"
+    },
+    {
+      "value": "Printing and copying"
+    },
+    {
+      "value": "Climate control"
+    },
+    {
+      "value": "Security"
+    },
+    {
+      "value": "Storage space"
+    },
+    {
+      "value": "Kitchen"
+    },
+    {
+      "value": "Accessible location"
+    }
+  ],
+  "Gym": [
+    {
+      "value": "Workout equipment"
+    },
+    {
+      "value": "Mirrors"
+    },
+    {
+      "value": "Sound system"
+    },
+    {
+      "value": "Locker rooms"
+    },
+    {
+      "value": "Showers"
+    },
+    {
+      "value": "Restrooms"
+    },
+    {
+      "value": "Water fountains"
+    },
+    {
+      "value": "Air conditioning/Heating"
+    },
+    {
+      "value": "Parking"
+    },
+    {
+      "value": "Accessibility"
+    }
+  ],
+  "Co-Working": [
+    {
+      "value": "Workstations (e.g. desks, chairs, lamps)"
+    },
+    {
+      "value": "Chairs"
+    },
+    {
+      "value": "Desks"
+    },
+    {
+      "value": "Lamps"
+    },
+    {
+      "value": "High-speed internet"
+    },
+    {
+      "value": "Conference rooms"
+    },
+    {
+      "value": "Phones"
+    },
+    {
+      "value": "Printing/copying equipment"
+    },
+    {
+      "value": "Break Room"
+    },
+    {
+      "value": "Refrigerator"
+    },
+    {
+      "value": "Microwave"
+    },
+    {
+      "value": "Coffee maker"
+    },
+    {
+      "value": "Restrooms"
+    },
+    {
+      "value": "Climate control"
+    },
+    {
+      "value": "Security features"
+    }
+  ],
+  "Kitchen": [
+    {
+      "value": "Appliances"
+    },
+    {
+      "value": "Oven"
+    },
+    {
+      "value": "Gas Stove"
+    },
+    {
+      "value": "Electric Stove"
+    },
+    {
+      "value": "Refrigerator"
+    },
+    {
+      "value": "Microwave"
+    },
+    {
+      "value": "Dishwasher"
+    },
+    {
+      "value": "Cookware and bakeware"
+    },
+    {
+      "value": "Utensils"
+    },
+    {
+      "value": "Dishes"
+    },
+    {
+      "value": "Glasses"
+    },
+    {
+      "value": "Silverware"
+    },
+    {
+      "value": "Cutting boards"
+    },
+    {
+      "value": "Sink and running water"
+    },
+    {
+      "value": "Counter space for food prep"
+    },
+    {
+      "value": "Trash and recycling receptacles"
+    },
+    {
+      "value": "Climate control"
+    },
+    {
+      "value": "Accessibility"
+    }
+  ],
+  "School": [
+    {
+      "value": "Classrooms"
+    },
+    {
+      "value": "Desks"
+    },
+    {
+      "value": "Chairs"
+    },
+    {
+      "value": "Whiteboards"
+    },
+    {
+      "value": "Chalkboards"
+    },
+    {
+      "value": "Audio-visual equipment"
+    },
+    {
+      "value": "Projectors"
+    },
+    {
+      "value": "Screens"
+    },
+    {
+      "value": "Speakers"
+    },
+    {
+      "value": "Computer workstations"
+    },
+    {
+      "value": "Library or reading room"
+    },
+    {
+      "value": "Gymnasium"
+    },
+    {
+      "value": "Sports Fields"
+    },
+    {
+      "value": "Restrooms"
+    },
+    {
+      "value": "Climate control"
+    },
+    {
+      "value": "Security features"
+    },
+    {
+      "value": "Accessibility"
+    }
+  ],
+  "Venue": [
+    {
+      "value": "Tables"
+    },
+    {
+      "value": "Chairs"
+    },
+    {
+      "value": "Sound system"
+    },
+    {
+      "value": "Lighting"
+    },
+    {
+      "value": "Stage"
+    },
+    {
+      "value": "Dance floor"
+    },
+    {
+      "value": "Catering kitchen or food service area"
+    },
+    {
+      "value": "Bar"
+    },
+    {
+      "value": "Restrooms"
+    },
+    {
+      "value": "Climate control"
+    },
+    {
+      "value": "Parking"
+    },
+    {
+      "value": "Valet service"
+    },
+    {
+      "value": "Accessibility"
+    }
+  ],
+  "Vacation Rental": [
+    {
+      "value": "Beds"
+    },
+    {
+      "value": "Linens"
+    },
+    {
+      "value": "Bathrooms"
+    },
+    {
+      "value": "Living room"
+    },
+    {
+      "value": "Kitchen with appliances"
+    },
+    {
+      "value": "Dining area with table and chairs"
+    },
+    {
+      "value": "Television"
+    },
+    {
+      "value": "Outdoor space"
+    },
+    {
+      "value": "Outdoor seating"
+    },
+    {
+      "value": "Grill"
+    },
+    {
+      "value": "Laundry facilities"
+    },
+    {
+      "value": "Parking"
+    },
+    {
+      "value": "Internet access"
+    }
+  ],
+  "Industrial": [
+    {
+      "value": "Loading dock"
+    },
+    {
+      "value": "Drive-in access"
+    },
+    {
+      "value": "High ceilings"
+    },
+    {
+      "value": "Industrial lighting"
+    },
+    {
+      "value": "Electrical outlets and power supply"
+    },
+    {
+      "value": "Storage space"
+    },
+    {
+      "value": "Restrooms"
+    },
+    {
+      "value": "Climate control"
+    },
+    {
+      "value": "Security features"
+    },
+    {
+      "value": "Accessibility"
+    }
+  ],
+  "Retail": [
+    {
+      "value": "Sales floor or showroom space"
+    },
+    {
+      "value": "Display cases or shelves"
+    },
+    {
+      "value": "Lighting"
+    },
+    {
+      "value": "Point-of-sale equipment"
+    },
+    {
+      "value": "Storage space"
+    },
+    {
+      "value": "Restrooms"
+    },
+    {
+      "value": "Climate control"
+    },
+    {
+      "value": "Security features"
+    },
+    {
+      "value": "Parking"
+    },
+    {
+      "value": "Accessibility"
+    }
+  ],
+  "Medical Facility": [
+    {
+      "value": "Examination rooms"
+    },
+    {
+      "value": "Patient areas"
+    },
+    {
+      "value": "Medical equipment and supplies"
+    },
+    {
+      "value": "Waiting room with seating"
+    },
+    {
+      "value": "Reception desk and check-in area"
+    },
+    {
+      "value": "Administrative office space"
+    },
+    {
+      "value": "Restrooms"
+    },
+    {
+      "value": "Climate control"
+    },
+    {
+      "value": "Security features"
+    },
+    {
+      "value": "Parking"
+    },
+    {
+      "value": "Accessibility"
+    }
+  ],
+  "Parking": [
+    {
+      "value": "Marked parking spots"
+    },
+    {
+      "value": "Lighting"
+    },
+    {
+      "value": "Security Cameras"
+    },
+    {
+      "value": "Security Attendants"
+    },
+    {
+      "value": "Parking payment system"
+    },
+    {
+      "value": "Signage to available spots"
+    },
+    {
+      "value": "Restrooms"
+    },
+    {
+      "value": "Accessible parking"
+    },
+    {
+      "value": "Shaded Area"
+    }
+  ],
+  "Land": [
+    {
+      "value": "Clear boundaries"
+    },
+    {
+      "value": "Accessible roadways"
+    },
+    {
+      "value": "Access to Water"
+    },
+    {
+      "value": "Access to Electricity"
+    },
+    {
+      "value": "Tent or shelter rental options"
+    },
+    {
+      "value": "Portable restroom rental options"
+    },
+    {
+      "value": "Trash and recycling receptacles"
+    },
+    {
+      "value": "Parking"
+    },
+    {
+      "value": "Shaded Areas"
+    },
+    {
+      "value": "Security features"
+    },
+    {
+      "value": "Fences"
+    }
+  ]
+}

@@ -62,6 +62,8 @@ export default function ViewPaymentMethods({ payID }: any) {
         }
     }, [cards]);
 
+    console.log(cards)
+
     return (
         <div>
             <button className="uppercase font-lg font-bold w-full hover:bg-info-light p-4 text-left flex items-center gap-4 whitespace-nowrap" onClick={() => setViewCards(true)}>

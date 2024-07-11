@@ -1,0 +1,104 @@
+{
+  "times": [
+    {
+      "dbvalue": 0,
+      "displayValue": "12:00am"
+    },
+    {
+      "dbvalue": 1,
+      "displayValue": "1:00am"
+    },
+    {
+      "dbvalue": 2,
+      "displayValue": "2:00am"
+    },
+    {
+      "dbvalue": 3,
+      "displayValue": "3:00am"
+    },
+    {
+      "dbvalue": 4,
+      "displayValue": "4:00am"
+    },
+    {
+      "dbvalue": 5,
+      "displayValue": "5:00am"
+    },
+    {
+      "dbvalue": 6,
+      "displayValue": "6:00am"
+    },
+    {
+      "dbvalue": 7,
+      "displayValue": "7:00am"
+    },
+    {
+      "dbvalue": 8,
+      "displayValue": "8:00am"
+    },
+    {
+      "dbvalue": 9,
+      "displayValue": "9:00am"
+    },
+    {
+      "dbvalue": 10,
+      "displayValue": "10:00am"
+    },
+    {
+      "dbvalue": 11,
+      "displayValue": "11:00am"
+    },
+    {
+      "dbvalue": 12,
+      "displayValue": "12:00pm"
+    },
+    {
+      "dbvalue": 13,
+      "displayValue": "1:00pm"
+    },
+    {
+      "dbvalue": 14,
+      "displayValue": "2:00pm"
+    },
+    {
+      "dbvalue": 15,
+      "displayValue": "3:00pm"
+    },
+    {
+      "dbvalue": 16,
+      "displayValue": "4:00pm"
+    },
+    {
+      "dbvalue": 17,
+      "displayValue": "5:00pm"
+    },
+    {
+      "dbvalue": 18,
+      "displayValue": "6:00pm"
+    },
+    {
+      "dbvalue": 19,
+      "displayValue": "7:00pm"
+    },
+    {
+      "dbvalue": 20,
+      "displayValue": "8:00pm"
+    },
+    {
+      "dbvalue": 21,
+      "displayValue": "9:00pm"
+    },
+    {
+      "dbvalue": 22,
+      "displayValue": "10:00pm"
+    },
+    {
+      "dbvalue": 23,
+      "displayValue": "11:00pm"
+    },
+    {
+      "dbvalue": 24,
+      "displayValue": "11:59pm"
+    }
+  ]
+}

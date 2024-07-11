@@ -39,9 +39,7 @@ export default function AddCardModal({ student, paySimpleID, cards, update, setU
         billingZip: '',
         isDefault: true,
         studioId: suid,
-    });
-
-    console.log('paySimpleID', paySimpleID);
+    });   
 
     const convertToMMYYYY = (month: string, year: string) => {
         return `${month}/${year}`;

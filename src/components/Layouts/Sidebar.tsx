@@ -31,6 +31,8 @@ import IconMail from '../Icon/IconMail';
 import IconMenuNotes from '../Icon/Menu/IconMenuNotes';
 import IconNotesEdit from '../Icon/IconNotesEdit';
 import IconSearch from '../Icon/IconSearch';
+import IconUsersGroup from '../Icon/IconUsersGroup';
+import IconMenuDatatables from '../Icon/Menu/IconMenuDatatables';
 
 const Sidebar = () => {
     const { isMaster, masters, suid }: any = UserAuth();
@@ -163,7 +165,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'classes' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('classes')}>
                                     <div className="flex items-center">
-                                        <IconMenuWidgets className="group-hover:!text-primary shrink-0" />
+                                        <IconMenuDatatables className="group-hover:!text-primary shrink-0" />
                                         <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Classes</span>
                                     </div>
 
@@ -230,7 +232,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'staff' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('staff')}>
                                     <div className="flex items-center">
-                                        <IconMenuUsers className="group-hover:!text-primary shrink-0" />
+                                        <IconUsersGroup fill={true} className="group-hover:!text-primary shrink-0" />
                                         <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Staff</span>
                                     </div>
 
@@ -246,6 +248,38 @@ const Sidebar = () => {
                                         </li>
                                         <li>
                                             <NavLink to="/staff/add-staff">Add Staff</NavLink>
+                                        </li>
+                                    </ul>
+                                </AnimateHeight>
+                            </li>
+                            <li className="menu nav-item">
+                                <button type="button" className={`${currentMenu === 'premium' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('premium')}>
+                                    <div className="flex items-center">
+                                        <IconMenuAuthentication className="group-hover:!text-primary shrink-0" />
+                                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Premium Tools</span>
+                                    </div>
+
+                                    <div className={currentMenu !== 'premium' ? 'rtl:rotate-90 -rotate-90' : ''}>
+                                        <IconCaretDown />
+                                    </div>
+                                </button>
+
+                                <AnimateHeight duration={300} height={currentMenu === 'premium' ? 'auto' : 0}>
+                                    <ul className="sub-menu text-gray-500">
+                                        <li>
+                                            <NavLink  to="/marketing/view-emails">View Emails</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/marketing/view-news-letters">View NewsLetters</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/marketing/email-lists">Emailing Lists</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/marketing/view-news-letters">View NewsLetters</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/marketing/view-text-messages">Text Messages</NavLink>
                                         </li>
                                     </ul>
                                 </AnimateHeight>
@@ -325,6 +359,41 @@ const Sidebar = () => {
                                 <IconMinus className="w-4 h-5 flex-none hidden" />
                                 <span>Tools</span>
                             </h2>
+                            <li className="menu nav-item">
+                                <button type="button" className={`${currentMenu === 'space' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('space')}>
+                                    <div className="flex items-center text-info">
+                                        <IconMenuWidgets className="group-hover:!text-primary shrink-0 text-info" />
+                                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Space Sharing</span>
+                                    </div>
+
+                                    <div className={currentMenu !== 'space' ? 'rtl:rotate-90 -rotate-90' : ''}>
+                                        <IconCaretDown />
+                                    </div>
+                                </button>
+
+                                <AnimateHeight duration={300} height={currentMenu === 'space' ? 'auto' : 0}>
+                                    <ul className="sub-menu text-gray-500">
+                                        <li>
+                                            <NavLink  to="/space-sharing/spaces">Dashboard</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink  to="/space-sharing/space-list">Spaces</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/space-sharing/bookings">Bookings</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/space-sharing/renters">Renters</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/space-sharing/documents">Documents</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/space-sharing/messages">Messages</NavLink>
+                                        </li>
+                                    </ul>
+                                </AnimateHeight>
+                            </li>
                             <li className="nav-item">
                                 <NavLink to="/reports/all-reports" className="group">
                                     <div className="flex items-center">
@@ -335,30 +404,30 @@ const Sidebar = () => {
                             </li>
                             <li className="nav-item">
                                 <ul>
-                                    <li className="nav-item">
+                                    {/* <li className="nav-item">
                                         <NavLink to="/marketing/view-emails" className="group">
                                             <div className="flex items-center">
                                                 <IconMenuMailbox className="group-hover:!text-primary shrink-0" />
                                                 <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('View Emails')}</span>
                                             </div>
                                         </NavLink>
-                                    </li>
-                                    <li className="nav-item">
+                                    </li> */}
+                                    {/* <li className="nav-item">
                                         <NavLink to="/marketing/view-news-letters" className="group">
                                             <div className="flex items-center">
                                                 <IconMenuNotes className="group-hover:!text-primary shrink-0" />
                                                 <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('View Newsletters')}</span>
                                             </div>
                                         </NavLink>
-                                    </li>
-                                    <li className="nav-item">
+                                    </li> */}
+                                    {/* <li className="nav-item">
                                         <NavLink to="/marketing/email-lists" className="group">
                                             <div className="flex items-center">
                                                 <IconMenuForms className="group-hover:!text-primary shrink-0" />
                                                 <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Emailing Lists')}</span>
                                             </div>
                                         </NavLink>
-                                    </li>
+                                    </li> */}
                                     <li className="nav-item">
                                         <NavLink to="/marketing/capture-forms" className="group">
                                             <div className="flex items-center">

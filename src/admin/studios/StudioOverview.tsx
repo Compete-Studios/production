@@ -22,7 +22,6 @@ import BulkUpload from './BulkUpload';
 import { showMessage, showErrorMessage } from '../../functions/shared';
 import { getStudioInfo, updateStudioActivity } from '../../functions/api';
 
-
 const StudioOverview = () => {
     const suid = useParams<{ id: string }>();
     const dispatch = useDispatch();
@@ -45,10 +44,12 @@ const StudioOverview = () => {
     };
 
     const handleDeactivate = async () => {
-        try{
+        try {
             await updateStudioActivity(suid.id, 0);
-            showMessage('Studio successfully deactivated. Their login privileges are suspended and they will no longer appear on the list of active studios. Please note that this did NOT change any payments or arrangements with Mailgun or Plivo.');
-        }catch(error){
+            showMessage(
+                'Studio successfully deactivated. Their login privileges are suspended and they will no longer appear on the list of active studios. Please note that this did NOT change any payments or arrangements with Mailgun or Plivo.'
+            );
+        } catch (error) {
             console.error('Failed to deactivate studio:', error);
             showErrorMessage(`Failed to deactivate studio. Error: ${(error as Error).message}`);
         }
@@ -100,14 +101,11 @@ const StudioOverview = () => {
                         </button>
                     ) : (
                         <>
-                            <div className="text-lg text-red-500 font-semibold">
-                                This studio is not active.
-                            </div>
+                            <div className="text-lg text-red-500 font-semibold">This studio is not active.</div>
                             <button className="btn btn-primary gap-x-1 w-full sm:w-auto" onClick={handleReactivate}>
                                 <IconRefresh className="w-5 h-5" /> Reactivate Studio
                             </button>
                         </>
-
                     )}
                 </div>
             </div>
@@ -116,8 +114,9 @@ const StudioOverview = () => {
                     <Tab as={Fragment}>
                         {({ selected }) => (
                             <button
-                                className={`${selected ? 'text-info !outline-none before:!w-full' : ''
-                                    } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
+                                className={`${
+                                    selected ? 'text-info !outline-none before:!w-full' : ''
+                                } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
                             >
                                 <IconUser className="w-5 h-5 ltr:mr-2 rtl:ml-2" />
                                 Studio Info
@@ -127,8 +126,9 @@ const StudioOverview = () => {
                     <Tab as={Fragment}>
                         {({ selected }) => (
                             <button
-                                className={`${selected ? 'text-info !outline-none before:!w-full' : ''
-                                    } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
+                                className={`${
+                                    selected ? 'text-info !outline-none before:!w-full' : ''
+                                } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
                             >
                                 <IconChecks className="w-5 h-5 ltr:mr-2 rtl:ml-2" />
                                 Studio Limits
@@ -138,8 +138,9 @@ const StudioOverview = () => {
                     <Tab as={Fragment}>
                         {({ selected }) => (
                             <button
-                                className={`${selected ? 'text-info !outline-none before:!w-full' : ''
-                                    } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
+                                className={`${
+                                    selected ? 'text-info !outline-none before:!w-full' : ''
+                                } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
                             >
                                 <IconDollarSign className="w-5 h-5 ltr:mr-2 rtl:ml-2" />
                                 Paysimple Integration
@@ -149,8 +150,9 @@ const StudioOverview = () => {
                     <Tab as={Fragment}>
                         {({ selected }) => (
                             <button
-                                className={`${selected ? 'text-info !outline-none before:!w-full' : ''
-                                    } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
+                                className={`${
+                                    selected ? 'text-info !outline-none before:!w-full' : ''
+                                } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
                             >
                                 <IconMail className="w-5 h-5 ltr:mr-2 rtl:ml-2" />
                                 Email Setup
@@ -160,8 +162,9 @@ const StudioOverview = () => {
                     <Tab as={Fragment}>
                         {({ selected }) => (
                             <button
-                                className={`${selected ? 'text-info !outline-none before:!w-full' : ''
-                                    } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
+                                className={`${
+                                    selected ? 'text-info !outline-none before:!w-full' : ''
+                                } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
                             >
                                 <IconMessage className="w-5 h-5 ltr:mr-2 rtl:ml-2" />
                                 Text Message Setup
@@ -171,15 +174,15 @@ const StudioOverview = () => {
                     <Tab as={Fragment}>
                         {({ selected }) => (
                             <button
-                                className={`${selected ? 'text-info !outline-none before:!w-full' : ''
-                                    } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
+                                className={`${
+                                    selected ? 'text-info !outline-none before:!w-full' : ''
+                                } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
                             >
                                 <IconFile className="w-5 h-5 ltr:mr-2 rtl:ml-2" />
                                 Bulk Upload
                             </button>
                         )}
                     </Tab>
-                    
                 </Tab.List>
                 <Tab.Panels>
                     <Tab.Panel>

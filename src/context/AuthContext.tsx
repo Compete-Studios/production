@@ -33,6 +33,7 @@ export default function AuthContextProvider({ children }: any) {
     const [fbForms, setFBForms] = useState<any>([]);
     const [masterStudio, setMasterStudio] = useState<any>(null);
     const [layout, setLayout] = useState<any>({});
+    const [spaces, setSpaces] = useState<any>([]);
     const [update, setUpdate] = useState(false);
     const [inactiveStudents, setInactiveStudents] = useState<any>([]);
     const [emailList, setEmailList] = useState<any>([]);
@@ -40,6 +41,18 @@ export default function AuthContextProvider({ children }: any) {
         status: false,
         prospect: null,
     });
+
+    const getAllSpaces = async (uid: any) => {
+        const spacesRef = collection(db, "spaces");
+        const uidToString = uid.toString();
+        const q = query(spacesRef, where('userID', '==', uidToString));
+        const querySnapshot = await getDocs(q);
+        let spacesArray: any[] = [];
+        querySnapshot.forEach((doc) => {
+            spacesArray.push({ ...doc.data(), id: doc.id });
+        });
+        setSpaces(spacesArray);
+    };
 
     const fetchData = async (url: any, setter: any) => {
         try {
@@ -95,6 +108,7 @@ export default function AuthContextProvider({ children }: any) {
         fetchData(`${REACT_API_BASE_URL}/student-access/getPaymentPipelineStepsByStudioId/${suid}`, setLatePayementPipeline);
         fetchData(`${REACT_API_BASE_URL}/studio-access/getStudentsByStudioId/${suid}/1`, setStudents);
         fetchRecordSet(`${REACT_API_BASE_URL}/studio-access/getStudioOptions/${suid}`, setStudioOptions);
+        getAllSpaces(suid);
     };
 
     const getSCHDATA = async () => {
@@ -106,8 +120,6 @@ export default function AuthContextProvider({ children }: any) {
             console.error('No response');
         }
     };
-
-   
 
     const getStudioInfo = async (suid: any, main: any) => {
         try {
@@ -237,6 +249,7 @@ export default function AuthContextProvider({ children }: any) {
                 inactiveStudents,
                 emailList,
                 setEmailList,
+                spaces
             }}
         >
             {children}

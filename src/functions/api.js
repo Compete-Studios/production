@@ -1654,3 +1654,13 @@ export const searchAll = async (searchData) => {
         throw error;
     }
 };
+
+export const getStudentsByBillingId = async (billingId) => {
+    try {
+        const response = await fetchData(`billing-account-access/getStudentsByBillingId/${billingId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};

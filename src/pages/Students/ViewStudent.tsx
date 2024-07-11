@@ -13,6 +13,7 @@ import {
     dropStudentFromClass,
     dropStudentFromProgram,
     dropStudentFromWaitingList,
+    dropStudent,
     getClassesByStudentId,
     getPaymentScheduleByID,
     getPaymentSchedulesForCustomer,
@@ -44,6 +45,7 @@ import AddStudentToProgram from '../Classes/AddStudenToProgram';
 import AddStudentToWaitingList from '../Classes/AddStudentToWaitingList';
 import SendQuickText from './buttoncomponents/SendQuickText';
 import SendQuickEmail from './buttoncomponents/SendQuickEmail';
+import DeleteStudent from './buttoncomponents/DeleteStudent';
 import ViewStudentActionItem from './ViewStudentActionItem';
 import { Tab } from '@headlessui/react';
 import SendQuickWaiver from './buttoncomponents/SendQuickWaiver';
@@ -420,6 +422,31 @@ const ViewStudent = () => {
 
     const payHistoryIds = hashids.encode(paySimpleInfo, (student?.Student_id));   
 
+    const reactivateStudent = async () => {
+        const data = {
+            studentId: student?.Student_id,
+            activityLevel: 1,
+        };
+        try{
+            const active = await dropStudent(data);
+            if(active){
+                showMessage('Student Reactivated');
+                setStudent({...student, activity: 1});
+            }
+            else{
+                showWarningMessage('Student could not be reactivated');
+            }
+        }catch(error){
+            console.log(error);
+            showWarningMessage('There was an error. Student could not be reactivated');
+        }
+    };
+
+    //This function used when deleting a student
+    const handleStudentUpdate = (updatedStudent: any) => {
+        setStudent(updatedStudent);
+    };
+
     return (
         <div>
             <div className="sm:flex sm:items-center sm:justify-between">
@@ -452,8 +479,17 @@ const ViewStudent = () => {
                             <p className="font-normal text-sm">{student?.email}</p>
                             <p className="font-normal text-sm">{convertPhoneNumber(student?.Phone)}</p>
                             <p className="font-normal text-sm">{convertPhoneNumber(student?.Phone2)}</p>
-
-                            <p className={`font-normal text-md mt-4 ${student?.activity ? 'text-success' : 'text-danger'}`}>{student?.activity ? 'Active' : 'Inactive'}</p>
+                            <div>
+                                <p className={`font-normal text-md mt-4 ${student?.activity ? 'text-success' : 'text-danger'}`}>{student?.activity ? 'Active' : 'Inactive'}</p>
+                                {!student?.activity && (
+                                    <button
+                                        className="mt-2 px-4 py-2 bg-red-600 text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-red-700 focus:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-600 transition-all duration-300 ease-in-out"
+                                        onClick={() => { reactivateStudent() }}
+                                    >
+                                        Reactivate Student
+                                    </button>
+                                )}
+                            </div>
                             <p className="font-normal text-xs ">Next Contact Date: {formatDate(student?.NextContactDate)}</p>
                             <p className="font-normal text-xs ">Created: {formatDate(student?.EntryDate)}</p>
                             <p className={`font-normal text-xs ${rank ? 'text-success' : 'text-danger'}`}>Rank: {rank ? rank : 'No rank set'}</p>
@@ -501,7 +537,15 @@ const ViewStudent = () => {
                         <SendQuickText student={student} name="Student" pipeline={pipeline} />
                         <SendQuickWaiver student={student} prospect={false} />
                         <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left">Clone Student</button>
-                        <button className="uppercase font-lg font-bold w-full hover:bg-danger-light p-4 text-left">Delete Student</button>
+                        <DeleteStudent
+                            student={student}
+                            billingInfo={paySimpleInfo}
+                            paymentSchedules={paymentSchedules}
+                            classes={classes}
+                            programs={programs}
+                            waitingLists={waitingLists}
+                            onStudentUpdate={handleStudentUpdate}
+                        />
                     </div>
                 </div>
                 <div className="lg:w-full lg:mt-0 mt-8">

@@ -11,7 +11,7 @@ import Error from './Error';
 import IconMail from '../../components/Icon/IconMail';
 
 const LoginBoxed = () => {
-    const { isLoggedIn }: any = UserAuth();
+    const { isLoggedIn, setShowLoading }: any = UserAuth();
     const [userName, setUserName] = useState('');
     const [email, setEmail] = useState('');
     const [userNameOption, setUserNameOption] = useState(false);
@@ -29,6 +29,7 @@ const LoginBoxed = () => {
 
     const submitForm = async (e: any) => {
         e.preventDefault();
+        setShowLoading(true);
         let response = null;
         const doesUsernameContainAt = userName.includes('@');
         console.log(doesUsernameContainAt);

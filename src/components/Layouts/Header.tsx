@@ -7,7 +7,8 @@ import { useTranslation } from 'react-i18next';
 import Dropdown from '../Dropdown';
 import IconMenu from '../Icon/IconMenu';
 import IconCalendar from '../Icon/IconCalendar';
-import IconChatNotification from '../Icon/IconChatNotification';
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
 import IconSearch from '../Icon/IconSearch';
 import IconXCircle from '../Icon/IconXCircle';
 import IconSun from '../Icon/IconSun';
@@ -40,7 +41,7 @@ import IconSettings from '../Icon/IconSettings';
 import { deleteMessage, listenForMessages } from '../../firebase/firebaseFunctions';
 
 const Header = () => {
-    const { setSearchedStudentsAndProspects, suid, studioInfo, isMaster, masters, setSelectedSuid, isAdmin }: any = UserAuth();
+    const { setSearchedStudentsAndProspects, suid, studioInfo, isMaster, masters, setSelectedSuid, isAdmin, setShowLoading }: any = UserAuth();
     const [searchItem, setSearchItem] = useState('');
     const [studioInitials, setStudioInitials] = useState('');
     const [options, setOptions] = useState<any>([]);
@@ -265,6 +266,7 @@ const Header = () => {
     const { t } = useTranslation();
 
     const handleLogOut = () => {
+        setShowLoading(true);
         logout();
     };
 
@@ -318,18 +320,22 @@ const Header = () => {
                     <div className="ltr:mr-2 rtl:ml-2 hidden sm:block">
                         <ul className="flex items-center space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6]">
                             <li>
+                            <Tippy content="Event Calendar" placement="bottom">
                                 <Link to="/apps/calendar" className="block p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60">
                                     <IconCalendar />
                                 </Link>
+                                </Tippy>
                             </li>
+                            <Tippy content="Add Student Note" placement="bottom">
                             <li>
                                 <AddStudentNote />
                             </li>
-                            <li>
+                            </Tippy>
+                            {/* <li>
                                 <Link to="/apps/chat" className="block p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60">
                                     <IconChatNotification />
                                 </Link>
-                            </li>
+                            </li> */}
                         </ul>
                     </div>
                     <div className="sm:flex-1 ltr:sm:ml-0 ltr:ml-auto sm:rtl:mr-0 rtl:mr-auto flex items-center space-x-1.5 lg:space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6]">

@@ -549,6 +549,9 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
     }
 }
 
+/* make scrollbar thin */
+
+
 /* perfect scrollbar */
 .ps__rail-y > .ps__thumb-y,
 .ps__rail-y > .ps__thumb-y {

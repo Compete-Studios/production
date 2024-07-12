@@ -10,11 +10,11 @@ import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import IconPlus from '../../components/Icon/IconPlus';
 import IconX from '../../components/Icon/IconX';
-import { createEvent } from '../../firebase/auth';
 import { UserAuth } from '../../context/AuthContext';
+import { createEvent } from '../../firebase/firebaseFunctions';
 
 const Calendar = () => {
-    const { suid, inactiveStudents } : any = UserAuth();
+    const { suid, events, setEvents }: any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Calendar'));
@@ -27,19 +27,6 @@ const Calendar = () => {
         // return dt.getMonth() < 10 ? '0' + month : month;
     };
 
-    console.log('inactiveStudents', inactiveStudents);
-
-    const [events, setEvents] = useState<any>([
-        {
-            id: 1,
-            title: 'All Day Event',
-            start: "2021" + '-' + "04" + '-01T14:30:00',
-            end: "2021" + '-' + "05" + '-02T14:30:00',
-            className: 'danger',
-            description: 'Aenean fermentum quam vel sapien rutrum cursus. Vestibulum imperdiet finibus odio, nec tincidunt felis facilisis eu.',
-        },
- 
-    ]);
     const [isAddEventModal, setIsAddEventModal] = useState(false);
     const [minStartDate, setMinStartDate] = useState<any>('');
     const [minEndDate, setMinEndDate] = useState<any>('');
@@ -54,6 +41,7 @@ const Calendar = () => {
         dt = dt.getFullYear() + '-' + month + '-' + date + 'T' + hours + ':' + mins;
         return dt;
     };
+
     const editEvent = (data: any = null) => {
         let params = JSON.parse(JSON.stringify(defaultParams));
         setParams(params);
@@ -75,6 +63,7 @@ const Calendar = () => {
         }
         setIsAddEventModal(true);
     };
+
     const editDate = (data: any) => {
         let obj = {
             event: {
@@ -112,7 +101,6 @@ const Calendar = () => {
         } else {
             //add event
 
-
             let maxEventId = 0;
             if (events) {
                 maxEventId = events.reduce((max: number, character: any) => (character.id > max ? character.id : max), events[0].id);
@@ -126,7 +114,8 @@ const Calendar = () => {
                 description: params.description,
                 className: params.type,
             };
-            // createEvent(event, suid);
+            createEvent(event, suid);
+            localStorage.setItem('qued', 'true');
             let dataevent = events || [];
             dataevent = dataevent.concat([event]);
             setTimeout(() => {
@@ -161,6 +150,7 @@ const Calendar = () => {
             padding: '10px 20px',
         });
     };
+    
 
     return (
         <div>
@@ -171,15 +161,19 @@ const Calendar = () => {
                         <div className="flex items-center mt-2 flex-wrap sm:justify-start justify-center">
                             <div className="flex items-center ltr:mr-4 rtl:ml-4">
                                 <div className="h-2.5 w-2.5 rounded-sm ltr:mr-2 rtl:ml-2 bg-primary"></div>
-                                <div>Work</div>
+                                <div>Class</div>
                             </div>
                             <div className="flex items-center ltr:mr-4 rtl:ml-4">
                                 <div className="h-2.5 w-2.5 rounded-sm ltr:mr-2 rtl:ml-2 bg-info"></div>
-                                <div>Travel</div>
+                                <div>Performance</div>
                             </div>
                             <div className="flex items-center ltr:mr-4 rtl:ml-4">
                                 <div className="h-2.5 w-2.5 rounded-sm ltr:mr-2 rtl:ml-2 bg-success"></div>
-                                <div>Personal</div>
+                                <div>Event</div>
+                            </div>
+                            <div className="flex items-center ltr:mr-4 rtl:ml-4">
+                                <div className="h-2.5 w-2.5 rounded-sm ltr:mr-2 rtl:ml-2 bg-secondary"></div>
+                                <div>Staff</div>
                             </div>
                             <div className="flex items-center">
                                 <div className="h-2.5 w-2.5 rounded-sm ltr:mr-2 rtl:ml-2 bg-danger"></div>
@@ -309,7 +303,7 @@ const Calendar = () => {
                                             </div>
                                             <div>
                                                 <label>Badge:</label>
-                                                <div className="mt-3">
+                                                <div className="mt-3 text-sm">
                                                     <label className="inline-flex cursor-pointer ltr:mr-3 rtl:ml-3">
                                                         <input
                                                             type="radio"
@@ -330,7 +324,7 @@ const Calendar = () => {
                                                             checked={params.type === 'info'}
                                                             onChange={(e) => setParams({ ...params, type: e.target.value })}
                                                         />
-                                                        <span className="ltr:pl-2 rtl:pr-2">Intro</span>
+                                                        <span className="ltr:pl-2 rtl:pr-2">Performance</span>
                                                     </label>
                                                     <label className="inline-flex cursor-pointer ltr:mr-3 rtl:ml-3">
                                                         <input
@@ -339,6 +333,17 @@ const Calendar = () => {
                                                             name="type"
                                                             value="success"
                                                             checked={params.type === 'success'}
+                                                            onChange={(e) => setParams({ ...params, type: e.target.value })}
+                                                        />
+                                                        <span className="ltr:pl-2 rtl:pr-2">Event</span>
+                                                    </label>
+                                                    <label className="inline-flex cursor-pointer ltr:mr-3 rtl:ml-3">
+                                                        <input
+                                                            type="radio"
+                                                            className="form-radio text-secondary"
+                                                            name="type"
+                                                            value="secondary"
+                                                            checked={params.type === 'secondary'}
                                                             onChange={(e) => setParams({ ...params, type: e.target.value })}
                                                         />
                                                         <span className="ltr:pl-2 rtl:pr-2">Staff</span>

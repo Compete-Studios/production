@@ -134,16 +134,6 @@ export const logout = async () => {
     }
 };
 
-export const createEvent = async (data, suid) => {
-    try {
-        const docRef = doc(db, suid, data.eventID);
-        await setDoc(docRef, data);
-        return true;
-    } catch (error) {
-        return error.message;
-    }
-};
-
 export const createUser = async (email, password, userData) => {
     try {
         // Check if the desiredUsername already exists in userTable

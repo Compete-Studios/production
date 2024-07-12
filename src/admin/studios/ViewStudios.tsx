@@ -11,20 +11,22 @@ import IconUserPlus from '../../components/Icon/IconUserPlus';
 import { updateStudioIDForAdmimMimic } from '../../firebase/firebaseFunctions';
 
 const ViewStudios = () => {
-    const { suid, isAdmin }: any = UserAuth();
+    const { showLoading, setShowLoading, isAdmin }: any = UserAuth();
     const [studios, setStudios] = useState<any>([]);
-    const [showLoading, setShowLoading] = useState(false);
     const [activeOnly, setActiveOnly] = useState(true);
+
+    const handleFetchByRole = async (role: string) => {
+        const response = await fetch(`${REACT_API_BASE_URL}/admin-tools/getStudiosByRole/${role}`);
+        const json = await response.json();
+        setStudios(json.recordset);
+        setShowLoading(false);
+    };
 
     useEffect(() => {
         setShowLoading(true);
         const role = 'User';
         console.log('BEGIN FETCH STUDIOS');
-        fetch(`${REACT_API_BASE_URL}/admin-tools/getStudiosByRole/${role}`)
-            .then((response) => response.json())
-            .then((json) => setStudios(json.recordset));
-        console.log('STUDIOS  ', studios);
-        setShowLoading(false);
+        handleFetchByRole(role);
     }, []);
 
     const dispatch = useDispatch();
@@ -101,11 +103,11 @@ const ViewStudios = () => {
         }
     }, [isAdmin]);
 
-
-    const handleMimic = (id: any) => {
-        updateStudioIDForAdmimMimic(id);
+    const handleMimic = async (id: any) => {
+        setShowLoading(true);
+        await updateStudioIDForAdmimMimic(id);
         navigate('/dashboard');
-    }
+    };
 
     return (
         <div>

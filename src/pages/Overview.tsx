@@ -7,8 +7,6 @@ import IconUsers from '../components/Icon/IconUsers';
 import IconDollarSignCircle from '../components/Icon/IconDollarSignCircle';
 import IconMenuDashboard from '../components/Icon/Menu/IconMenuDashboard';
 import { setPageTitle } from '../store/themeConfigSlice';
-
-import { UserAuth } from '../context/AuthContext';
 import IconUsersGroup from '../components/Icon/IconUsersGroup';
 import Schedules from './Marketing/Schedules';
 import StudentPipeline from './Students/StudentPipeline';

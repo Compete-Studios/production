@@ -40,6 +40,18 @@ export const getFormsFromFirebase = async (id) => {
     }
 };
 
+export const createEvent = async (data, suid) => {
+    const collectionTitle = 'events' + suid;
+    try {
+        const docRef = collection(db, collectionTitle);
+        await addDoc(docRef, data);
+        return true;
+    } catch (error) {
+        return error.message;
+    }
+};
+
+
 export const getForm = async (id) => {
     try {
         const docRef = doc(db, 'forms', id);

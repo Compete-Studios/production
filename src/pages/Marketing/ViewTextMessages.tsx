@@ -8,12 +8,15 @@ import { setPageTitle } from '../../store/themeConfigSlice';
 import IconBell from '../../components/Icon/IconBell';
 import IconCaretDown from '../../components/Icon/IconCaretDown';
 import { getTextLogsByStudioId } from '../../functions/texts';
-import { constFormateDateMMDDYYYY } from '../../functions/shared';
+import { constFormateDateMMDDYYYY, showErrorMessage } from '../../functions/shared';
 import { UserAuth } from '../../context/AuthContext';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { formatWithTimeZone, handleGetTimeZoneOfUser } from '../../functions/dates';
 import { searchProspectsByPhone, searchStaffByPhone, searchStudentsByPhone } from '../../functions/api';
+import IconEye from '../../components/Icon/IconEye';
+import IconChatDot from '../../components/Icon/IconChatDot';
+import ChatModal from './ChatModal';
 
 const ViewTextMessages = () => {
     const { suid, studioOptions, studioInfo }: any = UserAuth();
@@ -23,6 +26,7 @@ const ViewTextMessages = () => {
     });
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const [loading, setLoading] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
 
     // show/hide
     const [page, setPage] = useState(1);
@@ -38,7 +42,7 @@ const ViewTextMessages = () => {
         direction: 'asc',
     });
     //start date is 7 days ago
-    const [startDate, setStartDate] = useState<string>(new Date(new Date().setDate(new Date().getDate() - 7)).toISOString().split('T')[0]);
+    const [startDate, setStartDate] = useState<string>(new Date(new Date().setDate(new Date().getDate() - 3)).toISOString().split('T')[0]);
     const [endDate, setEndDate] = useState<string>(new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0]);
 
     const formatDate = (date: any) => {
@@ -168,6 +172,7 @@ const ViewTextMessages = () => {
                     type: removeNumber(chat.FromNumber) === removeNumber(studioOptions?.TextFromNumber) ? 'studio' : 'student',
                     isOutGoing: removeNumber(chat.FromNumber) === removeNumber(studioOptions?.TextFromNumber),
                     textID: chat.TextId,
+                    rawNumber: removeNumber(chat.FromNumber),
                 };
             });
 
@@ -201,6 +206,7 @@ const ViewTextMessages = () => {
                         from: chat.fromName,
                         type: chat.fromType,
                         isOutGoing: chat.isOutGoing,
+                        rawNumber: chat.rawNumber,
                         recipients: [],
                     };
                 }
@@ -232,7 +238,7 @@ const ViewTextMessages = () => {
             const finalTextMessages = await Promise.all(recipientChecks);
 
             setTextData(finalTextMessages);
-            setInitialRecords(sortBy(finalTextMessages, 'sendDate'));
+            setInitialRecords(sortBy(finalTextMessages, 'SendDate').reverse());
             setLoading(false);
         } catch (error) {
             console.log(error);
@@ -246,35 +252,88 @@ const ViewTextMessages = () => {
 
     const totalPagesArray = Array.from({ length: totalPages }, (_, i) => i + 1);
 
+    const handleSearchDates = async () => {
+        //a user can only search 7 day range at a time
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const diff = Math.abs(start.getTime() - end.getTime());
+        const diffDays = Math.ceil(diff / (1000 * 3600 * 24));
+        if (diffDays > 7) {
+            return showErrorMessage('You can only search a 7 day range at a time');
+        } else {
+            setLoading(true);
+            handlegetlogs();
+        }
+    };
+
+    const [chatData, setChatData] = useState<any>({
+        recipients: [],
+        sendDate: '',
+        body: '',
+        from: '',
+        type: '',
+        isOutGoing: false,
+        rawNumber: '',
+    });
+
+    const handleOpenModal = (data: any) => {
+        setChatData(data);
+        setIsOpen(true);
+    };
+
     return (
         <div>
             {loading ? (
-                <div className="flex items-center justify-center h-96">
-                    <div className="loader">Loading...</div>
+                <div className="screen_loader fixed inset-0 bg-[#fafafa] dark:bg-[#060818] z-[60] grid place-content-center animate__animated">
+                    <svg width="64" height="64" viewBox="0 0 135 135" xmlns="http://www.w3.org/2000/svg" fill="#4361ee">
+                        <path d="M67.447 58c5.523 0 10-4.477 10-10s-4.477-10-10-10-10 4.477-10 10 4.477 10 10 10zm9.448 9.447c0 5.523 4.477 10 10 10 5.522 0 10-4.477 10-10s-4.478-10-10-10c-5.523 0-10 4.477-10 10zm-9.448 9.448c-5.523 0-10 4.477-10 10 0 5.522 4.477 10 10 10s10-4.478 10-10c0-5.523-4.477-10-10-10zM58 67.447c0-5.523-4.477-10-10-10s-10 4.477-10 10 4.477 10 10 10 10-4.477 10-10z">
+                            <animateTransform attributeName="transform" type="rotate" from="0 67 67" to="-360 67 67" dur="2.5s" repeatCount="indefinite" />
+                        </path>
+                        <path d="M28.19 40.31c6.627 0 12-5.374 12-12 0-6.628-5.373-12-12-12-6.628 0-12 5.372-12 12 0 6.626 5.372 12 12 12zm30.72-19.825c4.686 4.687 12.284 4.687 16.97 0 4.686-4.686 4.686-12.284 0-16.97-4.686-4.687-12.284-4.687-16.97 0-4.687 4.686-4.687 12.284 0 16.97zm35.74 7.705c0 6.627 5.37 12 12 12 6.626 0 12-5.373 12-12 0-6.628-5.374-12-12-12-6.63 0-12 5.372-12 12zm19.822 30.72c-4.686 4.686-4.686 12.284 0 16.97 4.687 4.686 12.285 4.686 16.97 0 4.687-4.686 4.687-12.284 0-16.97-4.685-4.687-12.283-4.687-16.97 0zm-7.704 35.74c-6.627 0-12 5.37-12 12 0 6.626 5.373 12 12 12s12-5.374 12-12c0-6.63-5.373-12-12-12zm-30.72 19.822c-4.686-4.686-12.284-4.686-16.97 0-4.686 4.687-4.686 12.285 0 16.97 4.686 4.687 12.284 4.687 16.97 0 4.687-4.685 4.687-12.283 0-16.97zm-35.74-7.704c0-6.627-5.372-12-12-12-6.626 0-12 5.373-12 12s5.374 12 12 12c6.628 0 12-5.373 12-12zm-19.823-30.72c4.687-4.686 4.687-12.284 0-16.97-4.686-4.686-12.284-4.686-16.97 0-4.687 4.686-4.687 12.284 0 16.97 4.686 4.687 12.284 4.687 16.97 0z">
+                            <animateTransform attributeName="transform" type="rotate" from="0 67 67" to="360 67 67" dur="8s" repeatCount="indefinite" />
+                        </path>
+                    </svg>
                 </div>
             ) : (
                 <div className="panel">
-                    <div className="flex items-start gap-4 pb-4">
-                        <div className="flex items-center gap-1">
-                            <div className="w-3 h-3 rounded-full bg-info" />
-                            <div>Student</div>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-start gap-4 pb-4">
+                            <div className="flex items-center gap-1">
+                                <div className="w-3 h-3 rounded-full bg-info" />
+                                <div>Student</div>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <div className="w-3 h-3 rounded-full bg-primary" />
+                                <div>Prospect</div>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <div className="w-3 h-3 rounded-full bg-danger" />
+                                <div>Inactive Student</div>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <div className="w-3 h-3 rounded-full bg-secondary" />
+                                <div>Staff</div>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-1">
-                            <div className="w-3 h-3 rounded-full bg-primary" />
-                            <div>Prospect</div>
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <div className="w-3 h-3 rounded-full bg-danger" />
-                            <div>Inactive Student</div>
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <div className="w-3 h-3 rounded-full bg-secondary" />
-                            <div>Staff</div>
+                        <div className="flex items-end gap-4">
+                            <div>
+                                <label className="block text-sm font-semibold dark:text-white-light">Start Date</label>
+                                <input type="date" className="form-input" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold dark:text-white-light">End Date</label>
+                                <input type="date" className="form-input" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+                            </div>
+                            <div>
+                                <button type="button" className="btn btn-primary" onClick={handleSearchDates}>
+                                    Search
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
+                    <div className="flex md:items-center md:flex-row flex-col my-5 gap-5">
                         <h5 className="font-semibold text-lg dark:text-white-light">Search Message History</h5>
-                        <div className="flex items-center gap-5 ltr:ml-auto rtl:mr-auto">
+                        <div className="flex items-center gap-5 ">
                             <div className="text-right">
                                 <input type="text" className="form-input" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                             </div>
@@ -302,42 +361,53 @@ const ViewTextMessages = () => {
                                                 <td className="whitespace-nowrap">
                                                     {data.recipients?.length > 1 ? (
                                                         <>
-                                                            {data.recipients.slice(0, 2).map((recipient, i) => (
-                                                                <span
-                                                                    key={i}
-                                                                    className={`                                badge
-                                    ${
-                                        recipient.type === 'staff'
-                                            ? 'bg-secondary/10 text-secondary ring-1 font-bold ring-inset ring-secondary'
-                                            : recipient.type === 'student'
-                                            ? 'bg-info/10 text-info ring-1 font-bold ring-inset ring-info'
-                                            : recipient.type === 'prospect'
-                                            ? 'bg-primary/10 text-primary ring-1 ring-inset font-bold ring-primary'
-                                            : 'bg-danger/10 text-danger ring-1 ring-inset font-bold ring-danger'
-                                    }
-                                    `}
-                                                                >
-                                                                    {recipient.name}
-                                                                </span>
-                                                            ))}
-                                                            {data.recipients.length > 2 && <span className="ml-1 text-xs text-gray-500">+{data.recipients.length - 2} more</span>}
+                                                            <span className="ml-1 text-xs text-gray-500 flex items-center gap-1">
+                                                                +{data?.recipients?.length} Recipients
+                                                                <div className="dropdown">
+                                                                    <Dropdown
+                                                                        btnClassName="btn p-0 rounded-none border-0 shadow-none dropdown-toggle text-black dark:text-white-dark hover:text-primary dark:hover:text-primary"
+                                                                        button={<IconCaretDown className="w-5 h-5" aria-hidden="true" />}
+                                                                    >
+                                                                        <ul className="max-w-48 w-auto max-h-96 h-auto overflow-y-auto">
+                                                                            {data.recipients.map((recipient: any, index: number) => {
+                                                                                return (
+                                                                                    <li key={index}>
+                                                                                        <div className="flex items-center gap-1">
+                                                                                            <span
+                                                                                                className={`badge ${
+                                                                                                    recipient.type === 'staff'
+                                                                                                        ? ' text-secondary'
+                                                                                                        : recipient.type === 'student'
+                                                                                                        ? ' text-info'
+                                                                                                        : recipient.type === 'prospect'
+                                                                                                        ? ' text-primary '
+                                                                                                        : ' text-danger '
+                                                                                                }`}
+                                                                                            >
+                                                                                                {recipient.name}
+                                                                                            </span>
+                                                                                        </div>
+                                                                                    </li>
+                                                                                );
+                                                                            })}
+                                                                        </ul>
+                                                                    </Dropdown>
+                                                                </div>
+                                                            </span>
                                                         </>
                                                     ) : data?.recipients[0]?.name === studioInfo?.Studio_Name ? (
                                                         <span className="badge bg-dark/10 text-dark ring-1 font-bold ring-inset ring-dark">{studioInfo?.Studio_Name}</span>
                                                     ) : (
                                                         <span
-                                                            className={`
-                            badge
-                            ${
-                                data?.recipients[0]?.type === 'staff'
-                                    ? 'bg-secondary/10 text-secondary ring-1 font-bold ring-inset ring-secondary'
-                                    : data?.recipients[0]?.type === 'student'
-                                    ? 'bg-info/10 text-info ring-1 font-bold ring-inset ring-info'
-                                    : data?.recipients[0]?.type === 'prospect'
-                                    ? 'bg-primary/10 text-primary ring-1 ring-inset font-bold ring-primary'
-                                    : 'bg-danger/10 text-danger ring-1 ring-inset font-bold ring-danger'
-                            }
-                            `}
+                                                            className={`badge ${
+                                                                data?.recipients[0]?.type === 'staff'
+                                                                    ? 'bg-secondary/10 text-secondary ring-1 font-bold ring-inset ring-secondary'
+                                                                    : data?.recipients[0]?.type === 'student'
+                                                                    ? 'bg-info/10 text-info ring-1 font-bold ring-inset ring-info'
+                                                                    : data?.recipients[0]?.type === 'prospect'
+                                                                    ? 'bg-primary/10 text-primary ring-1 ring-inset font-bold ring-primary'
+                                                                    : 'bg-danger/10 text-danger ring-1 ring-inset font-bold ring-danger'
+                                                            }`}
                                                         >
                                                             {data?.recipients[0]?.name}
                                                         </span>
@@ -345,17 +415,15 @@ const ViewTextMessages = () => {
                                                 </td>
                                                 <td className="whitespace-nowrap">
                                                     <span
-                                                        className={`
-                            badge
-                            ${
-                                data.type === 'studio'
-                                    ? 'bg-dark/10 text-dark ring-1 font-bold ring-inset ring-dark'
-                                    : data?.recipients[0]?.type === 'student'
-                                    ? 'bg-info/10 text-info ring-1 font-bold ring-inset ring-info'
-                                    : data?.recipients[0]?.type === 'prospect'
-                                    ? 'bg-primary/10 text-primary ring-1 ring-inset font-bold ring-primary'
-                                    : 'bg-danger/10 text-danger ring-1 ring-inset font-bold ring-danger'
-                            }`}
+                                                        className={`badge ${
+                                                            data.type === 'studio'
+                                                                ? 'bg-dark/10 text-dark ring-1 font-bold ring-inset ring-dark'
+                                                                : data?.recipients[0]?.type === 'student'
+                                                                ? 'bg-info/10 text-info ring-1 font-bold ring-inset ring-info'
+                                                                : data?.recipients[0]?.type === 'prospect'
+                                                                ? 'bg-primary/10 text-primary ring-1 ring-inset font-bold ring-primary'
+                                                                : 'bg-danger/10 text-danger ring-1 ring-inset font-bold ring-danger'
+                                                        }`}
                                                     >
                                                         {data.from === removeNumber(studioOptions?.TextFromNumber) ? studioInfo?.Studio_Name : data.from}
                                                     </span>
@@ -364,8 +432,8 @@ const ViewTextMessages = () => {
                                                     <div>{data.body}</div>
                                                 </td>
                                                 <td className="text-center">
-                                                    <button type="button" className="text-info">
-                                                        View
+                                                    <button type="button" className="text-info hover:text-blue-800" onClick={() => handleOpenModal(data)}>
+                                                        <IconChatDot />
                                                     </button>
                                                 </td>
                                             </tr>
@@ -373,6 +441,7 @@ const ViewTextMessages = () => {
                                     })}
                                 </tbody>
                             </table>
+                            <ChatModal isOpen={isOpen} setIsOpen={setIsOpen} chatDataForText={chatData} isOutgoing={chatData.isOutGoing} />
                         </div>
                     </div>
                     <div className="flex items-center justify-end w-full">

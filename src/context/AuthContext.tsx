@@ -20,6 +20,8 @@ export default function AuthContextProvider({ children }: any) {
     const [marketingSources, setMarketingSources] = useState([]);
     const [searchedStudentsAndProspects, setSearchedStudentsAndProspects] = useState([]);
     const [showLoading, setShowLoading] = useState(true);
+    const [fetchLoading, setFetchLoading] = useState(true);
+    const [globalLoading, setGlobalLoading] = useState(true);
     const [prospectIntros, setProspectIntros] = useState([]);
     const [scheduleID, setScheduleID] = useState('');
     const [studioInfo, setStudioInfo] = useState({});
@@ -37,13 +39,14 @@ export default function AuthContextProvider({ children }: any) {
     const [update, setUpdate] = useState(false);
     const [inactiveStudents, setInactiveStudents] = useState<any>([]);
     const [emailList, setEmailList] = useState<any>([]);
+    const [events, setEvents] = useState<any>([]);
     const [toActivate, setToActivate] = useState<any>({
         status: false,
         prospect: null,
     });
 
     const getAllSpaces = async (uid: any) => {
-        const spacesRef = collection(db, "spaces");
+        const spacesRef = collection(db, 'spaces');
         const uidToString = uid.toString();
         const q = query(spacesRef, where('userID', '==', uidToString));
         const querySnapshot = await getDocs(q);
@@ -52,6 +55,22 @@ export default function AuthContextProvider({ children }: any) {
             spacesArray.push({ ...doc.data(), id: doc.id });
         });
         setSpaces(spacesArray);
+    };
+
+    const getEvents = async (collectionTitle: any) => {
+        console.log('ran get Events');
+        try {
+            const docRef = collection(db, collectionTitle);
+            const querySnapshot = await getDocs(docRef);
+            const fetchedEvents = [];
+            querySnapshot.forEach((doc) => {
+                const docWithId = { ...doc.data(), id: doc.id };
+                fetchedEvents.push(docWithId);
+            });
+            return events;
+        } catch (error: any) {
+            return error.message;
+        }
     };
 
     const fetchData = async (url: any, setter: any) => {
@@ -94,30 +113,52 @@ export default function AuthContextProvider({ children }: any) {
         return res.json();
     };
 
+    const handleGetEvents = async (id: any) => {
+        const collectionTitle = 'events' + id;
+        try {
+            let data = await getEvents(collectionTitle);
+            setEvents(data);
+        } catch (error) {
+            console.log('error', error);
+        }
+    };
+
     const getData = async () => {
         const year = new Date().getFullYear();
         const month = new Date().getMonth() + 1;
-        fetchData(`${REACT_API_BASE_URL}/studio-access/getClassesByStudioId/${suid}`, setClasses);
-        fetchData(`${REACT_API_BASE_URL}/staff-access/getStaffByStudioId/${suid}/1`, setStaff);
-        fetchData(`${REACT_API_BASE_URL}/marketing-access/getStudentPipelineStepsByStudioId/${suid}`, setPipelineSteps);
-        fetchData(`${REACT_API_BASE_URL}/class-access/getProgramsByStudioId/${suid}`, setPrograms);
-        fetchData(`${REACT_API_BASE_URL}/marketing-access/getWaitingListsByStudioId/${suid}`, setWaitingLists);
-        fetchData(`${REACT_API_BASE_URL}/marketing-access/getPipelineStepsByStudioId/${suid}`, setProspectPipelineSteps);
-        fetchData(`${REACT_API_BASE_URL}/marketing-access/getMarketingMethodsByStudioId/${suid}`, setMarketingSources);
-        fetchData(`${REACT_API_BASE_URL}/student-access/getProspectIntros/${suid}/${month}/${year}`, setProspectIntros);
-        fetchData(`${REACT_API_BASE_URL}/student-access/getPaymentPipelineStepsByStudioId/${suid}`, setLatePayementPipeline);
-        fetchData(`${REACT_API_BASE_URL}/studio-access/getStudentsByStudioId/${suid}/1`, setStudents);
-        fetchRecordSet(`${REACT_API_BASE_URL}/studio-access/getStudioOptions/${suid}`, setStudioOptions);
+        setFetchLoading(true);
+        const classRes = await fetchData(`${REACT_API_BASE_URL}/studio-access/getClassesByStudioId/${suid}`, setClasses);
+        const staffRes = await fetchData(`${REACT_API_BASE_URL}/staff-access/getStaffByStudioId/${suid}/1`, setStaff);
+        const pipeLineRes = await fetchData(`${REACT_API_BASE_URL}/marketing-access/getStudentPipelineStepsByStudioId/${suid}`, setPipelineSteps);
+        const programRes = await fetchData(`${REACT_API_BASE_URL}/class-access/getProgramsByStudioId/${suid}`, setPrograms);
+        const waitingListRes = await fetchData(`${REACT_API_BASE_URL}/marketing-access/getWaitingListsByStudioId/${suid}`, setWaitingLists);
+        const studPipesRes = await fetchData(`${REACT_API_BASE_URL}/marketing-access/getPipelineStepsByStudioId/${suid}`, setProspectPipelineSteps);
+        const marketingRes = await fetchData(`${REACT_API_BASE_URL}/marketing-access/getMarketingMethodsByStudioId/${suid}`, setMarketingSources);
+        const introRes = await fetchData(`${REACT_API_BASE_URL}/student-access/getProspectIntros/${suid}/${month}/${year}`, setProspectIntros);
+        const paymentsRes = await fetchData(`${REACT_API_BASE_URL}/student-access/getPaymentPipelineStepsByStudioId/${suid}`, setLatePayementPipeline);
+        const studioRes = await fetchData(`${REACT_API_BASE_URL}/studio-access/getStudentsByStudioId/${suid}/1`, setStudents);
+        const optionsRes = await fetchRecordSet(`${REACT_API_BASE_URL}/studio-access/getStudioOptions/${suid}`, setStudioOptions);
         getAllSpaces(suid);
+        handleGetEvents(suid);
+
+        if (classRes && staffRes && pipeLineRes && programRes && waitingListRes && studPipesRes && marketingRes && introRes && paymentsRes && studioRes && optionsRes) {
+            setFetchLoading(false);
+        } else {
+            console.error('No response');
+            setFetchLoading(false);
+        }
     };
 
     const getSCHDATA = async () => {
+        setGlobalLoading(true);
         const response = await fetch(`${REACT_API_BASE_URL}/daily-schedule-tools/getDailyScheduleByStudioId/${suid}`);
         const data = await response.json();
         if (data) {
             setScheduleID(data);
+            setGlobalLoading(false);
         } else {
             console.error('No response');
+            setGlobalLoading(false);
         }
     };
 
@@ -181,11 +222,17 @@ export default function AuthContextProvider({ children }: any) {
     };
 
     useEffect(() => {
-        setShowLoading(true);
         getData();
         getSCHDATA();
-        setShowLoading(false);
     }, [suid, update]);
+
+    useEffect(() => {
+        if (fetchLoading === false && globalLoading === false) {
+            setShowLoading(false);
+        } else {
+            setShowLoading(true);
+        }
+    }, [fetchLoading, globalLoading]);
 
     useEffect(() => {
         // const suid = localStorage.getItem('suid');
@@ -249,7 +296,10 @@ export default function AuthContextProvider({ children }: any) {
                 inactiveStudents,
                 emailList,
                 setEmailList,
-                spaces
+                spaces,
+                events,
+                setEvents,
+                setShowLoading,
             }}
         >
             {children}

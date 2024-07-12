@@ -31,6 +31,7 @@ export const convertPhone = (phone) => {
     }
 };
 
+
 export const convertPhoneNumber = (phone) => {
     return phone?.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
 };
@@ -190,17 +191,17 @@ export const showCreationAlert = async (type) => {
         toast
             .fire({
                 icon: 'question',
-                title: "Create Default Student Pipeline Steps?",
-                text: "You can always edit the steps later",
+                title: 'Create Default Student Pipeline Steps?',
+                text: 'You can always edit the steps later',
                 showCancelButton: true,
-                confirmButtonText: "Create Steps",
+                confirmButtonText: 'Create Steps',
                 cancelButtonText: 'No, cancel!',
                 reverseButtons: true,
                 padding: '2em',
             })
             .then((result) => {
                 if (result.value) {
-                    Swal.fire({ title: "Steps Created", text: "You can now begin adding students to steps", icon: 'success', customClass: 'sweet-alerts' });
+                    Swal.fire({ title: 'Steps Created', text: 'You can now begin adding students to steps', icon: 'success', customClass: 'sweet-alerts' });
                     resolve(true);
                 }
             })
@@ -208,7 +209,7 @@ export const showCreationAlert = async (type) => {
                 reject(error);
             });
     });
-}
+};
 
 // export const createUsersFromLargeJSON = (json) => {
 //   try {

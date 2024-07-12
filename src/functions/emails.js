@@ -10,15 +10,25 @@ export const sendIndividualEmail = async (emailData) => {
     }
 };
 
-export const getTextLogsByStudioIdAndPhoneNumber = async (suid, phoneNumber) => {
+export const getTextLogsByStudioIdAndPhoneNumber = async (textData) => { 
     try {
-        const response = await fetchData(`text-helper/getTextLogsByStudioIdAndPhoneNumber/${phoneNumber}/${suid}`);
+        const response = await fetchData(`text-helper/getTextLogsByStudioIdAndPhoneNumber`, 'post', textData);
         return response;
     } catch (error) {
         console.error(error);
         throw error;
     }
 };
+
+export const addTextLog = async (textData) => {
+    try {
+        const response = await fetchData(`text-helper/addTextLog`, 'post', textData);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
 
 export const getNumberOfEmailsSentByStudio = async (data) => {
     try {

@@ -334,7 +334,6 @@ const ViewStudent = () => {
         scrollTop();
     }, []);
 
-
     const handleDeleteFromClass = (classID: any) => {
         showWarningMessage('Are you sure you want to remove this student from this class?', 'Remove Student From Class', 'Your student has been removed from the class')
             .then((confirmed: boolean) => {
@@ -420,23 +419,22 @@ const ViewStudent = () => {
         setHasedRefID(hashedStudent);
     }, [student]);
 
-    const payHistoryIds = hashids.encode(paySimpleInfo, (student?.Student_id));   
+    const payHistoryIds = hashids.encode(paySimpleInfo, student?.Student_id);
 
     const reactivateStudent = async () => {
         const data = {
             studentId: student?.Student_id,
             activityLevel: 1,
         };
-        try{
+        try {
             const active = await dropStudent(data);
-            if(active){
+            if (active) {
                 showMessage('Student Reactivated');
-                setStudent({...student, activity: 1});
-            }
-            else{
+                setStudent({ ...student, activity: 1 });
+            } else {
                 showWarningMessage('Student could not be reactivated');
             }
-        }catch(error){
+        } catch (error) {
             console.log(error);
             showWarningMessage('There was an error. Student could not be reactivated');
         }
@@ -481,14 +479,16 @@ const ViewStudent = () => {
                             <p className="font-normal text-sm">{convertPhoneNumber(student?.Phone2)}</p>
                             <div>
                                 <p className={`font-normal text-md mt-4 ${student?.activity ? 'text-success' : 'text-danger'}`}>{student?.activity ? 'Active' : 'Inactive'}</p>
-                                {!student?.activity && (
+                                {/* {!student?.activity && (
                                     <button
                                         className="mt-2 px-4 py-2 bg-red-600 text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-red-700 focus:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-600 transition-all duration-300 ease-in-out"
-                                        onClick={() => { reactivateStudent() }}
+                                        onClick={() => {
+                                            reactivateStudent();
+                                        }}
                                     >
                                         Reactivate Student
                                     </button>
-                                )}
+                                )} */}
                             </div>
                             <p className="font-normal text-xs ">Next Contact Date: {formatDate(student?.NextContactDate)}</p>
                             <p className="font-normal text-xs ">Created: {formatDate(student?.EntryDate)}</p>
@@ -500,15 +500,23 @@ const ViewStudent = () => {
                         </div>
                     </div>
                     <div className="p-4">
-                   
-                        <button className="text-zinc-500 mt-2 underline hover:text-info"
-                        onClick={() => {setSelectedIndex(4)}}
-                        >Classes</button>
+                        <button
+                            className="text-zinc-500 mt-2 underline hover:text-info"
+                            onClick={() => {
+                                setSelectedIndex(4);
+                            }}
+                        >
+                            Classes
+                        </button>
                         <div className="font-bold flex flex-wrap">{classes.length > 0 ? classes.map((c: any) => c.Name).join(', ') : 'No classes'}</div>
-                        <button 
-                        className="text-zinc-500 mt-2 underline hover:text-info"
-                        onClick={() => {setSelectedIndex(5)}}
-                        >Active Pay Schedules</button>
+                        <button
+                            className="text-zinc-500 mt-2 underline hover:text-info"
+                            onClick={() => {
+                                setSelectedIndex(5);
+                            }}
+                        >
+                            Active Pay Schedules
+                        </button>
                         <div className="">
                             {paymentSchedules.map((data: any, index: any) => {
                                 return (
@@ -537,15 +545,26 @@ const ViewStudent = () => {
                         <SendQuickText student={student} name="Student" pipeline={pipeline} />
                         <SendQuickWaiver student={student} prospect={false} />
                         <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left">Clone Student</button>
-                        <DeleteStudent
-                            student={student}
-                            billingInfo={paySimpleInfo}
-                            paymentSchedules={paymentSchedules}
-                            classes={classes}
-                            programs={programs}
-                            waitingLists={waitingLists}
-                            onStudentUpdate={handleStudentUpdate}
-                        />
+                        {student?.activity ? (
+                            <DeleteStudent
+                                student={student}
+                                billingInfo={paySimpleInfo}
+                                paymentSchedules={paymentSchedules}
+                                classes={classes}
+                                programs={programs}
+                                waitingLists={waitingLists}
+                                onStudentUpdate={handleStudentUpdate}
+                            />
+                        ) : (
+                            <button
+                                className="uppercase font-lg font-bold w-full hover:bg-danger-light p-4 text-left"
+                                onClick={() => {
+                                    reactivateStudent();
+                                }}
+                            >
+                                Reactivate Student
+                            </button>
+                        )}
                     </div>
                 </div>
                 <div className="lg:w-full lg:mt-0 mt-8">
@@ -554,8 +573,9 @@ const ViewStudent = () => {
                             <Tab as={Fragment}>
                                 {({ selected }) => (
                                     <button
-                                        className={`${selected ? 'text-info !outline-none before:!w-full' : ''
-                                            } relative -mb-[1px] flex lg:hidden  items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full `}
+                                        className={`${
+                                            selected ? 'text-info !outline-none before:!w-full' : ''
+                                        } relative -mb-[1px] flex lg:hidden  items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full `}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="w-5 h-5 ltr:mr-2 rtl:ml-2" viewBox="0 0 16 16">
                                             <path d="M5 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4m4-2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5M9 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4A.5.5 0 0 1 9 8m1 2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5" />
@@ -568,8 +588,9 @@ const ViewStudent = () => {
                             <Tab as={Fragment}>
                                 {({ selected }) => (
                                     <button
-                                        className={`${selected ? 'text-info !outline-none before:!w-full' : ''
-                                            } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
+                                        className={`${
+                                            selected ? 'text-info !outline-none before:!w-full' : ''
+                                        } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="w-5 h-5 ltr:mr-2 rtl:ml-2" viewBox="0 0 16 16">
                                             <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z" />
@@ -582,8 +603,9 @@ const ViewStudent = () => {
                             <Tab as={Fragment}>
                                 {({ selected }) => (
                                     <button
-                                        className={`${selected ? 'text-info !outline-none before:!w-full' : ''
-                                            } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
+                                        className={`${
+                                            selected ? 'text-info !outline-none before:!w-full' : ''
+                                        } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="w-5 h-5 ltr:mr-2 rtl:ml-2" viewBox="0 0 16 16">
                                             <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z" />
@@ -596,8 +618,9 @@ const ViewStudent = () => {
                             <Tab as={Fragment}>
                                 {({ selected }) => (
                                     <button
-                                        className={`${selected ? 'text-info !outline-none before:!w-full' : ''
-                                            } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
+                                        className={`${
+                                            selected ? 'text-info !outline-none before:!w-full' : ''
+                                        } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="w-5 h-5 ltr:mr-2 rtl:ml-2" viewBox="0 0 16 16">
                                             <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2z" />
@@ -609,8 +632,9 @@ const ViewStudent = () => {
                             <Tab as={Fragment}>
                                 {({ selected }) => (
                                     <button
-                                        className={`${selected ? 'text-info !outline-none before:!w-full' : ''
-                                            } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
+                                        className={`${
+                                            selected ? 'text-info !outline-none before:!w-full' : ''
+                                        } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="w-5 h-5 ltr:mr-2 rtl:ml-2" viewBox="0 0 16 16">
                                             <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm-5 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5z" />
@@ -623,8 +647,9 @@ const ViewStudent = () => {
                             <Tab as={Fragment}>
                                 {({ selected }) => (
                                     <button
-                                        className={`${selected ? 'text-info !outline-none before:!w-full' : ''
-                                            } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
+                                        className={`${
+                                            selected ? 'text-info !outline-none before:!w-full' : ''
+                                        } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="w-5 h-5 ltr:mr-2 rtl:ml-2" viewBox="0 0 16 16">
                                             <path d="M14 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" />
@@ -692,7 +717,26 @@ const ViewStudent = () => {
                                         <SendQuickText student={student} name="Student" pipeline={pipeline} />
                                         <SendQuickWaiver student={student} prospect={false} />
                                         <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left">Clone Student</button>
-                                        <button className="uppercase font-lg font-bold w-full hover:bg-danger-light p-4 text-left">Delete Student</button>
+                                        {student?.activity ? (
+                                            <DeleteStudent
+                                                student={student}
+                                                billingInfo={paySimpleInfo}
+                                                paymentSchedules={paymentSchedules}
+                                                classes={classes}
+                                                programs={programs}
+                                                waitingLists={waitingLists}
+                                                onStudentUpdate={handleStudentUpdate}
+                                            />
+                                        ) : (
+                                            <button
+                                                className="uppercase font-lg font-bold w-full hover:bg-danger-light p-4 text-left"
+                                                onClick={() => {
+                                                    reactivateStudent();
+                                                }}
+                                            >
+                                                Reactivate Student
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </Tab.Panel>
@@ -1278,9 +1322,7 @@ const ViewStudent = () => {
                                                     <h5 className="font-semibold text-lg dark:text-white-light">Payment Schedules</h5>
 
                                                     <div>
-                                                        <Link
-                                                            to={`/students/view-payment-history/${payHistoryIds}`}
-                                                            className="btn btn-danger btn-sm gap-x-2" >
+                                                        <Link to={`/students/view-payment-history/${payHistoryIds}`} className="btn btn-danger btn-sm gap-x-2">
                                                             <IconCalendar /> View Payment History
                                                         </Link>
                                                     </div>
@@ -1319,8 +1361,9 @@ const ViewStudent = () => {
                                                                                 <td>{formatDate(data?.EndDate)}</td>
                                                                                 <td>
                                                                                     <span
-                                                                                        className={`badge whitespace-nowrap ${data.ScheduleStatus === 'Active' ? 'badge-outline-primary' : 'badge-outline-danger'
-                                                                                            }`}
+                                                                                        className={`badge whitespace-nowrap ${
+                                                                                            data.ScheduleStatus === 'Active' ? 'badge-outline-primary' : 'badge-outline-danger'
+                                                                                        }`}
                                                                                     >
                                                                                         {data.ScheduleStatus}
                                                                                     </span>

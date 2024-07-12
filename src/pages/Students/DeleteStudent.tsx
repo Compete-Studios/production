@@ -53,6 +53,7 @@ import IconEye from '../../components/Icon/IconEye';
 import ViewPaymentMethods from './ViewPaymentMethods';
 import BillingInfoUpdate from './components/BillingInfoUpdate';
 import Hashids from 'hashids';
+import axios from 'axios';
 
 interface UpdateValues {
   [key: string]: any;
@@ -98,6 +99,7 @@ const DeleteStudent: React.FC = () => {
   const [selectedIndex, setSelectedIndex] = useState(1);
   const [pipeline, setPipeline] = useState<any>([]);
   const [updateBilling, setUpdateBilling] = useState<boolean>(false);
+  const [message, setMessage] = useState("")
   const hashids = new Hashids();
   const dispatch = useDispatch();
   useEffect(() => {

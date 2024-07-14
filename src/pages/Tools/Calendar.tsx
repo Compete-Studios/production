@@ -84,36 +84,34 @@ const Calendar = () => {
         if (!params.end) {
             return true;
         }
-        if (params.id) {
-            //update event
-            let dataevent = events || [];
-            let event: any = dataevent.find((d: any) => d.id === parseInt(params.id));
-            event.title = params.title;
-            event.start = params.start;
-            event.end = params.end;
-            event.description = params.description;
-            event.className = params.type;
+        // if (params.id) {
+        //     //update event
+        //     let dataevent = events || [];
+        //     let event: any = dataevent.find((d: any) => d.id === parseInt(params.id));
+        //     event.title = params.title;
+        //     event.start = params.start;
+        //     event.end = params.end;
+        //     event.description = params.description;
+        //     event.className = params.type;
 
-            setEvents([]);
-            setTimeout(() => {
-                setEvents(dataevent);
-            });
-        } else {
+        //     setEvents([]);
+        //     setTimeout(() => {
+        //         setEvents(dataevent);
+        //     });
+        // } 
+        else {
             //add event
 
-            let maxEventId = 0;
-            if (events) {
-                maxEventId = events.reduce((max: number, character: any) => (character.id > max ? character.id : max), events[0].id);
-            }
-            maxEventId = maxEventId + 1;
+            
             let event = {
-                id: maxEventId,
+                id: events.length + 1,
                 title: params.title,
                 start: params.start,
                 end: params.end,
                 description: params.description,
                 className: params.type,
             };
+            console.log(event)
             createEvent(event, suid);
             localStorage.setItem('qued', 'true');
             let dataevent = events || [];

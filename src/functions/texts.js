@@ -30,3 +30,13 @@ export const getTextLogsByStudioIdPhone = async (data) => {
         throw error;
     }
 };
+
+export const sendBulkSMS = async (data) => {
+    try {
+        const response = await fetchData(`text-helper/sendBulkSMS`, "post", data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};

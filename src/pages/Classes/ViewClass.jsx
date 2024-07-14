@@ -49,8 +49,7 @@ export default function ViewClass({ classId }) {
     const getTimeOnlyfromZulueStamp = (date) => {
         const timeString = date?.split('T')[1];
         return timeString?.slice(0, 5);
-    };
-    console.log(scheduleInfo);
+    };  
 
     return (
         <div>

@@ -5,6 +5,7 @@ import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import IconEye from '../../components/Icon/IconEye';
 import { Link, useNavigate } from 'react-router-dom';
+import SendBulkText from '../Marketing/SendBulkText';
 
 const searchInit = {
     studioId: 32,
@@ -158,10 +159,11 @@ export default function AdvancedSearch() {
                     <h1 className="text-2xl font-bold">Advanced Search</h1>
                     <p className="text-gray-500">Search for students, prospects, and staff</p>
                 </div>
-                <div>
-                    <button className="btn btn-info" onClick={() => handleGetEmails()}>
+                <div className="flex items-center gap-2">
+                    <button className="btn btn-info w-44" onClick={() => handleGetEmails()}>
                         Email This List
                     </button>
+                    <SendBulkText isButton={true} recipients={[]} displayAll={false}  />
                 </div>
             </div>
             <div className="grid grid-cols-4 gap-2">

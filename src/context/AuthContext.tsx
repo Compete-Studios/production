@@ -57,21 +57,7 @@ export default function AuthContextProvider({ children }: any) {
         setSpaces(spacesArray);
     };
 
-    const getEvents = async (collectionTitle: any) => {
-        console.log('ran get Events');
-        try {
-            const docRef = collection(db, collectionTitle);
-            const querySnapshot = await getDocs(docRef);
-            const fetchedEvents = [];
-            querySnapshot.forEach((doc) => {
-                const docWithId = { ...doc.data(), id: doc.id };
-                fetchedEvents.push(docWithId);
-            });
-            return events;
-        } catch (error: any) {
-            return error.message;
-        }
-    };
+    const getEvents = async (collectionTitle: any) => {};
 
     const fetchData = async (url: any, setter: any) => {
         try {
@@ -116,10 +102,16 @@ export default function AuthContextProvider({ children }: any) {
     const handleGetEvents = async (id: any) => {
         const collectionTitle = 'events' + id;
         try {
-            let data = await getEvents(collectionTitle);
-            setEvents(data);
-        } catch (error) {
-            console.log('error', error);
+            const docRef = collection(db, collectionTitle);
+            const querySnapshot = await getDocs(docRef);
+            const fetchedEvents = [];
+            querySnapshot.forEach((doc) => {
+                const docWithId = { ...doc.data(), id: doc.id };
+                fetchedEvents.push(docWithId);
+            });
+            return events;
+        } catch (error: any) {
+            return error.message;
         }
     };
 

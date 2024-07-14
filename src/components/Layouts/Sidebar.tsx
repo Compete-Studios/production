@@ -256,7 +256,7 @@ const Sidebar = () => {
                                 <button type="button" className={`${currentMenu === 'premium' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('premium')}>
                                     <div className="flex items-center">
                                         <IconMenuAuthentication className="group-hover:!text-primary shrink-0" />
-                                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Premium Tools</span>
+                                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Advanced</span>
                                     </div>
 
                                     <div className={currentMenu !== 'premium' ? 'rtl:rotate-90 -rotate-90' : ''}>
@@ -267,7 +267,7 @@ const Sidebar = () => {
                                 <AnimateHeight duration={300} height={currentMenu === 'premium' ? 'auto' : 0}>
                                     <ul className="sub-menu text-gray-500">
                                         <li>
-                                            <NavLink  to="/marketing/view-emails">View Emails</NavLink>
+                                            <NavLink to="/marketing/view-emails">View Emails</NavLink>
                                         </li>
                                         <li>
                                             <NavLink to="/marketing/view-news-letters">View NewsLetters</NavLink>
@@ -284,7 +284,7 @@ const Sidebar = () => {
                                     </ul>
                                 </AnimateHeight>
                             </li>
-                            
+
                             {/* <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'charts' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('charts')}>
                                     <div className="flex items-center">
@@ -321,19 +321,19 @@ const Sidebar = () => {
                             {/* <h2 className="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
                                 <IconMinus className="w-4 h-5 flex-none hidden" />
                                 <span>{t('Connect')}</span>
-                            </h2>
-
+                            </h2> */}
+                            {/* 
                             <li className="nav-item">
                                 <ul>                               
                                                                    
-                                    <li className="nav-item">
+                                     <li className="nav-item">
                                         <NavLink to="/apps/mailbox" className="group">
                                             <div className="flex items-center">
                                                 <IconMenuMailbox className="group-hover:!text-primary shrink-0" />
                                                 <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('View Emails')}</span>
                                             </div>
                                         </NavLink>
-                                    </li>
+                                    </li> 
                                     <li className="nav-item">
                                         <NavLink to="/facebook-add-creator" className="group">
                                             <div className="flex items-center">
@@ -341,16 +341,9 @@ const Sidebar = () => {
                                                 <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Facebook Forms</span>
                                             </div>
                                         </NavLink>
-                                    </li>
+                                    </li> 
                                
-                                    <li className="nav-item">
-                                        <NavLink to="/marketing/landing-page-creator" className="group">
-                                            <div className="flex items-center">
-                                                <IconMenuTodo className="group-hover:!text-primary shrink-0" />
-                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Landing Page Maker')}</span>
-                                            </div>
-                                        </NavLink>
-                                    </li>
+                            
                                     
                                 </ul>
                             </li> */}
@@ -359,41 +352,7 @@ const Sidebar = () => {
                                 <IconMinus className="w-4 h-5 flex-none hidden" />
                                 <span>Tools</span>
                             </h2>
-                            <li className="menu nav-item">
-                                <button type="button" className={`${currentMenu === 'space' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('space')}>
-                                    <div className="flex items-center text-info">
-                                        <IconMenuWidgets className="group-hover:!text-primary shrink-0 text-info" />
-                                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Space Sharing</span>
-                                    </div>
 
-                                    <div className={currentMenu !== 'space' ? 'rtl:rotate-90 -rotate-90' : ''}>
-                                        <IconCaretDown />
-                                    </div>
-                                </button>
-
-                                <AnimateHeight duration={300} height={currentMenu === 'space' ? 'auto' : 0}>
-                                    <ul className="sub-menu text-gray-500">
-                                        <li>
-                                            <NavLink  to="/space-sharing/spaces">Dashboard</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink  to="/space-sharing/space-list">Spaces</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/space-sharing/bookings">Bookings</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/space-sharing/renters">Renters</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/space-sharing/documents">Documents</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/space-sharing/messages">Messages</NavLink>
-                                        </li>
-                                    </ul>
-                                </AnimateHeight>
-                            </li>
                             <li className="nav-item">
                                 <NavLink to="/reports/all-reports" className="group">
                                     <div className="flex items-center">
@@ -523,6 +482,54 @@ const Sidebar = () => {
                                         </li>
                                     )} */}
                                 </ul>
+                            </li>
+
+                            <h2 className="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
+                                <IconMinus className="w-4 h-5 flex-none hidden" />
+                                <span>DEMO (In Progress)</span>
+                            </h2>
+                            <li className="menu nav-item">
+                                <button type="button" className={`${currentMenu === 'space' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('space')}>
+                                    <div className="flex items-center text-info">
+                                        <IconMenuWidgets className="group-hover:!text-primary shrink-0 text-info" />
+                                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Space Sharing</span>
+                                    </div>
+
+                                    <div className={currentMenu !== 'space' ? 'rtl:rotate-90 -rotate-90' : ''}>
+                                        <IconCaretDown />
+                                    </div>
+                                </button>
+
+                                <AnimateHeight duration={300} height={currentMenu === 'space' ? 'auto' : 0}>
+                                    <ul className="sub-menu text-gray-500">
+                                        <li>
+                                            <NavLink to="/space-sharing/spaces">Dashboard</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/space-sharing/space-list">Spaces</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/space-sharing/bookings">Bookings</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/space-sharing/renters">Renters</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/space-sharing/documents">Documents</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/space-sharing/messages">Messages</NavLink>
+                                        </li>
+                                    </ul>
+                                </AnimateHeight>
+                            </li>
+                            <li className="nav-item">
+                                <NavLink to="/marketing/landing-page-creator" className="group">
+                                    <div className="flex items-center">
+                                        <IconMenuTodo className="group-hover:!text-primary shrink-0" />
+                                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Landing Page Maker')}</span>
+                                    </div>
+                                </NavLink>
                             </li>
 
                             {/* <h2 className="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">

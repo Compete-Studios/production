@@ -87,9 +87,9 @@ export default function ProspectPipeline() {
                                                 </Link>
                                             </Tippy>
                                         </div>
-                                        {/* <div>
+                                        <div>
                                        <ZapierModal pipeline={data} />
-                                        </div> */}
+                                        </div>
                                         <div>
                                             <EditProspectPipelineStep data={data} />
                                         </div>

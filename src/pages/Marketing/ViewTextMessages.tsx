@@ -17,6 +17,7 @@ import { searchProspectsByPhone, searchStaffByPhone, searchStudentsByPhone } fro
 import IconEye from '../../components/Icon/IconEye';
 import IconChatDot from '../../components/Icon/IconChatDot';
 import ChatModal from './ChatModal';
+import SendBulkText from './SendBulkText';
 
 const ViewTextMessages = () => {
     const { suid, studioOptions, studioInfo }: any = UserAuth();
@@ -27,6 +28,7 @@ const ViewTextMessages = () => {
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const [loading, setLoading] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
+    const [senderName, setSenderName] = useState('');
 
     // show/hide
     const [page, setPage] = useState(1);
@@ -42,7 +44,7 @@ const ViewTextMessages = () => {
         direction: 'asc',
     });
     //start date is 7 days ago
-    const [startDate, setStartDate] = useState<string>(new Date(new Date().setDate(new Date().getDate() - 3)).toISOString().split('T')[0]);
+    const [startDate, setStartDate] = useState<string>(new Date(new Date().setDate(new Date().getDate() - 2)).toISOString().split('T')[0]);
     const [endDate, setEndDate] = useState<string>(new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0]);
 
     const formatDate = (date: any) => {
@@ -230,6 +232,17 @@ const ViewTextMessages = () => {
                     const result = await checkStudent(recipient.phoneNumber);
                     recipient.name = result.name;
                     recipient.type = result.type;
+                } else if (message.recipients.length <= 10 && message.recipients[0].name !== studioInfo?.Studio_Name) {
+                    const recipientChecks = message.recipients.map(async (recipient: any) => {
+                        if (recipient.name !== studioInfo?.Studio_Name) {
+                            const result = await checkStudent(recipient.phoneNumber);
+                            recipient.name = result.name;
+                            recipient.type = result.type;
+                        }
+                        return recipient;
+                    });
+
+                    message.recipients = await Promise.all(recipientChecks);
                 }
                 return message;
             });
@@ -276,8 +289,13 @@ const ViewTextMessages = () => {
         rawNumber: '',
     });
 
-    const handleOpenModal = (data: any) => {
+    const handleOpenModal = (data: any, index: any = undefined) => {
         setChatData(data);
+        if (index !== undefined) {
+            setSenderName(data?.recipients[index]?.name);
+        } else {
+            setSenderName(data?.from);
+        }
         setIsOpen(true);
     };
 
@@ -384,7 +402,16 @@ const ViewTextMessages = () => {
                                                                                                         : ' text-danger '
                                                                                                 }`}
                                                                                             >
-                                                                                                {recipient.name}
+                                                                                                {recipient.name}{' '}
+                                                                                                <Tippy content="View Messages">
+                                                                                                    <button
+                                                                                                        type="button"
+                                                                                                        className="text-info hover:text-blue-800"
+                                                                                                        onClick={() => handleOpenModal(data, index)}
+                                                                                                    >
+                                                                                                        <IconChatDot />
+                                                                                                    </button>
+                                                                                                </Tippy>
                                                                                             </span>
                                                                                         </div>
                                                                                     </li>
@@ -432,16 +459,22 @@ const ViewTextMessages = () => {
                                                     <div>{data.body}</div>
                                                 </td>
                                                 <td className="text-center">
-                                                    <button type="button" className="text-info hover:text-blue-800" onClick={() => handleOpenModal(data)}>
-                                                        <IconChatDot />
-                                                    </button>
+                                                    {data.recipients.length > 1 ? (
+                                                        <SendBulkText recipients={data.recipients} bodyMessage={data.body} />
+                                                    ) : (
+                                                        <Tippy content="View Messages">
+                                                            <button type="button" className="text-info hover:text-blue-800" onClick={() => handleOpenModal(data, data.from === removeNumber(studioOptions?.TextFromNumber) ? 0 : undefined)}>
+                                                                <IconChatDot />
+                                                            </button>
+                                                        </Tippy>
+                                                    )}
                                                 </td>
                                             </tr>
                                         );
                                     })}
                                 </tbody>
                             </table>
-                            <ChatModal isOpen={isOpen} setIsOpen={setIsOpen} chatDataForText={chatData} isOutgoing={chatData.isOutGoing} />
+                            <ChatModal isOpen={isOpen} setIsOpen={setIsOpen} chatDataForText={chatData} isOutgoing={chatData.isOutGoing} name={senderName} />
                         </div>
                     </div>
                     <div className="flex items-center justify-end w-full">

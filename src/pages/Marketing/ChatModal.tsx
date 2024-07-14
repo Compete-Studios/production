@@ -22,7 +22,7 @@ const textInit = {
     message: '',
 };
 
-export default function ChatModal({ chatDataForText, isOutgoing, isOpen, setIsOpen }: any) {
+export default function ChatModal({ chatDataForText, isOutgoing, isOpen, setIsOpen, name }: any) {
     const { suid, studioOptions }: any = UserAuth();
     const [textMessage, setTextMessage] = useState<TextMessage>(textInit);
     const [texts, setTexts] = useState<any>([]);
@@ -184,7 +184,7 @@ export default function ChatModal({ chatDataForText, isOutgoing, isOpen, setIsOp
 
     useEffect(() => {
         scrollToBottom();
-    }, [scrollBehavior]);
+    }, [isOpen]);
 
     return (
         <div>
@@ -214,8 +214,8 @@ export default function ChatModal({ chatDataForText, isOutgoing, isOpen, setIsOp
                                     leaveTo="opacity-0 scale-95"
                                 >
                                     <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-2xl my-8 text-black dark:text-white-dark">
-                                        <div className="flex bg-info sticky top-0 dark:bg-info-dark items-center justify-between px-5 py-3 text-white dark:text-black h-full " id="chattop">
-                                            <h5 className="font-bold text-lg">Send Text</h5>
+                                        <div className="flex bg-info sticky top-0 dark:bg-info-dark items-center justify-between px-5 py-3 text-white dark:text-black h-full " id="chat">
+                                            <h5 className="font-bold text-lg">Send Text To {name}</h5>
                                             <button type="button" className="text-white dark:text-black" onClick={() => setIsOpen(false)}>
                                                 <IconX />
                                             </button>

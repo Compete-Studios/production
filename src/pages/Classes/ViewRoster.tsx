@@ -18,6 +18,7 @@ import IconDollarSignCircle from '../../components/Icon/IconDollarSignCircle';
 import { hashTheID } from '../../functions/shared';
 import { formatHoursFromDateTime, handleGetTimeZoneOfUser } from '../../functions/dates';
 import Tippy from '@tippyjs/react';
+import SendBulkText from '../Marketing/SendBulkText';
 
 const ViewRoster = () => {
     const { suid, classes, staff }: any = UserAuth();
@@ -34,6 +35,7 @@ const ViewRoster = () => {
     const [classSchedule, setClassSchedule] = useState<any>([{}]);
     const [value, setValue] = useState<any>('list');
     const [hashedID, setHashedID] = useState<any>('');
+    const [bulkRecipientsForText, setBulkRecipientsForText] = useState([]);
 
     const [defaultParams] = useState({
         id: null,
@@ -197,6 +199,27 @@ const ViewRoster = () => {
         });
     };
 
+    //set an array of phone numbers to send bulk text each number should be an object of {phoneNumber: '1234567890', name: 'John Doe', type: 'student'}
+    const handleSetBulk = (staffNumbers: any, studentNumbers: any, prospectNumbers: any) => {
+        let bulkRecipients: any = [];
+        staffNumbers.map((d: any) => {
+            bulkRecipients.push({ phoneNumber: d.Phone, name: d.Name, type: 'staff' });
+        });
+        studentNumbers.map((d: any) => {
+            bulkRecipients.push({ phoneNumber: d.Phone, name: d.Name, type: 'student' });
+        });
+        prospectNumbers.map((d: any) => {
+            bulkRecipients.push({ phoneNumber: d.Phone, name: d.Name, type: 'prospect' });
+        });
+        setBulkRecipientsForText(bulkRecipients);
+    };
+    
+    useEffect(() => {
+        handleSetBulk(classStaff, studentRoster, prospectRoster);
+    }, [classStaff, studentRoster, prospectRoster]);
+
+    console.log('bulkRecipientsForText', bulkRecipientsForText)
+
     return (
         <>
             {' '}
@@ -270,11 +293,10 @@ const ViewRoster = () => {
                         <IconSend />
                         Email Class
                     </Link>
+                    <div>
 
-                    <button className="btn btn-secondary gap-2 w-full">
-                        <IconMessage />
-                        Text CLass
-                    </button>
+                    <SendBulkText isButton={true} recipients={bulkRecipientsForText} displayAll={false}  />
+                    </div>
 
                     <button className="btn btn-success gap-2 w-full">
                         <IconDollarSignCircle />
@@ -498,11 +520,7 @@ const ViewRoster = () => {
                             <IconSend />
                             Email Class
                         </Link>
-
-                        <button className="btn btn-secondary gap-2 w-44">
-                            <IconMessage />
-                            Text CLass
-                        </button>
+                        <SendBulkText isButton={true} recipients={bulkRecipientsForText} displayAll={false} />
 
                         <button className="btn btn-success gap-2 w-44">
                             <IconDollarSignCircle />

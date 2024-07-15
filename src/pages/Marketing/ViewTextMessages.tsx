@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../../store';
 import Dropdown from '../../components/Dropdown';
 import { setPageTitle } from '../../store/themeConfigSlice';
-import IconBell from '../../components/Icon/IconBell';
 import IconCaretDown from '../../components/Icon/IconCaretDown';
 import { getTextLogsByStudioId } from '../../functions/texts';
 import { constFormateDateMMDDYYYY, showErrorMessage } from '../../functions/shared';
@@ -14,7 +13,6 @@ import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { formatWithTimeZone, handleGetTimeZoneOfUser } from '../../functions/dates';
 import { searchProspectsByPhone, searchStaffByPhone, searchStudentsByPhone } from '../../functions/api';
-import IconEye from '../../components/Icon/IconEye';
 import IconChatDot from '../../components/Icon/IconChatDot';
 import ChatModal from './ChatModal';
 import SendBulkText from './SendBulkText';
@@ -73,7 +71,7 @@ const ViewTextMessages = () => {
         setInitialRecords(() => {
             return textData.filter((item) => {
                 return (
-                    item.body.toString().includes(search.toLowerCase()) ||
+                    item.body.toLowerCase().includes(search.toLowerCase()) ||
                     item.from.toLowerCase().includes(search.toLowerCase()) ||
                     item.recipients.some((r: any) => r.name.toLowerCase().includes(search.toLowerCase()))
                 );

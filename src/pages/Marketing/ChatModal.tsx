@@ -51,7 +51,7 @@ export default function ChatModal({ chatDataForText, isOutgoing, isOpen, setIsOp
         } else if (hours < 24) {
             return Math.floor(hours) > 1 ? `${Math.floor(hours)} hours ago` : `${Math.floor(hours)} hour ago`;
         } else if (days < 7) {
-            return Math.floor(days) > 1 ? `${Math.floor(days)} days ago}` : `${Math.floor(days)} day ago`;
+            return Math.floor(days) > 1 ? `${Math.floor(days)} days ago` : `${Math.floor(days)} day ago`;
         } else if (weeks < 4) {
             return Math.floor(weeks) > 1 ? `${Math.floor(weeks)} weeks ago` : `${Math.floor(weeks)} week ago`;
         } else if (months < 12) {

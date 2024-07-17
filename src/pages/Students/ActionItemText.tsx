@@ -2,7 +2,10 @@ import React, { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import 'flatpickr/dist/flatpickr.css';
 import IconX from '../../components/Icon/IconX';
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
 import SendText from './components/SendText';
+import IconMessage from '../../components/Icon/IconMessage';
 
 export default function ActionItemText({ student, pipeline }: any) {
     const [showTextActionModal, setTextShowActionModal] = useState(false);
@@ -48,10 +51,17 @@ export default function ActionItemText({ student, pipeline }: any) {
 
     return (
         <div>
-            <div className="flex items-center gap-2 justify-end">
-                <button type="button" className="btn btn-danger btn-sm flex items-center gap-1" onClick={() => setTextShowActionModal(true)}>
+            <div className="hidden md:flex items-center gap-2 justify-end">
+                <button type="button" className="btn btn-danger btn-sm flex items-center gap-1 w-full" onClick={() => setTextShowActionModal(true)}>
                     Send Text
                 </button>
+            </div>
+            <div className="md:hidden flex items-center gap-2 justify-end">
+            <Tippy content="Send Text">
+            <button type="button" className="btn btn-danger btn-sm flex items-center gap-1" onClick={() => setTextShowActionModal(true)}>
+                    <IconMessage />
+                </button>
+                </Tippy>
             </div>
             <Transition.Root show={showTextActionModal} as={Fragment}>
                 <Dialog className="relative z-50" onClose={setTextShowActionModal}>

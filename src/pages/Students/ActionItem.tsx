@@ -11,26 +11,25 @@ import IconListCheck from '../../components/Icon/IconListCheck';
 import SendMail from './components/SendMail';
 import SendText from './components/SendText';
 import QuickUpdate from './components/QuickUpdate';
-import IconLink from '../../components/Icon/IconLink';
-import IconInfoCircle from '../../components/Icon/IconInfoCircle';
-import IconPlus from '../../components/Icon/IconPlus';
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
 
-export default function ActionItem({ student, pipeline, studioOptions, update, setUpdate }: any) {
+export default function ActionItem({ student, pipeline, update, setUpdate }: any) {
     const [showActionModal, setShowActionModal] = useState(false);
-    const [expandedDescription, setExpandedDescription] = useState(false);
-    const [defaultTab, setDefaultTab] = useState(0);
-
-    const description = pipeline?.Description || '';
-
-
-    console.log(student)
 
     return (
         <div>
-            <div className="flex items-center gap-2 justify-end">
-                <button type="button" className="btn btn-info btn-sm flex items-center gap-1" onClick={() => setShowActionModal(true)}>
+            <div className="hidden md:flex  items-center gap-2 justify-end">
+                <button type="button" className="btn btn-info btn-sm flex items-center gap-1 w-full" onClick={() => setShowActionModal(true)}>
                     <IconBolt fill={true} className="h-4 w-4" /> Update Step
                 </button>
+            </div>
+            <div className="md:hidden flex  items-center gap-2 justify-end">
+                <Tippy content="Update Step">
+                    <button type="button" className="btn btn-info btn-sm flex items-center gap-1" onClick={() => setShowActionModal(true)}>
+                        <IconBolt fill={true} />
+                    </button>
+                </Tippy>
             </div>
             <Transition.Root show={showActionModal} as={Fragment}>
                 <Dialog className="relative z-50" onClose={setShowActionModal}>
@@ -59,8 +58,12 @@ export default function ActionItem({ student, pipeline, studioOptions, update, s
                                                                 Action Pipeline Step <span className="font-bold text-primary">{pipeline?.StepName}</span>{' '}
                                                             </Dialog.Title>
                                                             <p className="text-sm text-gray-500">This action toolbar allows you to quickly email, text, add notes, or update the student step.</p>
-                                                            <h4 className="text-lg font-medium text-gray-900 dark:text-white-dark pt-4">Student: <span className='text-secondary'>{student?.FName} {student?.LName}</span></h4> 
-                                                         
+                                                            <h4 className="text-lg font-medium text-gray-900 dark:text-white-dark pt-4">
+                                                                Student:{' '}
+                                                                <span className="text-secondary">
+                                                                    {student?.FName} {student?.LName}
+                                                                </span>
+                                                            </h4>
                                                         </div>
 
                                                         <div className="flex h-7 items-center">
@@ -75,10 +78,7 @@ export default function ActionItem({ student, pipeline, studioOptions, update, s
 
                                                 {/* Divider container */}
                                                 <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0 px-5 mt-8">
-                                                    <QuickUpdate 
-                                                    student={student} 
-                                                    setShowActionModal={setShowActionModal} 
-                                                    setUpdate={setUpdate} update={update} />
+                                                    <QuickUpdate student={student} setShowActionModal={setShowActionModal} setUpdate={setUpdate} update={update} />
                                                 </div>
                                             </div>
                                         </form>

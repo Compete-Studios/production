@@ -5,9 +5,8 @@ import { Tab } from '@headlessui/react';
 import IconX from '../../components/Icon/IconX';
 import IconBolt from '../../components/Icon/IconBolt';
 import IconMail from '../../components/Icon/IconMail';
-import IconMessage2 from '../../components/Icon/IconMessage2';
-import IconNotes from '../../components/Icon/IconNotes';
-import IconListCheck from '../../components/Icon/IconListCheck';
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
 import SendMail from './components/SendMail';
 import SendText from './components/SendText';
 import QuickUpdate from './components/QuickUpdate';
@@ -59,10 +58,17 @@ export default function ActionItemEmail({ student, pipeline, studioOptions, upda
 
     return (
         <div>
-            <div className='flex items-center gap-2 justify-end'>
-                <button type="button" className="btn btn-secondary btn-sm flex items-center gap-1" onClick={() => setShowActionModal(true)}>
-               Send Email
+            <div className="hidden md:flex items-center gap-2 justify-end">
+                <button type="button" className="btn btn-secondary btn-sm flex items-center gap-1 w-full" onClick={() => setShowActionModal(true)}>
+                    Send Email
                 </button>
+            </div>
+            <div className="md:hidden flex items-center gap-2 justify-end">
+                <Tippy content="Send Mail">
+                <button type="button" className="btn btn-secondary btn-sm flex items-center gap-1" onClick={() => setShowActionModal(true)}>
+                    <IconMail />
+                </button>
+                </Tippy> 
             </div>
             <Transition.Root show={showActionModal} as={Fragment}>
                 <Dialog className="relative z-50" onClose={setShowActionModal}>
@@ -91,7 +97,12 @@ export default function ActionItemEmail({ student, pipeline, studioOptions, upda
                                                                 Action Email <span className="font-bold text-primary">{pipeline?.StepName}</span>{' '}
                                                             </Dialog.Title>
                                                             <p className="text-sm text-gray-500">This action toolbar allows you to quickly email, text, add notes, or update the student step.</p>
-                                                            <h4 className="text-lg font-medium text-gray-900 dark:text-white-dark pt-4">Student: <span className='text-secondary'>{student?.FName} {student?.LName}</span></h4> 
+                                                            <h4 className="text-lg font-medium text-gray-900 dark:text-white-dark pt-4">
+                                                                Student:{' '}
+                                                                <span className="text-secondary">
+                                                                    {student?.FName} {student?.LName}
+                                                                </span>
+                                                            </h4>
                                                         </div>
 
                                                         <div className="flex h-7 items-center">

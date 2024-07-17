@@ -1,9 +1,9 @@
-import fetchData from "./fetchdata";
+import fetchData from './fetchdata';
 
 export const runPaymentForCustomer = async (paymentData) => {
     console.log('runPaymentForCustomer paymentData:', paymentData);
     try {
-        const response = await fetchData(`paysimple-helper/runPayment`, 'post',  paymentData);
+        const response = await fetchData(`paysimple-helper/runPayment`, 'post', paymentData);
         return response;
     } catch (error) {
         console.error(error);
@@ -11,9 +11,9 @@ export const runPaymentForCustomer = async (paymentData) => {
     }
 };
 
-export const runPaymentForQuickPay= async (paymentData) => {
+export const runPaymentForQuickPay = async (paymentData) => {
     try {
-        const response = await fetchData(`paysimple-helper/runPaymentForQuickPay`, 'post',  paymentData);
+        const response = await fetchData(`paysimple-helper/runPaymentForQuickPay`, 'post', paymentData);
         return response;
     } catch (error) {
         console.error(error);
@@ -31,13 +31,12 @@ export const createNewPaySimpleCustomer = async (customerData) => {
     }
 };
 
-
 export const addCreditCardToCustomer = async (customerData) => {
     try {
         const response = await fetchData(`paysimple-helper/addCreditCardToCustomer`, 'post', customerData);
         return response;
     } catch (error) {
-        throw error;  
+        throw error;
     }
 };
 
@@ -46,7 +45,17 @@ export const addCreditCardToCustomerForQuickPay = async (customerData) => {
         const response = await fetchData(`paysimple-helper/addCreditCardToCustomerForQuickPay`, 'post', customerData);
         return response;
     } catch (error) {
-        throw error;  
+        throw error;
+    }
+};
+
+export const getCreditCard = async (customerId, studioId) => {
+    try {
+        const response = await fetchData(`paysimple-helper/getCreditCard/${customerId}/${studioId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
     }
 };
 
@@ -60,10 +69,9 @@ export const addCreditCardToCustomerForQuickPay = async (customerData) => {
 //     }
 // };
 
-
 export const addBankAccountToCustomer = async (customerData) => {
     try {
-        const response = await fetchData(`paysimple-helper/addBankAccountToCustomer`, 'post',  customerData);
+        const response = await fetchData(`paysimple-helper/addBankAccountToCustomer`, 'post', customerData);
         return response;
     } catch (error) {
         console.error(error);
@@ -90,7 +98,7 @@ export const getCustomerPayments = async (data) => {
         console.error(error);
         throw error;
     }
-}
+};
 
 // ****FOR TESTING****
 // export const getCustomerPayments = async (data) => {
@@ -126,7 +134,17 @@ export const getAllCustomerPaymentAccounts = async (customerId, studioId) => {
 
 export const createPaymentSchedule = async (paymentData) => {
     try {
-        const response = await fetchData(`paysimple-helper/createPaymentSchedule`, 'post',  paymentData);
+        const response = await fetchData(`paysimple-helper/createPaymentSchedule`, 'post', paymentData);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const updatePaymentSchedule = async (paymentData) => {
+    try {
+        const response = await fetchData(`paysimple-helper/updatePaymentSchedule`, 'post', paymentData);
         return response;
     } catch (error) {
         console.error(error);
@@ -166,10 +184,9 @@ export const getPaymentByID = async (paymentId, suid) => {
 //     }
 // };
 
-
 export const voidAPayment = async (paymentData) => {
     try {
-        const response = await fetchData(`paysimple-helper/voidPayment`, 'post',  paymentData);
+        const response = await fetchData(`paysimple-helper/voidPayment`, 'post', paymentData);
         return response;
     } catch (error) {
         console.error(error);
@@ -257,17 +274,71 @@ export const getPaymentNotes = async (paymentId) => {
         console.error(error);
         throw error;
     }
-}
+};
 
+export const getPaymentScheduleNote = async (paymentScheduleId) => {
+    try {
+        const response = await fetchData(`payments/getPaymentScheduleNote/${paymentScheduleId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const suspendPaymentSchedule = async (data) => {
+    try {
+        const response = await fetchData(`payments/suspendPaymentSchedule`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const resumePaymentSchedule = async (data) => {
+    try {
+        const response = await fetchData(`paysimple-helper/resumePaymentSchedule`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const pausePaymentSchedule = async (data) => {
+    try {
+        const response = await fetchData(`paysimple-helper/pausePaymentSchedule`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const addPaymentScheduleNote = async (paymentScheduleId, notes) => {
+    const paymentData = {
+        paymentScheduleId: paymentScheduleId,
+        notes: notes,
+    };
+    try {
+        const response = await fetchData(`payments/addPaymentScheduleNote`, 'post', paymentData);
+        console.log('AddPaymentScheduleNote response:', response);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
 
 export const addPaymentNotes = async (paymentId, notes) => {
     const paymentData = {
         paymentId: paymentId,
-        notes: notes
-    }
+        notes: notes,
+    };
     try {
-        const response = await fetchData(`payments/addPaymentNotes`, 'post',  paymentData);
-        console.log('AddPaymentNote response:', response);  
+        const response = await fetchData(`payments/addPaymentNotes`, 'post', paymentData);
+        console.log('AddPaymentNote response:', response);
         return response;
     } catch (error) {
         console.error(error);
@@ -293,7 +364,7 @@ export const getInternalPaymentsByStudentId = async (studentId) => {
         console.error(error);
         throw error;
     }
-}
+};
 
 export const deleteInternalPayment = async (paymentId) => {
     try {
@@ -303,7 +374,7 @@ export const deleteInternalPayment = async (paymentId) => {
         console.error(error);
         throw error;
     }
-}
+};
 
 export const updateLatePaymentDateStepID = async (paymentData) => {
     try {
@@ -313,7 +384,7 @@ export const updateLatePaymentDateStepID = async (paymentData) => {
         console.error(error);
         throw error;
     }
-}
+};
 
 export const showAPaymentWasRetried = async (paymentData) => {
     try {
@@ -323,7 +394,7 @@ export const showAPaymentWasRetried = async (paymentData) => {
         console.error(error);
         throw error;
     }
-}
+};
 
 export const addLatePayment = async (paymentData) => {
     try {

@@ -54,7 +54,7 @@ export default function ViewPaymentMethods({ payID }: any) {
     }, [payID]);
 
     useEffect(() => {
-        if (cards.length > 0) {
+        if (cards?.length > 0) {
             const defaultCC: any = cards.find((card: any) => card.IsDefault);
             setDefaultCard(defaultCC?.Id);
         } else {

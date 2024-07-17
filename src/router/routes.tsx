@@ -496,7 +496,7 @@ const routes = [
         element: <UpdateBilling />,
     },
     {
-        path: '/students/view-active-payment-schedules',
+        path: '/students/view-active-payment-schedules/:id/:payId',
         element: <ViewActivePaymentSchedules />,
     },
     {

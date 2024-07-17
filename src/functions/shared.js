@@ -31,7 +31,6 @@ export const convertPhone = (phone) => {
     }
 };
 
-
 export const convertPhoneNumber = (phone) => {
     return phone?.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
 };
@@ -115,8 +114,8 @@ export const showWarningMessage = (msg = '', text = '', confirmed = '', title = 
     return new Promise((resolve, reject) => {
         const toast = Swal.mixin({
             customClass: {
-                confirmButton: 'btn btn-secondary',
-                cancelButton: 'btn btn-dark ltr:mr-3 rtl:ml-3',
+                confirmButton: 'btn btn-success',
+                cancelButton: 'btn btn-danger ltr:mr-3 rtl:ml-3',
                 popup: 'sweet-alerts',
             },
             buttonsStyling: false,
@@ -147,6 +146,8 @@ export const showWarningMessage = (msg = '', text = '', confirmed = '', title = 
     });
 };
 
+
+
 export const statusCSS = (status) => {
     switch (status) {
         case 'Pending':
@@ -173,6 +174,11 @@ export const statusCSS = (status) => {
             return 'text-info';
         case 'Voided':
             return ' text-red-800';
+        case 'Active':
+            return ' text-success';
+        case 'Suspended':
+        case 'Expired':
+            return ' text-warning';
         default:
             return 'text-gray-800';
     }

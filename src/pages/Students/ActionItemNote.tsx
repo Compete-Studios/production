@@ -3,9 +3,8 @@ import { Dialog, Transition } from '@headlessui/react';
 import 'flatpickr/dist/flatpickr.css';
 import { Tab } from '@headlessui/react';
 import IconX from '../../components/Icon/IconX';
-import IconBolt from '../../components/Icon/IconBolt';
-import IconMail from '../../components/Icon/IconMail';
-import IconMessage2 from '../../components/Icon/IconMessage2';
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
 import IconNotes from '../../components/Icon/IconNotes';
 import IconListCheck from '../../components/Icon/IconListCheck';
 import SendMail from './components/SendMail';
@@ -60,10 +59,17 @@ export default function ActionItemNote({ student, pipeline, studioOptions, updat
 
     return (
         <div>
-            <div className="flex items-center gap-2 justify-end">
-                <button type="button" className="btn btn-warning btn-sm flex items-center gap-1" onClick={() => setShowActionModal(true)}>
+            <div className="hidden md:flex items-center gap-2 justify-end">
+                <button type="button" className="btn btn-warning btn-sm flex items-center gap-1 w-full" onClick={() => setShowActionModal(true)}>
                     <IconNotes fill={true} className="h-4 w-4" /> View Notes
                 </button>
+            </div>
+            <div className="md:hidden flex items-center gap-2 justify-end">
+            <Tippy content="View Notes">
+                <button type="button" className="btn btn-warning btn-sm flex items-center gap-1" onClick={() => setShowActionModal(true)}>
+                    <IconNotes fill={true} /> 
+                </button>
+                </Tippy>
             </div>
             <Transition.Root show={showActionModal} as={Fragment}>
                 <Dialog className="relative z-50" onClose={setShowActionModal}>

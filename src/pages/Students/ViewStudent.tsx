@@ -33,7 +33,7 @@ import IconTrash from '../../components/Icon/IconTrash';
 import IconDollarSignCircle from '../../components/Icon/IconDollarSignCircle';
 import IconPlus from '../../components/Icon/IconPlus';
 import StudentsQuickPay from './StudentsQuickPay';
-import { convertPhone, showMessage, showWarningMessage, unHashTheID } from '../../functions/shared';
+import { convertPhone, hashTheID, showMessage, showWarningMessage, unHashTheID } from '../../functions/shared';
 import { formatDate } from '@fullcalendar/core';
 import { getAllCustomerPaymentAccounts } from '../../functions/payments';
 import UpdateContactPopUp from './UpdateContactPopUp';
@@ -54,6 +54,7 @@ import IconEye from '../../components/Icon/IconEye';
 import ViewPaymentMethods from './ViewPaymentMethods';
 import BillingInfoUpdate from './components/BillingInfoUpdate';
 import Hashids from 'hashids';
+import ViewActivePaymentSchedules from './ViewActivePaymentSchedules';
 
 interface UpdateValues {
     [key: string]: any;
@@ -99,6 +100,7 @@ const ViewStudent = () => {
     const [selectedIndex, setSelectedIndex] = useState(1);
     const [pipeline, setPipeline] = useState<any>([]);
     const [updateBilling, setUpdateBilling] = useState<boolean>(false);
+    const [updated, setUpdated] = useState<boolean>(false);
     const hashids = new Hashids();
     const dispatch = useDispatch();
     useEffect(() => {
@@ -118,6 +120,8 @@ const ViewStudent = () => {
         const newID = parseInt(student?.Student_id) * parseInt(suid);
         navigate(`/students/${newID}/add-payment-schedules`);
     };
+
+    console.log('student', student);
 
     const getPaySimpleInformation = async (studentID: any) => {
         try {
@@ -221,6 +225,8 @@ const ViewStudent = () => {
     };
 
     const getPaymentSchedules = async (paySimpleID: any, studioId: any) => {
+        setPaymentSchedules([]);  
+        setPaymentsLoading(true);      
         try {
             if (paySimpleID && suid) {
                 const customerIdResponse = await getPaymentSchedulesForCustomer(paySimpleInfo, studioId);
@@ -231,6 +237,7 @@ const ViewStudent = () => {
                             setPaymentSchedules((prev: any) => {
                                 return [...prev, res.Response];
                             });
+                            setPaymentsLoading(false);
                         });
                         if (i === schedules.length - 1) {
                             setPaymentsLoading(false);
@@ -316,7 +323,7 @@ const ViewStudent = () => {
     useEffect(() => {
         getBillingInfo(paySimpleInfo, suid);
         getPaymentSchedules(paySimpleInfo, suid);
-    }, [paySimpleInfo, suid]);
+    }, [paySimpleInfo, suid, updated]);
 
     const convertPhoneNumber = (phone: any) => {
         return phone?.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
@@ -1312,8 +1319,8 @@ const ViewStudent = () => {
                                     <div className="col-span-2 row-span-full">
                                         {paymentsLoading ? (
                                             <div className="panel">
-                                                <div className="flex items-center justify-center h-56">
-                                                    <span className="animate-spin border-4 border-primary border-l-transparent rounded-full w-10 h-10 inline-block align-middle m-auto mb-10"></span>
+                                                <div className="flex items-center justify-center h-24">
+                                                    <span className="animate-spin border-4 border-primary border-l-transparent rounded-full w-10 h-10 inline-block align-middle m-auto"></span>
                                                 </div>
                                             </div>
                                         ) : (
@@ -1368,10 +1375,8 @@ const ViewStudent = () => {
                                                                                         {data.ScheduleStatus}
                                                                                     </span>
                                                                                 </td>
-                                                                                <td className="text-center">
-                                                                                    <button>
-                                                                                        <IconEye />
-                                                                                    </button>
+                                                                                <td className="text-center flex items-center justify-center">
+                                                                                   <ViewActivePaymentSchedules student={student} paymentInfo={data} setUpdated={setUpdated} updated={updated} />
                                                                                 </td>
                                                                             </tr>
                                                                         );

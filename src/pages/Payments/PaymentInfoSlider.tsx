@@ -104,7 +104,8 @@ export default function PaymentInfoSlider({ payID }: any) {
     }, []);
 
     const handleGetNotes = async () => {
-        const paymentNotes = await getPaymentNotes(paymentInfo?.Id);
+        const paymentNotes = await getPaymentNotes(paymentInfo?.AccountId);
+        console.log(paymentNotes);
         setPaymentNotes(paymentNotes[0].Notes);
     };
 
@@ -113,7 +114,7 @@ export default function PaymentInfoSlider({ payID }: any) {
     }, [paymentInfo]);
 
     useEffect(() => {
-        if (customerPaymentAccount.length > 0) {
+        if (customerPaymentAccount?.length > 0) {
             const card = customerPaymentAccount.find((card: any) => card.Id === paymentInfo.AccountId);
             setCreditCard(card);
         }

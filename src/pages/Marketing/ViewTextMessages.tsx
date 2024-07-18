@@ -458,7 +458,7 @@ const ViewTextMessages = () => {
                                                 </td>
                                                 <td className="text-center">
                                                     {data.recipients.length > 1 ? (
-                                                        <SendBulkText recipients={data.recipients} bodyMessage={data.body} />
+                                                        <SendBulkText recipients={data.recipients} bodyMessage={data.body} displayAll={true} />
                                                     ) : (
                                                         <Tippy content="View Messages">
                                                             <button type="button" className="text-info hover:text-blue-800" onClick={() => handleOpenModal(data, data.from === removeNumber(studioOptions?.TextFromNumber) ? 0 : undefined)}>

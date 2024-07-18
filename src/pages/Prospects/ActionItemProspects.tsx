@@ -12,8 +12,8 @@ export default function ActionItemProspect({ student, pipeline, prospectPipeline
     return (
         <div>
             <div className="flex items-center gap-2 justify-end">
-                <button type="button" className="btn btn-info btn-sm flex items-center gap-1" onClick={() => setShowActionModal(true)}>
-                    <IconBolt fill={true} className="h-4 w-4" /> Update Step
+                <button type="button" className="btn btn-info btn-sm flex items-center gap-1 h-8" onClick={() => setShowActionModal(true)}>
+                     <span className="hidden md:block">Update Step</span><span className="md:hidden block"><IconBolt fill={true} /></span>
                 </button>
             </div>
             <Transition.Root show={showActionModal} as={Fragment}>

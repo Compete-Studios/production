@@ -64,6 +64,8 @@ const updateValuesInit = {
     First_Name: false,
     Last_Name: false,
     email: false,
+    Phone: false,
+    Phone2: false,
     Contact1: false,
     Contact2: false,
     mailingaddr: false,
@@ -120,8 +122,6 @@ const ViewStudent = () => {
         const newID = parseInt(student?.Student_id) * parseInt(suid);
         navigate(`/students/${newID}/add-payment-schedules`);
     };
-
-    console.log('student', student);
 
     const getPaySimpleInformation = async (studentID: any) => {
         try {
@@ -888,6 +888,48 @@ const ViewStudent = () => {
                                                 </button>
                                             ) : (
                                                 <button className="ml-auto text-info hover:text-blue-900" onClick={() => setToUpdate({ ...toUpdate, email: true })}>
+                                                    <IconEdit className="w-4 h-4" />
+                                                </button>
+                                            )}
+                                             <p className="font-bold">Cell Number:</p>
+                                            {toUpdate?.Phone ? (
+                                                <input type="text" className="form-input" value={student?.Phone} onChange={(e) => setStudent({ ...student, Phone: e.target.value })} />
+                                            ) : (
+                                                <p className={`font-normal ${!student?.email && 'text-danger'}`}>{student?.Phone ? convertPhoneNumber(student?.Phone): 'No Phone Set'}</p>
+                                            )}
+                                            {toUpdate?.Phone ? (
+                                                <button
+                                                    className="ml-auto text-info hover:text-blue-900"
+                                                    onClick={() => {
+                                                        setToUpdate({ ...toUpdate, Phone: false });
+                                                        handleUpdateByColumn('Phone');
+                                                    }}
+                                                >
+                                                    Save
+                                                </button>
+                                            ) : (
+                                                <button className="ml-auto text-info hover:text-blue-900" onClick={() => setToUpdate({ ...toUpdate, Phone: true })}>
+                                                    <IconEdit className="w-4 h-4" />
+                                                </button>
+                                            )}
+                                             <p className="font-bold">Home Phone:</p>
+                                            {toUpdate?.Phone2 ? (
+                                                <input type="text" className="form-input" value={student?.Phone2} onChange={(e) => setStudent({ ...student, Phone2: e.target.value })} />
+                                            ) : (
+                                                <p className={`font-normal ${!student?.Phone2 && 'text-danger'}`}>{student?.Phone2 ? convertPhoneNumber(student?.Phone2) : 'No Home Phone Set'}</p>
+                                            )}
+                                            {toUpdate?.Phone2 ? (
+                                                <button
+                                                    className="ml-auto text-info hover:text-blue-900"
+                                                    onClick={() => {
+                                                        setToUpdate({ ...toUpdate, Phone2: false });
+                                                        handleUpdateByColumn('Phone2');
+                                                    }}
+                                                >
+                                                    Save
+                                                </button>
+                                            ) : (
+                                                <button className="ml-auto text-info hover:text-blue-900" onClick={() => setToUpdate({ ...toUpdate, Phone2: true })}>
                                                     <IconEdit className="w-4 h-4" />
                                                 </button>
                                             )}

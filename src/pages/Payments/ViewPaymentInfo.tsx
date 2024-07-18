@@ -290,8 +290,8 @@ export default function ViewPaymentInfo() {
         deliverytime: null,
     };
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="flex h-full flex-col bg-white py-6 shadow-xl">
+        <div className="sm:flex sm:items-start gap-4 max-w-7xl ">
+            <div className="flex h-full flex-col bg-white py-6 shadow-xl sm:w-3/5">
                 <div className="relative flex-1 px-4 sm:px-6">
                     <div>
                         <div className="flex items-center justify-between">
@@ -395,23 +395,23 @@ export default function ViewPaymentInfo() {
                                     additional="Any notes you would like to add to the receipt?"
                                 />
                             </div>
-                            <button className="btn btn-primary w-full" onClick={() => handlePrintReceipt()}>
+                            <button className="btn btn-primary w-full whitespace-nowrap" onClick={() => handlePrintReceipt()}>
                                 Print Reciept
                             </button>
                             {paymentInfo?.Status === 'Authorized' ? (
                                 <button
-                                    className="btn btn-secondary w-full"
+                                    className="btn btn-secondary w-full whitespace-nowrap"
                                     onClick={() => handleVoidPayment()}
                                     disabled={paymentInfo?.Status === 'Settled' || paymentInfo?.Status === 'Declined' || paymentInfo?.Status === 'Refunded' || paymentInfo?.Status === 'Voided'}
                                 >
                                     Void Payment
                                 </button>
                             ) : paymentInfo?.Status === 'Settled' ? (
-                                <button className="btn btn-danger w-full" onClick={() => handleVoidPayment()}>
+                                <button className="btn btn-danger w-full whitespace-nowrap" onClick={() => handleVoidPayment()}>
                                     Refund Payment
                                 </button>
                             ) : (
-                                <button className="btn btn-secondary w-full" onClick={() => handleVoidPayment()} disabled>
+                                <button className="btn btn-secondary w-full whitespace-nowrap" onClick={() => handleVoidPayment()} disabled>
                                     Void Payment
                                 </button>
                             )}
@@ -419,9 +419,9 @@ export default function ViewPaymentInfo() {
                     </div>
                 </div>
             </div>
-            <div className="panel p-0 relative">
+            <div className="panel p-0 relative sm:w-2/5">
                 <div className="p-5 pb-20">
-                    <h2 className="text-xl">Late Payment Notes</h2>
+                    <h2 className="text-xl">Payment Notes</h2>
                     <div className="p-3 bg-dark-light/50 dark:bg-dark mt-2 border rounded-sm">
                         {paymentNotes?.split('\n').map((note: any, index: any) => {
                             return (

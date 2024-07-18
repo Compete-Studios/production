@@ -74,7 +74,7 @@ export default function SendBulkText({ recipients, bodyMessage = null, isButton 
             <div className="">
                 <div className="flex items-center justify-center">
                     {isButton ? (
-                        <button className="btn btn-secondary gap-2 w-44" onClick={() => setOpenBulk(true)}>
+                        <button className="btn btn-secondary gap-2 w-full whitespace-nowrap" onClick={() => setOpenBulk(true)}>
                             <IconMessage />
                             Text This List
                         </button>
@@ -119,17 +119,35 @@ export default function SendBulkText({ recipients, bodyMessage = null, isButton 
                                                 <IconX className="h-6 w-6" />
                                             </button>
                                         </div>
-                                        <div className="p-5 pb-44 flex items-start justify-between gap-4">
+                                        <div className="p-5 pb-44 sm:flex sm:items-start sm:justify-between gap-4">
                                             <div className="ml-1 text-xs text-gray-500 flex items-center gap-1">
                                                 <div>
-                                                    <div className="flex items-center gap-1">{checkedRecipients?.length} Recipients </div>
+                                                    <Tippy content="View All">
+                                                        <button
+                                                            className="hover:text-info"
+                                                            onClick={() => {
+                                                                setViewAll(!viewAll);
+                                                            }}
+                                                        >
+                                                            <div className="flex items-center gap-1">
+                                                                <div>{checkedRecipients?.length} Recipients</div>
+                                                                <div>
+                                                                    <IconCaretDown className={`${!viewAll && '-rotate-90'}`} />
+                                                                </div>
+                                                            </div>
+                                                        </button>
+                                                    </Tippy>
                                                     <div className="mt-2 btn p-0 rounded-none border-0 shadow-none dropdown-toggle text-black dark:text-white-dark hover:text-primary dark:hover:text-primary bg-zinc-100 max-h-full overflow-y-auto">
-                                                        {checkedRecipients?.length <= 20 ? (
-                                                            <ul className="max-w-56 w-auto max-h-auto h-auto max-h-screen overflow-y-auto bg-zinc-50 border rounded-lg">
+                                                        {viewAll && (
+                                                            <ul
+                                                                className={`w-auto max-h-auto h-auto max-h-screen overflow-y-auto bg-zinc-50 border rounded-lg grid ${
+                                                                    displayAll ? 'grid-cols-1' : 'sm:grid-cols-3 grid-cols-2'
+                                                                }  gap-x-2`}
+                                                            >
                                                                 {recipients?.map((recipient: any, index: number) => {
                                                                     return (
                                                                         <li key={index}>
-                                                                            <div className="flex items-center gap-1 whitespace-nowrap px-2">
+                                                                            <div className="flex items-center whitespace-nowrap px-2">
                                                                                 <input
                                                                                     type="checkbox"
                                                                                     checked={checkedRecipients?.includes(recipient)}
@@ -160,8 +178,6 @@ export default function SendBulkText({ recipients, bodyMessage = null, isButton 
                                                                     );
                                                                 })}
                                                             </ul>
-                                                        ) : (
-                                                            <div className="flex items-center gap-1 text-xs text-danger">This List Is Too Long To Display</div>
                                                         )}
                                                     </div>
                                                 </div>
@@ -182,7 +198,7 @@ export default function SendBulkText({ recipients, bodyMessage = null, isButton 
                                                         <textarea
                                                             className="form-input rounded-md border-0 bg-[#f4f4f4] pr-12 focus:outline-none py-2"
                                                             placeholder="Type a message"
-                                                            rows={2}
+                                                            rows={3}
                                                             value={textMessage.message}
                                                             onChange={(e) => setTextMessage({ ...textMessage, message: e.target.value })}
                                                         />

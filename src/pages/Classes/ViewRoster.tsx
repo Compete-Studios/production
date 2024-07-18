@@ -19,6 +19,7 @@ import { hashTheID } from '../../functions/shared';
 import { formatHoursFromDateTime, handleGetTimeZoneOfUser } from '../../functions/dates';
 import Tippy from '@tippyjs/react';
 import SendBulkText from '../Marketing/SendBulkText';
+import EmailClassModal from '../Marketing/EmailClassModal';
 
 const ViewRoster = () => {
     const { suid, classes, staff }: any = UserAuth();
@@ -203,22 +204,22 @@ const ViewRoster = () => {
     const handleSetBulk = (staffNumbers: any, studentNumbers: any, prospectNumbers: any) => {
         let bulkRecipients: any = [];
         staffNumbers.map((d: any) => {
-            bulkRecipients.push({ phoneNumber: d.Phone, name: d.Name, type: 'staff' });
+            bulkRecipients.push({ phoneNumber: d.Phone, name: d.Name, type: 'staff', email: d.email });
         });
         studentNumbers.map((d: any) => {
-            bulkRecipients.push({ phoneNumber: d.Phone, name: d.Name, type: 'student' });
+            bulkRecipients.push({ phoneNumber: d.Phone, name: d.Name, type: 'student', email: d.email });
         });
         prospectNumbers.map((d: any) => {
-            bulkRecipients.push({ phoneNumber: d.Phone, name: d.Name, type: 'prospect' });
+            bulkRecipients.push({ phoneNumber: d.Phone, name: d.Name, type: 'prospect', email: d.email });
         });
         setBulkRecipientsForText(bulkRecipients);
     };
-    
+
     useEffect(() => {
         handleSetBulk(classStaff, studentRoster, prospectRoster);
     }, [classStaff, studentRoster, prospectRoster]);
 
-    console.log('bulkRecipientsForText', bulkRecipientsForText)
+    console.log('bulkRecipientsForText', bulkRecipientsForText);
 
     return (
         <>
@@ -230,13 +231,31 @@ const ViewRoster = () => {
                     </Link>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>Class</span>
+                    <span>{classData?.Name}</span>
                 </li>
             </ul>
             <div>
                 <div className="flex items-center justify-between flex-wrap gap-4 mt-4">
                     <div>
-                        <h2 className="text-xl font-bold">Roster for {classData?.Name}</h2>
+                        <div className='flex items-center gap-4'>
+                            <h2 className="text-xl font-bold">Roster for {classData?.Name}</h2>
+                            <div>
+                                <div className="flex sm:flex-row flex-col sm:items-center justify-end sm:gap-3 gap-4 w-full sm:w-auto">
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            placeholder="Search Roster"
+                                            className="form-input py-2 ltr:pr-11 rtl:pl-11 peer"
+                                            value={search}
+                                            onChange={(e) => setSearch(e.target.value)}
+                                        />
+                                        <button type="button" className="absolute ltr:right-[11px] rtl:left-[11px] top-1/2 -translate-y-1/2 peer-focus:text-primary">
+                                            <IconSearch className="mx-auto" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div className="text-sm text-gray-500dark:text-gray-400 mb-4 gap-1">
                             Instructors:
                             <div className="flex flex-wrap">
@@ -270,59 +289,47 @@ const ViewRoster = () => {
                                 </span>
                             </div>
                         ))}
+                        <div className="sm:flex space-y-4 sm:space-y-0 items-center gap-2 mt-4">
+                            <button type="button" className="btn btn-primary gap-2 w-full whitespace-nowrap" onClick={() => editUser()}>
+                                <IconUserPlus />
+                                Add Student
+                            </button>
+
+                            <button type="button" className="btn btn-dark gap-2 w-full whitespace-nowrap" onClick={() => editUser()}>
+                                <IconUserPlus />
+                                Add Prospect
+                            </button>
+                            <button type="button" className="btn btn-warning gap-2 w-full whitespace-nowrap">
+                                <IconPrinter />
+                                Print Roster
+                            </button>
+                            {/* <Link to={`/marketing/create-news-letter/${hashedID}/class`} type="button" className="btn btn-info gap-2 w-full whitespace-nowrap">
+                                <IconSend />
+                                Email Class
+                            </Link> */}
+                            <div>
+                                <EmailClassModal classuid={classId} recipients={bulkRecipientsForText}  type={"classType"} />
+                            </div>
+                            <div className='w-full'>
+                                <SendBulkText isButton={true} recipients={bulkRecipientsForText} displayAll={false} />
+                            </div>
+
+                            <button className="btn btn-success gap-2 w-full whitespace-nowrap">
+                                <IconDollarSignCircle />
+                                Bulk Pay
+                            </button>
+                        </div>
                     </div>
 
                     {/* <div className="flex sm:flex-row flex-col sm:items-center justify-end sm:gap-3 gap-4 w-full sm:w-auto mt-3">
-                        <button type="button" className="btn btn-primary" onClick={() => editUser()}>
-                            <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
-                            Add Student
-                        </button>
-
-                        <button type="button" className="btn btn-dark" onClick={() => editUser()}>
-                            <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
-                            Add Prospect
-                        </button>
+                       
                     </div> */}
                 </div>
-                <div className="panel xl:hidden sm:flex sm:items-center sm:gap-2 sm:space-y-0 space-y-3">
-                    <button type="button" className="btn btn-warning gap-2 w-full">
-                        <IconPrinter />
-                        Print Roster
-                    </button>
-                    <Link to={`/marketing/create-news-letter/${hashedID}/class`} type="button" className="btn btn-info gap-2 w-full">
-                        <IconSend />
-                        Email Class
-                    </Link>
-                    <div>
 
-                    <SendBulkText isButton={true} recipients={bulkRecipientsForText} displayAll={false}  />
-                    </div>
-
-                    <button className="btn btn-success gap-2 w-full">
-                        <IconDollarSignCircle />
-                        Bulk Pay
-                    </button>
-                </div>
-                <div className="lg:flex items-start mt-5 gap-4">
+                <div className="lg:flex items-start mt-4 gap-4">
                     <div className="grow">
                         <div className="flex items-center justify-between flex-wrap gap-4 p-5">
                             <h2 className="text-xl">Students Enrolled</h2>
-                            <div>
-                                <div className="flex sm:flex-row flex-col sm:items-center justify-end sm:gap-3 gap-4 w-full sm:w-auto">
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            placeholder="Search Roster"
-                                            className="form-input py-2 ltr:pr-11 rtl:pl-11 peer"
-                                            value={search}
-                                            onChange={(e) => setSearch(e.target.value)}
-                                        />
-                                        <button type="button" className="absolute ltr:right-[11px] rtl:left-[11px] top-1/2 -translate-y-1/2 peer-focus:text-primary">
-                                            <IconSearch className="mx-auto" />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                         <div className="panel p-0 border-0 overflow-hidden">
                             <div className="table-responsive">
@@ -511,7 +518,7 @@ const ViewRoster = () => {
                             </Transition>
                         </div>
                     </div>
-                    <div className="panel space-y-3 hidden xl:block xl:sticky xl:top-20 flex-none">
+                    {/* <div className="panel space-y-3 hidden xl:block xl:sticky xl:top-20 flex-none">
                         <button type="button" className="btn btn-warning gap-2 w-44">
                             <IconPrinter />
                             Print Roster
@@ -526,7 +533,7 @@ const ViewRoster = () => {
                             <IconDollarSignCircle />
                             Bulk Pay
                         </button>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </>

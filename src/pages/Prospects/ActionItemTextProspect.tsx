@@ -3,6 +3,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import 'flatpickr/dist/flatpickr.css';
 import IconX from '../../components/Icon/IconX';
 import SendText from '../Students/components/SendText';
+import IconChatDot from '../../components/Icon/IconChatDot';
 
 export default function ActionItemTextProspect({ student, pipeline }: any) {
     const [showTextActionModal, setTextShowActionModal] = useState(false);
@@ -49,8 +50,8 @@ export default function ActionItemTextProspect({ student, pipeline }: any) {
     return (
         <div>
             <div className="flex items-center gap-2 justify-end">
-                <button type="button" className="btn btn-danger btn-sm flex items-center gap-1" onClick={() => setTextShowActionModal(true)}>
-                    Send Text
+                <button type="button" className="btn btn-danger btn-sm flex items-center gap-1 h-8" onClick={() => setTextShowActionModal(true)}>
+                <span className="hidden md:block">Send Text</span><span className="md:hidden block"><IconChatDot /></span>
                 </button>
             </div>
             <Transition.Root show={showTextActionModal} as={Fragment}>

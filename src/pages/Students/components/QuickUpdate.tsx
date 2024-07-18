@@ -44,7 +44,6 @@ export default function QuickUpdate({ student, setShowActionModal, update, setUp
             const response2 = await updateStudentByColumn(data2);
             showMessage('Updated Successfully');
             setShowActionModal(false);
-            navigate(`/students/view-student/${hashTheID(student.StudentId)}/${hashTheID(suid)}`)
             setUpdate(!update);
         } catch (error) {
             console.log(error);

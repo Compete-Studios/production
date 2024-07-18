@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { UserAuth } from '../../context/AuthContext';
-import { getInvoicesByStudioId, getProspectInvoicesByStudioId } from '../../functions/api';
+import { deleteInvoice, getInvoicesByStudioId, getProspectInvoicesByStudioId } from '../../functions/api';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import IconTrashLines from '../../components/Icon/IconTrashLines';
-import { formatDate, hashTheID, showMessage, showErrorMessage } from '../../functions/shared';
+import { formatDate, hashTheID, showMessage, showErrorMessage, showWarningMessage } from '../../functions/shared';
 import IconEye from '../../components/Icon/IconEye';
 import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../store/themeConfigSlice';
@@ -48,6 +48,25 @@ export default function ViewInvoices() {
     useEffect(() => {
         dispatch(setPageTitle('Invoices'));
     }, [dispatch]);
+
+    const handleDeleteTheInvoice = async (invoiceID: any) => {
+        showWarningMessage('Are you sure you want to delete this invoice?', 'Delete Invoice', 'Your invoice has been removed successfully')
+            .then(async (confirmed: boolean) => {
+                if (confirmed) {
+                    const response = await deleteInvoice(invoiceID);
+                    if (response.status === 200) {
+                        console.log('Invoice Deleted');
+                    }
+                } else {
+                    // User canceled the action
+                    console.log('User canceled');
+                }
+            })
+            .catch((error) => {
+                // Handle error if any
+                console.error('Error:', error);
+            });
+    };
 
     const handleGetStudentInvoices = async () => {
         try {
@@ -118,12 +137,7 @@ export default function ViewInvoices() {
                             </div>
                             <div className="md:flex-auto flex-1">
                                 <label className="form-label text-transparent">Search</label>
-                                <button
-                                    type="button"
-                                    className="btn btn-primary w-full"
-                                    onClick={handleSearch}
-                                    disabled={loading}
-                                >
+                                <button type="button" className="btn btn-primary w-full" onClick={handleSearch} disabled={loading}>
                                     {loading ? 'Searching...' : 'Search'}
                                 </button>
                             </div>
@@ -157,7 +171,7 @@ export default function ViewInvoices() {
     );
 }
 
-const InvoiceTable = ({ title, invoices, suid }: { title: string, invoices: Invoice[], suid: string }) => {
+const InvoiceTable = ({ title, invoices, suid }: { title: string; invoices: Invoice[]; suid: string }) => {
     return (
         <div className="table-responsive mt-12">
             <h2 className="text-xl">{title}</h2>
@@ -183,16 +197,17 @@ const InvoiceTable = ({ title, invoices, suid }: { title: string, invoices: Invo
                             <td>{formatDate(data.DueDate)}</td>
                             <td>
                                 <div
-                                    className={`whitespace-nowrap ${data.PaymentId > 0
-                                        ? 'text-success'
-                                        : data.status === 'Pending'
+                                    className={`whitespace-nowrap ${
+                                        data.PaymentId > 0
+                                            ? 'text-success'
+                                            : data.status === 'Pending'
                                             ? 'text-secondary'
                                             : data.status === 'In Progress'
-                                                ? 'text-info'
-                                                : data.status === 'Canceled'
-                                                    ? 'text-danger'
-                                                    : 'text-danger'
-                                        }`}
+                                            ? 'text-info'
+                                            : data.status === 'Canceled'
+                                            ? 'text-danger'
+                                            : 'text-danger'
+                                    }`}
                                 >
                                     {data.PaymentId > 0 ? 'Paid' : 'Open'}
                                 </div>
@@ -207,7 +222,7 @@ const InvoiceTable = ({ title, invoices, suid }: { title: string, invoices: Invo
                                 </div>
                                 <div>
                                     <Tippy content="Delete Invoice">
-                                        <button type="button">
+                                        <button type="button" onClick={() => handleDeleteTheInvoice(data.InvoiceId)}>
                                             <IconTrashLines className="m-auto text-danger hover:text-red-800" />
                                         </button>
                                     </Tippy>

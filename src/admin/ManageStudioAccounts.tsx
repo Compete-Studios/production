@@ -171,7 +171,7 @@ const ManageStudioAccounts = () => {
 
                                         <td>
                                             {contact?.hasAccount && (<div className="flex gap-4 items-center justify-center">
-                                                <button type="button" className="btn btn-sm btn-outline-info" onClick={() => handleResetPassword("bret@techbret.com")}>
+                                                <button type="button" className="btn btn-sm btn-outline-info" onClick={() => handleResetPassword(contact.Contact_Email)}>
                                                     Reset Password
                                                 </button>
 

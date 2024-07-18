@@ -58,18 +58,11 @@ export default function ActionItemEmail({ student, pipeline, studioOptions, upda
 
     return (
         <div>
-            <div className="hidden md:flex items-center gap-2 justify-end">
-                <button type="button" className="btn btn-secondary btn-sm flex items-center gap-1 w-full" onClick={() => setShowActionModal(true)}>
-                    Send Email
+            <div className="flex items-center gap-2 justify-end">
+                <button type="button" className="btn btn-secondary btn-sm flex items-center gap-1 h-8" onClick={() => setShowActionModal(true)}>
+                <span className="hidden md:block">Send Email</span><span className="md:hidden block"><IconMail /></span>
                 </button>
-            </div>
-            <div className="md:hidden flex items-center gap-2 justify-end">
-                <Tippy content="Send Mail">
-                <button type="button" className="btn btn-secondary btn-sm flex items-center gap-1" onClick={() => setShowActionModal(true)}>
-                    <IconMail />
-                </button>
-                </Tippy> 
-            </div>
+            </div>        
             <Transition.Root show={showActionModal} as={Fragment}>
                 <Dialog className="relative z-50" onClose={setShowActionModal}>
                     <div className="fixed inset-0" />

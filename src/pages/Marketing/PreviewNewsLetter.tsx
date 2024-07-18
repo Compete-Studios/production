@@ -6,7 +6,7 @@ import { sendEmailToClass } from '../../functions/emails';
 import { showErrorMessage, showMessage } from '../../functions/shared';
 import { useNavigate } from 'react-router-dom';
 
-export default function PreviewNewsLetter({ emailData, htmlValue, listOfNewMembers }: any) {
+export default function PreviewNewsLetter({ emailData, htmlValue, listOfNewMembers, setModal, modal }: any) {
     const { suid }: any = UserAuth();
     const [newsModal, setNewsModal] = useState(false);
     const [listOfEmails, setListOfEmails] = useState<any>([]);
@@ -20,20 +20,6 @@ export default function PreviewNewsLetter({ emailData, htmlValue, listOfNewMembe
 
     const handleSendEmail = (e: any) => {
         e.preventDefault();
-        const data = {
-            studioId: suid,
-            level: emailData.level,
-            listName: emailData.listName,
-            newsLetterTitle: emailData.newsLetterTitle,
-            type: emailData.type,
-            listDescription: emailData.listDescription,
-            listOfNewMembers: listOfEmails,
-            from: emailData.from,
-            subject: emailData.subject,
-            html: htmlValue,
-        };
-
-        
         // const data = {
         //     studioId: suid,
         //     level: emailData.level,
@@ -41,11 +27,25 @@ export default function PreviewNewsLetter({ emailData, htmlValue, listOfNewMembe
         //     newsLetterTitle: emailData.newsLetterTitle,
         //     type: emailData.type,
         //     listDescription: emailData.listDescription,
-        //     listOfNewMembers: ['bret@techbret.com', "", "hello@codetega.com", "bretljohnson0@gmail.com"],
+        //     listOfNewMembers: listOfEmails,
         //     from: emailData.from,
         //     subject: emailData.subject,
         //     html: htmlValue,
         // };
+
+        
+        const data = {
+            studioId: suid,
+            level: emailData.level,
+            listName: emailData.listName,
+            newsLetterTitle: emailData.newsLetterTitle,
+            type: emailData.type,
+            listDescription: emailData.listDescription,
+            listOfNewMembers: ['bret@techbret.com', "", "hello@codetega.com", "bretljohnson0@gmail.com"],
+            from: emailData.from,
+            subject: emailData.subject,
+            html: htmlValue,
+        };
 
         const navigate = useNavigate();
        
@@ -55,7 +55,7 @@ export default function PreviewNewsLetter({ emailData, htmlValue, listOfNewMembe
             if (res.status === 200) {
                 showMessage('Email Sent Successfully');
                 setNewsModal(false);
-                navigate('/marketing/view-emails');
+                setModal(false);
             } else {
                 showErrorMessage('Email Failed to Send, Please Try Again');
                 setNewsModal(false);

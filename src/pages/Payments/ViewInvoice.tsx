@@ -14,6 +14,10 @@ import html2canvas from 'html2canvas';
 import StudentsQuickPay from '../Students/StudentsQuickPay';
 import { REACT_BASE_URL } from '../../constants';
 import { sendIndividualEmail } from '../../functions/emails';
+import ConfirmInvoiceSend from './ConfirmInvoiceSend';
+import StudioInfo from '../../admin/studios/StudioInfo';
+import Hashids from 'hashids';
+import IconEye from '../../components/Icon/IconEye';
 
 const columns = [
     {
@@ -90,12 +94,10 @@ const ViewInvoice = () => {
         window.print();
     };
     const [invoiceID, setInvoiceID] = useState<any>('');
+    const hashids = new Hashids();
     const [hashedSUID, setHashedSUID] = useState<any>('');
     const [invoiceData, setInvoiceData] = useState<InvoiceData>(invoiceInit);
     const [studentInfo, setStudentInfo] = useState<any>({});
-    const [sending, setSending] = useState(false);
-    const [sendEmail, setSendEmail] = useState(true);
-    const [sendText, setSendText] = useState(true);
 
     const { id, stud } = useParams<{ id: string; stud: string }>();
 
@@ -160,75 +162,17 @@ const ViewInvoice = () => {
             });
     };
 
-    const createInvoiceURL = async (invoiceId: any) => {
-        const linkForInvoice = `${REACT_BASE_URL}pay-invoice/${invoiceId}`;
-        const htmlFOrEmail = `"<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Document</title></head><body style=\"background-color: #f4f4f4; font-family: Arial, sans-serif;\"><div style=\"max-width: 600px; margin: 0 auto; padding: 20px;\"><h2 style=\"color: #333;\">You have a new Invoice from ${studioInfo?.Studio_Name}</h2><p style=\"color: #666;\">Please go to ${linkForInvoice} to pay your invoice.</p><p style=\"color: #666;\">Best regards,<br> ${studioInfo?.Studio_Name}</p></div></body></html>"`;
-        return htmlFOrEmail;
-    };
-
-
-   
-    const handleResendInvoice = async (e: any) => {
-        e.preventDefault();
-        try {
-            setSending(true);
-            const newInvoiceLink = await createInvoiceURL(invoiceID);
-            const linkForInvoice = `${REACT_BASE_URL}pay-invoice/${invoiceID}`;
-
-            const emailData = {
-                to: "bret@techbret.com",
-                from: studioInfo?.Contact_Email,
-                subject: 'Invoice for your payment',
-                html: newInvoiceLink,
-                deliverytime: null,
-            };
-
-            const text = {
-                to: '7193184101',
-                studioId: suid,
-                message: 'You have a new invoice from ' + studioInfo?.Studio_Name + ' please go to ' + linkForInvoice + ' to pay your invoice.',
-            };
-
-            const data = {
-                studioId: suid,
-                email: emailData,
-            };
-            
-            if (sendEmail) {
-                sendIndividualEmail(data).then((res) => {
-                    console.log(res);
-                });
-            }
-
-            if (sendText) {
-                sendAText(text).then((res) => {
-                    console.log(res);
-                });
-            }
-            setTimeout(() => {
-                showMessage('Invoice Sent Successfully');
-                setSending(false);
-                navigate(-1);
-            }, 2000);;
-        } catch (error) {
-            console.log(error);
-            setTimeout(() => {
-              showMessage('Invoice Sent Successfully');
-              setSending(false);
-              navigate(-1);
-          }, 2000);;
-        }
-    };
-
-    console.log(invoiceData);
-
     return (
         <div>
             <div className="flex items-center lg:justify-end justify-center flex-wrap gap-4 mb-6">
-                <button type="button" className="btn btn-info gap-2" onClick={(e: any) => handleResendInvoice(e)}>
-                    <IconSend />
-                    Resend Invoice
-                </button>
+                {invoiceData.PaymentId === 0 ? (
+                    <ConfirmInvoiceSend suid={suid} studioInfo={studioInfo} invoiceID={invoiceID} studentInfo={studentInfo} />
+                ) : (
+                    <Link to={`/payments/view-payment-info/${hashids.encode(invoiceData.PaymentId)}/${hashids.encode(suid)}`} type="button" className="btn btn-info gap-2">
+                        <IconEye />
+                        View Payment
+                    </Link>
+                )}
 
                 <button type="button" className="btn btn-primary gap-2" onClick={() => exportTable()}>
                     <IconPrinter />
@@ -249,7 +193,11 @@ const ViewInvoice = () => {
             </div>
             <div id="invoice-table" className="panel">
                 <div className="flex justify-between flex-wrap gap-4 px-4">
-                    <div className="text-2xl font-semibold uppercase">Invoice</div>
+                    <div>
+                        <div className="text-2xl font-semibold uppercase">Invoice</div>
+                        <div className={`${invoiceData.PaymentId === 0 ? 'text-danger' : 'text-success'} text-lg font-bold`}>{invoiceData.PaymentId === 0 ? 'Open' : 'Paid'}</div>
+                    </div>
+
                     <div className="shrink-0">
                         <img src="/assets/images/logo.svg" alt="img" className="w-14 ltr:ml-auto rtl:mr-auto" />
                     </div>

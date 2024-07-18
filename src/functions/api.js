@@ -459,6 +459,16 @@ export const getInvoiceById = async (invoiceId) => {
     }
 };
 
+export const markInvoiceAsPaid = async (invoiceId, paymentID) => {
+    try {
+        const response = await fetchData(`invoice-access/markInvoiceAsPaid/${invoiceId}/${paymentID}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const deleteInvoice = async (invoiceId) => {
     try {
         const response = await fetchData(`invoice-access/deleteInvoice/${invoiceId}`, 'get');

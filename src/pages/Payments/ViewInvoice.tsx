@@ -220,6 +220,8 @@ const ViewInvoice = () => {
         }
     };
 
+    console.log(invoiceData);
+
     return (
         <div>
             <div className="flex items-center lg:justify-end justify-center flex-wrap gap-4 mb-6">

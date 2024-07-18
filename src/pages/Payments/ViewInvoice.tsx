@@ -5,13 +5,15 @@ import { setPageTitle } from '../../store/themeConfigSlice';
 import IconSend from '../../components/Icon/IconSend';
 import IconPrinter from '../../components/Icon/IconPrinter';
 import IconDownload from '../../components/Icon/IconDownload';
-import { constFormateDateMMDDYYYY, convertPhone, showWarningMessage, unHashTheID } from '../../functions/shared';
+import { constFormateDateMMDDYYYY, convertPhone, showMessage, showWarningMessage, unHashTheID } from '../../functions/shared';
 import { UserAuth } from '../../context/AuthContext';
-import { deleteInvoice, getInvoiceById, getStudentInfo } from '../../functions/api';
+import { createNewInvoice, deleteInvoice, getInvoiceById, getStudentInfo, sendAText } from '../../functions/api';
 import IconTrash from '../../components/Icon/IconTrash';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import StudentsQuickPay from '../Students/StudentsQuickPay';
+import { REACT_BASE_URL } from '../../constants';
+import { sendIndividualEmail } from '../../functions/emails';
 
 const columns = [
     {
@@ -91,6 +93,9 @@ const ViewInvoice = () => {
     const [hashedSUID, setHashedSUID] = useState<any>('');
     const [invoiceData, setInvoiceData] = useState<InvoiceData>(invoiceInit);
     const [studentInfo, setStudentInfo] = useState<any>({});
+    const [sending, setSending] = useState(false);
+    const [sendEmail, setSendEmail] = useState(true);
+    const [sendText, setSendText] = useState(true);
 
     const { id, stud } = useParams<{ id: string; stud: string }>();
 
@@ -155,10 +160,70 @@ const ViewInvoice = () => {
             });
     };
 
+    const createInvoiceURL = async (invoiceId: any) => {
+        const linkForInvoice = `${REACT_BASE_URL}pay-invoice/${invoiceId}`;
+        const htmlFOrEmail = `"<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Document</title></head><body style=\"background-color: #f4f4f4; font-family: Arial, sans-serif;\"><div style=\"max-width: 600px; margin: 0 auto; padding: 20px;\"><h2 style=\"color: #333;\">You have a new Invoice from ${studioInfo?.Studio_Name}</h2><p style=\"color: #666;\">Please go to ${linkForInvoice} to pay your invoice.</p><p style=\"color: #666;\">Best regards,<br> ${studioInfo?.Studio_Name}</p></div></body></html>"`;
+        return htmlFOrEmail;
+    };
+
+
+   
+    const handleResendInvoice = async (e: any) => {
+        e.preventDefault();
+        try {
+            setSending(true);
+            const newInvoiceLink = await createInvoiceURL(invoiceID);
+            const linkForInvoice = `${REACT_BASE_URL}pay-invoice/${invoiceID}`;
+
+            const emailData = {
+                to: "bret@techbret.com",
+                from: studioInfo?.Contact_Email,
+                subject: 'Invoice for your payment',
+                html: newInvoiceLink,
+                deliverytime: null,
+            };
+
+            const text = {
+                to: '7193184101',
+                studioId: suid,
+                message: 'You have a new invoice from ' + studioInfo?.Studio_Name + ' please go to ' + linkForInvoice + ' to pay your invoice.',
+            };
+
+            const data = {
+                studioId: suid,
+                email: emailData,
+            };
+            
+            if (sendEmail) {
+                sendIndividualEmail(data).then((res) => {
+                    console.log(res);
+                });
+            }
+
+            if (sendText) {
+                sendAText(text).then((res) => {
+                    console.log(res);
+                });
+            }
+            setTimeout(() => {
+                showMessage('Invoice Sent Successfully');
+                setSending(false);
+                navigate(-1);
+            }, 2000);;
+        } catch (error) {
+            console.log(error);
+            setTimeout(() => {
+              showMessage('Invoice Sent Successfully');
+              setSending(false);
+              navigate(-1);
+          }, 2000);;
+        }
+    };
+
     return (
         <div>
             <div className="flex items-center lg:justify-end justify-center flex-wrap gap-4 mb-6">
-                <button type="button" className="btn btn-info gap-2">
+                <button type="button" className="btn btn-info gap-2" onClick={(e: any) => handleResendInvoice(e)}>
                     <IconSend />
                     Resend Invoice
                 </button>

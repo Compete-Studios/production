@@ -131,17 +131,18 @@ const Invoice = () => {
     };
 
     const createInvoiceURL = async (invoiceId: any) => {
-        const linkForInvoice = `${REACT_BASE_URL}/pay-invoice/${invoiceId}`;
+        const linkForInvoice = `${REACT_BASE_URL}pay-invoice/${invoiceId}`;
         const htmlFOrEmail = `"<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Document</title></head><body style=\"background-color: #f4f4f4; font-family: Arial, sans-serif;\"><div style=\"max-width: 600px; margin: 0 auto; padding: 20px;\"><h2 style=\"color: #333;\">You have a new Invoice from ${studioInfo?.Studio_Name}</h2><p style=\"color: #666;\">Please go to ${linkForInvoice} to pay your invoice.</p><p style=\"color: #666;\">Best regards,<br> ${studioInfo?.Studio_Name}</p></div></body></html>"`;
         return htmlFOrEmail;
     };
 
-    const handleSendInvoice = async () => {
+    const handleSendInvoice = async (e: any) => {
+        e.preventDefault();
         try {
             setSending(true);
             const res = await createNewInvoice(invoiceData);
             const newInvoiceLink = await createInvoiceURL(res.output.NewInvoiceId);
-            const linkForInvoice = `${REACT_BASE_URL}/pay-invoice/${res.output.NewInvoiceId}`;
+            const linkForInvoice = `${REACT_BASE_URL}pay-invoice/${res.output.NewInvoiceId}`;
 
             const emailData = {
                 to: email,
@@ -159,22 +160,27 @@ const Invoice = () => {
                 studioId: suid,
                 email: emailData,
             };
+
             if (sendEmail) {
+                console.log(data);
                 sendIndividualEmail(data).then((res) => {
                     console.log(res);
                 });
             }
 
             if (sendText) {
+                console.log(text);
                 sendAText(text).then((res) => {
                     console.log(res);
                 });
             }
+
             setTimeout(() => {
                 showMessage('Invoice Sent Successfully');
                 setSending(false);
                 navigate(-1);
             }, 2000);;
+
         } catch (error) {
             console.log(error);
             setTimeout(() => {

@@ -125,7 +125,7 @@ export default function ViewStudentsInPipeline() {
                                                     </td>
                                                     <td className="relative whitespace-nowrap text-right text-sm font-medium">
                                                         {new Date(list.NextContactDate) <= new Date() && (
-                                                            <div className="xl:flex items-center justify-end gap-1 space-y-2 xl:space-y-0">
+                                                            <div className="flex items-center justify-end gap-1">
                                                                 <ActionItemEmail
                                                                     student={list}
                                                                     pipeline={pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}

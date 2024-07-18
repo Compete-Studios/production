@@ -879,9 +879,11 @@ const routes = [
     //errors
     {
         path: '*',
-        element: <HomeMain />,
+        element: <Error />,
         layout: 'blank',
     },
+
+
 ];
 
 export { routes };

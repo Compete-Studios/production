@@ -225,8 +225,8 @@ const ViewStudent = () => {
     };
 
     const getPaymentSchedules = async (paySimpleID: any, studioId: any) => {
-        setPaymentSchedules([]);  
-        setPaymentsLoading(true);      
+        setPaymentSchedules([]);
+        setPaymentsLoading(true);
         try {
             if (paySimpleID && suid) {
                 const customerIdResponse = await getPaymentSchedulesForCustomer(paySimpleInfo, studioId);
@@ -891,11 +891,11 @@ const ViewStudent = () => {
                                                     <IconEdit className="w-4 h-4" />
                                                 </button>
                                             )}
-                                             <p className="font-bold">Cell Number:</p>
+                                            <p className="font-bold">Cell Number:</p>
                                             {toUpdate?.Phone ? (
                                                 <input type="text" className="form-input" value={student?.Phone} onChange={(e) => setStudent({ ...student, Phone: e.target.value })} />
                                             ) : (
-                                                <p className={`font-normal ${!student?.email && 'text-danger'}`}>{student?.Phone ? convertPhoneNumber(student?.Phone): 'No Phone Set'}</p>
+                                                <p className={`font-normal ${!student?.email && 'text-danger'}`}>{student?.Phone ? convertPhoneNumber(student?.Phone) : 'No Phone Set'}</p>
                                             )}
                                             {toUpdate?.Phone ? (
                                                 <button
@@ -912,7 +912,7 @@ const ViewStudent = () => {
                                                     <IconEdit className="w-4 h-4" />
                                                 </button>
                                             )}
-                                             <p className="font-bold">Home Phone:</p>
+                                            <p className="font-bold">Home Phone:</p>
                                             {toUpdate?.Phone2 ? (
                                                 <input type="text" className="form-input" value={student?.Phone2} onChange={(e) => setStudent({ ...student, Phone2: e.target.value })} />
                                             ) : (
@@ -1241,55 +1241,94 @@ const ViewStudent = () => {
                                         <div className="flex items-center justify-between mb-5">
                                             <h5 className="font-semibold text-lg dark:text-white-light">Schedule and Classes</h5>
                                         </div>
-                                        <div className="mb-5 space-y-4  ">
-                                            <div className="flex items-center">
-                                                <p className="font-bold ">Classes:</p>
-                                                <div className="ml-auto">
-                                                    <AddStudentToClass student={student} alreadyIn={classes} updateClasses={updateClasses} setUpdateClasses={setUpdateClasses} />
-                                                </div>
-                                            </div>
-                                            {classes?.map((classItem: any, index: any) => (
-                                                <div key={index} className={`hover:bg-zinc-100 py-4 px-2 flex items-center justify-between `}>
-                                                    <h6 className="text-[#515365] font-semibold dark:text-white-dark">{classItem?.Name}</h6>
-                                                    <button className="btn btn-danger btn-sm" onClick={() => handleDeleteFromClass(classItem?.ClassId)}>
-                                                        Remove
-                                                    </button>
-                                                </div>
-                                            ))}
-                                            {classes?.length === 0 && <div className="text-[#515365] dark:text-white-dark">None</div>}
-                                            <div className="flex items-center">
-                                                <p className="font-bold ">Programs:</p>
-                                                <div className="ml-auto">
-                                                    <AddStudentToProgram student={student} alreadyIn={programs} updateClasses={updateClasses} setUpdateClasses={setUpdateClasses} />
-                                                </div>
-                                            </div>
-                                            {programs?.map((programItem: any, index: any) => (
-                                                <div key={index} className={`hover:bg-zinc-100 py-4 px-2 flex items-center justify-between `}>
-                                                    <h6 className="text-[#515365] font-semibold dark:text-white-dark">{programItem?.Name}</h6>
-                                                    <button className="btn btn-danger btn-sm" onClick={() => handleDeleteFromProgram(programItem?.ProgramId)}>
-                                                        Remove
-                                                    </button>
-                                                </div>
-                                            ))}
-                                            {programs?.length === 0 && <div className="text-[#515365] dark:text-white-dark">None</div>}
-                                            <div className="flex items-center">
-                                                <p className="font-bold ">Waiting Lists:</p>
-                                                <div className="ml-auto">
-                                                    <AddStudentToWaitingList student={student} alreadyIn={waitingLists} updateClasses={updateClasses} setUpdateClasses={setUpdateClasses} />
-                                                </div>
-                                            </div>
-                                            {waitingLists?.map((listItem: any, index: any) => (
-                                                <div key={index} className="">
-                                                    <div key={index} className={`hover:bg-zinc-100 py-4 px-2 flex items-center justify-between `}>
-                                                        <h6 className="text-[#515365] font-semibold dark:text-white-dark">{listItem?.Title}</h6>
-                                                        <button className="btn btn-danger btn-sm" onClick={() => handleRemoveFromList(listItem?.WaitingListId)}>
-                                                            Remove
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                            {waitingLists?.length === 0 && <div className="text-[#515365] dark:text-white-dark">None</div>}
+                                        <div className="table-responsive mb-5">
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Classes</th>
+                                                        <th className="text-center">
+                                                            <AddStudentToClass student={student} alreadyIn={classes} updateClasses={updateClasses} setUpdateClasses={setUpdateClasses} />
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {classes?.map((classItem: any, index: any) => {
+                                                        return (
+                                                            <tr key={index} className='hover:bg-dark-light '>
+                                                                <td>
+                                                                    <div className="whitespace-nowrap">{classItem?.Name}</div>
+                                                                </td>
+
+                                                                <td className="flex">
+                                                                    <button className="btn btn-danger btn-sm ml-auto" onClick={() => handleDeleteFromClass(classItem?.ClassId)}>
+                                                                        Remove
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })}
+                                                </tbody>
+                                            </table>
                                         </div>
+                                        <div className="table-responsive mb-5">
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Programs</th>
+                                                        <th className="text-center">
+                                                        <AddStudentToProgram student={student} alreadyIn={programs} updateClasses={updateClasses} setUpdateClasses={setUpdateClasses} />
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {programs?.map((programItem: any, index: any) => {
+                                                        return (
+                                                            <tr key={index} className='hover:bg-zinc-100 '>
+                                                                <td>
+                                                                    <div className="whitespace-nowrap">{programItem?.Name}</div>
+                                                                </td>
+
+                                                                <td className="flex">
+                                                                    <button className="btn btn-danger btn-sm ml-auto" onClick={() => handleDeleteFromProgram(programItem?.ProgramId)}>
+                                                                        Remove
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div className="table-responsive mb-5">
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Waiting Lists</th>
+                                                        <th className="text-center">
+                                                        <AddStudentToWaitingList student={student} alreadyIn={waitingLists} updateClasses={updateClasses} setUpdateClasses={setUpdateClasses} />
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {waitingLists?.map((listItem: any, index: any) => {
+                                                        return (
+                                                            <tr key={index} className='hover:bg-zinc-100 '>
+                                                                <td>
+                                                                    <div className="whitespace-nowrap">{listItem?.Title}</div>
+                                                                </td>
+
+                                                                <td className="flex">
+                                                                    <button className="btn btn-danger btn-sm ml-auto" onClick={() => handleRemoveFromList(listItem?.WaitingListId)}>
+                                                                        Remove
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                       
                                     </div>
                                 </div>
                             </Tab.Panel>
@@ -1418,7 +1457,7 @@ const ViewStudent = () => {
                                                                                     </span>
                                                                                 </td>
                                                                                 <td className="text-center flex items-center justify-center">
-                                                                                   <ViewActivePaymentSchedules student={student} paymentInfo={data} setUpdated={setUpdated} updated={updated} />
+                                                                                    <ViewActivePaymentSchedules student={student} paymentInfo={data} setUpdated={setUpdated} updated={updated} />
                                                                                 </td>
                                                                             </tr>
                                                                         );

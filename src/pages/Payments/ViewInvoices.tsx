@@ -43,30 +43,14 @@ export default function ViewInvoices() {
     const thisMonthEndDate = formatDateString(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0));
     const [startDate, setStartDate] = useState<string>(thisMonthStartDate);
     const [endDate, setEndDate] = useState<string>(thisMonthEndDate);
+    const [updated, setUpdated] = useState(false);
 
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Invoices'));
     }, [dispatch]);
+   
 
-    const handleDeleteTheInvoice = async (invoiceID: any) => {
-        showWarningMessage('Are you sure you want to delete this invoice?', 'Delete Invoice', 'Your invoice has been removed successfully')
-            .then(async (confirmed: boolean) => {
-                if (confirmed) {
-                    const response = await deleteInvoice(invoiceID);
-                    if (response.status === 200) {
-                        console.log('Invoice Deleted');
-                    }
-                } else {
-                    // User canceled the action
-                    console.log('User canceled');
-                }
-            })
-            .catch((error) => {
-                // Handle error if any
-                console.error('Error:', error);
-            });
-    };
 
     const handleGetStudentInvoices = async () => {
         try {
@@ -93,7 +77,7 @@ export default function ViewInvoices() {
     useEffect(() => {
         handleGetStudentInvoices();
         handleGetProspectInvoices();
-    }, [suid]);
+    }, [suid, updated]);
 
     const handleSearch = async () => {
         console.log('searching...', startDate, endDate);
@@ -162,8 +146,8 @@ export default function ViewInvoices() {
                     </div>
                 ) : (
                     <div>
-                        <InvoiceTable title="Student Invoices" invoices={studentInvoices} suid={suid} />
-                        <InvoiceTable title="Prospect Invoices" invoices={prospectInvoices} suid={suid} />
+                        <InvoiceTable title="Student Invoices" invoices={studentInvoices} suid={suid} setUpdated={setUpdated} updated={updated} />
+                        <InvoiceTable title="Prospect Invoices" invoices={prospectInvoices} suid={suid} setUpdated={setUpdated} updated={updated} />
                     </div>
                 )}
             </div>
@@ -171,7 +155,27 @@ export default function ViewInvoices() {
     );
 }
 
-const InvoiceTable = ({ title, invoices, suid }: { title: string; invoices: Invoice[]; suid: string }) => {
+const InvoiceTable = ({ title, invoices, suid, setUpdated, updated }: { title: string; invoices: Invoice[]; suid: string; setUpdated: any; updated: any }) => {
+
+     const handleDeleteTheInvoice = async (invoiceID: any) => {
+        showWarningMessage('Are you sure you want to delete this invoice?', 'Delete Invoice', 'Your invoice has been removed successfully')
+            .then(async (confirmed: boolean) => {
+                if (confirmed) {
+                    const response = await deleteInvoice(invoiceID);
+                    if (response.status === 200) {
+                        console.log('Invoice Deleted');
+                        setUpdated(!updated);
+                    }
+                } else {
+                    // User canceled the action
+                    console.log('User canceled');
+                }
+            })
+            .catch((error) => {
+                // Handle error if any
+                console.error('Error:', error);
+            });
+    };
     return (
         <div className="table-responsive mt-12">
             <h2 className="text-xl">{title}</h2>

@@ -20,6 +20,7 @@ import { formatHoursFromDateTime, handleGetTimeZoneOfUser } from '../../function
 import Tippy from '@tippyjs/react';
 import SendBulkText from '../Marketing/SendBulkText';
 import EmailClassModal from '../Marketing/EmailClassModal';
+import AddStudentProspectToClass from './AddStudentProspectToClass';
 
 const ViewRoster = () => {
     const { suid, classes, staff }: any = UserAuth();
@@ -28,7 +29,7 @@ const ViewRoster = () => {
         dispatch(setPageTitle('View Roster'));
     });
     const hashids = new Hashids();
-    const [addContactModal, setAddContactModal] = useState<any>(false);
+
     const [studentRoster, setStudentRoster] = useState<any>([]);
     const [prospectRoster, setProspectRoster] = useState<any>([]);
     const [classData, setClassData] = useState<any>([]);
@@ -167,7 +168,6 @@ const ViewRoster = () => {
         }
 
         showMessage('User has been saved successfully.');
-        setAddContactModal(false);
     };
 
     const editUser = (user: any = null) => {
@@ -177,7 +177,6 @@ const ViewRoster = () => {
             let json1 = JSON.parse(JSON.stringify(user));
             setParams(json1);
         }
-        setAddContactModal(true);
     };
 
     const deleteUser = (user: any = null) => {
@@ -219,8 +218,6 @@ const ViewRoster = () => {
         handleSetBulk(classStaff, studentRoster, prospectRoster);
     }, [classStaff, studentRoster, prospectRoster]);
 
-    console.log('bulkRecipientsForText', bulkRecipientsForText);
-
     return (
         <>
             {' '}
@@ -237,7 +234,7 @@ const ViewRoster = () => {
             <div>
                 <div className="flex items-center justify-between flex-wrap gap-4 mt-4">
                     <div>
-                        <div className='flex items-center gap-4'>
+                        <div className="flex items-center gap-4">
                             <h2 className="text-xl font-bold">Roster for {classData?.Name}</h2>
                             <div>
                                 <div className="flex sm:flex-row flex-col sm:items-center justify-end sm:gap-3 gap-4 w-full sm:w-auto">
@@ -290,11 +287,7 @@ const ViewRoster = () => {
                             </div>
                         ))}
                         <div className="sm:flex space-y-4 sm:space-y-0 items-center gap-2 mt-4">
-                            <button type="button" className="btn btn-primary gap-2 w-full whitespace-nowrap" onClick={() => editUser()}>
-                                <IconUserPlus />
-                                Add Student
-                            </button>
-
+                            <AddStudentProspectToClass />
                             <button type="button" className="btn btn-dark gap-2 w-full whitespace-nowrap" onClick={() => editUser()}>
                                 <IconUserPlus />
                                 Add Prospect
@@ -308,9 +301,9 @@ const ViewRoster = () => {
                                 Email Class
                             </Link> */}
                             <div>
-                                <EmailClassModal classuid={classId} recipients={bulkRecipientsForText}  type={"classType"} />
+                                <EmailClassModal classuid={classId} recipients={bulkRecipientsForText} type={'classType'} />
                             </div>
-                            <div className='w-full'>
+                            <div className="w-full">
                                 <SendBulkText isButton={true} recipients={bulkRecipientsForText} displayAll={false} />
                             </div>
 
@@ -421,101 +414,6 @@ const ViewRoster = () => {
                                     </div>
                                 </div>
                             )}
-
-                            <Transition appear show={addContactModal} as={Fragment}>
-                                <Dialog as="div" open={addContactModal} onClose={() => setAddContactModal(false)} className="relative z-[51]">
-                                    <Transition.Child
-                                        as={Fragment}
-                                        enter="ease-out duration-300"
-                                        enterFrom="opacity-0"
-                                        enterTo="opacity-100"
-                                        leave="ease-in duration-200"
-                                        leaveFrom="opacity-100"
-                                        leaveTo="opacity-0"
-                                    >
-                                        <div className="fixed inset-0 bg-[black]/60" />
-                                    </Transition.Child>
-                                    <div className="fixed inset-0 overflow-y-auto">
-                                        <div className="flex min-h-full items-center justify-center px-4 py-8">
-                                            <Transition.Child
-                                                as={Fragment}
-                                                enter="ease-out duration-300"
-                                                enterFrom="opacity-0 scale-95"
-                                                enterTo="opacity-100 scale-100"
-                                                leave="ease-in duration-200"
-                                                leaveFrom="opacity-100 scale-100"
-                                                leaveTo="opacity-0 scale-95"
-                                            >
-                                                <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setAddContactModal(false)}
-                                                        className="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
-                                                    >
-                                                        <IconX />
-                                                    </button>
-                                                    <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                                                        {params.id ? 'Edit Contact' : 'Add Contact'}
-                                                    </div>
-                                                    <div className="p-5">
-                                                        <form>
-                                                            <div className="mb-5">
-                                                                <label htmlFor="name">Name</label>
-                                                                <input id="name" type="text" placeholder="Enter Name" className="form-input" value={params.name} onChange={(e) => changeValue(e)} />
-                                                            </div>
-                                                            <div className="mb-5">
-                                                                <label htmlFor="email">Email</label>
-                                                                <input id="email" type="email" placeholder="Enter Email" className="form-input" value={params.email} onChange={(e) => changeValue(e)} />
-                                                            </div>
-                                                            <div className="mb-5">
-                                                                <label htmlFor="number">Phone Number</label>
-                                                                <input
-                                                                    id="phone"
-                                                                    type="text"
-                                                                    placeholder="Enter Phone Number"
-                                                                    className="form-input"
-                                                                    value={params.phone}
-                                                                    onChange={(e) => changeValue(e)}
-                                                                />
-                                                            </div>
-                                                            <div className="mb-5">
-                                                                <label htmlFor="occupation">Occupation</label>
-                                                                <input
-                                                                    id="role"
-                                                                    type="text"
-                                                                    placeholder="Enter Occupation"
-                                                                    className="form-input"
-                                                                    value={params.role}
-                                                                    onChange={(e) => changeValue(e)}
-                                                                />
-                                                            </div>
-                                                            <div className="mb-5">
-                                                                <label htmlFor="address">Address</label>
-                                                                <textarea
-                                                                    id="location"
-                                                                    rows={3}
-                                                                    placeholder="Enter Address"
-                                                                    className="form-textarea resize-none min-h-[130px]"
-                                                                    value={params.location}
-                                                                    onChange={(e) => changeValue(e)}
-                                                                ></textarea>
-                                                            </div>
-                                                            <div className="flex justify-end items-center mt-8">
-                                                                <button type="button" className="btn btn-outline-danger" onClick={() => setAddContactModal(false)}>
-                                                                    Cancel
-                                                                </button>
-                                                                <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={saveUser}>
-                                                                    {params.id ? 'Update' : 'Add'}
-                                                                </button>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                </Dialog.Panel>
-                                            </Transition.Child>
-                                        </div>
-                                    </div>
-                                </Dialog>
-                            </Transition>
                         </div>
                     </div>
                     {/* <div className="panel space-y-3 hidden xl:block xl:sticky xl:top-20 flex-none">

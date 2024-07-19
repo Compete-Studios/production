@@ -882,8 +882,6 @@ const routes = [
         element: <Error />,
         layout: 'blank',
     },
-
-
 ];
 
 export { routes };

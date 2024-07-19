@@ -55,7 +55,7 @@ export default function EmailClassModal({ classuid, recipients, type, displayAll
             newsLetterTitle: emailData.newsLetterTitle,
             type: emailData.type,
             listDescription: emailData.listDescription,
-            listOfNewMembers:checkedRecipients.map((recipient: any) => recipient.email),
+            listOfNewMembers: checkedRecipients.map((recipient: any) => recipient.email),
             from: emailData.from,
             subject: emailData.subject,
             html: value,
@@ -72,7 +72,7 @@ export default function EmailClassModal({ classuid, recipients, type, displayAll
         //     from: emailData.from,
         //     subject: emailData.subject,
         //     html: value,
-        // };     
+        // };
 
         try {
             const res = await sendEmailToClass(data);
@@ -129,8 +129,14 @@ export default function EmailClassModal({ classuid, recipients, type, displayAll
         <div className="">
             <div className="flex items-center justify-center">
                 <button type="button" onClick={() => setEmailModal(true)} className="btn btn-info gap-2 w-full whitespace-nowrap">
-                    <IconSend />
-                    Email Class
+                    {type === 'classType' ? (
+                        <>
+                            <IconSend />
+                            Email Class
+                        </>
+                    ) : (
+                        'Email This List'
+                    )}
                 </button>
             </div>
             <Transition appear show={emailModal} as={Fragment}>

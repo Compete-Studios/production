@@ -28,7 +28,7 @@ export default function AddStudentToClass({ student, alreadyIn, updateClasses, s
         try {
             const response = await addProspectToClass(newClass, student);
             if (response.status === 200) {
-                showMessage('Student added to Program');
+                showMessage('Student added to Class');
                 setUpdateClasses(!updateClasses);
                 setShowAddClassModal(false);
             }
@@ -46,7 +46,7 @@ export default function AddStudentToClass({ student, alreadyIn, updateClasses, s
         try {
             const response = await addStudentToClass(classData);
             if (response.status === 200) {
-                showMessage('Student added to Program');
+                showMessage('Student added to Class');
                 setUpdateClasses(!updateClasses);
                 setShowAddClassModal(false);
             }

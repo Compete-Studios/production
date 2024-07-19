@@ -27,7 +27,6 @@ const ManageStudioAccounts = () => {
     useEffect(() => {
         setShowLoading(true);
         const role = 'User';
-        console.log('BEGIN FETCH STUDIOS');
         const fetchUsers = async () => {
             try {
                 const response = await axios.get(`${REACT_API_BASE_URL}/admin-tools/fbusers/${role}`);

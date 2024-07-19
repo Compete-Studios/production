@@ -1,7 +1,7 @@
 import { Dialog, Transition, Tab } from '@headlessui/react';
 import { useState, Fragment, useEffect } from 'react';
 import IconEye from '../../components/Icon/IconEye';
-import { getStaffClassesByStaffId } from '../../functions/api';
+import { getStaffByStaffId, getStaffClassesByStaffId } from '../../functions/api';
 import IconX from '../../components/Icon/IconX';
 import { UserAuth } from '../../context/AuthContext';
 import { convertPhone, convertPhoneNumber } from '../../functions/shared';
@@ -25,7 +25,13 @@ export default function ViewStaffMember({ staffID }: any) {
             const response = await getStaffClassesByStaffId(id);
             setStaffClasses(response.recordset);
             const staffData = await staff.find((staff: any) => staff.StaffId === id);
-            setStaffInfo(staffData);
+            console.log(staffData);
+            if (staffData?.ActivityLevel) {
+                setStaffInfo(staffData);
+            } else {
+                const res = await getStaffByStaffId(id);
+                setStaffInfo(res);
+            }
         } catch (error) {
             console.error(error);
         }
@@ -44,11 +50,11 @@ export default function ViewStaffMember({ staffID }: any) {
     return (
         <div className="mb-5">
             <div className="flex items-center justify-center">
-              <Tippy content="View Staff Member" placement="top">
-                <button type="button" className="text-info hover:text-blue-800" onClick={() => getStaffInfo(staffID)}>
-                    <IconEye />
-                </button>
-              </Tippy>
+                <Tippy content="View Staff Member" placement="top">
+                    <button type="button" className="text-info hover:text-blue-800" onClick={() => getStaffInfo(staffID)}>
+                        <IconEye />
+                    </button>
+                </Tippy>
             </div>
             <Transition appear show={modal1} as={Fragment}>
                 <Dialog as="div" open={modal1} onClose={() => setModal1(false)}>
@@ -83,7 +89,7 @@ export default function ViewStaffMember({ staffID }: any) {
                                                 </h4>
                                                 <p className="mt-1 flex items-center">
                                                     <IconMail className="w-4 h-4 mr-1" />
-                                                    {staffInfo?.email}
+                                                    {staffInfo?.email || staffInfo?.Email}
                                                 </p>
                                                 <p className="flex items-center">
                                                     <IconPhone className="w-4 h-4 mr-1" />
@@ -97,9 +103,9 @@ export default function ViewStaffMember({ staffID }: any) {
                                     </div>
                                     <div className="p-5">
                                         <h5 className="text-xs font-bold uppercase mt-4">Address</h5>
-                                        <p className="text-md">{staffInfo?.address}</p>
+                                        <p className="text-md">{staffInfo?.address || staffInfo?.Address }</p>
                                         <p className="text-md">
-                                            {staffInfo?.city}, {staffInfo?.state} {staffInfo?.zip}
+                                            {staffInfo?.city || staffInfo?.City }, {staffInfo?.state || staffInfo?.State } {staffInfo?.zip || staffInfo?.Zip }
                                         </p>
                                         <h5 className="text-xs font-bold uppercase mt-4">Security Level</h5>
                                         <p className="text-md">{staffInfo?.SecurityLevel}</p>

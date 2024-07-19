@@ -389,6 +389,16 @@ export const searchProspectsByValues = async (queryParams) => {
     }
 };
 
+export const searchProspectsBySearchTerm = async (queryParams) => {
+    try {
+        const response = await fetchData(`student-access/searchProspectsBySearchTerm`, 'post', queryParams);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const searchProspectsByPhone = async (queryParams) => {
     try {
         const response = await fetchData(`student-access/searchProspectsByPhoneNumber`, 'post', queryParams);

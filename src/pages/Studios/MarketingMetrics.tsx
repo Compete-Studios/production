@@ -120,44 +120,7 @@ export default function MarketingMetrics() {
     }, [suid]);
 
     return (
-        <div className="grid sm:grid-cols-2 xl:grid-cols-2 gap-6 mb-6">
-            {/* <div className="panel h-auto sm:col-span-2 xl:col-span-1 pb-0">
-                <h5 className="font-semibold text-lg dark:text-white-light mb-5">Prospect Intros</h5>
-
-                <PerfectScrollbar className="relative h-[160px] ltr:pr-3 rtl:pl-3 ltr:-mr-3 rtl:-ml-3 mb-4">
-                    <div className="text-sm cursor-pointer">
-                        {prospectIntros?.filter((intro: any) => formatDateForPP(intro.IntroDate) === formatDateForPP(new Date()))?.length < 1 ? (
-                            <div className="text-center">
-                                <p className="text-danger">No intros today</p>
-                            </div>
-                        ) : (
-                            prospectIntros
-                                ?.filter((intro: any) => formatDateForPP(intro.IntroDate) === formatDateForPP(new Date()))
-                                ?.map((intro: any) => {
-                                    return (
-                                        <div key={intro.id} className="flex items-center py-1.5 relative group">
-                                            <div className="bg-primary w-1.5 h-1.5 rounded-full ltr:mr-1 rtl:ml-1.5"></div>
-                                            <div className="flex-1">
-                                                {intro.FName} {intro.LName}
-                                            </div>
-                                            <div className="ltr:ml-auto rtl:mr-auto text-xs text-white-dark dark:text-gray-500">{formatDateForPP(intro.IntroDate)}</div>
-
-                                            <span className="badge badge-outline-primary absolute ltr:right-0 rtl:left-0 text-xs bg-primary-light dark:bg-black opacity-0 group-hover:opacity-100">
-                                                Pending
-                                            </span>
-                                        </div>
-                                    );
-                                })
-                        )}
-                    </div>
-                </PerfectScrollbar>
-                <div className="border-t border-white-light dark:border-white/10">
-                            <Link to="/" className=" font-semibold group hover:text-primary p-4 flex items-center justify-center group">
-                                View All
-                                <IconArrowLeft className="rtl:rotate-180 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition duration-300 ltr:ml-1 rtl:mr-1" />
-                            </Link>
-                        </div>
-            </div> */}
+        <div className="grid sm:grid-cols-2 xl:grid-cols-2 gap-6 mb-6">  
             <div className="panel h-full ">
                 <div className="flex items-center justify-between dark:text-white-light mb-5">
                     <h5 className="font-semibold text-lg">Studio Information </h5>
@@ -187,7 +150,7 @@ export default function MarketingMetrics() {
                     </p>
                 </div>
             </div>
-            {!loadingEmails && !loadingEmailCount && !loadingTexts && !loadingActiveStudents ? (
+            {!loadingEmails && !loadingEmailCount && !loadingTexts && !loadingActiveStudents && monthlyTextLimit ? (
                 <div className="panel h-full ">
                     <div className="flex items-center justify-between dark:text-white-light mb-5">
                         <h5 className="font-semibold text-lg">Marketing Summary</h5>

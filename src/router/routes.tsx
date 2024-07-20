@@ -879,7 +879,7 @@ const routes = [
     //errors
     {
         path: '*',
-        element: <Error />,
+        element: <HomeMain />,
         layout: 'blank',
     },
 ];

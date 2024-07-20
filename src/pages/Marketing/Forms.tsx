@@ -57,8 +57,7 @@ export default function Forms() {
             introDate: '',
             birthdate: '',
         };
-        const response = await addProspect(prospectInfoData);
-        console.log(response);
+        const response = await addProspect(prospectInfoData);       
         if (response?.output?.NewProspectId || response?.recordset?.[0]?.NewProspectId) {
             showMessage('Form Submitted Successfully');
         } else {
@@ -102,7 +101,7 @@ export default function Forms() {
                     </div>
                 )}
 
-                {form?.form?.formInfo?.LastName && (
+                {form?.formInfo?.LastName && (
                     <div className={`${form?.formInfo?.Name && form?.formInfo?.LastName ? 'sm:col-span-3' : 'sm:col-span-full'}`}>
                         <label htmlFor="last-name">Last name</label>
                         <div className="mt-2">

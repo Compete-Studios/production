@@ -52,8 +52,7 @@ export default function AddStudentProspectToClass({ classID, studentRoster, stud
 
         setSelectedStudents((prevSelectedStudents: any) => [...prevSelectedStudents, ...newSelectedStudents]);
     };
-
-    console.log(studentRoster);
+   
 
     useEffect(() => {
         if (student) {

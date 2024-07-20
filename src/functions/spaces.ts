@@ -1,4 +1,4 @@
-import { arrayUnion, collection, doc, getDoc, getDocs, increment, query, setDoc, updateDoc, where } from 'firebase/firestore';
+import { addDoc, arrayUnion, collection, doc, getDoc, getDocs, increment, query, setDoc, updateDoc, where } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { sendEmailVerification } from 'firebase/auth';
 import { auth, db, storage } from '../firebase/firebase';
@@ -89,7 +89,7 @@ export const publishSpace = async (id: any, data: any, files: any) => {
     const postID = generateRandomID();
     const idToString = id.toString();
     const photos = await uploadMultipleImagesAndReturnArray(files, postID);
-    const spaceRef = doc(db,"spaces", postID);
+    const spaceRef = doc(db, 'spaces', postID);
     await setDoc(spaceRef, {
         ...data,
         photos: photos,
@@ -98,11 +98,15 @@ export const publishSpace = async (id: any, data: any, files: any) => {
         createdAt: new Date(),
         userID: id,
     });
-    const userRef = doc(db, "studioDB", idToString, "spaceInfo", "stats");
-    await setDoc(userRef, {
-        spaces: arrayUnion(postID),
-        writes: increment(1),
-    }, { merge: true });
+    const userRef = doc(db, 'studioDB', idToString, 'spaceInfo', 'stats');
+    await setDoc(
+        userRef,
+        {
+            spaces: arrayUnion(postID),
+            writes: increment(1),
+        },
+        { merge: true }
+    );
 
     return { status: 'success', id: postID };
 };
@@ -195,7 +199,7 @@ export const getAllBookings = async (spaceID) => {
     const bookingsRef = collection(db, 'bookings');
     const q = query(bookingsRef, where('spaceID', '==', spaceID));
     const querySnapshot = await getDocs(q);
-    let bookingsArray = [];
+    let bookingsArray: any = [];
     querySnapshot.forEach((doc) => {
         bookingsArray.push({ ...doc.data(), id: doc.id });
     });
@@ -212,5 +216,29 @@ export const updateBooking = async (id, data, userID) => {
     await updateDoc(userRef, {
         lastUpdated: new Date(),
     });
+    return { status: 'success' };
+};
+
+export const updateStats = async (id: any, data: any) => {
+    const statRef = collection(db, 'forms', id, 'stats');
+    await addDoc(statRef, data);
+    return { status: 'success' };
+};
+
+export const updateFormSubmissionCounnt = async (id: any) => {
+    const formRef = doc(db, 'forms', id);
+    await updateDoc(formRef, {
+        submissions: increment(1),
+    });
+
+    return { status: 'success' };
+};
+
+export const updateLoadCount = async (id: any) => {
+    const formRef = doc(db, 'forms', id);
+    await updateDoc(formRef, {
+        loads: increment(1),
+    });
+
     return { status: 'success' };
 };

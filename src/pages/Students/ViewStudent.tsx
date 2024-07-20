@@ -452,6 +452,8 @@ const ViewStudent = () => {
         setStudent(updatedStudent);
     };
 
+    console.log(student)
+
     return (
         <div>
             <div className="sm:flex sm:items-center sm:justify-between">
@@ -1220,6 +1222,20 @@ const ViewStudent = () => {
                                                 </label>
                                             );
                                         })}
+                                        <label htmlFor="completed" className="flex items-center cursor-pointer hover:bg-gray-100 p-1">
+                                            <input
+                                                type="radio"
+                                                name="pipeline"
+                                                className="form-radio"
+                                                value={parseInt(student?.StudentPipelineStatus)}
+                                                checked={parseInt(student?.StudentPipelineStatus) === 0}
+                                                onChange={() => {
+                                                    setStudent({ ...student, StudentPipelineStatus: 0 });
+                                                    setToUpdate({ ...toUpdate, StudentPipelineStatus: true });
+                                                }}
+                                            />
+                                            <span>No Status/Ignore</span>
+                                        </label>
                                     </div>
                                     {toUpdate?.StudentPipelineStatus && (
                                         <button
@@ -1254,7 +1270,7 @@ const ViewStudent = () => {
                                                 <tbody>
                                                     {classes?.map((classItem: any, index: any) => {
                                                         return (
-                                                            <tr key={index} className='hover:bg-dark-light '>
+                                                            <tr key={index} className="hover:bg-dark-light ">
                                                                 <td>
                                                                     <div className="whitespace-nowrap">{classItem?.Name}</div>
                                                                 </td>
@@ -1276,14 +1292,14 @@ const ViewStudent = () => {
                                                     <tr>
                                                         <th>Programs</th>
                                                         <th className="text-center">
-                                                        <AddStudentToProgram student={student} alreadyIn={programs} updateClasses={updateClasses} setUpdateClasses={setUpdateClasses} />
+                                                            <AddStudentToProgram student={student} alreadyIn={programs} updateClasses={updateClasses} setUpdateClasses={setUpdateClasses} />
                                                         </th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {programs?.map((programItem: any, index: any) => {
                                                         return (
-                                                            <tr key={index} className='hover:bg-zinc-100 '>
+                                                            <tr key={index} className="hover:bg-zinc-100 ">
                                                                 <td>
                                                                     <div className="whitespace-nowrap">{programItem?.Name}</div>
                                                                 </td>
@@ -1305,14 +1321,14 @@ const ViewStudent = () => {
                                                     <tr>
                                                         <th>Waiting Lists</th>
                                                         <th className="text-center">
-                                                        <AddStudentToWaitingList student={student} alreadyIn={waitingLists} updateClasses={updateClasses} setUpdateClasses={setUpdateClasses} />
+                                                            <AddStudentToWaitingList student={student} alreadyIn={waitingLists} updateClasses={updateClasses} setUpdateClasses={setUpdateClasses} />
                                                         </th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {waitingLists?.map((listItem: any, index: any) => {
                                                         return (
-                                                            <tr key={index} className='hover:bg-zinc-100 '>
+                                                            <tr key={index} className="hover:bg-zinc-100 ">
                                                                 <td>
                                                                     <div className="whitespace-nowrap">{listItem?.Title}</div>
                                                                 </td>
@@ -1328,7 +1344,6 @@ const ViewStudent = () => {
                                                 </tbody>
                                             </table>
                                         </div>
-                                       
                                     </div>
                                 </div>
                             </Tab.Panel>

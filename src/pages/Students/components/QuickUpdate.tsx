@@ -14,7 +14,7 @@ export default function QuickUpdate({ student, setShowActionModal, update, setUp
     const [newNotes, setNewNotes] = useState<any>('');
     const currentDate = new Date();
     const noteDate = `${currentDate.getMonth() + 1}/${currentDate.getDate()}/${currentDate.getFullYear() % 100}`;
-    
+
     const navigate = useNavigate();
 
     const handleGetStudentInfo = async (studentId: any) => {
@@ -25,7 +25,6 @@ export default function QuickUpdate({ student, setShowActionModal, update, setUp
     useEffect(() => {
         handleGetStudentInfo(student.StudentId);
     }, [student]);
- 
 
     const handleUpdateByColumn = async (column: string, secondColumn: string, e: any) => {
         e.preventDefault();
@@ -69,11 +68,8 @@ export default function QuickUpdate({ student, setShowActionModal, update, setUp
             </div>
             <div>
                 <label htmlFor="contactDate">Next Contact Date</label>
-                <input type="date" 
-                value={studentToUpdate.NextContactDate}
-                className="form-input" 
-                onChange={(e) => setStudentToUpdate({ ...studentToUpdate, NextContactDate: e.target.value })} />
-            </div>            
+                <input type="date" value={studentToUpdate.NextContactDate} className="form-input" onChange={(e) => setStudentToUpdate({ ...studentToUpdate, NextContactDate: e.target.value })} />
+            </div>
             <div className="grid grid-cols-2">
                 {pipelineSteps.map((step: any) => {
                     return (
@@ -90,6 +86,17 @@ export default function QuickUpdate({ student, setShowActionModal, update, setUp
                         </label>
                     );
                 })}
+                <div>
+                    <label htmlFor="completed" className="flex items-center cursor-pointer hover:bg-gray-100 p-1">
+                        <input type="radio" 
+                        name="pipeline" 
+                        className="form-radio" 
+                        value={parseInt(studentToUpdate?.StudentPipelineStatus)} 
+                        checked={studentToUpdate?.StudentPipelineStatus === 0} 
+                        onChange={() => setStudentToUpdate({ ...studentToUpdate, StudentPipelineStatus: 0 })}/>
+                        <span>No Status/Ignore</span>
+                    </label>
+                </div>
             </div>
             <div className="w-full">
                 <button className="btn btn-info ml-auto" onClick={(e: any) => handleUpdateByColumn('StudentPipelineStatus', 'NextContactDate', e)}>

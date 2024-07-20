@@ -3,6 +3,9 @@ import { useParams } from 'react-router-dom';
 import { getFormsFromFirebase } from '../../firebase/firebaseFunctions';
 import { formatDate, showErrorMessage, showMessage } from '../../functions/shared';
 import { addProspect } from '../../functions/api';
+import { sendIndividualEmail } from '../../functions/emails';
+import { updateFormSubmissionCounnt, updateLoadCount, updateStats } from '../../functions/spaces';
+import { UserAuth } from '../../context/AuthContext';
 
 const formInputs = {
     formName: 'Form Name',
@@ -21,6 +24,7 @@ const formInputs = {
 };
 
 export default function Forms() {
+    const { isLoggedIn }: any = UserAuth();
     const [form, setForm] = useState<any>({});
     const { id } = useParams<{ id: string }>();
     const [formInfo, setFormInfo] = useState<any>(formInputs);
@@ -33,6 +37,9 @@ export default function Forms() {
 
     useEffect(() => {
         handleGetFormFromFB(id);
+        if (!isLoggedIn) {
+            updateLoadCount(id);
+        }
     }, [id]);
 
     const handleSubmitForm = async () => {
@@ -57,9 +64,19 @@ export default function Forms() {
             introDate: '',
             birthdate: '',
         };
-        const response = await addProspect(prospectInfoData);       
+        const response = await addProspect(prospectInfoData);
         if (response?.output?.NewProspectId || response?.recordset?.[0]?.NewProspectId) {
             showMessage('Form Submitted Successfully');
+            const statsData = {
+                formID: id,
+                studioId: form?.studioID,
+                formName: form?.formName,
+                prospectID: response?.output?.NewProspectId || response?.recordset?.[0]?.NewProspectId,
+                prospectName: `${formInfo.firstName} ${formInfo.lastName}`,
+                date: new Date(),
+            };
+            updateStats(id, statsData);
+            updateFormSubmissionCounnt(id);
         } else {
             showErrorMessage('Error Submitting Form');
         }
@@ -67,9 +84,9 @@ export default function Forms() {
         //     const emailData = {
         //         to: formInfo.email,
         //         from: form?.emailFrom || '',
-        //         subject: form?.emailSubject || 'Thank you for your interest',
+        //         subject: form?.defaultEmailSubject || 'Thank you for your interest',
         //         html: form?.value || 'Thank you for your interest',
-        //     sendIndividualEmail({ ...formInfo, email: '' });
+        //     sendIndividualEmail(emailData);
         // }
     };
 

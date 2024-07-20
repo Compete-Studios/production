@@ -134,6 +134,8 @@ const SearchPayments = () => {
         }
     };
 
+    console.log(payments, 'payments');
+
     useEffect(() => {
         getPayments(suid, startDate, endDate, status)
             .then((response) => {

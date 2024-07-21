@@ -1119,6 +1119,16 @@ export const dropStudentFromProgram = async (programId, studentId) => {
     }
 };
 
+export const getAllStudensWithBarcode = async (studioId) => {
+    try {
+        const response = await fetchData(`student-access/getAllStudensWithBarcode/${studioId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const addProspectToClass = async (classId, prospectId) => {
     try {
         const response = await fetchData(`class-access/addProspectToClass/${classId}/${prospectId}`, 'get');
@@ -1652,8 +1662,6 @@ export const getStudentWithdrawals = async (startDate, endDate, suid) => {
         throw error;
     }
 };
-
-
 
 export const getAllActivePaymentSchedules = async (studioId) => {
     try {

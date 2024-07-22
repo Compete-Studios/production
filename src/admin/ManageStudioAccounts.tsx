@@ -27,7 +27,6 @@ const ManageStudioAccounts = () => {
     useEffect(() => {
         setShowLoading(true);
         const role = 'User';
-        console.log('BEGIN FETCH STUDIOS');
         const fetchUsers = async () => {
             try {
                 const response = await axios.get(`${REACT_API_BASE_URL}/admin-tools/fbusers/${role}`);
@@ -171,7 +170,7 @@ const ManageStudioAccounts = () => {
 
                                         <td>
                                             {contact?.hasAccount && (<div className="flex gap-4 items-center justify-center">
-                                                <button type="button" className="btn btn-sm btn-outline-info" onClick={() => handleResetPassword("bret@techbret.com")}>
+                                                <button type="button" className="btn btn-sm btn-outline-info" onClick={() => handleResetPassword(contact.Contact_Email)}>
                                                     Reset Password
                                                 </button>
 

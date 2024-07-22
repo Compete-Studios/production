@@ -40,6 +40,7 @@ export default function AuthContextProvider({ children }: any) {
     const [inactiveStudents, setInactiveStudents] = useState<any>([]);
     const [emailList, setEmailList] = useState<any>([]);
     const [events, setEvents] = useState<any>([]);
+    const [dailySchedule, setDailySchedule] = useState<any>(null);
     const [toActivate, setToActivate] = useState<any>({
         status: false,
         prospect: null,
@@ -130,10 +131,11 @@ export default function AuthContextProvider({ children }: any) {
         const paymentsRes = await fetchData(`${REACT_API_BASE_URL}/student-access/getPaymentPipelineStepsByStudioId/${suid}`, setLatePayementPipeline);
         const studioRes = await fetchData(`${REACT_API_BASE_URL}/studio-access/getStudentsByStudioId/${suid}/1`, setStudents);
         const optionsRes = await fetchRecordSet(`${REACT_API_BASE_URL}/studio-access/getStudioOptions/${suid}`, setStudioOptions);
+        const studioScheduleOptions = await fetchRecordSet(`${REACT_API_BASE_URL}/daily-schedule-tools/getDailyScheduleByStudioId/${suid}`, setDailySchedule);
         getAllSpaces(suid);
         handleGetEvents(suid);
 
-        if (classRes && staffRes && pipeLineRes && programRes && waitingListRes && studPipesRes && marketingRes && introRes && paymentsRes && studioRes && optionsRes) {
+        if (classRes && staffRes && pipeLineRes && programRes && waitingListRes && studPipesRes && marketingRes && introRes && paymentsRes && studioRes && optionsRes && studioScheduleOptions) {
             setFetchLoading(false);
         } else {
             console.error('No response');
@@ -141,18 +143,24 @@ export default function AuthContextProvider({ children }: any) {
         }
     };
 
-    const getSCHDATA = async () => {
-        setGlobalLoading(true);
-        const response = await fetch(`${REACT_API_BASE_URL}/daily-schedule-tools/getDailyScheduleByStudioId/${suid}`);
-        const data = await response.json();
-        if (data) {
-            setScheduleID(data);
-            setGlobalLoading(false);
-        } else {
-            console.error('No response');
-            setGlobalLoading(false);
+    useEffect(() => {
+        if (dailySchedule) {
+        setScheduleID(dailySchedule.ScheduleId);
         }
-    };
+    }, [dailySchedule]);
+
+    // const getSCHDATA = async () => {
+    //     setGlobalLoading(true);
+    //     const response = await fetch(`${REACT_API_BASE_URL}/daily-schedule-tools/getDailyScheduleByStudioId/${suid}`);
+    //     const data = await response.json();
+    //     if (data) {
+    //         setScheduleID(data);
+    //         setGlobalLoading(false);
+    //     } else {
+    //         console.error('No response');
+    //         setGlobalLoading(false);
+    //     }
+    // };
 
     const getStudioInfo = async (suid: any, main: any) => {
         try {
@@ -215,7 +223,6 @@ export default function AuthContextProvider({ children }: any) {
 
     useEffect(() => {
         getData();
-        getSCHDATA();
     }, [suid, update]);
 
     useEffect(() => {

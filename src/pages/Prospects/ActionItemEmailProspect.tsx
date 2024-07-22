@@ -58,8 +58,8 @@ export default function ActionItemEmailProspect({ student, pipeline, studioOptio
     return (
         <div>
             <div className="flex items-center gap-2 justify-end">
-                <button type="button" className="btn btn-secondary btn-sm flex items-center gap-1" onClick={() => setShowActionModal(true)}>
-                    Send Email
+                <button type="button" className="btn btn-secondary btn-sm flex items-center gap-1 h-8" onClick={() => setShowActionModal(true)}>
+                    <span className="hidden md:block">Send Email</span><span className="md:hidden block"><IconMail /></span>
                 </button>
             </div>
             <Transition.Root show={showActionModal} as={Fragment}>

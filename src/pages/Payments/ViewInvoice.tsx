@@ -5,13 +5,19 @@ import { setPageTitle } from '../../store/themeConfigSlice';
 import IconSend from '../../components/Icon/IconSend';
 import IconPrinter from '../../components/Icon/IconPrinter';
 import IconDownload from '../../components/Icon/IconDownload';
-import { constFormateDateMMDDYYYY, convertPhone, showWarningMessage, unHashTheID } from '../../functions/shared';
+import { constFormateDateMMDDYYYY, convertPhone, showMessage, showWarningMessage, unHashTheID } from '../../functions/shared';
 import { UserAuth } from '../../context/AuthContext';
-import { deleteInvoice, getInvoiceById, getStudentInfo } from '../../functions/api';
+import { createNewInvoice, deleteInvoice, getInvoiceById, getStudentInfo, sendAText } from '../../functions/api';
 import IconTrash from '../../components/Icon/IconTrash';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import StudentsQuickPay from '../Students/StudentsQuickPay';
+import { REACT_BASE_URL } from '../../constants';
+import { sendIndividualEmail } from '../../functions/emails';
+import ConfirmInvoiceSend from './ConfirmInvoiceSend';
+import StudioInfo from '../../admin/studios/StudioInfo';
+import Hashids from 'hashids';
+import IconEye from '../../components/Icon/IconEye';
 
 const columns = [
     {
@@ -88,6 +94,7 @@ const ViewInvoice = () => {
         window.print();
     };
     const [invoiceID, setInvoiceID] = useState<any>('');
+    const hashids = new Hashids();
     const [hashedSUID, setHashedSUID] = useState<any>('');
     const [invoiceData, setInvoiceData] = useState<InvoiceData>(invoiceInit);
     const [studentInfo, setStudentInfo] = useState<any>({});
@@ -158,10 +165,14 @@ const ViewInvoice = () => {
     return (
         <div>
             <div className="flex items-center lg:justify-end justify-center flex-wrap gap-4 mb-6">
-                <button type="button" className="btn btn-info gap-2">
-                    <IconSend />
-                    Resend Invoice
-                </button>
+                {invoiceData.PaymentId === 0 ? (
+                    <ConfirmInvoiceSend suid={suid} studioInfo={studioInfo} invoiceID={invoiceID} studentInfo={studentInfo} />
+                ) : (
+                    <Link to={`/payments/view-payment-info/${hashids.encode(invoiceData.PaymentId)}/${hashids.encode(suid)}`} type="button" className="btn btn-info gap-2">
+                        <IconEye />
+                        View Payment
+                    </Link>
+                )}
 
                 <button type="button" className="btn btn-primary gap-2" onClick={() => exportTable()}>
                     <IconPrinter />
@@ -182,7 +193,11 @@ const ViewInvoice = () => {
             </div>
             <div id="invoice-table" className="panel">
                 <div className="flex justify-between flex-wrap gap-4 px-4">
-                    <div className="text-2xl font-semibold uppercase">Invoice</div>
+                    <div>
+                        <div className="text-2xl font-semibold uppercase">Invoice</div>
+                        <div className={`${invoiceData.PaymentId === 0 ? 'text-danger' : 'text-success'} text-lg font-bold`}>{invoiceData.PaymentId === 0 ? 'Open' : 'Paid'}</div>
+                    </div>
+
                     <div className="shrink-0">
                         <img src="/assets/images/logo.svg" alt="img" className="w-14 ltr:ml-auto rtl:mr-auto" />
                     </div>

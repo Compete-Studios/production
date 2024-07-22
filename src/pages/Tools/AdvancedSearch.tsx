@@ -6,6 +6,9 @@ import 'tippy.js/dist/tippy.css';
 import IconEye from '../../components/Icon/IconEye';
 import { Link, useNavigate } from 'react-router-dom';
 import SendBulkText from '../Marketing/SendBulkText';
+import { hashTheID } from '../../functions/shared';
+import ViewStaffMember from '../Staff/ViewStaffMember';
+import EmailClassModal from '../Marketing/EmailClassModal';
 
 const searchInit = {
     studioId: 32,
@@ -40,6 +43,7 @@ export default function AdvancedSearch() {
     const [classStaff, setClassStaff] = useState<any>([]);
     const [studentRoster, setStudentRoster] = useState<any>([]);
     const [prospectRoster, setProspectRoster] = useState<any>([]);
+    const [bulkRecipientsForText, setBulkRecipientsForText] = useState<any>([]);
 
     const navigate = useNavigate();
 
@@ -71,6 +75,7 @@ export default function AdvancedSearch() {
 
     const handleCombineResults = () => {
         let combinedResults = [];
+
 
         if (classID) {
             const filteredStudents = students.filter((student: any) => studentRoster.some((rosterStudent: any) => rosterStudent.Student_ID === student.Student_id));
@@ -147,10 +152,30 @@ export default function AdvancedSearch() {
         setSearchQuery(searchInit);
     };
 
-    const handleGetEmails = () => {      
+    const handleGetEmails = () => {
         setEmailList(combinedResults);
         navigate('/marketing/create-news-letter/0/search');
     };
+
+    const handleSetBulk = (staffNumbers: any, studentNumbers: any, prospectNumbers: any) => {
+        let bulkRecipients: any = [];
+        staffNumbers.map((d: any) => {
+            bulkRecipients.push({ phoneNumber: d.Phone, name: d.FirstName + ', ' + d.LastName, type: 'staff', email: d.email });
+        });
+        studentNumbers.map((d: any) => {
+            bulkRecipients.push({ phoneNumber: d.Phone, name: d.First_Name + ', ' + d.Last_Name , type: 'student', email: d.email });
+        });
+        prospectNumbers.map((d: any) => {
+            bulkRecipients.push({ phoneNumber: d.Phone, name: d.FName + ', ' + d.LName , type: 'prospect', email: d.email });
+        });
+        setBulkRecipientsForText(bulkRecipients);
+    };
+
+    useEffect(() => {
+        handleSetBulk(staff, students, prospects);
+    }, [staff, students, prospects]);
+
+  
 
     return (
         <div>
@@ -160,10 +185,11 @@ export default function AdvancedSearch() {
                     <p className="text-gray-500">Search for students, prospects, and staff</p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button className="btn btn-info w-44" onClick={() => handleGetEmails()}>
+                    {/* <button className="btn btn-info w-44" onClick={() => handleGetEmails()}>
                         Email This List
-                    </button>
-                    <SendBulkText isButton={true} recipients={[]} displayAll={false}  />
+                    </button> */}
+                    <EmailClassModal recipients={bulkRecipientsForText} type={'search'} />
+                    <SendBulkText isButton={true} recipients={bulkRecipientsForText} displayAll={false} />
                 </div>
             </div>
             <div className="grid grid-cols-4 gap-2">
@@ -249,7 +275,7 @@ export default function AdvancedSearch() {
                     <div>
                         <label>Class</label>
                         <select className="form-select" value={classID} onChange={(e) => setClassID(e.target.value)}>
-                            <option value={""}>Select Option</option>
+                            <option value={''}>Select Option</option>
                             {classes?.map((classData: any, index: any) => (
                                 <option key={index} value={classData.ClassId}>
                                     {classData.Name}
@@ -312,11 +338,19 @@ export default function AdvancedSearch() {
                                                 </div>
                                             </td>
                                             <td className="text-center">
-                                                <Tippy content="View">
-                                                    <button type="button" className="text-info hover:text-blue-800">
+                                                {data.Student_id ? (
+                                                    <Tippy content="View">
+                                                        <Link to={`/students/view-student/${hashTheID(data.Student_id)}/${hashTheID(suid)}`} type="button" className="text-info hover:text-blue-800">
+                                                            <IconEye />
+                                                        </Link>
+                                                    </Tippy>
+                                                ) : data.ProspectId ? (
+                                                    <Link to={`/prospects/view-prospect/${hashTheID(data.ProspectId)}/${hashTheID(suid)}`} type="button" className="text-info hover:text-blue-800">
                                                         <IconEye />
-                                                    </button>
-                                                </Tippy>
+                                                    </Link>
+                                                ) : (
+                                                    <ViewStaffMember staffID={data.StaffId} />
+                                                )}
                                             </td>
                                         </tr>
                                     );

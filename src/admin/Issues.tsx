@@ -16,8 +16,7 @@ export default function Issues() {
     const [filter, setFilter] = useState<string>('All');
 
     const handleGetSprint = async (id: string) => {
-        const res = await getSprint(id);
-        console.log(res);
+        const res = await getSprint(id);  
         setSprintCards(res);
     };
 

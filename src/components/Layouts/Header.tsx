@@ -39,6 +39,7 @@ import Select from 'react-select';
 import { handleGetTimeZoneOfUser } from '../../functions/dates';
 import IconSettings from '../Icon/IconSettings';
 import { deleteMessage, listenForMessages } from '../../firebase/firebaseFunctions';
+import IconListCheck from '../Icon/IconListCheck';
 
 const Header = () => {
     const { setSearchedStudentsAndProspects, suid, studioInfo, isMaster, masters, setSelectedSuid, isAdmin, setShowLoading }: any = UserAuth();
@@ -60,8 +61,6 @@ const Header = () => {
         }
     }, [masters]);
 
-  
-
     const handleGetIncoming = async () => {
         const data = {
             studioId: suid,
@@ -70,7 +69,6 @@ const Header = () => {
         };
         try {
             const res = await getIncomingUnreadTextMessages(data);
-            console.log(res, 'res');
             setIncoming(res.recordset);
         } catch (error) {
             console.error(error);
@@ -198,7 +196,6 @@ const Header = () => {
         setMessages(messages.filter((user: any) => user.id !== value));
         deleteMessage(suid, value);
     };
-    
 
     const [notifications, setNotifications] = useState([
         {
@@ -320,16 +317,27 @@ const Header = () => {
                     <div className="ltr:mr-2 rtl:ml-2 hidden sm:block">
                         <ul className="flex items-center space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6]">
                             <li>
-                            <Tippy content="Event Calendar" placement="bottom">
-                                <Link to="/apps/calendar" className="block p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60">
-                                    <IconCalendar />
-                                </Link>
+                                <Tippy content="Event Calendar" placement="bottom">
+                                    <Link to="/apps/calendar" className="block p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60">
+                                        <IconCalendar />
+                                    </Link>
                                 </Tippy>
                             </li>
                             <Tippy content="Add Student Note" placement="bottom">
-                            <li>
-                                <AddStudentNote />
-                            </li>
+                                <li>
+                                    <AddStudentNote />
+                                </li>
+                            </Tippy>
+                            <Tippy content="Stealth Attendance" placement="bottom">
+                                <div className="flex items-center justify-center">
+                                    <Link
+                                        to="/classes/stealth-attendance"
+                                        type="button"
+                                        className="block p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60"
+                                    >
+                                        <IconListCheck />
+                                    </Link>
+                                </div>
                             </Tippy>
                             {/* <li>
                                 <Link to="/apps/chat" className="block p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60">
@@ -369,7 +377,11 @@ const Header = () => {
                                 <IconSearch className="w-4.5 h-4.5 mx-auto dark:text-[#d0d2d6]" />
                             </button>
                         </div>
-                        {isAdmin && (<Link to="/admin/studios" className='text-xs text-info hover:text-blue-800'>Admin Dashboard</Link>)}
+                        {isAdmin && (
+                            <Link to="/admin/studios" className="text-xs text-info hover:text-blue-800">
+                                Admin Dashboard
+                            </Link>
+                        )}
                         {isMaster && (
                             <Suspense fallback={<div>Loading...</div>}>
                                 <Select placeholder={selected?.label} options={options} isSearchable={false} className="hidden sm:block w-auto" onChange={handleSelectStudio} />
@@ -429,11 +441,11 @@ const Header = () => {
                                     <span>
                                         <IconMailDot />
                                         {messages?.length > 0 && (
-                                        <span className="flex absolute w-3 h-3 ltr:right-0 rtl:left-0 top-0">
-                                            <span className="animate-ping absolute ltr:-left-[3px] rtl:-right-[3px] -top-[3px] inline-flex h-full w-full rounded-full bg-success/50 opacity-75"></span>
-                                            <span className="relative inline-flex rounded-full w-[6px] h-[6px] bg-success"></span>
-                                        </span>
-                                    )}
+                                            <span className="flex absolute w-3 h-3 ltr:right-0 rtl:left-0 top-0">
+                                                <span className="animate-ping absolute ltr:-left-[3px] rtl:-right-[3px] -top-[3px] inline-flex h-full w-full rounded-full bg-success/50 opacity-75"></span>
+                                                <span className="relative inline-flex rounded-full w-[6px] h-[6px] bg-success"></span>
+                                            </span>
+                                        )}
                                     </span>
                                 }
                             >
@@ -504,7 +516,7 @@ const Header = () => {
                                             <path d="M10 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM6 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" />
                                             <path d="M8 12a1 1 0 1 0 0-2 1 1 0 0 0 0 2M1.599 4.058a.5.5 0 0 1 .208.676A7 7 0 0 0 1 8c0 1.18.292 2.292.807 3.266a.5.5 0 0 1-.884.468A8 8 0 0 1 0 8c0-1.347.334-2.619.923-3.734a.5.5 0 0 1 .676-.208m12.802 0a.5.5 0 0 1 .676.208A8 8 0 0 1 16 8a8 8 0 0 1-.923 3.734.5.5 0 0 1-.884-.468A7 7 0 0 0 15 8c0-1.18-.292-2.292-.807-3.266a.5.5 0 0 1 .208-.676M3.057 5.534a.5.5 0 0 1 .284.648A5 5 0 0 0 3 8c0 .642.12 1.255.34 1.818a.5.5 0 1 1-.93.364A6 6 0 0 1 2 8c0-.769.145-1.505.41-2.182a.5.5 0 0 1 .647-.284m9.886 0a.5.5 0 0 1 .648.284C13.855 6.495 14 7.231 14 8s-.145 1.505-.41 2.182a.5.5 0 0 1-.93-.364C12.88 9.255 13 8.642 13 8s-.12-1.255-.34-1.818a.5.5 0 0 1 .283-.648" />
                                         </svg>
-                                        {incoming.length > 0 && (
+                                        {incoming?.length > 0 && (
                                             <span className="flex absolute w-3 h-3 ltr:right-0 rtl:left-0 top-0">
                                                 <span className="animate-ping absolute ltr:-left-[3px] rtl:-right-[3px] -top-[3px] inline-flex h-full w-full rounded-full bg-success/50 opacity-75"></span>
                                                 <span className="relative inline-flex rounded-full w-[6px] h-[6px] bg-success"></span>

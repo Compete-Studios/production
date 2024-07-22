@@ -66,7 +66,7 @@ export default function ActionItemNote({ student, pipeline, studioOptions, updat
             </div>
             <div className="md:hidden flex items-center gap-2 justify-end">
             <Tippy content="View Notes">
-                <button type="button" className="btn btn-warning btn-sm flex items-center gap-1" onClick={() => setShowActionModal(true)}>
+                <button type="button" className="btn btn-warning btn-sm flex items-center gap-1 h-8" onClick={() => setShowActionModal(true)}>
                     <IconNotes fill={true} /> 
                 </button>
                 </Tippy>

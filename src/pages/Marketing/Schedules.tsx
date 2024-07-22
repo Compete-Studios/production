@@ -9,6 +9,7 @@ import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { REACT_API_BASE_URL } from '../../constants';
 import {
+    getProspectById,
     getProspectsInScheduleByPipelineStep,
     getProspectsInScheduleByPipelineStepFromArrayOfSteps,
     getStudentsInScheduleByPipelineStep,
@@ -20,6 +21,7 @@ import { hashTheID } from '../../functions/shared';
 import IconLoader from '../../components/Icon/IconLoader';
 import IconNotes from '../../components/Icon/IconNotes';
 import UpdateNotesForStudent from '../Students/UpdateNotesForStudent';
+import QuickAction from './QuickAction';
 
 export default function Schedules() {
     const { suid, scheduleID, update, setUpdate }: any = UserAuth();
@@ -66,8 +68,10 @@ export default function Schedules() {
     };
 
     useEffect(() => {
-        handleGetStudents();
-        handleGetProspects();
+        if (scheduleID) {
+            handleGetStudents();
+            handleGetProspects();
+        }
     }, [suid, scheduleID, update]);
 
     const handleGetNewSchedule = async () => {
@@ -125,46 +129,56 @@ export default function Schedules() {
     const getProspects = async () => {
         if (dailyScheduleProspectSteps?.length > 0) {
             const formattedDate = scheduleDate.toISOString().split('T')[0];
-
+    
             const data = {
                 studioId: suid,
                 steps: dailyScheduleProspectSteps,
                 nextContactDate: formattedDate, // Set to today's date
             };
-
-            const response = await getProspectsInScheduleByPipelineStepFromArrayOfSteps(data);
-            // Filter response items with recordset length greater than 1
-            const filteredResponse = response.filter((item: any) => item.recordset.length > 1);
-
-            // Extract student data from filtered response
-            const studentData = filteredResponse.map((item: any) => item.recordset).flat();
-
-            // Grouping student data by ProspectId
-            const groupedStudents: any = {};
-            studentData.forEach((student: any) => {
-                const studentId = student.ProspectId;
-                if (!groupedStudents[studentId]) {
-                    groupedStudents[studentId] = {
-                        StepName: student.StepName,
-                        Student_id: student.ProspectId,
-                        StudentName: student.ProspectName,
-                        Contact1: student.ParentName,
-                        Classes: [student.ClassName], // Assuming you want an array of class names
-                    };
-                } else {
-                    groupedStudents[studentId].Classes.push(student.ClassName);
-                }
-            });
-
-            // Converting the grouped students object to an array
-            const dailySP = Object.values(groupedStudents);
-            setDailyScheduleProspects(dailySP);
-            setGettingProspects(false);
+    
+            try {
+                const response = await getProspectsInScheduleByPipelineStepFromArrayOfSteps(data);
+                // Filter response items with recordset length greater than 1
+                const filteredResponse = response.filter((item: any) => item.recordset.length > 1);
+    
+                // Extract student data from filtered response
+                const studentData = filteredResponse.map((item: any) => item.recordset).flat();
+    
+                // Grouping student data by ProspectId
+                const groupedStudents: any = {};
+    
+                await Promise.all(studentData.map(async (student: any) => {
+                    const prospectValues = await getProspectById(student.ProspectId);
+                    const studentId = student.ProspectId;
+    
+                    if (!groupedStudents[studentId]) {
+                        groupedStudents[studentId] = {
+                            StepName: student.StepName,
+                            Student_id: student.ProspectId,
+                            StudentName: student.ProspectName,
+                            Contact1: student.ParentName,
+                            Classes: [student.ClassName],
+                            prospectInfo: prospectValues
+                        };
+                    } else {
+                        groupedStudents[studentId].Classes.push(student.ClassName);
+                    }
+                }));
+    
+                // Converting the grouped students object to an array
+                const dailySP = Object.values(groupedStudents);
+                setDailyScheduleProspects(dailySP);
+            } catch (error) {
+                console.error('Error fetching prospects:', error);
+            } finally {
+                setGettingProspects(false);
+            }
         } else {
             setGettingProspects(false);
             console.log('No prospects today');
         }
     };
+    
 
     useEffect(() => {
         getStudents();
@@ -182,7 +196,6 @@ export default function Schedules() {
         printWindow?.document.close();
         printWindow?.print();
     };
-    
 
     const prospectTableHTML = () => {
         const htmlForPrint =
@@ -496,8 +509,7 @@ export default function Schedules() {
         printWindow?.document.write(htmlData);
         printWindow?.document.close();
         printWindow?.print();
-    }
-
+    };
 
     return (
         <div className="grid grid-cols-1 gap-6 mb-6  border-t">
@@ -525,13 +537,13 @@ export default function Schedules() {
                             </button>
                         </div>
                     </div>
-                    <div className="panel px-0 pb-0 ">
-                        <div className="flex items-center justify-between mb-5 px-5">
+                    <div className="panel p-0 ">
+                        <div className="flex items-center justify-between py-5 px-5 bg-dark rounded-t-lg text-white">
                             <h5 className="font-semibold text-lg dark:text-white-light">Prospect Schedule</h5>
                             <Tippy content="Print Schedule">
-                                <button type="button" onClick={handlePrintProspectSchedule} className="font-semibold hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-600">
+                                <button type="button" onClick={handlePrintProspectSchedule} className="font-semibold  hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-600">
                                     <span className="flex items-center">
-                                        <IconPrinter className="w-5 h-5 text-black/70 dark:text-white/70 hover:!text-primary" />
+                                        <IconPrinter className="w-5 h-5 text-white dark:text-white/70 hover:!text-primary" />
                                     </span>
                                 </button>
                             </Tippy>
@@ -550,38 +562,41 @@ export default function Schedules() {
                                 </thead>
                                 <tbody>
                                     {dailyScheduleProspects?.length > 0 ? (
-                                        dailyScheduleProspects?.map((prospect: any) => (
-                                            <tr className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
+                                        dailyScheduleProspects?.map((prospect: any, index: any) => (
+                                            <tr key={index} className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
                                                 <td className="min-w-[150px] text-black dark:text-white">
                                                     <div className="flex items-center">
                                                         <span className="whitespace-nowrap">{prospect?.StepName}</span>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <Link
-                                                        to={`/prospects/view-prospect/${hashTheID(prospect.Student_id)}/${hashTheID(suid)}`}
-                                                        className="flex hover:text-green-800 text-primary font-bold gap-1"
-                                                    >
-                                                        {prospect?.StudentName}{' '}
-                                                        <span className="text-warning hover:yellow-900">
-                                                            <IconNotes />
-                                                        </span>
-                                                    </Link>
+                                                    <Tippy content="View Propsect">
+                                                        <Link
+                                                            to={`/prospects/view-prospect/${hashTheID(prospect.Student_id)}/${hashTheID(suid)}`}
+                                                            className="flex hover:text-green-800 text-primary font-bold gap-1"
+                                                        >
+                                                            {prospect?.StudentName}{' '}
+                                                            <span className="text-warning hover:yellow-900">
+                                                                <IconNotes />
+                                                            </span>
+                                                        </Link>
+                                                    </Tippy>
                                                 </td>
                                                 <td>{prospect?.Contact1}</td>
                                                 <td>
-                                                    {prospect?.Classes?.map((className: string) => (
-                                                        <div key={className}>{className}</div>
+                                                    {prospect?.Classes?.map((className: string, index: any) => (
+                                                        <div key={index}>{className}</div>
                                                     ))}
                                                 </td>
                                                 <td className="flex gap-1 staff-center w-max mx-auto ">
-                                                    <Tippy content="View">
+                                                    {/* <QuickAction student={prospect} /> */}
+                                                    <Tippy content="View Prospect">
                                                         <NavLink
                                                             to={`/prospects/view-prospect/${hashTheID(prospect.Student_id)}/${hashTheID(suid)}`}
                                                             className="flex text-primary hover:text-primary/90 gap-1"
                                                         >
                                                             {' '}
-                                                            <IconEye /> View
+                                                            <IconEye />
                                                         </NavLink>
                                                     </Tippy>
                                                 </td>
@@ -604,13 +619,13 @@ export default function Schedules() {
                 <div className="panel bg-gray-100 animate-pulse h-full"></div>
             ) : (
                 <Suspense fallback={<div>Loading...</div>}>
-                    <div className="panel px-0 pb-0">
-                        <div className="flex items-center justify-between mb-5 px-5">
+                    <div className="panel p-0">
+                        <div className="flex items-center justify-between py-5 px-5 bg-dark rounded-t-lg text-white">
                             <h5 className="font-semibold text-lg dark:text-white-light">Students Schedule</h5>
                             <Tippy content="Print Schedule">
                                 <button type="button" onClick={handlePrintStudentSchedule} className="font-semibold hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-600">
                                     <span className="flex items-center">
-                                        <IconPrinter className="w-5 h-5 text-black/70 dark:text-white/70 hover:!text-primary" />
+                                        <IconPrinter className="w-5 h-5 text-white dark:text-white/70 hover:!text-primary" />
                                     </span>
                                 </button>
                             </Tippy>
@@ -628,8 +643,8 @@ export default function Schedules() {
                                 </thead>
                                 <tbody>
                                     {dailyScheduleStudents?.length > 0 ? (
-                                        dailyScheduleStudents?.map((student: any) => (
-                                            <tr className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
+                                        dailyScheduleStudents?.map((student: any, index: any) => (
+                                            <tr key={index} className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
                                                 <td className="text-black dark:text-white flex-wra">
                                                     <div>{student?.StepName}</div>
                                                 </td>

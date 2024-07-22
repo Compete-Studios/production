@@ -122,6 +122,8 @@ const ViewProspect = () => {
         }
     };
 
+    console.log('student', student);
+
     const getStudentBarcode = async (studentID: any) => {
         // try {
         //     const response = await getStudentCustomBarcodeId(studentID, suid);
@@ -599,6 +601,27 @@ const ViewProspect = () => {
                                                     <IconEdit className="w-4 h-4" />
                                                 </button>
                                             )}
+                                            <p className="font-bold">Phone:</p>
+                                            {toUpdate?.phone ? (
+                                                <input type="text" className="form-input" value={student?.Phone} onChange={(e) => setStudent({ ...student, Phone: e.target.value })} />
+                                            ) : (
+                                                <p className={`font-normal ${!student?.Phone && 'text-danger'}`}>{student?.Phone ? convertPhoneNumber(student?.Phone) : 'No Phone # Set'}</p>
+                                            )}
+                                            {toUpdate?.phone ? (
+                                                <button
+                                                    className="ml-auto text-info hover:text-blue-900"
+                                                    onClick={() => {
+                                                        setToUpdate({ ...toUpdate, phone: false });
+                                                        handleUpdateByColumn('Phone');
+                                                    }}
+                                                >
+                                                    Save
+                                                </button>
+                                            ) : (
+                                                <button className="ml-auto text-info hover:text-blue-900" onClick={() => setToUpdate({ ...toUpdate, phone: true })}>
+                                                    <IconEdit className="w-4 h-4" />
+                                                </button>
+                                            )}
                                             <p className="font-bold">Parent Name:</p>
                                             {toUpdate?.parentName ? (
                                                 <input type="text" className="form-input" value={student?.ParentName} onChange={(e) => setStudent({ ...student, ParentName: e.target.value })} />
@@ -858,6 +881,7 @@ const ViewProspect = () => {
                                             onClick={() => {
                                                 setToUpdate({ ...toUpdate, currentPipelineStatus: false });
                                                 handleUpdateByColumn('CurrentPipelineStatus');
+                                                showMessage('Pipeline Status Updated', 'success');
                                             }}
                                         >
                                             Save

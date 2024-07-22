@@ -361,11 +361,13 @@ const routes = [
     {
         path: '/classes/barcode-attendance',
         element: <BarcodeAttendance />,
+        layout: 'blank',
     },
 
     {
         path: '/classes/stealth-attendance',
         element: <StealthAttendance />,
+        layout: 'blank',
     },
     {
         path: '/classes/add-room',

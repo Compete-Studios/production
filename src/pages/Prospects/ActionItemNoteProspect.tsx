@@ -51,7 +51,7 @@ export default function ActionItemNoteProspect({ student, pipeline, studioOption
         <div>
             <div className="flex items-center gap-2 justify-end">
                 <button type="button" className="btn btn-warning btn-sm flex items-center gap-1" onClick={() => setShowActionModal(true)}>
-                    <IconNotes fill={true} className="h-4 w-4" /> View Notes
+                   <span className="hidden md:block">View Notes</span><span className="md:hidden block"><IconNotes fill={true} /></span>
                 </button>
             </div>
             <Transition.Root show={showActionModal} as={Fragment}>

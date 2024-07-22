@@ -85,6 +85,15 @@ export default function QuickUpdateProspect({ student, setShowActionModal, updat
                         </label>
                     );
                 })}
+                    <label htmlFor="completed" className="flex items-center cursor-pointer hover:bg-gray-100 p-1">
+                        <input type="radio" 
+                        name="pipeline" 
+                        className="form-radio" 
+                        value={parseInt(studentToUpdate?.CurrentPipelineStatus)} 
+                        checked={studentToUpdate?.CurrentPipelineStatus === 0} 
+                        onChange={() => setStudentToUpdate({ ...studentToUpdate, CurrentPipelineStatus: 0 })}/>
+                        <span>No Status/Ignore</span>
+                    </label>
             </div>
 
             <div className="w-full">

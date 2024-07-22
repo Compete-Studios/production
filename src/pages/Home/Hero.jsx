@@ -29,7 +29,7 @@ export default function Hero() {
                 <IconCalendar className="-mr-0.5 h-5 w-5" aria-hidden="true" />
               </button>
               <Link
-                to="/create-account"
+                to="/auth/boxed-signup"
                 className="text-sm font-semibold leading-6 text-gray-900"
               >
                 Sign Up <span aria-hidden="true">→</span>

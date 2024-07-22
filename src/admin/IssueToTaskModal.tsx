@@ -19,7 +19,6 @@ export default function IssueToTaskModal({ docData, cards, setIssues }: any) {
 
     const handleUpdateSprintCards = (list: any) => {
         updateSprint('1', list);
-        console.log('list', list);
     };
 
     const convertFBNanoandSecToDate = (timestamp: any) => {

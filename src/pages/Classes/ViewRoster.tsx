@@ -8,26 +8,32 @@ import IconUserPlus from '../../components/Icon/IconUserPlus';
 import IconSearch from '../../components/Icon/IconSearch';
 import IconUser from '../../components/Icon/IconUser';
 import IconX from '../../components/Icon/IconX';
-import { Link, useParams } from 'react-router-dom';
-import { getProspectsByClassId, getStaffByClassId, getStudentsByClassId, getTheClassScheduleByClassId } from '../../functions/api';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { dropProspectFromClass, dropStudentFromClass, getProspectsByClassId, getStaffByClassId, getStudentsByClassId, getTheClassScheduleByClassId } from '../../functions/api';
 import { UserAuth } from '../../context/AuthContext';
 import IconSend from '../../components/Icon/IconSend';
 import IconPrinter from '../../components/Icon/IconPrinter';
 import IconMessage from '../../components/Icon/IconMessage';
 import IconDollarSignCircle from '../../components/Icon/IconDollarSignCircle';
-import { hashTheID } from '../../functions/shared';
+import { convertPhone, hashTheID, showWarningMessage } from '../../functions/shared';
 import { formatHoursFromDateTime, handleGetTimeZoneOfUser } from '../../functions/dates';
 import Tippy from '@tippyjs/react';
 import SendBulkText from '../Marketing/SendBulkText';
+import EmailClassModal from '../Marketing/EmailClassModal';
+import AddStudentProspectToClass from './AddStudentProspectToClass';
+import IconTrashLines from '../../components/Icon/IconTrashLines';
+import IconEye from '../../components/Icon/IconEye';
+import { REACT_BASE_URL } from '../../constants';
+import BulkPay from '../Payments/BulkPay';
 
 const ViewRoster = () => {
-    const { suid, classes, staff }: any = UserAuth();
+    const { suid, classes, staff, setSelectedProspects, setSelectedStudents }: any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('View Roster'));
     });
     const hashids = new Hashids();
-    const [addContactModal, setAddContactModal] = useState<any>(false);
+
     const [studentRoster, setStudentRoster] = useState<any>([]);
     const [prospectRoster, setProspectRoster] = useState<any>([]);
     const [classData, setClassData] = useState<any>([]);
@@ -36,6 +42,9 @@ const ViewRoster = () => {
     const [value, setValue] = useState<any>('list');
     const [hashedID, setHashedID] = useState<any>('');
     const [bulkRecipientsForText, setBulkRecipientsForText] = useState([]);
+    const [updatedClasses, setUpdatedClasses] = useState(false);
+
+    const navigate = useNavigate();
 
     const [defaultParams] = useState({
         id: null,
@@ -110,7 +119,7 @@ const ViewRoster = () => {
         } catch (error) {
             console.error(error);
         }
-    }, [classId, suid, uid]);
+    }, [classId, suid, uid, updatedClasses]);
 
     const [filteredItems, setFilteredItems] = useState<any>(studentRoster);
     const [filteredProspects, setFilteredProspects] = useState<any>(prospectRoster);
@@ -166,7 +175,6 @@ const ViewRoster = () => {
         }
 
         showMessage('User has been saved successfully.');
-        setAddContactModal(false);
     };
 
     const editUser = (user: any = null) => {
@@ -176,12 +184,53 @@ const ViewRoster = () => {
             let json1 = JSON.parse(JSON.stringify(user));
             setParams(json1);
         }
-        setAddContactModal(true);
     };
 
     const deleteUser = (user: any = null) => {
         setFilteredItems(filteredItems.filter((d: any) => d.id !== user.Student_ID));
         showMessage('User has been deleted successfully.');
+    };
+
+    const handleDeleteFromClass = (uid: any) => {
+        showWarningMessage('Are you sure you want to remove this student from this class?', 'Remove Student From Class', 'Your student has been removed from the class')
+            .then((confirmed: boolean) => {
+                if (confirmed) {
+                    // User confirmed the action
+                    dropStudentFromClass(uid, classId).then((response) => {
+                        if (response) {
+                            setUpdatedClasses(!updatedClasses);
+                        }
+                    });
+                } else {
+                    // User canceled the action
+                    console.log('User canceled');
+                }
+            })
+            .catch((error) => {
+                // Handle error if any
+                console.error('Error:', error);
+            });
+    };
+
+    const handleDeleteProspectFromClass = (uid: any) => {
+        showWarningMessage('Are you sure you want to remove this student from the class?', 'Remove Student From Class', 'Your student has been removed from the class')
+            .then((confirmed: boolean) => {
+                if (confirmed) {
+                    // User confirmed the action
+                    dropProspectFromClass(uid, classId).then((response) => {
+                        if (response) {
+                            setUpdatedClasses(!updatedClasses);
+                        }
+                    });
+                } else {
+                    // User canceled the action
+                    console.log('User canceled');
+                }
+            })
+            .catch((error) => {
+                // Handle error if any
+                console.error('Error:', error);
+            });
     };
 
     const showMessage = (msg = '', type = 'success') => {
@@ -203,22 +252,86 @@ const ViewRoster = () => {
     const handleSetBulk = (staffNumbers: any, studentNumbers: any, prospectNumbers: any) => {
         let bulkRecipients: any = [];
         staffNumbers.map((d: any) => {
-            bulkRecipients.push({ phoneNumber: d.Phone, name: d.Name, type: 'staff' });
+            bulkRecipients.push({ phoneNumber: d.Phone, name: d.Name, type: 'staff', email: d.email });
         });
         studentNumbers.map((d: any) => {
-            bulkRecipients.push({ phoneNumber: d.Phone, name: d.Name, type: 'student' });
+            bulkRecipients.push({ phoneNumber: d.Phone, name: d.Name, type: 'student', email: d.email });
         });
         prospectNumbers.map((d: any) => {
-            bulkRecipients.push({ phoneNumber: d.Phone, name: d.Name, type: 'prospect' });
+            bulkRecipients.push({ phoneNumber: d.Phone, name: d.Name, type: 'prospect', email: d.email });
         });
         setBulkRecipientsForText(bulkRecipients);
     };
-    
+
     useEffect(() => {
         handleSetBulk(classStaff, studentRoster, prospectRoster);
     }, [classStaff, studentRoster, prospectRoster]);
 
-    console.log('bulkRecipientsForText', bulkRecipientsForText)
+    const handlePrintRoster = (students: any, prospects: any) => {
+        const htmlData = tableHTML(students, prospects);
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+            printWindow.document.open();
+            printWindow.document.write(htmlData);
+            printWindow.document.close();
+            printWindow.focus(); // Ensure the new window is focused
+            printWindow.print();
+        }
+    };
+
+    const tableHTML = (students: any, prospects: any) => {
+        const htmlForEmail = `<!DOCTYPE html>
+        <html>
+        <head>
+            <meta name="viewport" content="width=device-width" />
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+            <title>Roster</title>
+        </head>
+        <body style="margin:0px; background: #f8f8f8; ">
+            <div width="100%" style="background: #f8f8f8; padding: 0px 0px; font-family:arial; line-height:28px; height:100%;  width: 100%; color: #514d6a;">
+                <table border="0" cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th style="border: 1px solid #ddd; padding: 8px;">Name</th>
+                            <th style="border: 1px solid #ddd; padding: 8px;">Phone</th>
+                            <th style="border: 1px solid #ddd; padding: 8px;">Email</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; width: 300px;">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${students
+                            .map((d: any) => {
+                                return `<tr>
+                            <td style="border: 1px solid #ddd; padding: 8px; width: 100px">${d.Name}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px; width: 100px">${d.Phone}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px; width: 100px">${d.email}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px; width: 300px;"></td>
+                            </tr>`;
+                            })
+                            .join('')}
+                        ${prospects
+                            .map((d: any) => {
+                                return `<tr>
+                            <td style="border: 1px solid #ddd; padding: 8px; width: 100px">${d.Name}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px; width: 100px">${d.Phone}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px; width: 100px">${d.email}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px; width: 300px;"></td>
+                            </tr>`;
+                            })
+                            .join('')}
+                    </tbody>
+                </table>
+            </div>
+            <div style="text-align: center; font-size: 12px; color: #b2b2b5; margin-top: 20px">
+                <p>
+                    Powered by CompeteStudio.pro <br>
+                    <a href="${REACT_BASE_URL}" style="color: #b2b2b5; text-decoration: underline;">Visit Us</a>
+                </p>
+            </div>
+        </body>
+        </html>`;
+        return htmlForEmail;
+    };
 
     return (
         <>
@@ -230,16 +343,34 @@ const ViewRoster = () => {
                     </Link>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>Class</span>
+                    <span>{classData?.Name}</span>
                 </li>
             </ul>
             <div>
                 <div className="flex items-center justify-between flex-wrap gap-4 mt-4">
                     <div>
-                        <h2 className="text-xl font-bold">Roster for {classData?.Name}</h2>
+                        <div className="flex items-center gap-4">
+                            <h2 className="text-xl font-bold">Roster for {classData?.Name}</h2>
+                            <div>
+                                <div className="flex sm:flex-row flex-col sm:items-center justify-end sm:gap-3 gap-4 w-full sm:w-auto">
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            placeholder="Search Roster"
+                                            className="form-input py-2 ltr:pr-11 rtl:pl-11 peer"
+                                            value={search}
+                                            onChange={(e) => setSearch(e.target.value)}
+                                        />
+                                        <button type="button" className="absolute ltr:right-[11px] rtl:left-[11px] top-1/2 -translate-y-1/2 peer-focus:text-primary">
+                                            <IconSearch className="mx-auto" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div className="text-sm text-gray-500dark:text-gray-400 mb-4 gap-1">
                             Instructors:
-                            <div className="flex flex-wrap">
+                            <div className="">
                                 {classStaff?.length > 0 ? (
                                     classStaff?.map((d: any, index: any) => (
                                         <div className="block">
@@ -270,60 +401,37 @@ const ViewRoster = () => {
                                 </span>
                             </div>
                         ))}
+                        <div className="sm:flex space-y-4 sm:space-y-0 items-center gap-2 mt-4">
+                            <AddStudentProspectToClass classID={classId} studentRoster={studentRoster} student={true} updatedClasses={updatedClasses} setUpdatedClasses={setUpdatedClasses} />
+                            <AddStudentProspectToClass classID={classId} studentRoster={prospectRoster} student={false} updatedClasses={updatedClasses} setUpdatedClasses={setUpdatedClasses} />
+                            <button type="button" className="btn btn-warning gap-2 w-full whitespace-nowrap" onClick={() => handlePrintRoster(studentRoster, prospectRoster)}>
+                                <IconPrinter />
+                                Print Roster
+                            </button>
+
+                            {/* <Link to={`/marketing/create-news-letter/${hashedID}/class`} type="button" className="btn btn-info gap-2 w-full whitespace-nowrap">
+                                <IconSend />
+                                Email Class
+                            </Link> */}
+                            <div>
+                                <EmailClassModal classuid={classId} recipients={bulkRecipientsForText} type={'classType'} />
+                            </div>
+                            <div className="w-full">
+                                <SendBulkText isButton={true} recipients={bulkRecipientsForText} displayAll={false} />
+                            </div>
+
+                          <BulkPay students={studentRoster} prospects={prospectRoster} />
+                        </div>
                     </div>
 
                     {/* <div className="flex sm:flex-row flex-col sm:items-center justify-end sm:gap-3 gap-4 w-full sm:w-auto mt-3">
-                        <button type="button" className="btn btn-primary" onClick={() => editUser()}>
-                            <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
-                            Add Student
-                        </button>
-
-                        <button type="button" className="btn btn-dark" onClick={() => editUser()}>
-                            <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
-                            Add Prospect
-                        </button>
+                       
                     </div> */}
                 </div>
-                <div className="panel xl:hidden sm:flex sm:items-center sm:gap-2 sm:space-y-0 space-y-3">
-                    <button type="button" className="btn btn-warning gap-2 w-full">
-                        <IconPrinter />
-                        Print Roster
-                    </button>
-                    <Link to={`/marketing/create-news-letter/${hashedID}/class`} type="button" className="btn btn-info gap-2 w-full">
-                        <IconSend />
-                        Email Class
-                    </Link>
-                    <div>
 
-                    <SendBulkText isButton={true} recipients={bulkRecipientsForText} displayAll={false}  />
-                    </div>
-
-                    <button className="btn btn-success gap-2 w-full">
-                        <IconDollarSignCircle />
-                        Bulk Pay
-                    </button>
-                </div>
-                <div className="lg:flex items-start mt-5 gap-4">
-                    <div className="grow">
-                        <div className="flex items-center justify-between flex-wrap gap-4 p-5">
-                            <h2 className="text-xl">Students Enrolled</h2>
-                            <div>
-                                <div className="flex sm:flex-row flex-col sm:items-center justify-end sm:gap-3 gap-4 w-full sm:w-auto">
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            placeholder="Search Roster"
-                                            className="form-input py-2 ltr:pr-11 rtl:pl-11 peer"
-                                            value={search}
-                                            onChange={(e) => setSearch(e.target.value)}
-                                        />
-                                        <button type="button" className="absolute ltr:right-[11px] rtl:left-[11px] top-1/2 -translate-y-1/2 peer-focus:text-primary">
-                                            <IconSearch className="mx-auto" />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <div className="lg:flex items-start mt-4 gap-4">
+                    <div className="grow panel p-0">
+                
                         <div className="panel p-0 border-0 overflow-hidden">
                             <div className="table-responsive">
                                 <table className="table-striped table-hover">
@@ -333,31 +441,62 @@ const ViewRoster = () => {
                                             <th className="hidden lg:table-cell">Phone</th>
                                             <th className="hidden sm:table-cell">Email</th>
 
-                                            <th className="!text-center">Actions</th>
+                                            <th className="text-right">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <tr className="border-t border-gray-200">
+                                            <th scope="colgroup" colSpan={5} className="bg-dark py-4 pl-4 pr-3 text-left text-xl font-semibold text-white sm:pl-3">
+                                                Students
+                                            </th>
+                                        </tr>
                                         {filteredItems?.map((contact: any) => {
                                             return (
                                                 <tr key={contact.Student_ID}>
                                                     <td className="max-w-[200px]">
                                                         <div>{contact.Name}</div>
                                                     </td>
-                                                    <td className="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">{contact.Phone}</td>
+                                                    <td className="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">{convertPhone(contact.Phone)}</td>
                                                     <td className="hidden px-3 py-4 text-sm text-gray-500 sm:table-cell">{contact.email}</td>
 
                                                     <td>
-                                                        <div className="flex gap-4 items-center justify-center">
+                                                        <div className="flex gap-4 items-center justify-end">
                                                             <Link
                                                                 to={`/students/view-student/${hashTheID(contact.Student_ID)}/${hashTheID(suid)}`}
                                                                 type="button"
-                                                                className="btn btn-sm btn-outline-primary"
+                                                                className="btn btn-sm btn-outline-primary gap-1"
                                                                 onClick={() => editUser(contact)}
                                                             >
-                                                                Info
+                                                                <IconEye /> View
                                                             </Link>
-                                                            <button type="button" className="btn btn-sm btn-outline-danger" onClick={() => deleteUser(contact)}>
-                                                                Remove
+                                                            <button type="button" className="btn btn-sm btn-outline-danger gap-1" onClick={() => handleDeleteFromClass(contact.Student_ID)}>
+                                                                <IconTrashLines /> Remove
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                        <tr className="border-t border-gray-200">
+                                            <th scope="colgroup" colSpan={5} className="bg-dark py-4 pl-4 pr-3 text-left text-xl font-semibold text-white sm:pl-3">
+                                                Prospects
+                                            </th>
+                                        </tr>
+                                        {filteredProspects?.map((contact: any) => {
+                                            return (
+                                                <tr key={contact.ProspectId}>
+                                                    <td className="max-w-[200px]">
+                                                        <div>{contact.Name}</div>
+                                                    </td>
+                                                    <td className="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">{convertPhone(contact.Phone)}</td>
+                                                    <td className="hidden px-3 py-4 text-sm text-gray-500 sm:table-cell">{contact.email}</td>
+                                                    <td>
+                                                        <div className="flex gap-4 items-center justify-end">
+                                                            <Link to={`/prospects/view-prospect/${hashTheID(contact.ProspectId)}/${hashTheID(suid)}`} type="button" className="btn btn-sm btn-outline-primary gap-1" onClick={() => editUser(contact)}>
+                                                                <IconEye /> View
+                                                            </Link>
+                                                            <button type="button" className="btn btn-sm btn-outline-danger gap-1" onClick={() => handleDeleteProspectFromClass(contact.ProspectId)}>
+                                                                <IconTrashLines /> Remove
                                                             </button>
                                                         </div>
                                                     </td>
@@ -368,150 +507,8 @@ const ViewRoster = () => {
                                 </table>
                             </div>
                         </div>
-                        <div className="mt-12">
-                            <div className="flex items-center justify-between flex-wrap gap-4">
-                                <h2 className="text-xl">Prospects Enrolled</h2>
-                            </div>
-                            {value === 'list' && (
-                                <div className="mt-5 panel p-0 border-0 overflow-hidden">
-                                    <div className="table-responsive">
-                                        <table className="table-striped table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>Student Name</th>
-                                                    <th>Phone</th>
-                                                    <th>Email</th>
-
-                                                    <th className="!text-center">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {filteredProspects?.map((contact: any) => {
-                                                    return (
-                                                        <tr key={contact.ProspectId}>
-                                                            <td>
-                                                                <div className="flex items-center w-max">
-                                                                    <div>{contact.Name}</div>
-                                                                </div>
-                                                            </td>
-                                                            <td className="whitespace-nowrap">{contact.Phone}</td>
-                                                            <td className="whitespace-nowrap">{contact.email}</td>
-                                                            <td>
-                                                                <div className="flex gap-4 items-center justify-center">
-                                                                    <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => editUser(contact)}>
-                                                                        Info
-                                                                    </button>
-                                                                    <button type="button" className="btn btn-sm btn-outline-danger" onClick={() => deleteUser(contact)}>
-                                                                        Remove
-                                                                    </button>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    );
-                                                })}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            )}
-
-                            <Transition appear show={addContactModal} as={Fragment}>
-                                <Dialog as="div" open={addContactModal} onClose={() => setAddContactModal(false)} className="relative z-[51]">
-                                    <Transition.Child
-                                        as={Fragment}
-                                        enter="ease-out duration-300"
-                                        enterFrom="opacity-0"
-                                        enterTo="opacity-100"
-                                        leave="ease-in duration-200"
-                                        leaveFrom="opacity-100"
-                                        leaveTo="opacity-0"
-                                    >
-                                        <div className="fixed inset-0 bg-[black]/60" />
-                                    </Transition.Child>
-                                    <div className="fixed inset-0 overflow-y-auto">
-                                        <div className="flex min-h-full items-center justify-center px-4 py-8">
-                                            <Transition.Child
-                                                as={Fragment}
-                                                enter="ease-out duration-300"
-                                                enterFrom="opacity-0 scale-95"
-                                                enterTo="opacity-100 scale-100"
-                                                leave="ease-in duration-200"
-                                                leaveFrom="opacity-100 scale-100"
-                                                leaveTo="opacity-0 scale-95"
-                                            >
-                                                <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setAddContactModal(false)}
-                                                        className="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
-                                                    >
-                                                        <IconX />
-                                                    </button>
-                                                    <div className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                                                        {params.id ? 'Edit Contact' : 'Add Contact'}
-                                                    </div>
-                                                    <div className="p-5">
-                                                        <form>
-                                                            <div className="mb-5">
-                                                                <label htmlFor="name">Name</label>
-                                                                <input id="name" type="text" placeholder="Enter Name" className="form-input" value={params.name} onChange={(e) => changeValue(e)} />
-                                                            </div>
-                                                            <div className="mb-5">
-                                                                <label htmlFor="email">Email</label>
-                                                                <input id="email" type="email" placeholder="Enter Email" className="form-input" value={params.email} onChange={(e) => changeValue(e)} />
-                                                            </div>
-                                                            <div className="mb-5">
-                                                                <label htmlFor="number">Phone Number</label>
-                                                                <input
-                                                                    id="phone"
-                                                                    type="text"
-                                                                    placeholder="Enter Phone Number"
-                                                                    className="form-input"
-                                                                    value={params.phone}
-                                                                    onChange={(e) => changeValue(e)}
-                                                                />
-                                                            </div>
-                                                            <div className="mb-5">
-                                                                <label htmlFor="occupation">Occupation</label>
-                                                                <input
-                                                                    id="role"
-                                                                    type="text"
-                                                                    placeholder="Enter Occupation"
-                                                                    className="form-input"
-                                                                    value={params.role}
-                                                                    onChange={(e) => changeValue(e)}
-                                                                />
-                                                            </div>
-                                                            <div className="mb-5">
-                                                                <label htmlFor="address">Address</label>
-                                                                <textarea
-                                                                    id="location"
-                                                                    rows={3}
-                                                                    placeholder="Enter Address"
-                                                                    className="form-textarea resize-none min-h-[130px]"
-                                                                    value={params.location}
-                                                                    onChange={(e) => changeValue(e)}
-                                                                ></textarea>
-                                                            </div>
-                                                            <div className="flex justify-end items-center mt-8">
-                                                                <button type="button" className="btn btn-outline-danger" onClick={() => setAddContactModal(false)}>
-                                                                    Cancel
-                                                                </button>
-                                                                <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={saveUser}>
-                                                                    {params.id ? 'Update' : 'Add'}
-                                                                </button>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                </Dialog.Panel>
-                                            </Transition.Child>
-                                        </div>
-                                    </div>
-                                </Dialog>
-                            </Transition>
-                        </div>
                     </div>
-                    <div className="panel space-y-3 hidden xl:block xl:sticky xl:top-20 flex-none">
+                    {/* <div className="panel space-y-3 hidden xl:block xl:sticky xl:top-20 flex-none">
                         <button type="button" className="btn btn-warning gap-2 w-44">
                             <IconPrinter />
                             Print Roster
@@ -526,7 +523,7 @@ const ViewRoster = () => {
                             <IconDollarSignCircle />
                             Bulk Pay
                         </button>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </>

@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getFormsFromFirebase } from '../../firebase/firebaseFunctions';
 import { formatDate, showErrorMessage, showMessage } from '../../functions/shared';
 import { addProspect } from '../../functions/api';
+import { sendIndividualEmail } from '../../functions/emails';
+import { updateFormSubmissionCounnt, updateLoadCount, updateStats } from '../../functions/spaces';
+import { UserAuth } from '../../context/AuthContext';
 
 const formInputs = {
     formName: 'Form Name',
@@ -21,9 +24,11 @@ const formInputs = {
 };
 
 export default function Forms() {
+    const { isLoggedIn }: any = UserAuth();
     const [form, setForm] = useState<any>({});
     const { id } = useParams<{ id: string }>();
     const [formInfo, setFormInfo] = useState<any>(formInputs);
+    const [submitted, setSubmitted] = useState(false);
 
     const handleGetFormFromFB = async (formID: any) => {
         const fbform: any = await getFormsFromFirebase(formID);
@@ -33,7 +38,12 @@ export default function Forms() {
 
     useEffect(() => {
         handleGetFormFromFB(id);
+        if (!isLoggedIn) {
+            updateLoadCount(id);
+        }
     }, [id]);
+
+    const navigate = useNavigate();
 
     const handleSubmitForm = async () => {
         const prospectInfoData = {
@@ -58,9 +68,20 @@ export default function Forms() {
             birthdate: '',
         };
         const response = await addProspect(prospectInfoData);
-        console.log(response);
         if (response?.output?.NewProspectId || response?.recordset?.[0]?.NewProspectId) {
-            showMessage('Form Submitted Successfully');
+            showMessage(formInfo.successMessage ? formInfo.successMessage : 'Form Submitted Successfully');
+            const statsData = {
+                formID: id,
+                studioId: form?.studioID,
+                formName: form?.formName,
+                prospectID: response?.output?.NewProspectId || response?.recordset?.[0]?.NewProspectId,
+                prospectName: `${formInfo.firstName} ${formInfo.lastName}`,
+                date: new Date(),
+            };
+            updateStats(id, statsData);
+            updateFormSubmissionCounnt(id);
+            setFormInfo(formInputs);
+            window.location.href = formInfo.successURL || '/';
         } else {
             showErrorMessage('Error Submitting Form');
         }
@@ -68,9 +89,9 @@ export default function Forms() {
         //     const emailData = {
         //         to: formInfo.email,
         //         from: form?.emailFrom || '',
-        //         subject: form?.emailSubject || 'Thank you for your interest',
+        //         subject: form?.defaultEmailSubject || 'Thank you for your interest',
         //         html: form?.value || 'Thank you for your interest',
-        //     sendIndividualEmail({ ...formInfo, email: '' });
+        //     sendIndividualEmail(emailData);
         // }
     };
 
@@ -93,6 +114,7 @@ export default function Forms() {
                                 name="first-name"
                                 id="first-name"
                                 autoComplete="given-name"
+                                value={formInfo.firstName}
                                 className={`form-input w-full ${form?.mem?.rounded} ${form?.heightOption?.height}`}
                                 onChange={(e) => {
                                     setFormInfo({ ...formInfo, firstName: e.target.value });
@@ -102,7 +124,7 @@ export default function Forms() {
                     </div>
                 )}
 
-                {form?.form?.formInfo?.LastName && (
+                {form?.formInfo?.LastName && (
                     <div className={`${form?.formInfo?.Name && form?.formInfo?.LastName ? 'sm:col-span-3' : 'sm:col-span-full'}`}>
                         <label htmlFor="last-name">Last name</label>
                         <div className="mt-2">
@@ -111,6 +133,7 @@ export default function Forms() {
                                 name="last-name"
                                 id="last-name"
                                 autoComplete="family-name"
+                                value={formInfo.lastName}
                                 className={`form-input w-full ${form?.mem?.rounded} ${form?.heightOption?.height}`}
                                 onChange={(e) => {
                                     setFormInfo({ ...formInfo, lastName: e.target.value });
@@ -129,6 +152,7 @@ export default function Forms() {
                                 name="email"
                                 type="email"
                                 autoComplete="email"
+                                value={formInfo.email}
                                 className={`form-input w-full ${form?.mem?.rounded} ${form?.heightOption?.height}`}
                                 onChange={(e) => {
                                     setFormInfo({ ...formInfo, email: e.target.value });
@@ -147,6 +171,7 @@ export default function Forms() {
                                 name="phone"
                                 type="tel"
                                 autoComplete="phone"
+                                value={formInfo.phone}
                                 className={`form-input w-full ${form?.mem?.rounded} ${form?.heightOption?.height}`}
                                 onChange={(e) => {
                                     setFormInfo({ ...formInfo, phone: e.target.value });
@@ -165,6 +190,7 @@ export default function Forms() {
                                 name="street-address"
                                 id="street-address"
                                 autoComplete="street-address"
+                                value={formInfo.address}
                                 className={`form-input w-full ${form?.mem?.rounded} ${form?.heightOption?.height}`}
                                 onChange={(e) => {
                                     setFormInfo({ ...formInfo, address: e.target.value });
@@ -183,6 +209,7 @@ export default function Forms() {
                                 name="city"
                                 id="city"
                                 autoComplete="address-level2"
+                                value={formInfo.city}
                                 className={`form-input w-full ${form?.mem?.rounded} ${form?.heightOption?.height}`}
                                 onChange={(e) => {
                                     setFormInfo({ ...formInfo, city: e.target.value });
@@ -201,6 +228,7 @@ export default function Forms() {
                                 name="region"
                                 id="region"
                                 autoComplete="address-level1"
+                                value={formInfo.state}
                                 className={`form-input w-full ${form?.mem?.rounded} ${form?.heightOption?.height}`}
                                 onChange={(e) => {
                                     setFormInfo({ ...formInfo, state: e.target.value });
@@ -219,6 +247,7 @@ export default function Forms() {
                                 name="postal-code"
                                 id="postal-code"
                                 autoComplete="postal-code"
+                                value={formInfo.zip}
                                 className={`form-input w-full ${form?.mem?.rounded} ${form?.heightOption?.height}`}
                                 onChange={(e) => {
                                     setFormInfo({ ...formInfo, zip: e.target.value });
@@ -237,6 +266,7 @@ export default function Forms() {
                                 name="first-name"
                                 id="first-name"
                                 autoComplete="given-name"
+                                value={formInfo.parentName}
                                 className={`form-input w-full ${form?.mem?.rounded} ${form?.heightOption?.height}`}
                                 onChange={(e) => {
                                     setFormInfo({ ...formInfo, parentName: e.target.value });
@@ -255,6 +285,7 @@ export default function Forms() {
                                 name="first-name"
                                 id="first-name"
                                 autoComplete="given-name"
+                                value={formInfo.age}
                                 className={`form-input w-full ${form?.mem?.rounded} ${form?.heightOption?.height}`}
                                 onChange={(e) => {
                                     setFormInfo({ ...formInfo, age: e.target.value });
@@ -273,7 +304,7 @@ export default function Forms() {
                                 name="comment"
                                 id="comment"
                                 className={`form-textarea w-full ${form?.mem?.rounded}`}
-                                defaultValue={''}
+                                defaultValue={formInfo.notes}
                                 onChange={(e) => {
                                     setFormInfo({ ...formInfo, notes: e.target.value });
                                 }}
@@ -291,7 +322,7 @@ export default function Forms() {
                                 name="comment"
                                 id="comment"
                                 className={`form-textarea w-full ${form?.mem?.rounded}`}
-                                defaultValue={''}
+                                defaultValue={formInfo.additionalInfo}
                                 onChange={(e) => {
                                     setFormInfo({ ...formInfo, additionalInfo: e.target.value });
                                 }}

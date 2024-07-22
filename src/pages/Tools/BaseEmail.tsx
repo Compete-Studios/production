@@ -57,7 +57,7 @@ export default function BaseEmail({ email, emailhtml, setNotes, notes, title, ad
 
     return (
         <div>
-            <button type="button" onClick={() => setModal2(true)} className="btn btn-info gap-1 w-full">
+            <button type="button" onClick={() => setModal2(true)} className="btn btn-info gap-1 w-full whitespace-nowrap">
                 <IconMail fill={true} /> {title}
             </button>
             <Transition appear show={modal2} as={Fragment}>

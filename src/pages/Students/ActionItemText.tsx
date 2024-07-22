@@ -58,7 +58,7 @@ export default function ActionItemText({ student, pipeline }: any) {
             </div>
             <div className="md:hidden flex items-center gap-2 justify-end">
             <Tippy content="Send Text">
-            <button type="button" className="btn btn-danger btn-sm flex items-center gap-1" onClick={() => setTextShowActionModal(true)}>
+            <button type="button" className="btn btn-danger btn-sm flex items-center gap-1 h-8" onClick={() => setTextShowActionModal(true)}>
                     <IconMessage />
                 </button>
                 </Tippy>

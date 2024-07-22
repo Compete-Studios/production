@@ -115,7 +115,7 @@ export default function CaptureForms() {
 
     return (
         <>
-            {forms?.length > 0 ? (
+            
                 <div className="px-4 sm:px-6 lg:px-8">
                     <div className="sm:flex sm:items-center">
                         <div className="sm:flex-auto">
@@ -231,22 +231,7 @@ export default function CaptureForms() {
                         </div>
                     )}
                 </div>
-            ) : (
-                <div className="flex items-center justify-center h-96">
-                    <div>
-                        <h1 className="text-xl font-semibold text-gray-700">You have not added any student pipeline steps yet</h1>
-                        <div className="mt-4">
-                            <Link
-                                to="/advanced/capture-forms/create-form"
-                                type="button"
-                                className="rounded-sm bg-com px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-comhover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-com flex items-center justify-center"
-                            >
-                                Create a New Form
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            )}
+           
         </>
     );
 }

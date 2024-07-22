@@ -19,14 +19,14 @@ export default function ActionItem({ student, pipeline, update, setUpdate }: any
 
     return (
         <div>
-            <div className="hidden md:flex  items-center gap-2 justify-end">
+            <div className="hidden md:flex items-center gap-2 justify-end">
                 <button type="button" className="btn btn-info btn-sm flex items-center gap-1 w-full" onClick={() => setShowActionModal(true)}>
-                    <IconBolt fill={true} className="h-4 w-4" /> Update Step
+                    <IconBolt fill={true} className="h-3 w-3" /> Update Step
                 </button>
             </div>
             <div className="md:hidden flex  items-center gap-2 justify-end">
                 <Tippy content="Update Step">
-                    <button type="button" className="btn btn-info btn-sm flex items-center gap-1" onClick={() => setShowActionModal(true)}>
+                    <button type="button" className="btn btn-info btn-sm flex items-center gap-1 h-8" onClick={() => setShowActionModal(true)}>
                         <IconBolt fill={true} />
                     </button>
                 </Tippy>

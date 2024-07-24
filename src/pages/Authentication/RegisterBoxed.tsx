@@ -41,7 +41,7 @@ const userInit = {
     desired_Pswd: '',
     salt: '',
     paysimpleCustomerId: '',
-    role: '',
+    role: 'User',
     Studio_Id: '',
     userRole: '',
 };

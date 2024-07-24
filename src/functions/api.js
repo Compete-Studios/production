@@ -1,4 +1,6 @@
 import fetchData from './fetchdata';
+import fetchDataServer from './fetchdataserver';
+
 
 export const getBirthdaysByStudioId = async (studioId, index) => {
     try {
@@ -29,6 +31,37 @@ export const getDNSReportForReport = async (studioId, date) => {
         throw error;
     }
 };
+
+export const getAllInvoices = async () => {
+    try {
+        const response = await fetchData(`invoice-access/getAllInvoices`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+// export const getAllInvoicesFromServer = async () => {
+//     try {
+//         const response = await fetchDataServer(`invoice-access/getAllInvoicesFromServer`, 'get');
+//         return response;
+//     } catch (error) {
+//         console.error(error);
+//         throw error;
+//     }
+// };
+
+// export const updateInvoices = async (data) => {
+//     console.log('data', data);
+//     try {
+//         const response = await fetchDataServer(`invoice-access/updateInvoiceWithNewPaymentIDByID`, 'post', data);
+//         return response;
+//     } catch (error) {
+//         console.error(error);
+//         throw error;
+//     }
+// };
 
 export const addNewStudent = async (formData) => {
     try {

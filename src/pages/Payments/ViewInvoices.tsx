@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { UserAuth } from '../../context/AuthContext';
-import { deleteInvoice, getInvoicesByStudioId, getProspectInvoicesByStudioId } from '../../functions/api';
+import { deleteInvoice, getAllInvoices, getAllInvoicesFromServer, getInvoicesByStudioId, getProspectInvoicesByStudioId, updateInvoices } from '../../functions/api';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import Tippy from '@tippyjs/react';
@@ -37,6 +37,8 @@ export default function ViewInvoices() {
     const [prospectInvoices, setProspectInvoices] = useState<Invoice[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    // const [allInvoices, setAllInvoices] = useState([]);
+    // const [serverInvoices, setServerInvoices] = useState([]);
 
     const currentDate = new Date();
     const thisMonthStartDate = formatDateString(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
@@ -44,13 +46,81 @@ export default function ViewInvoices() {
     const [startDate, setStartDate] = useState<string>(thisMonthStartDate);
     const [endDate, setEndDate] = useState<string>(thisMonthEndDate);
     const [updated, setUpdated] = useState(false);
+    // const [invoicesNotInLocal, setInvoicesNotInLocal] = useState([]);
 
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Invoices'));
     }, [dispatch]);
-   
 
+    // const handleGetAllInvoices = async () => {
+    //     try {
+    //         const res = await getAllInvoices();
+    //         const res2 = await getAllInvoicesFromServer();
+    //         console.log('All Invoices:', res.recordset);
+    //         console.log('Server Invoices:', res2.recordset);
+    
+    //         const localInvoices = res.recordset;
+    //         const serverInvoices = res2.recordset;
+    
+    //         // Assuming each invoice has a unique identifier called `id`
+    //         const invoicesNotInLocal = serverInvoices.filter(serverInvoice => 
+    //             !localInvoices.some(localInvoice => localInvoice.InvoiceId === serverInvoice.InvoiceId)
+    //         );
+    
+    //         console.log('Invoices not in local:', invoicesNotInLocal);
+    
+    //         setAllInvoices(localInvoices);
+    //         setServerInvoices(serverInvoices);
+    
+    //         // Do something with invoicesNotInLocal, e.g., set to a state
+    //         setInvoicesNotInLocal(invoicesNotInLocal);
+    
+    //     } catch (error) {
+    //         console.error('Error fetching all invoices:', error);
+    //     }
+    // };
+    
+    // useEffect(() => {
+    //     handleGetAllInvoices();
+    // }, []);
+    
+    // useEffect(() => {
+    //     handleGetAllInvoices();
+    // }, []);
+
+    // const updateInvoice = async (invoiceID: any, paymentId: any) => {
+    //     console.log('Updating invoice...', invoiceID, paymentId);
+    //     const data = {
+    //         invoiceId: invoiceID,
+    //         paymentId: paymentId,
+    //     }
+    //     try {
+    //         const response = await updateInvoices(data);
+    //         if (response.status === 200) {
+    //             console.log('Invoice Deleted');
+    //             setUpdated(!updated);
+    //         }
+    //     } catch (error) {
+    //         console.error('Error updating invoice:', error);
+    //     }
+    // }
+
+    // const handleUpdateAllInvoices = async () => {
+    //     console.log('Updating all invoices with InvoiceId between 1400 and 1600...');
+    //     try {
+    //         const invoicesToUpdate = allInvoices.filter((invoice: any) => invoice.InvoiceId > 7499 && invoice.InvoiceId < 500);
+    
+    //         for (const invoice of invoicesToUpdate) {
+    //             await updateInvoice(invoice.InvoiceId, invoice.PaymentId);
+    //         }
+            
+    //         console.log('Selected Invoices Updated');
+    //     } catch (error) {
+    //         console.error('Error updating selected invoices:', error);
+    //     }
+    // };
+    
 
     const handleGetStudentInvoices = async () => {
         try {
@@ -96,6 +166,7 @@ export default function ViewInvoices() {
         <div>
             <div className="panel">
                 <div className="mb-4.5 flex md:items-center md:flex-row flex-col gap-5">
+               
                     <div className="flex items-center gap-5">
                         <h2 className="text-xl">View Your Invoices</h2>
                     </div>
@@ -156,8 +227,7 @@ export default function ViewInvoices() {
 }
 
 const InvoiceTable = ({ title, invoices, suid, setUpdated, updated }: { title: string; invoices: Invoice[]; suid: string; setUpdated: any; updated: any }) => {
-
-     const handleDeleteTheInvoice = async (invoiceID: any) => {
+    const handleDeleteTheInvoice = async (invoiceID: any) => {
         showWarningMessage('Are you sure you want to delete this invoice?', 'Delete Invoice', 'Your invoice has been removed successfully')
             .then(async (confirmed: boolean) => {
                 if (confirmed) {

@@ -97,7 +97,7 @@ const DeleteStudent: React.FC<DeleteStudentProps> = ({ student, billingInfo, pay
             console.log('API Response:', results); // Log the complete response for debugging
 
             // Check if the response has the expected structure and success message
-            if (results.body === "Success") {
+            if (results.body === "Success" || results === "Student deactivated and removed from classes and waiting lists.") {
                 // Delete student from classes, waiting lists, programs, pipeline
 
                 if (classes && classes.length > 0) {
@@ -112,7 +112,7 @@ const DeleteStudent: React.FC<DeleteStudentProps> = ({ student, billingInfo, pay
                 if (programs && programs.length > 0) {
                     for (let i = 0; i < programs.length; i++) {
                         await dropStudentFromProgram(
-                            programs[i].ProgramId, 
+                            programs[i].ProgramId,
                             student.Student_id
                         );
                     }
@@ -127,7 +127,7 @@ const DeleteStudent: React.FC<DeleteStudentProps> = ({ student, billingInfo, pay
                     }
                 }
 
-                if(student.StudentPipelineStatus && student.StudentPipelineStatus !== -1) {
+                if (student.StudentPipelineStatus && student.StudentPipelineStatus !== -1) {
                     const data = {
                         studentId: student.Student_id,
                         columnName: 'StudentPipelineStatus',
@@ -139,13 +139,14 @@ const DeleteStudent: React.FC<DeleteStudentProps> = ({ student, billingInfo, pay
                 showMessage('Student successfully deactivated.');
                 onStudentUpdate({ ...student, activity: 0 }); // Update the student state in the parent component
             } else {
-                showErrorMessage('An unknown error occurred: ' + results.message);
+                showErrorMessage('An unknown error occurred: ' + (results.message || 'No additional details provided.'));
             }
         } catch (error) {
             console.error('Error deleting student:', error); // Log the error for debugging
             showErrorMessage('An error occurred while deleting the student');
         }
     };
+
 
     const convertPhoneNumber = (phone: string) => {
         return phone?.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');

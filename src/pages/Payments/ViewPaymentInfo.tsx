@@ -37,6 +37,8 @@ export default function ViewPaymentInfo() {
     const paymentID: any = hashids.decode(payID)[0];
     const studID: any = hashids.decode(amyID)[0];
 
+    console.log('paymentID', paymentID);
+
     // useEffect(() => {
     //     if (parseInt(studID) !== parseInt(suid)) showMessage('You are not authorized to view this page');
     // }, []);
@@ -69,10 +71,12 @@ export default function ViewPaymentInfo() {
     };
 
     const handleGetPaymeingInfo = async () => {
+        console.log('paymentID', paymentID, suid);
         try {
             getPaymentByID(paymentID, suid).then((res) => {
+                console.log('paymentInfo', res);
                 if (res.Meta.HttpStatusCode) {
-                    setPaymentInfo(res.Response);
+                    setPaymentInfo(res.Response);                    
                     handleGetCustomerInfo(res.Response.CustomerId);
                     if (res.Response.CanVoidUntil) {
                         setVoidDate(res.Response.CanVoidUntil);

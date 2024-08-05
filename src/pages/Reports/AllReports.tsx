@@ -48,16 +48,16 @@ const AllReports = () => {
 
         const reportComponents: { [key: string]: { component: React.ReactNode, label: string, icon: React.ElementType }[] } = {
             'Student': [
-                { component: <DNS />, label: 'DNS', icon: IconChecks },
-                { component: <AttendanceReport />, label: 'Attendance', icon: IconAward },
-                { component: <Birthday />, label: 'Birthday', icon: IconCalendar }
+                { component: <Suspense fallback={<div>Loading...</div>}><DNS /></Suspense>, label: 'DNS', icon: IconChecks },
+                { component: <Suspense fallback={<div>Loading...</div>}><AttendanceReport /></Suspense>, label: 'Attendance', icon: IconAward },
+                { component: <Suspense fallback={<div>Loading...</div>}><Birthday /></Suspense>, label: 'Birthday', icon: IconCalendar }
             ],
             'Marketing': [
-                { component: <Snapshot />, label: 'Snapshot', icon: IconBarChart }
+                { component: <Suspense fallback={<div>Loading...</div>}><Snapshot /></Suspense>, label: 'Snapshot', icon: IconBarChart }
             ],
             'Financial': [
-                { component: <AnticipatedPayments />, label: 'Anticipated Payments', icon: IconDollarSign },
-                { component: <StudentsToRenew />, label: 'Students To Renew', icon: IconCashBanknotes }
+                { component: <Suspense fallback={<div>Loading...</div>}><AnticipatedPayments /></Suspense>, label: 'Anticipated Payments', icon: IconDollarSign },
+                { component: <Suspense fallback={<div>Loading...</div>}><StudentsToRenew /></Suspense>, label: 'Students To Renew', icon: IconCashBanknotes }
             ]
         };
 

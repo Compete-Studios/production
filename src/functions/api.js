@@ -1,8 +1,9 @@
 import fetchData from './fetchdata';
 
 export const getBirthdaysByStudioId = async (studioId, index) => {
+    console.log('getBirthdaysByStudioId API', studioId, index);
     try {
-        const response = await fetchData(`student-access/getBirthdays/${studioId}/${index}`, 'get');
+        const response = await fetchData(`student-access/getBirthdaysByStudioId/${studioId}/${index}`, 'get');
         return response;
     } catch (error) {
         console.error(error);

@@ -1,22 +1,20 @@
 import { useEffect, useState } from "react";
 import { UserAuth } from "../../context/AuthContext";
-import { fetchFromAPI } from "../../functions/shared";
-import { format, set } from "date-fns";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import { getBirthdaysByStudioId } from "../../functions/api";
 
 const Birthdays = () => {
-    const { suid }: any = UserAuth();
+    const { suid } = UserAuth() as { suid: number };
     const [loading, setLoading] = useState(false);
     const [birthdays, setBirthdays] = useState([]);
     const currentMonthIndex = new Date().getMonth();
-    // The database sproc expects a 1-based month index, Jan = 1, Feb = 2, etc.
     const [month, setMonth] = useState(currentMonthIndex + 1);
 
-    const getBirthdaysForReports = async (suid: any, monthIndex: any) => {
+    const getBirthdaysForReports = async (suid: number, monthIndex: number) => {
+        console.log("Getting birthdays for", suid, monthIndex);
         try {
-           const response = await getBirthdaysByStudioId(suid, monthIndex);
+            const response = await getBirthdaysByStudioId(suid, monthIndex);
             return response.recordset;
         } catch (error) {
             console.log(error);
@@ -24,51 +22,37 @@ const Birthdays = () => {
         }
     };
 
-    function setDateToLocal(dateString: any) {
-        // Extract date parts (year, month, day) from the dateString
+    const formatDate = (dateString: string) => {
         const [year, month, day] = dateString.split('T')[0].split('-');
+        return `${year}-${month}-${day}`;
+    };
 
-        // Construct a date string in the format 'yyyy/mm/dd'
-        const formattedDateString = `${year}/${month}/${day}`;
-
-        // Create a new Date object from the formatted string
-        const localDate = new Date(formattedDateString);
-
-        return localDate;
-    }
-
-    // Get all students who have birthdays in the current month
     const getBirthdays = async () => {
         setLoading(true);
         try {
-            const birthdays: any = await getBirthdaysForReports(suid, month);
+            const birthdayData = await getBirthdaysForReports(suid, month);
+            const currentYear = new Date().getFullYear();
 
-            const formattedBirthdays = birthdays.map((birthday: any) => {
-                let dob = new Date(birthday.Birthdate);
-                console.log('DOB:', dob);
-                const currentYear = new Date().getFullYear();
+            const formattedBirthdays = birthdayData
+                .map((birthday: any) => {
+                    let dob = new Date(birthday.Birthdate);
+                    dob.setFullYear(currentYear);
 
-                // Set the year to the current year
-                dob = new Date(dob.setFullYear(currentYear));
+                    const formattedDate = formatDate(dob.toISOString());
 
-                // Set the birthday to local time
-                dob = setDateToLocal(dob.toISOString());
+                    if (isNaN(dob.getTime())) {
+                        console.error("Invalid date for", birthday);
+                        return null;
+                    }
 
-                // Ensure the date is valid
-                if (isNaN(dob.getTime())) {
-                    console.error("Invalid date for", birthday);
-                    return null;
-                }
-                return {
-                    title: `${birthday.First_Name} ${birthday.Last_Name}`,
-                    date: format(dob, "yyyy-MM-dd"),
-                }
-            }).filter((event: any) => !!event); //Filter out null values
+                    return {
+                        title: `${birthday.First_Name} ${birthday.Last_Name}`,
+                        date: formattedDate,
+                    };
+                })
+                .filter((event: any) => !!event);
 
-            console.log('GET BIRTHDAYS RAN');
-            console.log('FORMATTED BIRTHDAYS:', formattedBirthdays);
             setBirthdays(formattedBirthdays);
-
         } catch (error) {
             console.log(error);
             return [];
@@ -79,7 +63,6 @@ const Birthdays = () => {
 
     const handleMonthChange = (info: any) => {
         const newMonth = info.view.currentStart.getMonth() + 1;
-        console.log('NEW MONTH:', newMonth, 'CURRENT MONTH:', month);
         if (newMonth !== month) {
             setMonth(newMonth);
         }
@@ -108,7 +91,7 @@ const Birthdays = () => {
                     <FullCalendar
                         key={month}
                         plugins={[dayGridPlugin]}
-                        initialView='dayGridMonth'
+                        initialView="dayGridMonth"
                         events={birthdays}
                         datesSet={handleMonthChange}
                     />

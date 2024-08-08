@@ -485,7 +485,7 @@ export default function ViewLatePayment() {
 
                             const retryData = {
                                 originalPaymentId: originalPaymentId,
-                                newPaymentId: newPaymentId,
+                                retriedPaymentId: newPaymentId,
                                 retryTime: response.PaymentDate,
                                 notes: notes,
                             };

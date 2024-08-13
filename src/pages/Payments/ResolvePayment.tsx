@@ -3,10 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import IconLock from '../../components/Icon/IconLock';
 import IconCircleCheck from '../../components/Icon/IconCircleCheck';
-import { getStudentIdFromPaysimpleCustomerId, getStudentInfo } from '../../functions/api';
+import { getPaymentScheduleByID, getStudentIdFromPaysimpleCustomerId, getStudentInfo } from '../../functions/api';
 import { addCreditCardToCustomer, getAllCustomerPaymentAccounts, getPaymentByID, runPaymentForCustomer } from '../../functions/payments';
 import { formatWithTimeZone, handleGetTimeZoneOfUser } from '../../functions/dates';
 import { showErrorMessage, showMessage } from '../../functions/shared';
+import { addLatePayment, showAPaymentWasRetried, updatePaymentSchedule } from '../../functions/payments';
 interface CreditCard {
     ccNumber: string;
     customerId: number;
@@ -149,6 +150,7 @@ export default function ResolvePayment() {
                     isDefault: false,
                     studioId: 0,
                 });
+                handleResolvePayment(response?.Response);
                 setCardLoading(false);
                 showMessage('Payment has been processed successfully');
                 navigate('/payments/thank-you');
@@ -160,6 +162,66 @@ export default function ResolvePayment() {
         } catch {
             showErrorMessage('An error occurred while processing the payment');
             setCardLoading(false);
+        }
+    };
+
+    const handleResolvePayment = async (response: any) => {
+        const retriedPaymentId = response.Id;
+
+        // add the new payment to the LatePayments DB table
+        const paymentData = {
+            studioId: stud,
+            paysimpleTransactionId: retriedPaymentId,
+            retriedTransactionId: 0,
+            ignoreThisPayment: true,
+            paysimpleCustomerId: response.CustomerId,
+            customerName: `${response.CustomerFirstName} ${response.CustomerLastName}`,
+            amount: response.Amount,
+            date: response.PaymentDate,
+            notes: '',
+            nextContactDate: '',
+        };
+        try{
+            await addLatePayment(paymentData);
+        }catch(err){
+            console.error(err);
+        }
+
+        const notes = `This payment is a retry of the Paysimple payment: ${paymentIDInfo.ID}, which occurred on ${paymentIDInfo.PaymentDate} for the amount of  ${paymentIDInfo.Amount}.  Handled through the student portal.`;
+
+        //Link this new payment to the previous failed payment
+        const retryData = {
+            originalPaymentId: paymentIDInfo.ID,
+            retriedPaymentId: retriedPaymentId,
+            retryTime: response.PaymentDate,
+            notes: notes,
+        };
+
+        try{
+            await showAPaymentWasRetried(retryData);
+        }catch(err){
+            console.error(err);
+        }
+
+        //If there's a paymentschedule attached to this payment and the user selected "Default", update the payment schedule
+        try{
+            if (paymentIDInfo.PaymentScheduleId && creditCardData.isDefault) {
+                //Get the payment schedule info
+                const paymentScheduleInfo = await getPaymentScheduleByID(paymentIDInfo.PaymentScheduleId, stud);
+
+                if (paymentScheduleInfo.Response) {
+                    const paymentScheduleData = {
+                        studioId: stud,
+                        paymentScheduleId: paymentIDInfo.PaymentScheduleId,
+                        paymentAccountId: response.AccountId,
+                        amount: paymentScheduleInfo.amount,
+                        startDate: paymentScheduleInfo.startDate,
+                    };
+                    await updatePaymentSchedule(paymentScheduleData);
+                }
+            }
+        }catch(err){
+            console.error(err);
         }
     };
 

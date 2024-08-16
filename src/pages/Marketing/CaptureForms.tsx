@@ -122,7 +122,7 @@ export default function CaptureForms() {
                             <h1 className="text-base font-semibold leading-6 text-gray-900">Capture Forms</h1>
                             <p className="text-sm text-gray-700">Here&apos;s a list of all your forms</p>
                         </div>
-
++
                         <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
                             <Link to="/marketing/create-capture-form" type="button" className="btn btn-primary">
                                 Create a New Form

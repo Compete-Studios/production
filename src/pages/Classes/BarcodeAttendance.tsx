@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { UserAuth } from '../../context/AuthContext';
 import { getAllStudensWithBarcode } from '../../functions/api';
+import StudentSlider from './StudentSlider';
 
 export default function BarcodeAttendance() {
     const { suid }: any = UserAuth();
@@ -8,9 +9,11 @@ export default function BarcodeAttendance() {
     const [students, setStudents] = useState<any>([]);
     const [student, setStudent] = useState<any>(null);
     const [loading, setLoading] = useState(false);
+    const [open, setOpen] = useState(false);
+    const [studentID, setStudentID] = useState('');
 
     // Handle barcode scan
-    const handleKeyPress = (e) => {
+    const handleKeyPress = (e: any) => {
         if (e.key === 'Enter') {
             setBarcode(e.target.value);
         }
@@ -20,9 +23,15 @@ export default function BarcodeAttendance() {
         setBarcode(e.target.value);
     };
 
+    useEffect(() => {
+        if (!suid) {
+            window.location.href = '/';
+        }
+    }, []);
+
     // Automatically focus the input field when the component mounts
     useEffect(() => {
-        const input = document.getElementById('barcode-input');
+        const input: any = document.getElementById('barcode-input');
         input.focus();
     }, []);
 
@@ -41,6 +50,7 @@ export default function BarcodeAttendance() {
             if (student) {
                 setStudent(student);
                 setLoading(true);
+                setStudentID(student.StudentId);
             } else {
                 setStudent(null);
             }
@@ -51,7 +61,12 @@ export default function BarcodeAttendance() {
         }
     }, [barcode]);
 
-    console.log(students);
+    useEffect(() => {
+        if (student) {
+            setLoading(false);
+            setOpen(true);
+        }
+    }, [student]);
 
     return (
         <>
@@ -72,6 +87,7 @@ export default function BarcodeAttendance() {
                         {student && <h1>{student.StudentId}</h1>}
                         <input id="barcode-input" type="text" className="form-input h-12 text-xl" placeholder="Scan Barcode" value={barcode} onKeyDown={handleKeyPress} onChange={handleBarcode} />
                     </div>
+                    <StudentSlider open={open} setOpen={setOpen} studentID={studentID} />
                 </div>
             )}
         </>

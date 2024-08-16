@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getProspectsByClassId, getStaffByClassId, getStudentsByClassId, searchAll } from '../../functions/api';
+import { getProspectsByClassId, getProspectsByProgramId, getStaffByClassId, getStudentsByClassId, getStudentsByProgramId, searchAll } from '../../functions/api';
 import { UserAuth } from '../../context/AuthContext';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
@@ -43,7 +43,9 @@ export default function AdvancedSearch() {
     const [classStaff, setClassStaff] = useState<any>([]);
     const [studentRoster, setStudentRoster] = useState<any>([]);
     const [prospectRoster, setProspectRoster] = useState<any>([]);
-    const [bulkRecipientsForText, setBulkRecipientsForText] = useState<any>([]);
+    const [studentProgramRoster, setStudentProgramRoster] = useState<any>([]);
+    const [prospectProgramRoster, setProspectProgramRoster] = useState<any>([]);
+    const [bulkRecipientsForText, setBulkRecipientsForText] = useState<any>([]);   
 
     const navigate = useNavigate();
 
@@ -75,20 +77,39 @@ export default function AdvancedSearch() {
 
     const handleCombineResults = () => {
         let combinedResults = [];
-
-
+    
+        // Filter by classID if it exists
         if (classID) {
-            const filteredStudents = students.filter((student: any) => studentRoster.some((rosterStudent: any) => rosterStudent.Student_ID === student.Student_id));
-            const filteredProspects = prospects.filter((prospect: any) => prospectRoster.some((rosterProspect: any) => rosterProspect.ProspectId === prospect.ProspectId));
-            const filteredStaff = staff.filter((staffMember: any) => classStaff.some((classStaffMember: any) => classStaffMember.StaffId === staffMember.StaffId));
-
+            const filteredStudents = students.filter((student: any) => 
+                studentRoster.some((rosterStudent: any) => rosterStudent.Student_ID === student.Student_id)
+            );
+            const filteredProspects = prospects.filter((prospect: any) => 
+                prospectRoster.some((rosterProspect: any) => rosterProspect.ProspectId === prospect.ProspectId)
+            );
+            const filteredStaff = staff.filter((staffMember: any) => 
+                classStaff.some((classStaffMember: any) => classStaffMember.StaffId === staffMember.StaffId)
+            );
+    
             combinedResults = [...filteredStudents, ...filteredProspects, ...filteredStaff];
         } else {
             combinedResults = [...students, ...prospects, ...staff];
         }
-
+    
+        // Further filter by program if it exists
+        if (program) {
+            const filteredStudentPrograms = combinedResults.filter((student: any) => 
+                studentProgramRoster.some((studentProgram: any) =>  studentProgram.Student_ID === student.Student_id)
+            );            
+            const filteredProspectPrograms = combinedResults.filter((prospect: any) => 
+                prospectProgramRoster.some((prospectProgram: any) => prospectProgram.ProspectId === prospect.ProspectId)
+            );
+    
+            combinedResults = [...filteredStudentPrograms, ...filteredProspectPrograms];
+        }
+    
         setCombinedResults(combinedResults);
     };
+    console.log(combinedResults, 'combinedResults');
 
     useEffect(() => {
         handleCombineResults();
@@ -109,6 +130,20 @@ export default function AdvancedSearch() {
 
             getProspectsByClassId(classID).then((res) => {
                 setProspectRoster(res);
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const handleGetProgramPeople = async (prID: any) => {
+        try {
+            getStudentsByProgramId(prID).then((res) => {
+                setStudentProgramRoster(res.recordset);
+                
+            });
+            getProspectsByProgramId(prID).then((res) => {
+                setProspectProgramRoster(res.recordset);
             });
         } catch (error) {
             console.log(error);
@@ -142,6 +177,9 @@ export default function AdvancedSearch() {
             if (classID) {
                 handleGetClassStaff();
             }
+            if (program) {
+                handleGetProgramPeople(program);
+            }
         } catch (error) {
             console.log(error);
         }
@@ -163,10 +201,10 @@ export default function AdvancedSearch() {
             bulkRecipients.push({ phoneNumber: d.Phone, name: d.FirstName + ', ' + d.LastName, type: 'staff', email: d.email });
         });
         studentNumbers.map((d: any) => {
-            bulkRecipients.push({ phoneNumber: d.Phone, name: d.First_Name + ', ' + d.Last_Name , type: 'student', email: d.email });
+            bulkRecipients.push({ phoneNumber: d.Phone, name: d.First_Name + ', ' + d.Last_Name, type: 'student', email: d.email });
         });
         prospectNumbers.map((d: any) => {
-            bulkRecipients.push({ phoneNumber: d.Phone, name: d.FName + ', ' + d.LName , type: 'prospect', email: d.email });
+            bulkRecipients.push({ phoneNumber: d.Phone, name: d.FName + ', ' + d.LName, type: 'prospect', email: d.email });
         });
         setBulkRecipientsForText(bulkRecipients);
     };
@@ -174,8 +212,6 @@ export default function AdvancedSearch() {
     useEffect(() => {
         handleSetBulk(staff, students, prospects);
     }, [staff, students, prospects]);
-
-  
 
     return (
         <div>
@@ -279,6 +315,17 @@ export default function AdvancedSearch() {
                             {classes?.map((classData: any, index: any) => (
                                 <option key={index} value={classData.ClassId}>
                                     {classData.Name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label>Programs</label>
+                        <select className="form-select" value={program} onChange={(e) => setProgram(e.target.value)}>
+                            <option value={''}>Select Option</option>
+                            {programs?.map((programData: any, index: any) => (
+                                <option key={index} value={programData.ProgramId}>
+                                    {programData.Name}
                                 </option>
                             ))}
                         </select>

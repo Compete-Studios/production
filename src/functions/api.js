@@ -622,6 +622,16 @@ export const getStudentsInScheduleByPipelineStepFromArrayOfSteps = async (data) 
     }
 };
 
+export const addPPStepToDailySchedule = async (data) => {
+    try {
+        const response = await fetchData(`daily-schedule-tools/addPPStepToDailySchedule`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const getUserFormsByStudioId = async (studioId) => {
     try {
         const response = await fetchData(`forms/getUserFormsByStudioId/${studioId}`, 'get');
@@ -1121,7 +1131,7 @@ export const dropStudentFromProgram = async (programId, studentId) => {
 
 export const getAllStudensWithBarcode = async (studioId) => {
     try {
-        const response = await fetchData(`student-access/getAllStudensWithBarcode/${studioId}`, 'get');
+        const response = await fetchData(`student-access/getAllStudentsWithBarcode/${studioId}`, 'get');
         return response;
     } catch (error) {
         console.error(error);

@@ -64,8 +64,8 @@ const Header = () => {
     const handleGetIncoming = async () => {
         const data = {
             studioId: suid,
-            startDate: '2024-05-12',
-            endDate: '2024-05-17',
+            startDate: new Date(new Date().setDate(new Date().getDate() - 2)).toISOString().split('T')[0],
+            endDate: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0],
         };
         try {
             const res = await getIncomingUnreadTextMessages(data);
@@ -78,6 +78,8 @@ const Header = () => {
     useEffect(() => {
         handleGetIncoming();
     }, []);
+
+    console.log('incoming', incoming);
 
     const handleSelectStudio = (value: any) => {
         setSelected(value);
@@ -529,10 +531,10 @@ const Header = () => {
                                     <li onClick={(e) => e.stopPropagation()}>
                                         <div className="flex items-center px-4 py-2 justify-between font-semibold">
                                             <h4 className="text-lg">Notification</h4>
-                                            {notifications.length ? <span className="badge bg-primary/80">{incoming.length} New</span> : ''}
+                                            {incoming?.length ? <span className="badge bg-primary/80">{incoming.length} New</span> : ''}
                                         </div>
                                     </li>
-                                    {notifications.length > 0 ? (
+                                    {incoming?.length > 0 ? (
                                         <>
                                             {incoming?.map((notification: any) => {
                                                 return (
@@ -579,7 +581,7 @@ const Header = () => {
                                             })}
                                             <li>
                                                 <div className="p-4">
-                                                    <button className="btn btn-primary block w-full btn-small">Read All Notifications</button>
+                                                    <Link to="/marketing/view-text-messages/recieved" className="btn btn-primary text-center justify-center block w-full btn-small">Read All Notifications</Link>
                                                 </div>
                                             </li>
                                         </>

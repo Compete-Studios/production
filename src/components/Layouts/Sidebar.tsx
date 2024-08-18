@@ -276,9 +276,6 @@ const Sidebar = () => {
                                             <NavLink to="/marketing/email-lists">Emailing Lists</NavLink>
                                         </li>
                                         <li>
-                                            <NavLink to="/marketing/view-news-letters">View NewsLetters</NavLink>
-                                        </li>
-                                        <li>
                                             <NavLink to="/marketing/view-text-messages">Text Messages</NavLink>
                                         </li>
                                     </ul>

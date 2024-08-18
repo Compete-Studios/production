@@ -92,6 +92,26 @@ export const getNewsletterLogsByStudioId = async (data) => {
     }
 };
 
+export const getNewsletterDetails = async (id) => {
+    try {
+        const response = await fetchData(`email/getNewsletterDetails/${id}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
+export const getEmailLogsByNewsletterId = async (id) => {
+    try {
+        const response = await fetchData(`email/getEmailLogsByNewsletterId/${id}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
 export const getAllEmailingListsByStudioId = async (studioID) => {
     try {
         const response = await fetchData(`email/GetAllEmailingListsByStudioId/${studioID}`, 'get',);

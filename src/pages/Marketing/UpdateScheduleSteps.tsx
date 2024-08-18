@@ -10,14 +10,13 @@ export default function UpdateScheduleSteps({ type, steps, studioID, ppStepId, s
     const [selectedSteps, setSelectedSteps] = useState<any>(steps);
     const [modal1, setModal1] = useState(false);
 
-
     const handleAddOrRemoveStep = (step: any) => {
         if (selectedSteps.find((s: any) => s.PipelineStepId === step.PipelineStepId)) {
             setSelectedSteps((prev: any) => prev.filter((s: any) => s.PipelineStepId !== step.PipelineStepId));
         } else {
             setSelectedSteps((prev: any) => [...prev, step]);
         }
-    }; 
+    };
 
     return (
         <div>
@@ -57,7 +56,6 @@ export default function UpdateScheduleSteps({ type, steps, studioID, ppStepId, s
                                         {type === 'student' ? (
                                             <p>
                                                 {pipelineSteps?.map((step: any) => {
-                                                    console.log(step.PipelineStepId);
                                                     return (
                                                         <div key={step.Step_Id} className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 py-2">
                                                             <div>
@@ -67,7 +65,10 @@ export default function UpdateScheduleSteps({ type, steps, studioID, ppStepId, s
                                                             <label className="inline-flex">
                                                                 <input
                                                                     type="checkbox"
-                                                                    checked={step.PipelineStepId === steps.find((s: any) => s.PipelineStepId === step.PipelineStepId)?.PipelineStepId || selectedSteps.find((s: any) => s.PipelineStepId === step.PipelineStepId)?.PipelineStepId}
+                                                                    checked={
+                                                                        step.PipelineStepId === steps.find((s: any) => s.PipelineStepId === step.PipelineStepId)?.PipelineStepId ||
+                                                                        selectedSteps.find((s: any) => s.PipelineStepId === step.PipelineStepId)?.PipelineStepId
+                                                                    }
                                                                     className="form-checkbox"
                                                                     onClick={() => handleAddOrRemoveStep(step)}
                                                                 />
@@ -79,7 +80,6 @@ export default function UpdateScheduleSteps({ type, steps, studioID, ppStepId, s
                                         ) : (
                                             <p>
                                                 {prospectPipelineSteps?.map((step: any) => {
-                                                    console.log(step.PipelineStepId);
                                                     return (
                                                         <div key={step.Step_Id} className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 py-2">
                                                             <div>
@@ -89,7 +89,10 @@ export default function UpdateScheduleSteps({ type, steps, studioID, ppStepId, s
                                                             <label className="inline-flex">
                                                                 <input
                                                                     type="checkbox"
-                                                                    checked={step.PipelineStepId === steps.find((s: any) => s.PipelineStepId === step.PipelineStepId)?.PipelineStepId || selectedSteps.find((s: any) => s.PipelineStepId === step.PipelineStepId)?.PipelineStepId}
+                                                                    checked={
+                                                                        step.PipelineStepId === steps.find((s: any) => s.PipelineStepId === step.PipelineStepId)?.PipelineStepId ||
+                                                                        selectedSteps.find((s: any) => s.PipelineStepId === step.PipelineStepId)?.PipelineStepId
+                                                                    }
                                                                     className="form-checkbox"
                                                                     onClick={() => handleAddOrRemoveStep(step)}
                                                                 />

@@ -10,10 +10,137 @@ import IconPencil from '../../components/Icon/IconPencil';
 export default function ViewFormIFrame({ formList }: any) {
     const [modal2, setModal2] = useState(false);
     const [message2, setMessage2] = useState<any>('');
+    const [howManyTrue, setHowManyTrue] = useState(0);
 
     useEffect(() => {
-        const iFrame = `<iframe src="${REACT_BASE_URL}form/${formList.id}" width="100%" height="100%" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>`;
-        setMessage2(iFrame);
+        // Count the number of true fields
+        const howManyTrueInit = Object.values(formList.formInfo).filter((x) => x === true).length;
+
+        let height = 200;
+        let smlHeight = 200;
+
+        // Check specific field pairs and add height if both fields in the pair are true
+        const fields = formList.formInfo;
+
+        // Add height for specific field pairs
+        if (fields.Email || fields.Phone) {
+            height += 60;
+        }
+        if (fields.Name || fields.LastName) {
+            height += 60;
+        }
+        if (fields.City || fields.State || fields.Zip) {
+            height += 60;
+        }
+        if (fields.Address) {
+            height += 60;
+        }
+        if (fields.Notes) {
+            height += 120;
+        }
+        if (fields.ParentName || fields.Age) {
+            height += 60;
+        }
+        if (fields.City || fields.State || fields.Zip) {
+            height += 60;
+        }
+        if (fields.FormDescription) {
+            height += 60;
+        }
+        if (fields.AdditionalInfo) {
+            height += 120;
+        }
+        if (fields.FriendlyName) {
+            height += 60;
+        }
+
+        // Add height for specific field pairs
+        if (fields.Email) {
+            smlHeight += 62;
+        }
+        if (fields.Phone) {
+            smlHeight += 62;
+        }
+        if (fields.Name) {
+            smlHeight += 62;
+        }
+        if (fields.LastName) {
+            smlHeight += 62;
+        }
+        if (fields.City) {
+            smlHeight += 62;
+        }
+        if (fields.State) {
+            smlHeight += 62;
+        }
+        if (fields.Zip) {
+            smlHeight += 62;
+        }
+        if (fields.Address) {
+            smlHeight += 62;
+        }
+        if (fields.Notes) {
+            smlHeight += 125;
+        }
+        if (fields.ParentName) {
+            smlHeight += 62;
+        }
+        if (fields.Age) {
+            smlHeight += 62;
+        }
+        if (fields.City) {
+            smlHeight += 62;
+        }
+        if (fields.State) {
+            smlHeight += 62;
+        }
+        if (fields.Zip) {
+            smlHeight += 62;
+        }
+        if (fields.FormDescription) {
+            smlHeight += 62;
+        }
+        if (fields.AdditionalInfo) {
+            smlHeight += 125;
+        }
+        if (fields.FriendlyName) {
+            smlHeight += 62;
+        }
+
+        const additionalHeight = formList.heightOption.name === 'Short' ? 0 : formList.heightOption.name === 'Medium' ? 100 : formList.heightOption.name === 'Tall' ? 200 : 300;
+
+        height += additionalHeight;
+        smlHeight += additionalHeight;
+
+        // // // Optionally, you can also add height based on the number of true fields
+        // // // For example, if you want to add 40px for each field beyond a certain count
+        // // // This is just an example and you can adjust as needed
+        // // height += (howManyTrueInit * 35);
+
+        // // Create the iframe with calculated height
+        // const iFrame = `<iframe src="${REACT_BASE_URL}form/${formList.id}" style="border-style: none; width: 100%; height: ${height}px;">Loading…</iframe>`;
+
+        const newiFrame = `<style>
+  .responsive-iframe {
+    width: 100%;
+    border-style: none;
+    height: ${height}px; /* Default height for larger screens */
+  }
+
+  /* Media query for smaller screens */
+  @media (max-width: 640px) {
+    .responsive-iframe {
+      height: ${smlHeight}px; /* Height for medium screens */
+    }
+  }
+
+  
+</style>
+
+<iframe src="${REACT_BASE_URL}form/${formList.id}" class="responsive-iframe">Loading…</iframe>`;
+
+        setHowManyTrue(howManyTrueInit);
+        setMessage2(newiFrame);
     }, [formList]);
 
     const copyToClipboard = (text: any) => {
@@ -96,7 +223,6 @@ export default function ViewFormIFrame({ formList }: any) {
                                             </div>
                                         </form>
                                         <div className="flex justify-end items-center mt-8">
-                                            
                                             <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setModal2(false)}>
                                                 Close
                                             </button>

@@ -96,8 +96,8 @@ export default function Forms() {
     };
 
     return (
-        <div>
-            <div className={`p-5 ${form?.selectedColor?.bg} ${form?.mem?.rounded} shadow shadow-zinc-400 grid max-w-2xl mx-auto grid-cols-1 sm:grid-cols-6 gap-4`}>
+        <div className={`${form?.selectedColor?.bg} min-h-screen h-full `}>
+            <div className={`p-5 ${form?.selectedColor?.bg} ${form?.mem?.rounded} grid max-w-2xl mx-auto grid-cols-1 sm:grid-cols-6 gap-4`}>
                 {form?.formInfo?.FriendlyName && (
                     <div className="sm:col-span-full">
                         <div className="text-2xl font-semibold text-center">{form?.formHeadline || ' Form Name'}</div>

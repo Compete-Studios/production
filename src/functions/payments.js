@@ -256,6 +256,27 @@ export const getLatePayment = async (paymentId) => {
     }
 };
 
+export const getLatePaymentsFromPaysimple = async (studioId) => {
+    try {
+        const response = await fetchData(`late-payment-pipeline/getLatePaymentsFromPaysimple/${studioId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const TESTgetLatePaymentsFromPaysimple = async (studioId) => {
+    try {
+        const response = await fetchData(`late-payment-pipeline/TESTgetLatePaymentsFromPaysimple/${studioId}`, 'get');
+        console.log('TESTgetLatePaymentsFromPaysimple response:', response);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const getPaymentInfo = async (paymentId) => {
     try {
         const response = await fetchData(`late-payment-pipeline/getPaymentInfo/${paymentId}`, 'get');

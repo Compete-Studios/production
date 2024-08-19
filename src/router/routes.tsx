@@ -532,7 +532,7 @@ const routes = [
         element: <TextStudent />,
     },
     {
-        path: '/students/update-barcode',
+        path: '/students/update-barcode/:id',
         element: <UpdateBarcode />,
     },
     {

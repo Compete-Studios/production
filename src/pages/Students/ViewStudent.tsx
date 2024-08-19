@@ -26,6 +26,7 @@ import {
     getWaitingListsByStudentId,
     updateStudentByColumn,
     updateStudentNotes,
+    addCustomBarcodeId,
 } from '../../functions/api';
 import IconUser from '../../components/Icon/IconUser';
 import AddNoteModal from './AddNoteModal';
@@ -149,6 +150,18 @@ const ViewStudent = () => {
 
     const handleUpdateNotes = () => {
         setUpdateNotes(true);
+    };
+
+    const handleUpdateBarcode = async (e: any) => {
+        e.preventDefault();
+        const dataForBarcode = {
+            studentId: unHashTheID(uid),
+            studentBarcodeId: barcode,
+            studioId: suid,
+        };
+        const res = await addCustomBarcodeId(dataForBarcode);
+        console.log(res);
+        setUpdate(false);
     };
 
     const handleSaveNotes = () => {
@@ -452,7 +465,7 @@ const ViewStudent = () => {
         setStudent(updatedStudent);
     };
 
-    console.log(student)
+    console.log(student);
 
     return (
         <div>
@@ -502,7 +515,29 @@ const ViewStudent = () => {
                             <p className="font-normal text-xs ">Next Contact Date: {formatDate(student?.NextContactDate)}</p>
                             <p className="font-normal text-xs ">Created: {formatDate(student?.EntryDate)}</p>
                             <p className={`font-normal text-xs ${rank ? 'text-success' : 'text-danger'}`}>Rank: {rank ? rank : 'No rank set'}</p>
-                            <p className={`font-normal text-xs ${barcode ? 'text-success' : 'text-danger'}`}>Barcode ID: {barcode ? barcode : 'No barcode set'}</p>
+                            {update ? (
+                                <div className="flex items-center gap-1">
+                                    <input type="text" className="form-input h-7" value={barcode} placeholder="Enter Barcode" onChange={(e) => setBarcode(e.target.value)} />
+                                    <button
+                                        className="btn btn-sm btn-info"
+                                        onClick={(e: any) => {
+                                            handleUpdateBarcode(e);
+                                        }}
+                                    >
+                                        Save
+                                    </button>
+                                </div>
+                            ) : (
+                                <p className={`font-normal flex items-end gap-1 text-xs ${barcode ? 'text-success' : 'text-danger'}`}>
+                                    Barcode ID: {barcode ? barcode : 'No barcode set'}{' '}
+                                    <span>
+                                        <button onClick={() => setUpdate(true)}>
+                                            <IconEdit className="w-3 h-3 text-info" fill={true} />
+                                        </button>
+                                    </span>
+                                </p>
+                            )}
+
                             <p className={`font-normal text-xs`}>
                                 Pipeline Step: <span className={`font-normal text-xs ${pipeline?.StepName ? 'text-success' : 'text-danger'}`}>{pipeline?.StepName}</span>
                             </p>

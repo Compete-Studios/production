@@ -1702,3 +1702,13 @@ export const getStudentsByBillingId = async (billingId) => {
         throw error;
     }
 };
+
+export const addCustomBarcodeId = async (data) => {
+    try {
+        const response = await fetchData(`student-access/addCustomBarcodeId`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};

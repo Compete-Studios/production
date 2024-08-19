@@ -19,6 +19,7 @@ import IconTrashLines from '../../components/Icon/IconTrashLines';
 
 export default function ViewStudentsInPipeline() {
     const { suid, setProspectToEdit, prospectPipelineSteps, update, setUpdate }: any = UserAuth();
+    const [pipelineToText, setPipelineToText] = useState<any>(null);
 
     const dispatch = useDispatch();
     useEffect(() => {
@@ -36,6 +37,10 @@ export default function ViewStudentsInPipeline() {
     };
 
     const { id } = useParams();
+
+    useEffect(() => {
+        setPipelineToText(prospectPipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? '')));
+    }, [id]);
 
     useEffect(() => {
         try {
@@ -66,6 +71,8 @@ export default function ViewStudentsInPipeline() {
         setProspectToEdit(id);
         navigate('/students/view-student');
     };
+
+ 
 
     const handleDropProspect = async (id: any) => {
         showWarningMessage('Are you sure you want to delete this prospect?', 'Remove Prospect', 'Your Prospect has been removed successfully')
@@ -170,7 +177,7 @@ export default function ViewStudentsInPipeline() {
                                                             />
                                                             <ActionItemTextProspect
                                                                 student={list}
-                                                                pipeline={prospectPipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
+                                                                pipeline={pipelineToText}
                                                                 studioOptions={studioOptions}
                                                                 setUpdate={setUpdate}
                                                                 update={update}

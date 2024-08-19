@@ -339,7 +339,7 @@ const Invoice = () => {
                                                 </td>
                                                 <td>
                                                     <input
-                                                        type="number"
+                                                        type="text"
                                                         className="form-input w-32"
                                                         placeholder="Price"
                                                         min={0}

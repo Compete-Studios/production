@@ -285,7 +285,7 @@ export default function StudentsQuickPay({ student, suid, title = 'Quick Pay', i
                                                                         value={amount || ''}
                                                                         placeholder="0.00"
                                                                         className="form-input ltr:rounded-l-none rtl:rounded-r-none"
-                                                                        onChange={(e) => setAmount(parseFloat(e.target.value))}
+                                                                        onChange={(e) => setAmount(e.target.value)}
                                                                     />
                                                                     <input
                                                                         type="text"

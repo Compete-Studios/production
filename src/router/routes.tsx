@@ -137,8 +137,10 @@ const Waivers = lazy(() => import('../pages/Marketing/Waivers'));
 const StudentPortal = lazy(() => import('../pages/Marketing/StudentPortal'));
 const ViewNewsLetters = lazy(() => import('../pages/Marketing/ViewNewsLetters'));
 const ViewNewsLetter = lazy(() => import('../pages/Marketing/ViewNewsletter'));
+const ViewEmailDetails = lazy(() => import('../pages/Marketing/ViewEmailDetails'));
 const NewsLetterDetails = lazy(() => import('../pages/Marketing/NewsLetterDetails'));
 const EmailLists = lazy(() => import('../pages/Marketing/EmailLists'));
+const EmailListDetails = lazy(() => import('../pages/Marketing/EmailListDetails'));
 const ViewEmailListInfo = lazy(() => import('../pages/Marketing/ViewEmailListInfo'));
 const CreateNewsLetter = lazy(() => import('../pages/Marketing/CreateNewsLetter'));
 const CreateNewMailingList = lazy(() => import('../pages/Marketing/CreateNewMailingList'));
@@ -544,7 +546,9 @@ const routes = [
     {
         path: '/students/email-list-students',
         element: <EmailList />,
+
     },
+    
     {
         path: '/students/text-list-all-students',
         element: <TextList />,
@@ -704,6 +708,14 @@ const routes = [
     {
         path: '/marketing/email-lists',
         element: <EmailLists />,
+    },
+    {
+        path: '/marketing/email-list-details/:listID',
+        element: <EmailListDetails />,
+    },
+    {
+        path: '/marketing/email-details/:id',
+        element: <ViewEmailDetails />,
     },
     {
         path: '/marketing/view-email-list-info',

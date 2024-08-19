@@ -112,10 +112,40 @@ export const getEmailLogsByNewsletterId = async (id) => {
     }
 }
 
+export const getEmailLogByEmailId = async (id) => {
+    try {
+        const response = await fetchData(`email/getEmailLogByEmailId/${id}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
 export const getAllEmailingListsByStudioId = async (studioID) => {
     try {
         const response = await fetchData(`email/GetAllEmailingListsByStudioId/${studioID}`, 'get',);
         return response.lists;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getEmailListMembers = async (listID) => {
+    try {
+        const response = await fetchData(`email/getEmailListMembers/${listID}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getEmailingListByListId = async (listID) => {
+    try {
+        const response = await fetchData(`email/GetEmailingListByListId/${listID}`, 'get');
+        return response;
     } catch (error) {
         console.error(error);
         throw error;

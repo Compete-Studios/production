@@ -68,8 +68,9 @@ export default function Forms() {
             birthdate: '',
         };
         const response = await addProspect(prospectInfoData);
+        console.log(response, 'response');
         if (response?.output?.NewProspectId || response?.recordset?.[0]?.NewProspectId) {
-            showMessage(formInfo.successMessage ? formInfo.successMessage : 'Form Submitted Successfully');
+            showMessage(form.successMessage ? form.successMessage : 'Form Submitted Successfully');
             const statsData = {
                 formID: id,
                 studioId: form?.studioID,
@@ -81,7 +82,7 @@ export default function Forms() {
             updateStats(id, statsData);
             updateFormSubmissionCounnt(id);
             setFormInfo(formInputs);
-            window.location.href = formInfo.successURL || '/';
+            window.location.href = form?.successURL || '/';                      
         } else {
             showErrorMessage('Error Submitting Form');
         }
@@ -94,6 +95,8 @@ export default function Forms() {
         //     sendIndividualEmail(emailData);
         // }
     };
+
+    console.log(form, 'form');
 
     return (
         <div className={`${form?.selectedColor?.bg} min-h-screen h-full `}>

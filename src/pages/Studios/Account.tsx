@@ -43,8 +43,6 @@ export default function Account() {
       });
   }, [suid]);
 
-  console.log("options", options);
-
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
@@ -104,7 +102,7 @@ export default function Account() {
                       <Link
                         to="/manage-account"
                         type="button"
-                        className="text-indigo-600 hover:text-indigo-900"
+                        className="text-emerald-600 hover:text-emerald-900"
                       >
                         Manage
                       </Link>

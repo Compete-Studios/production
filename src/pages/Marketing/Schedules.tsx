@@ -48,7 +48,6 @@ export default function Schedules() {
     const handleGetStudents = async () => {
         const data = await fetch(`${REACT_API_BASE_URL}/daily-schedule-tools/getSPStepsForSchedule/${scheduleID}/${suid}`);
         const dataJson = await data.json();
-        console.log(dataJson);
         if (dataJson.length > 0) {
             setDailyScheduleStudentSteps(dataJson);
         } else {
@@ -92,7 +91,6 @@ export default function Schedules() {
         if (dailyScheduleStudentSteps?.length > 0) {
             // Format today's date as 'YYYY-MM-DD'
             const formattedDate = scheduleDate.toISOString().split('T')[0];
-            console.log('dailyScheduleStudentSteps', dailyScheduleStudentSteps);
 
             const data = {
                 studioId: suid,

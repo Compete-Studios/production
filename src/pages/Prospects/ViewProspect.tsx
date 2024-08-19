@@ -77,6 +77,7 @@ const ViewProspect = () => {
     const [rank, setRank] = useState<any>(null);
     const [hasCards, setHasCards] = useState<boolean>(false);
     const [paymentSchedules, setPaymentSchedules] = useState<any>([]);
+    const [pipeline, setPipeline] = useState<any>({});
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Prospect Profile'));
@@ -122,7 +123,9 @@ const ViewProspect = () => {
         }
     };
 
-    console.log('student', student);
+    useEffect(() => {
+        setPipeline(prospectPipelineSteps.find((step: any) => step.PipelineStepId === parseInt(student.CurrentPipelineStatus ?? '')));
+    }, [student]);
 
     const getStudentBarcode = async (studentID: any) => {
         // try {
@@ -386,7 +389,7 @@ const ViewProspect = () => {
                             isProspect={true}
                             name="Prospect"
                         />
-                        <SendQuickText student={student} name="Prospect" />
+                        <SendQuickText student={student} pipeline={pipeline} name="Prospect" />
                         <SendQuickWaiver student={student} prospect={true} />
                         <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left">Create a Billing Account</button>
                         <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left">Clone Prospect</button>

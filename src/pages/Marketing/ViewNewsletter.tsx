@@ -52,8 +52,6 @@ export default function ViewNewsletter() {
         handleGetLogs();
     }, []);
 
-    console.log(logs, 'logs');
-
     return (
         <div>
             <h1 className="text-2xl font-semibold text-gray-800">Newsletter Details</h1>

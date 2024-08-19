@@ -4,9 +4,10 @@ import IconEye from '../../components/Icon/IconEye';
 import { useEffect, useState } from 'react';
 import { UserAuth } from '../../context/AuthContext';
 import { getAllEmailLogsByStudioId, getEmailLogsByStudioId } from '../../functions/emails';
-import { constFormateDateMMDDYYYY } from '../../functions/shared';
+import { constFormateDateMMDDYYYY, hashTheID } from '../../functions/shared';
 import { formatWithTimeZone, handleGetTimeZoneOfUser } from '../../functions/dates';
 import IconCircleCheck from '../../components/Icon/IconCircleCheck';
+import { Link } from 'react-router-dom';
 
 
 export default function ViewEmails() {
@@ -119,9 +120,9 @@ export default function ViewEmails() {
 
                                     <td className="text-right">
                                         <Tippy content="View Details">
-                                            <button type="button" className="text-info">
+                                            <Link to={`/marketing/email-details/${hashTheID(data.EmailId)}`} type="button" className="text-info">
                                                 <IconEye />
-                                            </button>
+                                            </Link>
                                         </Tippy>
                                     </td>
                                 </tr>

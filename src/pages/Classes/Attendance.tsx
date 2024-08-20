@@ -6,15 +6,16 @@ import IconCashBanknotes from '../../components/Icon/IconCashBanknotes';
 import IconPrinter from '../../components/Icon/IconPrinter';
 import IconEye from '../../components/Icon/IconEye';
 import PrintableRoll from './PrintableRoll';
-import { getAttendanceByClassIdDate, getTheClassScheduleByClassId, updateAttendance } from '../../functions/api';
+import { getAttendanceByClassIdDate, getStudentsByClassId, getTheClassScheduleByClassId, updateAttendance } from '../../functions/api';
 import { formatDate } from '../../functions/shared';
 import IconCircleCheck from '../../components/Icon/IconCircleCheck';
 import Tippy from '@tippyjs/react';
 import IconEdit from '../../components/Icon/IconEdit';
 import { Link } from 'react-router-dom';
+import { updateAttendanceForStudent } from '../../firebase/firebaseFunctions';
 
 export default function Attendance() {
-    const { classes }: any = UserAuth();
+    const { classes, attendanceArr }: any = UserAuth();
     const [months, setMonths] = useState([]);
     const [searchValue, setSearchValue] = useState('');
     const [classID, setClassID] = useState('');
@@ -23,8 +24,7 @@ export default function Attendance() {
     const [studentNamesAndDates, setStudentNamesAndDates] = useState([]);
     const [newChecks, setNewChecks] = useState([]);
     const [newUnchecks, setNewUnchecks] = useState([]);
-
-    console.log(classes, 'classes');
+    const [students, setStudents] = useState([]);   
 
     const getLastSixMonths = () => {
         const months = [];
@@ -70,6 +70,22 @@ export default function Attendance() {
             console.log(error);
         }
     };
+
+    const handleGetStudents = async () => {
+        if (!classID) return;
+        try {
+            const res = await getStudentsByClassId(classID);
+            console.log(res, 'res');
+            setStudents(res);
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    useEffect(() => {
+        handleGetStudents();
+    }, [classID]);
 
     const sortAttendanceAndCombineLikeStudentsByIdIntoOneObject = (data: any) => {
         const students: any = [];
@@ -132,13 +148,25 @@ export default function Attendance() {
 
     const handleUpdateAttendance = async () => {
         console.log(newChecks, newUnchecks);
-        // try {
-        //     const response = await updateAttendance(newChecks);
-        //     console.log(response);
-        // } catch (error) {
-        //     console.log(error);
-        // }
+        const types = [
+            { type: 'barcode', id: 0 },
+            { type: 'teacherCheckIn', id: 1 },
+            { type: 'studentCheckIn', id: 2 },
+            { type: 'manual', id: 3 },
+        ]
+        const attendanceData = {
+            date: "2024-08-07",
+            class: 11338,
+            attended: true,
+            barcode: "123456",
+            type: "barcode",
+        }
+        const res = await updateAttendanceForStudent("100260", attendanceData, "32");
+        console.log(res, 'res');
+
     };
+
+    console.log(attendanceArr, 'atr');
 
     return (
         <>
@@ -222,7 +250,7 @@ export default function Attendance() {
                             </tr>
                         </thead>
                         <tbody>
-                            {studentNamesAndDates?.map((data: any) => {
+                            {students?.map((data: any) => {
                                 return (
                                     <tr key={data.StudentId}>
                                         {' '}
@@ -230,7 +258,7 @@ export default function Attendance() {
                                         <td>
                                             <div className="whitespace-nowrap">{data.Name}</div>
                                         </td>
-                                        {scheduleDates.map((date: any) => (
+                                        {/* {scheduleDates.map((date: any) => (
                                             <td key={date}>
                                                 <input
                                                     type="checkbox"
@@ -240,6 +268,14 @@ export default function Attendance() {
                                                         newChecks.find((item: any) => item.StudentId === data.StudentId && item.Dates.includes(date))
                                                     }
                                                     onChange={() => (data.Dates.includes(date) ? handleUncheck(data.StudentId, date) : handleNewCheck(data.StudentId, date))}
+                                                />
+                                            </td>
+                                        ))} */}
+                                        {scheduleDates.map((date: any) => (
+                                            <td key={date}>
+                                                <input
+                                                    type="checkbox"
+                                                    className="form-checkbox"
                                                 />
                                             </td>
                                         ))}

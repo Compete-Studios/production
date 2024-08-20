@@ -51,7 +51,6 @@ export const createEvent = async (data, suid) => {
     }
 };
 
-
 export const getForm = async (id) => {
     try {
         const docRef = doc(db, 'forms', id);
@@ -227,4 +226,10 @@ export const updateStudioIDForAdmimMimic = async (studioID) => {
     await updateDoc(docRef, { studioID: [studioID] });
     await logoutForAdmin();
     await login('competeAdmin', '9911competeADMIN!@#$');
+};
+
+export const updateAttendanceForStudent = async (studentID, attendance, suid) => {
+    const docRef = doc(db, 'students', suid.toString(), 'attendance', studentID.toString());
+    const res = await setDoc(docRef, { attendance }, { merge: true });
+    return res;
 };

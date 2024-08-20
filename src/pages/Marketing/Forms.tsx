@@ -82,6 +82,7 @@ export default function Forms() {
             updateStats(id, statsData);
             updateFormSubmissionCounnt(id);
             setFormInfo(formInputs);
+            // window.top.location.href
             window.location.href = form?.successURL || '/';                      
         } else {
             showErrorMessage('Error Submitting Form');

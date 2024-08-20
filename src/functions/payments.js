@@ -256,6 +256,27 @@ export const getLatePayment = async (paymentId) => {
     }
 };
 
+export const getLatePaymentsFromPaysimple = async (studioId) => {
+    try {
+        const response = await fetchData(`late-payment-pipeline/getLatePaymentsFromPaysimple/${studioId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const TESTgetLatePaymentsFromPaysimple = async (studioId) => {
+    try {
+        const response = await fetchData(`late-payment-pipeline/TESTgetLatePaymentsFromPaysimple/${studioId}`, 'get');
+        console.log('TESTgetLatePaymentsFromPaysimple response:', response);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const getPaymentInfo = async (paymentId) => {
     try {
         const response = await fetchData(`late-payment-pipeline/getPaymentInfo/${paymentId}`, 'get');
@@ -405,3 +426,96 @@ export const addLatePayment = async (paymentData) => {
         throw error;
     }
 };
+
+export const createPaysimpleWebhook = async (data) => {
+    try {
+        const response = await fetchData(`paysimple-routes/createWebhook`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const failedPaymentWebhookAuth = async () => {
+    try {
+        const response = await fetchData(`paysimple-routes/failedPaymentWebhookAuth`, 'post');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const addWebhookToOurDB = async (data) => {
+    try {
+        const response = await fetchData(`payments/addWebhook`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getStudioIdFromPaysimpleCustomerId = async (customerId) => {
+    try {
+        const response = await fetchData(`billing-account-access/getStudioIdFromPaysimpleCustomerId/${customerId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+// Retry utility function
+const retry = async (fn, retries = 3, delay = 1000) => {
+    try {
+        return await fn();
+    } catch (error) {
+        if (shouldRetry(error) && retries > 0) {
+            console.warn(`Retrying... ${retries} attempts left`);
+            await new Promise(res => setTimeout(res, delay + Math.random() * 500)); // Add jitter
+            return retry(fn, retries - 1, delay * 2); // Exponential backoff with jitter
+        } else {
+            throw error;
+        }
+    }
+};
+
+// Determines if an error is retryable
+const shouldRetry = (error) => {
+    if (error.code === 'ECONNABORTED' || error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+        return true;
+    }
+
+    if (error.response) {
+        const status = error.response.status;
+        if (status >= 500 && status < 600) { // Server errors
+            return true;
+        }
+        if (status === 429) { // Too many requests
+            return true;
+        }
+    }
+
+    // Detecting SQL deadlock error codes (e.g., SQL Server's 1205)
+    if (error.message && error.message.includes('deadlock')) {
+        return true;
+    }
+
+    return false;
+};
+
+
+// export const addLatePayment = async (paymentData) => {
+//     // Retry the request if it fails
+//     return retry(async () => {
+//         try {
+//             const response = await fetchData(`late-payment-pipeline/addLatePayment`, 'post', paymentData);
+//             return response;
+//         } catch (error) {
+//             console.error("Error in addLatePayment:", error);
+//             throw error;
+//         }
+//     });
+// };

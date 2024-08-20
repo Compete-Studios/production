@@ -1,19 +1,40 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { UserAuth } from "../../context/AuthContext";
 import { getClassesByStudentId, getDNSReportForReport } from "../../functions/api";
 import { showErrorMessage } from "../../functions/shared";
 
-const DNS = () => {
-    const { students }: any = UserAuth();
-    const [dnsData, setDnsData] = useState([]);
+interface Student {
+    Student_ID: string;
+    First_Name: string;
+    Last_Name: string;
+    Phone: string;
+    email: string;
+}
+
+interface Class {
+    Name: string;
+}
+
+interface DNSReport {
+    studentId: string;
+    classes: Class[];
+}
+
+const DNS: React.FC = () => {
+    const { students } = UserAuth() as { students: Student[] };
+    const [dnsData, setDnsData] = useState<StudentWithClasses[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
-    //Initialize the date range to the last two weeks
+    interface StudentWithClasses extends Student {
+        classes: Class[];
+    }
+
+    // Initialize the date range to the last two weeks
     const currentDate = new Date();
     const twoWeeksAgo = new Date(currentDate.getTime() - 14 * 24 * 60 * 60 * 1000);
-    const [date, setDate] = useState(twoWeeksAgo);
+    const [date, setDate] = useState<Date>(twoWeeksAgo);
 
-    const getDNSReport = async (studentId: any, date: any) => {
+    const getDNSReport = async (studentId: string, date: string): Promise<DNSReport> => {
         try {
             const response = await getDNSReportForReport(studentId, date);
             return { studentId, classes: response.recordset };
@@ -23,7 +44,7 @@ const DNS = () => {
         }
     };
 
-    const getClassesEnrolled = async (studentId: any) => {
+    const getClassesEnrolled = async (studentId: string): Promise<Class[]> => {
         try {
             const response = await getClassesByStudentId(studentId);
             return response.recordset;
@@ -33,54 +54,47 @@ const DNS = () => {
         }
     };
 
-    const fetchDNSData = async (date: any) => {
-        const dateObj = new Date(date);
-        const formattedDate = dateObj.toISOString().slice(0, 10);
+    const fetchDNSData = useCallback(async (date: Date) => {
+        const formattedDate = date.toISOString().slice(0, 10);
         setLoading(true);
-        //console.log('Fetching DNS data for date: ', formattedDate, students);
         try {
-            const studentDNSPromises = students.map((student: any) =>
+            const studentDNSPromises = students.map((student) =>
                 getDNSReport(student.Student_ID, formattedDate)
             );
             const studentDNS = await Promise.all(studentDNSPromises);
 
-            // Create a Set of student IDs who have attended classes
             const attendedStudentIDs = new Set(
-                studentDNS.flatMap(report =>
-                    report.classes.length > 0 ? [report.studentId] : []
-                )
+                studentDNS.flatMap(report => (report.classes.length > 0 ? [report.studentId] : []))
             );
 
-            // Filter out students who attended, leaving those who didn't
-            const studentsWhoDidNotShow = students.filter((student: any) =>
-                !attendedStudentIDs.has(student.Student_ID)
+            const studentsWhoDidNotShow = students.filter(
+                (student) => !attendedStudentIDs.has(student.Student_ID)
             );
 
-            // Get the classes each student is enrolled in
-            const studentsWithClasses: any = await Promise.all(studentsWhoDidNotShow.map(async (student: any) => {
-                const classes = await getClassesEnrolled(student.Student_ID);
-                return {
-                    ...student,
-                    classes
-                };
-            }));
+            const studentsWithClasses = await Promise.all(
+                studentsWhoDidNotShow.map(async (student) => {
+                    const classes = await getClassesEnrolled(student.Student_ID);
+                    return {
+                        ...student,
+                        classes,
+                    };
+                })
+            );
 
             setDnsData(studentsWithClasses);
-        
         } catch (error) {
             console.error(error);
             showErrorMessage(`Error fetching students. Error: ${(error as Error).message}`);
-        }finally{
+        } finally {
             setLoading(false);
         }
-    };
+    }, [students]);
 
     useEffect(() => {
         if (date && students && students.length > 0) {
             fetchDNSData(date);
         }
-    }, [date, students]);
-
+    }, [date, students, fetchDNSData]);
 
     return (
         <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
@@ -94,7 +108,7 @@ const DNS = () => {
             </div>
             <div className="flex items-center gap-x-2">
                 <span className="text-sm text-gray-500 font-medium">Since:</span>
-                <div className="grid gap-2" >
+                <div className="grid gap-2">
                     <div className="mt-2">
                         <input
                             type="date"
@@ -110,62 +124,49 @@ const DNS = () => {
                 <p>Compiling DNS data...this can take a moment...</p>
             ) : (
                 dnsData.length > 0 ? (
+                    <div>
+                        <h3 className="text-xl font-bold tracking-tight flex items-center gap-2">Students: </h3>
                         <div>
-                            <h3 className="text-xl font-bold tracking-tight flex items-center gap-2">Students: </h3>
-                            <div>
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-gray-50">
-                                        <tr>
-                                            <th
-                                                scope="col"
-                                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                            >
-                                                Name
-                                            </th>
-                                            <th
-                                                scope="col"
-                                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                            >
-                                                Phone
-                                            </th>
-                                            <th
-                                                scope="col"
-                                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                            >
-                                                Email
-                                            </th>
-                                            <th
-                                                scope="col"
-                                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                            >
-                                                Enrolled in:
-                                            </th>
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Name
+                                        </th>
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Phone
+                                        </th>
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Email
+                                        </th>
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Enrolled in:
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {dnsData.map((student) => (
+                                        <tr key={student.Student_ID}>
+                                            <td className="px-6 py-4 whitespace-normal word-break text-sm text-gray-500">
+                                                {student.First_Name} {student.Last_Name}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-normal word-break text-sm text-gray-500">
+                                                {student.Phone}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-normal word-break text-sm text-gray-500">
+                                                {student.email}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-normal word-break text-sm text-gray-500">
+                                                {student.classes.map((classObj, index) => (
+                                                    <span key={index}>{(index ? ', ' : '') + classObj.Name}</span>
+                                                ))}
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
-                                        {dnsData.map((student: any) => (
-                                            <tr key={student.Student_id}>
-                                                <td className="px-6 py-4 whitespace-normal word-break text-sm text-gray-500">
-                                                    {student.First_Name} {student.Last_Name}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-normal word-break text-sm text-gray-500">
-                                                    {student.Phone}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-normal word-break text-sm text-gray-500">
-                                                    {student.email}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-normal word-break text-sm text-gray-500">
-                                                    {student.classes.map((classObj: any, index: any) => (
-                                                        <span key={index}>{(index ? ', ' : '') + classObj.Name}</span>
-                                                    ))}
-                                                </td>
-
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
+                    </div>
                 ) : (
                     <p>No students found.</p>
                 )

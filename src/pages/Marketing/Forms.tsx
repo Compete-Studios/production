@@ -68,8 +68,9 @@ export default function Forms() {
             birthdate: '',
         };
         const response = await addProspect(prospectInfoData);
+        console.log(response, 'response');
         if (response?.output?.NewProspectId || response?.recordset?.[0]?.NewProspectId) {
-            showMessage(formInfo.successMessage ? formInfo.successMessage : 'Form Submitted Successfully');
+            showMessage(form.successMessage ? form.successMessage : 'Form Submitted Successfully');
             const statsData = {
                 formID: id,
                 studioId: form?.studioID,
@@ -81,7 +82,7 @@ export default function Forms() {
             updateStats(id, statsData);
             updateFormSubmissionCounnt(id);
             setFormInfo(formInputs);
-            window.location.href = formInfo.successURL || '/';
+            window.location.href = form?.successURL || '/';                      
         } else {
             showErrorMessage('Error Submitting Form');
         }
@@ -95,9 +96,11 @@ export default function Forms() {
         // }
     };
 
+    console.log(form, 'form');
+
     return (
-        <div>
-            <div className={`p-5 ${form?.selectedColor?.bg} ${form?.mem?.rounded} shadow shadow-zinc-400 grid max-w-2xl mx-auto grid-cols-1 sm:grid-cols-6 gap-4`}>
+        <div className={`${form?.selectedColor?.bg} min-h-screen h-full `}>
+            <div className={`p-5 ${form?.selectedColor?.bg} ${form?.mem?.rounded} grid max-w-2xl mx-auto grid-cols-1 sm:grid-cols-6 gap-4`}>
                 {form?.formInfo?.FriendlyName && (
                     <div className="sm:col-span-full">
                         <div className="text-2xl font-semibold text-center">{form?.formHeadline || ' Form Name'}</div>

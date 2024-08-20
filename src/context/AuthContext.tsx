@@ -240,9 +240,8 @@ export default function AuthContextProvider({ children }: any) {
             if (currentUser) {
                 setIsLoggedIn(true);
                 console.log('It ran again', selectedSuid);
-                const adminPrivileges = currentUser.email === 'info@competestudio.pro' ? true : false;
+                const adminPrivileges = currentUser.email === 'info@competestudio.pro' ? true : currentUser.email === 'info1@competestudio.com' ? true : false;
                 setIsAdmin(adminPrivileges);
-
                 setSuid(selectedSuid ? selectedSuid : currentUser.photoURL);
                 getStudioInfo(selectedSuid ? selectedSuid : currentUser.photoURL, currentUser.photoURL);
             } else {

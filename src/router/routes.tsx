@@ -116,7 +116,9 @@ const FinishedAddingAccountOptions = lazy(() => import('../pages/Students/Finish
 // Studios
 const PasswordReset = lazy(() => import('../pages/Studios/PasswordReset'));
 const Account = lazy(() => import('../pages/Studios/Account'));
+const TextSettings = lazy(() => import('../pages/Studios/TextSettings'));
 const Profile = lazy(() => import('../pages/Studios/Profile'));
+const EmailSettings = lazy(() => import('../pages/Studios/EmailSettings'));
 
 // Marketing
 const Methods = lazy(() => import('../pages/Marketing/Methods'));
@@ -126,6 +128,7 @@ const AddNewMethod = lazy(() => import('../pages/Marketing/AddNewMethod'));
 const DailySchedule = lazy(() => import('../pages/Marketing/DailySchedule'));
 const ViewEmails = lazy(() => import('../pages/Marketing/ViewEmails'));
 const ViewTextMessages = lazy(() => import('../pages/Marketing/ViewTextMessages'));
+const ViewRecievedOnly = lazy(() => import('../pages/Marketing/ViewRecievedOnly'));
 const CaptureForms = lazy(() => import('../pages/Marketing/CaptureForms'));
 const CaptureFormStats = lazy(() => import('../pages/Marketing/CaptureFormStats'));
 const EditCaptureForm = lazy(() => import('../pages/Marketing/EditCaptureForm'));
@@ -133,8 +136,11 @@ const LegacyConversion = lazy(() => import('../pages/Marketing/LegacyConversion'
 const Waivers = lazy(() => import('../pages/Marketing/Waivers'));
 const StudentPortal = lazy(() => import('../pages/Marketing/StudentPortal'));
 const ViewNewsLetters = lazy(() => import('../pages/Marketing/ViewNewsLetters'));
+const ViewNewsLetter = lazy(() => import('../pages/Marketing/ViewNewsletter'));
+const ViewEmailDetails = lazy(() => import('../pages/Marketing/ViewEmailDetails'));
 const NewsLetterDetails = lazy(() => import('../pages/Marketing/NewsLetterDetails'));
 const EmailLists = lazy(() => import('../pages/Marketing/EmailLists'));
+const EmailListDetails = lazy(() => import('../pages/Marketing/EmailListDetails'));
 const ViewEmailListInfo = lazy(() => import('../pages/Marketing/ViewEmailListInfo'));
 const CreateNewsLetter = lazy(() => import('../pages/Marketing/CreateNewsLetter'));
 const CreateNewMailingList = lazy(() => import('../pages/Marketing/CreateNewMailingList'));
@@ -526,7 +532,7 @@ const routes = [
         element: <TextStudent />,
     },
     {
-        path: '/students/update-barcode',
+        path: '/students/update-barcode/:id',
         element: <UpdateBarcode />,
     },
     {
@@ -540,7 +546,9 @@ const routes = [
     {
         path: '/students/email-list-students',
         element: <EmailList />,
+
     },
+    
     {
         path: '/students/text-list-all-students',
         element: <TextList />,
@@ -657,6 +665,11 @@ const routes = [
         element: <ViewTextMessages />,
     },
     {
+        path: '/marketing/view-text-messages/recieved',
+        element: <ViewRecievedOnly />,
+    },
+
+    {
         path: '/marketing/capture-forms',
         element: <CaptureForms />,
     },
@@ -685,12 +698,24 @@ const routes = [
         element: <ViewNewsLetters />,
     },
     {
+        path: '/marketing/view-news-letter/:id/:total',
+        element: <ViewNewsLetter />,
+    },
+    {
         path: '/marketing/news-letter-details',
         element: <NewsLetterDetails />,
     },
     {
         path: '/marketing/email-lists',
         element: <EmailLists />,
+    },
+    {
+        path: '/marketing/email-list-details/:listID',
+        element: <EmailListDetails />,
+    },
+    {
+        path: '/marketing/email-details/:id',
+        element: <ViewEmailDetails />,
     },
     {
         path: '/marketing/view-email-list-info',
@@ -753,6 +778,14 @@ const routes = [
     {
         path: '/studios/Profile',
         element: <Profile />,
+    },
+    {
+        path: '/studios/text-settings',
+        element: <TextSettings />,
+    },
+    {
+        path: '/studios/email-settings',
+        element: <EmailSettings />,
     },
 
     //other

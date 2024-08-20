@@ -3,8 +3,6 @@ import { Link, NavLink } from 'react-router-dom';
 import { UserAuth } from '../../context/AuthContext';
 import IconEye from '../../components/Icon/IconEye';
 import IconPrinter from '../../components/Icon/IconPrinter';
-import IconBolt from '../../components/Icon/IconBolt';
-import ActionItemProspects from '../Prospects/ActionItemProspects';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { REACT_API_BASE_URL } from '../../constants';
@@ -22,6 +20,8 @@ import IconLoader from '../../components/Icon/IconLoader';
 import IconNotes from '../../components/Icon/IconNotes';
 import UpdateNotesForStudent from '../Students/UpdateNotesForStudent';
 import QuickAction from './QuickAction';
+import IconNotesEdit from '../../components/Icon/IconNotesEdit';
+import UpdateScheduleSteps from './UpdateScheduleSteps';
 
 export default function Schedules() {
     const { suid, scheduleID, update, setUpdate }: any = UserAuth();
@@ -99,7 +99,10 @@ export default function Schedules() {
             };
 
             const response = await getStudentsInScheduleByPipelineStepFromArrayOfSteps(data);
-            const studentData = response.find((item: any) => item.recordset.length > 0)?.recordset || [];
+            const filteredResponse = response.filter((item: any) => item.recordset.length > 1);
+
+            // Extract student data from filtered response
+            const studentData = filteredResponse.map((item: any) => item.recordset).flat();
 
             // Grouping student data by Student_id
             const groupedStudents: any = {};
@@ -129,42 +132,44 @@ export default function Schedules() {
     const getProspects = async () => {
         if (dailyScheduleProspectSteps?.length > 0) {
             const formattedDate = scheduleDate.toISOString().split('T')[0];
-    
+
             const data = {
                 studioId: suid,
                 steps: dailyScheduleProspectSteps,
                 nextContactDate: formattedDate, // Set to today's date
             };
-    
+
             try {
                 const response = await getProspectsInScheduleByPipelineStepFromArrayOfSteps(data);
                 // Filter response items with recordset length greater than 1
                 const filteredResponse = response.filter((item: any) => item.recordset.length > 1);
-    
+
                 // Extract student data from filtered response
                 const studentData = filteredResponse.map((item: any) => item.recordset).flat();
-    
+
                 // Grouping student data by ProspectId
                 const groupedStudents: any = {};
-    
-                await Promise.all(studentData.map(async (student: any) => {
-                    const prospectValues = await getProspectById(student.ProspectId);
-                    const studentId = student.ProspectId;
-    
-                    if (!groupedStudents[studentId]) {
-                        groupedStudents[studentId] = {
-                            StepName: student.StepName,
-                            Student_id: student.ProspectId,
-                            StudentName: student.ProspectName,
-                            Contact1: student.ParentName,
-                            Classes: [student.ClassName],
-                            prospectInfo: prospectValues
-                        };
-                    } else {
-                        groupedStudents[studentId].Classes.push(student.ClassName);
-                    }
-                }));
-    
+
+                await Promise.all(
+                    studentData.map(async (student: any) => {
+                        const prospectValues = await getProspectById(student.ProspectId);
+                        const studentId = student.ProspectId;
+
+                        if (!groupedStudents[studentId]) {
+                            groupedStudents[studentId] = {
+                                StepName: student.StepName,
+                                Student_id: student.ProspectId,
+                                StudentName: student.ProspectName,
+                                Contact1: student.ParentName,
+                                Classes: [student.ClassName],
+                                prospectInfo: prospectValues,
+                            };
+                        } else {
+                            groupedStudents[studentId].Classes.push(student.ClassName);
+                        }
+                    })
+                );
+
                 // Converting the grouped students object to an array
                 const dailySP = Object.values(groupedStudents);
                 setDailyScheduleProspects(dailySP);
@@ -178,7 +183,6 @@ export default function Schedules() {
             console.log('No prospects today');
         }
     };
-    
 
     useEffect(() => {
         getStudents();
@@ -540,13 +544,18 @@ export default function Schedules() {
                     <div className="panel p-0 ">
                         <div className="flex items-center justify-between py-5 px-5 bg-dark rounded-t-lg text-white">
                             <h5 className="font-semibold text-lg dark:text-white-light">Prospect Schedule</h5>
-                            <Tippy content="Print Schedule">
-                                <button type="button" onClick={handlePrintProspectSchedule} className="font-semibold  hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-600">
-                                    <span className="flex items-center">
-                                        <IconPrinter className="w-5 h-5 text-white dark:text-white/70 hover:!text-primary" />
-                                    </span>
-                                </button>
-                            </Tippy>
+                            <div className="flex items-center gap-1">
+                                <div>
+                                    <UpdateScheduleSteps type="prospect" steps={dailyScheduleProspectSteps} studioID={suid} scheduleId={scheduleID} />
+                                </div>
+                                <Tippy content="Print Schedule">
+                                    <button type="button" onClick={handlePrintProspectSchedule} className="font-semibold  hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-600">
+                                        <span className="flex items-center">
+                                            <IconPrinter className="w-5 h-5 text-white dark:text-white/70 hover:!text-primary" />
+                                        </span>
+                                    </button>
+                                </Tippy>
+                            </div>
                         </div>
 
                         <div className="table-responsive">
@@ -622,13 +631,18 @@ export default function Schedules() {
                     <div className="panel p-0">
                         <div className="flex items-center justify-between py-5 px-5 bg-dark rounded-t-lg text-white">
                             <h5 className="font-semibold text-lg dark:text-white-light">Students Schedule</h5>
-                            <Tippy content="Print Schedule">
-                                <button type="button" onClick={handlePrintStudentSchedule} className="font-semibold hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-600">
-                                    <span className="flex items-center">
-                                        <IconPrinter className="w-5 h-5 text-white dark:text-white/70 hover:!text-primary" />
-                                    </span>
-                                </button>
-                            </Tippy>
+                            <div className="flex items-center gap-1">
+                                <div>
+                                    <UpdateScheduleSteps type="student" steps={dailyScheduleStudentSteps} studioID={suid} scheduleId={scheduleID} />
+                                </div>
+                                <Tippy content="Print Schedule">
+                                    <button type="button" onClick={handlePrintStudentSchedule} className="font-semibold hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-600">
+                                        <span className="flex items-center">
+                                            <IconPrinter className="w-5 h-5 text-white dark:text-white/70 hover:!text-primary" />
+                                        </span>
+                                    </button>
+                                </Tippy>
+                            </div>
                         </div>
                         <div className="table-responsive">
                             <table>

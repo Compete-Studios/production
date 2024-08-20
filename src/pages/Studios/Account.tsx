@@ -43,8 +43,6 @@ export default function Account() {
       });
   }, [suid]);
 
-  console.log("options", options);
-
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
@@ -104,7 +102,7 @@ export default function Account() {
                       <Link
                         to="/manage-account"
                         type="button"
-                        className="text-indigo-600 hover:text-indigo-900"
+                        className="text-emerald-600 hover:text-emerald-900"
                       >
                         Manage
                       </Link>
@@ -126,9 +124,9 @@ export default function Account() {
 
                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                       <Link
-                        to="/manage-account"
+                        to="/studios/text-settings"
                         type="button"
-                        className="text-indigo-600 hover:text-indigo-900"
+                        className="text-emerald-600 hover:text-emerlad-900"
                       >
                         Manage
                       </Link>
@@ -150,9 +148,9 @@ export default function Account() {
 
                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                       <Link
-                        to="/manage-account"
+                        to="/studios/email-settings"
                         type="button"
-                        className="text-indigo-600 hover:text-indigo-900"
+                        className="text-emerald-600 hover:text-emerald-900"
                       >
                         Manage
                       </Link>

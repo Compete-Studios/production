@@ -4,10 +4,11 @@ import IconEye from '../../components/Icon/IconEye';
 import { useEffect, useState } from 'react';
 import { UserAuth } from '../../context/AuthContext';
 import { getAllEmailingListsByStudioId } from '../../functions/emails';
-import { constFormateDateMMDDYYYY } from '../../functions/shared';
+import { constFormateDateMMDDYYYY, hashTheID } from '../../functions/shared';
 import { formatWithTimeZone, handleGetTimeZoneOfUser } from '../../functions/dates';
 import IconCircleCheck from '../../components/Icon/IconCircleCheck';
 import IconTrashLines from '../../components/Icon/IconTrashLines';
+import { Link } from 'react-router-dom';
 
 export default function EmailLists() {
     const { suid }: any = UserAuth();
@@ -47,14 +48,20 @@ export default function EmailLists() {
         setMonthlyAllotment(totalAllotment);
     }, [emails]);
 
-    console.log(emails, 'emails');
-
     return (
         <div>
+            <div className='md:flex md:items-center md:justify-between'>
+            <div>
             <h1 className="text-2xl font-semibold text-gray-800">View Email Lists</h1>
             <p className="text-sm text-gray-500">
                 Your studio has created {numberOfEmails} emails this month and your monthly allottment of emails is {monthlyAllotment}.
             </p>
+            </div>
+            <div className='md:mt-0 mt-4'>
+                <button className="btn btn-primary">Create New List</button>
+
+            </div>
+            </div>
             <div className="table-responsive mt-12 mb-5">
                 <table className="panel table-hover">
                     <thead>
@@ -73,9 +80,9 @@ export default function EmailLists() {
                                         <div>{data.FriendlyName}</div>
                                     </td>
                                     <td>
-                                        <button type="button" className="text-info">
+                                        <Link to={`/marketing/email-list-details/${hashTheID(data.EmailingListId)}`} type="button" className="text-info">
                                             View 
-                                        </button>
+                                        </Link>
                                     </td>
                                     <td>
                                         <button type="button" className="text-info">

@@ -20,20 +20,6 @@ export default function PreviewNewsLetter({ emailData, htmlValue, listOfNewMembe
 
     const handleSendEmail = (e: any) => {
         e.preventDefault();
-        // const data = {
-        //     studioId: suid,
-        //     level: emailData.level,
-        //     listName: emailData.listName,
-        //     newsLetterTitle: emailData.newsLetterTitle,
-        //     type: emailData.type,
-        //     listDescription: emailData.listDescription,
-        //     listOfNewMembers: listOfEmails,
-        //     from: emailData.from,
-        //     subject: emailData.subject,
-        //     html: htmlValue,
-        // };
-
-        
         const data = {
             studioId: suid,
             level: emailData.level,
@@ -41,11 +27,25 @@ export default function PreviewNewsLetter({ emailData, htmlValue, listOfNewMembe
             newsLetterTitle: emailData.newsLetterTitle,
             type: emailData.type,
             listDescription: emailData.listDescription,
-            listOfNewMembers: ['bret@techbret.com', "", "hello@codetega.com", "bretljohnson0@gmail.com"],
+            listOfNewMembers: listOfEmails,
             from: emailData.from,
             subject: emailData.subject,
             html: htmlValue,
         };
+
+        
+        // const data = {
+        //     studioId: suid,
+        //     level: emailData.level,
+        //     listName: emailData.listName,
+        //     newsLetterTitle: emailData.newsLetterTitle,
+        //     type: emailData.type,
+        //     listDescription: emailData.listDescription,
+        //     listOfNewMembers: ['bret@techbret.com', "", "hello@codetega.com", "bretljohnson0@gmail.com"],
+        //     from: emailData.from,
+        //     subject: emailData.subject,
+        //     html: htmlValue,
+        // };
 
         const navigate = useNavigate();
        

@@ -2,20 +2,24 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { formatDate } from '@fullcalendar/core';
 import { UserAuth } from '../../context/AuthContext';
-import { getProspectsByPipelineStep, getStudentsByPipelineStep, getStudioOptions } from '../../functions/api';
+import { dropProspect, getProspectsByPipelineStep, getStudentsByPipelineStep, getStudioOptions } from '../../functions/api';
 import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import IconPlus from '../../components/Icon/IconPlus';
-import { hashTheID } from '../../functions/shared';
+import { hashTheID, showWarningMessage } from '../../functions/shared';
 import ActionItemForSchedule from '../Marketing/ActionItemForSchedule';
 import ActionItemProspects from './ActionItemProspects';
 import ActionItemEmailProspect from './ActionItemEmailProspect';
 import ActionItemTextProspect from './ActionItemTextProspect';
 import ActionItemNoteProspect from './ActionItemNoteProspect';
 import { formatWithTimeZone, handleGetTimeZoneOfUser } from '../../functions/dates';
+import IconUserPlus from '../../components/Icon/IconUserPlus';
+import Tippy from '@tippyjs/react';
+import IconTrashLines from '../../components/Icon/IconTrashLines';
 
 export default function ViewStudentsInPipeline() {
     const { suid, setProspectToEdit, prospectPipelineSteps, update, setUpdate }: any = UserAuth();
+    const [pipelineToText, setPipelineToText] = useState<any>(null);
 
     const dispatch = useDispatch();
     useEffect(() => {
@@ -26,7 +30,17 @@ export default function ViewStudentsInPipeline() {
     const [studentsInPipeline, setStudentsInPipeline] = useState([]);
     const [studioOptions, setStudioOptions] = useState<any>([]);
 
+    const handleActivate = (e: any, uid: any) => {
+        e.preventDefault();
+        const newID = hashTheID(uid);
+        navigate(`/prospects/activate/${newID}`);
+    };
+
     const { id } = useParams();
+
+    useEffect(() => {
+        setPipelineToText(prospectPipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? '')));
+    }, [id]);
 
     useEffect(() => {
         try {
@@ -56,6 +70,27 @@ export default function ViewStudentsInPipeline() {
     const handleStudentToEdit = (id: any) => {
         setProspectToEdit(id);
         navigate('/students/view-student');
+    };
+
+ 
+
+    const handleDropProspect = async (id: any) => {
+        showWarningMessage('Are you sure you want to delete this prospect?', 'Remove Prospect', 'Your Prospect has been removed successfully')
+            .then((confirmed: boolean) => {
+                if (confirmed) {
+                    dropProspect(id).then((response) => {
+                        console.log(response);
+                        setUpdate(!update);
+                    });
+                } else {
+                    // User canceled the action
+                    console.log('User canceled');
+                }
+            })
+            .catch((error: any) => {
+                // Handle error if any
+                console.error('Error:', error);
+            });
     };
 
     return (
@@ -103,10 +138,7 @@ export default function ViewStudentsInPipeline() {
                                         <thead className="">
                                             <tr>
                                                 <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 dark:text-white">
-                                                    Last Name
-                                                </th>
-                                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 hidden sm:table-cell dark:text-white">
-                                                    First Name
+                                                    Name
                                                 </th>
                                                 <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 hidden sm:table-cell dark:text-white">
                                                     Next Contact
@@ -123,8 +155,10 @@ export default function ViewStudentsInPipeline() {
                                         <tbody className="divide-y divide-gray-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                                             {studentsInPipeline?.map((list: any) => (
                                                 <tr key={list.StudentId} className={`${new Date(list.NextContactDate) <= new Date() && 'bg-cs text-gray-900'}`}>
-                                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium  sm:pl-6">{list.LName}</td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm  hidden sm:table-cell">{list.FName}</td>
+                                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium  sm:pl-6">
+                                                        {list.LName}, {list.FName}
+                                                    </td>
+
                                                     <td
                                                         className={`whitespace-nowrap px-3 py-4 text-sm hidden sm:table-cell ${
                                                             new Date(list.NextContactDate) <= new Date() ? 'text-danger font-bold' : 'text-gray-900 dark:text-white'
@@ -133,49 +167,63 @@ export default function ViewStudentsInPipeline() {
                                                         {formatWithTimeZone(list.NextContactDate, handleGetTimeZoneOfUser())}
                                                     </td>
                                                     <td className="relative whitespace-nowrap text-right text-sm font-medium">
-                                                        {new Date(list.NextContactDate) <= new Date() && (
-                                                            <div className="flex items-center justify-end gap-1">
-                                                                <ActionItemEmailProspect
-                                                                    student={list}
-                                                                    pipeline={prospectPipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
-                                                                    studioOptions={studioOptions}
-                                                                    setUpdate={setUpdate}
-                                                                    update={update}
-                                                                />
-                                                                <ActionItemTextProspect
-                                                                    student={list}
-                                                                    pipeline={prospectPipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
-                                                                    studioOptions={studioOptions}
-                                                                    setUpdate={setUpdate}
-                                                                    update={update}
-                                                                />
-                                                                <ActionItemNoteProspect
-                                                                    student={list}
-                                                                    pipeline={prospectPipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
-                                                                    studioOptions={studioOptions}
-                                                                    setUpdate={setUpdate}
-                                                                    update={update}
-                                                                />
-                                                                <ActionItemProspects
-                                                                    student={list}
-                                                                    pipeline={prospectPipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
-                                                                    studioOptions={studioOptions}
-                                                                    setUpdate={setUpdate}
-                                                                    update={update}
-                                                                    prospectPipelineSteps={prospectPipelineSteps}
-                                                                />
-                                                            </div>
-                                                        )}
+                                                        <div className="flex items-center justify-end gap-1">
+                                                            <ActionItemEmailProspect
+                                                                student={list}
+                                                                pipeline={prospectPipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
+                                                                studioOptions={studioOptions}
+                                                                setUpdate={setUpdate}
+                                                                update={update}
+                                                            />
+                                                            <ActionItemTextProspect
+                                                                student={list}
+                                                                pipeline={pipelineToText}
+                                                                studioOptions={studioOptions}
+                                                                setUpdate={setUpdate}
+                                                                update={update}
+                                                            />
+                                                            <ActionItemNoteProspect
+                                                                student={list}
+                                                                pipeline={prospectPipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
+                                                                studioOptions={studioOptions}
+                                                                setUpdate={setUpdate}
+                                                                update={update}
+                                                            />
+                                                            <ActionItemProspects
+                                                                student={list}
+                                                                pipeline={prospectPipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
+                                                                studioOptions={studioOptions}
+                                                                setUpdate={setUpdate}
+                                                                update={update}
+                                                                prospectPipelineSteps={prospectPipelineSteps}
+                                                            />
+                                                        </div>
                                                     </td>
 
                                                     <td className="relative whitespace-nowrap text-right text-sm font-medium ">
-                                                        <Link
-                                                            to={`/prospects/view-prospect/${hashTheID(list.ProspectId)}/${hashTheID(suid)}`}
-                                                            type="button"
-                                                            className={`btn btn-sm ${new Date(list.NextContactDate) <= new Date() ? 'btn-success' : 'btn-outline-success dark:bg-gray-800'}`}
-                                                        >
-                                                            View
-                                                        </Link>
+                                                        <div className="flex items-center gap-2">
+                                                            <Link
+                                                                to={`/prospects/view-prospect/${hashTheID(list.ProspectId)}/${hashTheID(suid)}`}
+                                                                type="button"
+                                                                className={`btn btn-sm ${
+                                                                    new Date(list.NextContactDate) <= new Date() ? 'btn-success' : 'btn-outline-success dark:bg-gray-800 ml-auto'
+                                                                }`}
+                                                            >
+                                                                View
+                                                            </Link>
+                                                            <Tippy content="Activate As Student">
+                                                                <button type="button" className="text-warning" onClick={(e: any) => handleActivate(e, list.ProspectId)}>
+                                                                    {' '}
+                                                                    <IconUserPlus />
+                                                                </button>
+                                                            </Tippy>
+                                                            <Tippy content="Delete Prospect">
+                                                                <button type="button" className="text-danger" onClick={() => handleDropProspect(list.ProspectId)}>
+                                                                    {' '}
+                                                                    <IconTrashLines />
+                                                                </button>
+                                                            </Tippy>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ))}

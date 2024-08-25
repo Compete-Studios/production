@@ -68,7 +68,7 @@ export default function Forms() {
             birthdate: '',
         };
         const response = await addProspect(prospectInfoData);
-        console.log(response, 'response');
+       
         if (response?.output?.NewProspectId || response?.recordset?.[0]?.NewProspectId) {
             showMessage(form.successMessage ? form.successMessage : 'Form Submitted Successfully');
             const statsData = {
@@ -82,8 +82,7 @@ export default function Forms() {
             updateStats(id, statsData);
             updateFormSubmissionCounnt(id);
             setFormInfo(formInputs);
-            // window.top.location.href
-            window.location.href = form?.successURL || '/';                      
+            (window.top!.location.href = form?.successURL || '/');          
         } else {
             showErrorMessage('Error Submitting Form');
         }

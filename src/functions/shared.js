@@ -114,7 +114,7 @@ export const showWarningMessage = (msg = '', text = '', confirmed = '', title = 
     return new Promise((resolve, reject) => {
         const toast = Swal.mixin({
             customClass: {
-                confirmButton: 'btn btn-success',
+                confirmButton: 'btn btn-info',
                 cancelButton: 'btn btn-danger ltr:mr-3 rtl:ml-3',
                 popup: 'sweet-alerts',
             },

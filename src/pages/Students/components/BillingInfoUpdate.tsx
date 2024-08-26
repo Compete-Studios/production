@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 import { convertPhoneNumber } from '../../../functions/shared';
 import IconEdit from '../../../components/Icon/IconEdit';
-import { updatePaySimpleCustomer } from '../../../functions/api';
 import { UserAuth } from '../../../context/AuthContext';
 import IconSave from '../../../components/Icon/IconSave';
+import { showErrorMessage, showMessage } from '../../../functions/shared';
+import { updatePaySimpleCustomer, updateStudent } from '../../../functions/api';
+import StudentsOnBillingAccount from './StudentsOnBillingAccount';
+
 
 const updateValuesInitial = {
     FirstName: false,
@@ -16,8 +19,8 @@ const updateValuesInitial = {
     ZipCode: false,
 };
 
-export default function BillingInfoUpdate({ billingInfo, updateBilling, setUpdateBilling }: any) {
-    const { suid }: any = UserAuth();
+export default function BillingInfoUpdate({ billingInfo, updateBilling, setUpdateBilling, updateStudentsOnBilling, setUpdateStudentsOnBilling }: any) {
+    const { suid, students }: any = UserAuth();
     const [billingInfoTOUpdate, setBillingInfoTOUpdate] = useState(billingInfo);
     
 
@@ -36,29 +39,31 @@ export default function BillingInfoUpdate({ billingInfo, updateBilling, setUpdat
         });
     }, [billingInfo]);
 
+    
+
     const handleSave = async () => {
         const res = await updatePaySimpleCustomer(billingInfoTOUpdate);
-
         console.log(res);
     };
 
     return (
         <div>
             <div className="mb-5 space-y-4 p-5">
-                <div className="flex items-center gap-2">
-                    {updateBilling ? (
-                        <input
-                            type="text"
-                            value={billingInfoTOUpdate?.firstName}
-                            className="form-input"
-                            placeholder="First Name"
-                            onChange={(e) => setBillingInfoTOUpdate({ ...billingInfoTOUpdate, firstName: e.target.value })}
-                        />
-                    ) : (
-                        <p className="font-bold ">
-                            First Name: <span className="font-normal">{billingInfoTOUpdate?.firstName}</span>
-                        </p>
-                    )}
+                <div className='flex items-center gap-2'>
+                {updateBilling ? (
+                    <input
+                        type="text"
+                        value={billingInfoTOUpdate?.firstName}
+                        className="form-input"
+                        placeholder="First Name"
+                        onChange={(e) => setBillingInfoTOUpdate({ ...billingInfoTOUpdate, firstName: e.target.value })}
+                    />
+                ) : (
+                    <p className="font-bold ">
+                        First Name: <span className="font-normal">{billingInfoTOUpdate?.firstName}</span>
+                    </p>
+
+                )}
                 </div>
                 <div className="flex items-center gap-2">
                     {updateBilling ? (
@@ -169,10 +174,13 @@ export default function BillingInfoUpdate({ billingInfo, updateBilling, setUpdat
                         </p>
                     )}
                 </div>
+                <div>
+                    <StudentsOnBillingAccount paysimpleCustomerId={billingInfo.Id} />
+                </div>
                 <div className="flex items-center gap-2">
                     {updateBilling && (
                         <button className="btn btn-secondary ml-auto gap-1" onClick={handleSave}>
-                          <IconSave />  Save
+                            <IconSave />  Save
                         </button>
                     )}
                 </div>

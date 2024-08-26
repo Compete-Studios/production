@@ -1130,6 +1130,16 @@ export const dropStudentFromProgram = async (programId, studentId) => {
     }
 };
 
+export const dropStudentFromBillingAccount = async (studentId, paysimpleCustomerId) => {
+    try {
+        const response = await fetchData(`billing-account-access/deleteBillingAccount/${paysimpleCustomerId}/${studentId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const getAllStudensWithBarcode = async (studioId) => {
     try {
         const response = await fetchData(`student-access/getAllStudentsWithBarcode/${studioId}`, 'get');

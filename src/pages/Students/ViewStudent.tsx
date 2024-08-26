@@ -41,6 +41,7 @@ import UpdateContactPopUp from './UpdateContactPopUp';
 import UpdateAdditionalPopUp from './UpdateAdditionalPopUp';
 import AddCardModal from './AddCardModal';
 import AddBankModal from './AddBankModal';
+import AddStudentToBillingAccountModal from './AddStudentToBillingAccountModal';
 import AddStudentToClass from '../Classes/AddStudentToClass';
 import AddStudentToProgram from '../Classes/AddStudenToProgram';
 import AddStudentToWaitingList from '../Classes/AddStudentToWaitingList';
@@ -207,6 +208,7 @@ const ViewStudent = () => {
                 console.timeLog('customerIdResponse', customerIdResponse);
                 if (customerIdResponse?.Response) {
                     setBillingInfo(customerIdResponse?.Response);
+                    console.log('BILLING INFO', customerIdResponse?.Response);
                     setBillingLoading(false);
                 } else {
                     setBillingInfo(null);
@@ -617,9 +619,8 @@ const ViewStudent = () => {
                             <Tab as={Fragment}>
                                 {({ selected }) => (
                                     <button
-                                        className={`${
-                                            selected ? 'text-info !outline-none before:!w-full' : ''
-                                        } relative -mb-[1px] flex lg:hidden  items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full `}
+                                        className={`${selected ? 'text-info !outline-none before:!w-full' : ''
+                                            } relative -mb-[1px] flex lg:hidden  items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full `}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="w-5 h-5 ltr:mr-2 rtl:ml-2" viewBox="0 0 16 16">
                                             <path d="M5 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4m4-2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5M9 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4A.5.5 0 0 1 9 8m1 2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5" />
@@ -632,9 +633,8 @@ const ViewStudent = () => {
                             <Tab as={Fragment}>
                                 {({ selected }) => (
                                     <button
-                                        className={`${
-                                            selected ? 'text-info !outline-none before:!w-full' : ''
-                                        } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
+                                        className={`${selected ? 'text-info !outline-none before:!w-full' : ''
+                                            } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="w-5 h-5 ltr:mr-2 rtl:ml-2" viewBox="0 0 16 16">
                                             <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z" />
@@ -647,9 +647,8 @@ const ViewStudent = () => {
                             <Tab as={Fragment}>
                                 {({ selected }) => (
                                     <button
-                                        className={`${
-                                            selected ? 'text-info !outline-none before:!w-full' : ''
-                                        } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
+                                        className={`${selected ? 'text-info !outline-none before:!w-full' : ''
+                                            } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="w-5 h-5 ltr:mr-2 rtl:ml-2" viewBox="0 0 16 16">
                                             <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z" />
@@ -662,9 +661,8 @@ const ViewStudent = () => {
                             <Tab as={Fragment}>
                                 {({ selected }) => (
                                     <button
-                                        className={`${
-                                            selected ? 'text-info !outline-none before:!w-full' : ''
-                                        } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
+                                        className={`${selected ? 'text-info !outline-none before:!w-full' : ''
+                                            } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="w-5 h-5 ltr:mr-2 rtl:ml-2" viewBox="0 0 16 16">
                                             <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2z" />
@@ -676,9 +674,8 @@ const ViewStudent = () => {
                             <Tab as={Fragment}>
                                 {({ selected }) => (
                                     <button
-                                        className={`${
-                                            selected ? 'text-info !outline-none before:!w-full' : ''
-                                        } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
+                                        className={`${selected ? 'text-info !outline-none before:!w-full' : ''
+                                            } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="w-5 h-5 ltr:mr-2 rtl:ml-2" viewBox="0 0 16 16">
                                             <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm-5 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5z" />
@@ -691,9 +688,8 @@ const ViewStudent = () => {
                             <Tab as={Fragment}>
                                 {({ selected }) => (
                                     <button
-                                        className={`${
-                                            selected ? 'text-info !outline-none before:!w-full' : ''
-                                        } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
+                                        className={`${selected ? 'text-info !outline-none before:!w-full' : ''
+                                            } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="w-5 h-5 ltr:mr-2 rtl:ml-2" viewBox="0 0 16 16">
                                             <path d="M14 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" />
@@ -1439,6 +1435,11 @@ const ViewStudent = () => {
                                                                         <IconPlus /> Add Payment Schedule
                                                                     </button>
                                                                 </li>
+                                                                <li>
+                                                                    <AddStudentToBillingAccountModal inStudent={true}
+                                                                        billingAccountId={billingInfo?.Id} update={update} setUpdate={setUpdate}
+                                                                    />
+                                                                </li>
                                                             </ul>
                                                         </>
                                                     )}
@@ -1499,9 +1500,8 @@ const ViewStudent = () => {
                                                                                 <td>{formatDate(data?.EndDate)}</td>
                                                                                 <td>
                                                                                     <span
-                                                                                        className={`badge whitespace-nowrap ${
-                                                                                            data.ScheduleStatus === 'Active' ? 'badge-outline-primary' : 'badge-outline-danger'
-                                                                                        }`}
+                                                                                        className={`badge whitespace-nowrap ${data.ScheduleStatus === 'Active' ? 'badge-outline-primary' : 'badge-outline-danger'
+                                                                                            }`}
                                                                                     >
                                                                                         {data.ScheduleStatus}
                                                                                     </span>

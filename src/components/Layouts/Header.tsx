@@ -79,7 +79,6 @@ const Header = () => {
         handleGetIncoming();
     }, []);
 
-    console.log('incoming', incoming);
 
     const handleSelectStudio = (value: any) => {
         setSelected(value);

@@ -3,7 +3,7 @@ import { UserAuth } from '../../context/AuthContext';
 import { getAllStudensWithBarcode } from '../../functions/api';
 import StudentSlider from './StudentSlider';
 
-export default function BarcodeAttendance() {
+export default function StudentCheckIn() {
     const { suid }: any = UserAuth();
     const [barcode, setBarcode] = useState('');
     const [students, setStudents] = useState<any>([]);
@@ -84,22 +84,13 @@ export default function BarcodeAttendance() {
             ) : (
                 <div className="flex items-center justify-center h-screen bg-zinc-100">
                 <div className="-mt-24">
-                    <h1 className="text-2xl font-semibold text-gray-800 text-center ">Barcode Check-in</h1>
-                    <p className="text-center text-gray-500 mb-12">Please scan or enter your barcode to take attendance</p>
+                    <h1 className="text-2xl font-semibold text-gray-800 text-center ">Student Check-in</h1>
+                    <p className="text-center text-gray-500 mb-12">Please enter your student code to check-in</p>
                     <div>
                         {student && <h1>{student.StudentId}</h1>}
-                        <input 
-                        id="barcode-input" 
-                        type="text" 
-                        className="form-input h-12 text-xl" 
-                        placeholder="Scan Barcode" 
-                        value={barcode} 
-                        onKeyDown={handleKeyPress} 
-                        onChange={handleBarcode}
-                        autoComplete='off'
-                         />
+                        <input id="barcode-input" type="text" className="form-input h-12 text-xl" placeholder="Student Code" value={barcode} onKeyDown={handleKeyPress} onChange={handleBarcode} autoComplete='off'/>
                     </div>
-                    <StudentSlider open={open} setOpen={setOpen} studentID={studentID} setBarcode={setBarcode} />
+                    <StudentSlider open={open} setOpen={setOpen} studentID={studentID} setBarcode={setBarcode}/>
                 </div>
                 </div>
             )}

@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
+import { addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
 import { db, storage } from './firebase';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { login, logout } from './auth';
@@ -50,7 +50,6 @@ export const createEvent = async (data, suid) => {
         return error.message;
     }
 };
-
 
 export const getForm = async (id) => {
     try {
@@ -228,3 +227,33 @@ export const updateStudioIDForAdmimMimic = async (studioID) => {
     await logoutForAdmin();
     await login('competeAdmin', '9911competeADMIN!@#$');
 };
+
+export const updateAttendanceForStudent = async (attendance, suid, classID) => {   
+    const refDocLabel = suid + classID;
+    const docRef2 = doc(db, 'attendance', refDocLabel);
+    const res = await setDoc(docRef2, { [attendance.splicesonlyfirst6]: attendance.checks }, { merge: true });   
+    return res;
+};
+
+export const updateAttendanceForBarcode = async (attendance, suid, classID, arrVar) => {
+    console.log("arrVar", arrVar);
+    const refDocLabel = suid + classID;
+    const docRef2 = doc(db, 'attendance', refDocLabel);
+    const res = await setDoc(docRef2, { [arrVar]: arrayUnion(attendance) }, { merge: true });
+    return res;
+};
+
+
+export const getAttendanceByClassFB = async (suid, classID) => {
+    const refDocLabel = suid + classID;
+    const docRef = doc(db, 'attendance', refDocLabel);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        return docSnap.data();
+    } else {
+        return {};
+    }
+};
+
+
+

@@ -45,6 +45,7 @@ export default function AuthContextProvider({ children }: any) {
         status: false,
         prospect: null,
     });
+    const [attendanceArr, setAttendanceArr] = useState<any>([]);
 
     const getAllSpaces = async (uid: any) => {
         const spacesRef = collection(db, 'spaces');
@@ -56,6 +57,17 @@ export default function AuthContextProvider({ children }: any) {
             spacesArray.push({ ...doc.data(), id: doc.id });
         });
         setSpaces(spacesArray);
+    };
+
+    const getAllStudentsAttendanceRecords = async (uid: any) => {
+        const uidToString = uid.toString();
+        const studentsRef = collection(db, 'students', uidToString, 'attendance');
+        const querySnapshot = await getDocs(studentsRef);
+        let attendanceArray: any[] = [];
+        querySnapshot.forEach((doc) => {
+            attendanceArray.push({ ...doc.data(), id: doc.id });
+        });
+        setAttendanceArr(attendanceArray);
     };
 
     const getEvents = async (collectionTitle: any) => {};
@@ -132,7 +144,7 @@ export default function AuthContextProvider({ children }: any) {
         const studioRes = await fetchData(`${REACT_API_BASE_URL}/studio-access/getStudentsByStudioId/${suid}/1`, setStudents);
         const optionsRes = await fetchRecordSet(`${REACT_API_BASE_URL}/studio-access/getStudioOptions/${suid}`, setStudioOptions);
         const studioScheduleOptions = await fetchRecordSet(`${REACT_API_BASE_URL}/daily-schedule-tools/getDailyScheduleByStudioId/${suid}`, setDailySchedule);
-        getAllSpaces(suid);
+        getAllStudentsAttendanceRecords(suid);
         handleGetEvents(suid);
 
         if (classRes && staffRes && pipeLineRes && programRes && waitingListRes && studPipesRes && marketingRes && introRes && paymentsRes && studioRes && optionsRes && studioScheduleOptions) {
@@ -298,6 +310,7 @@ export default function AuthContextProvider({ children }: any) {
                 events,
                 setEvents,
                 setShowLoading,
+                attendanceArr
             }}
         >
             {children}

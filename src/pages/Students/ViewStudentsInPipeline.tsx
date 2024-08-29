@@ -124,38 +124,36 @@ export default function ViewStudentsInPipeline() {
                                                             : 'N/A'}
                                                     </td>
                                                     <td className="relative whitespace-nowrap text-right text-sm font-medium">
-                                                        {new Date(list.NextContactDate) <= new Date() && (
-                                                            <div className="flex items-center justify-end gap-1">
-                                                                <ActionItemEmail
-                                                                    student={list}
-                                                                    pipeline={pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
-                                                                    studioOptions={studioOptions}
-                                                                    setUpdate={setUpdate}
-                                                                    update={update}
-                                                                />
-                                                                <ActionItemText
-                                                                    student={list}
-                                                                    pipeline={pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
-                                                                    studioOptions={studioOptions}
-                                                                    setUpdate={setUpdate}
-                                                                    update={update}
-                                                                />
-                                                                <ActionItemNote
-                                                                    student={list}
-                                                                    pipeline={pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
-                                                                    studioOptions={studioOptions}
-                                                                    setUpdate={setUpdate}
-                                                                    update={update}
-                                                                />
-                                                                <ActionItem
-                                                                    student={list}
-                                                                    pipeline={pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
-                                                                    studioOptions={studioOptions}
-                                                                    setUpdate={setUpdate}
-                                                                    update={update}
-                                                                />
-                                                            </div>
-                                                        )}
+                                                        <div className="flex items-center justify-end gap-1">
+                                                            <ActionItemEmail
+                                                                student={list}
+                                                                pipeline={pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
+                                                                studioOptions={studioOptions}
+                                                                setUpdate={setUpdate}
+                                                                update={update}
+                                                            />
+                                                            <ActionItemText
+                                                                student={list}
+                                                                pipeline={pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
+                                                                studioOptions={studioOptions}
+                                                                setUpdate={setUpdate}
+                                                                update={update}
+                                                            />
+                                                            <ActionItemNote
+                                                                student={list}
+                                                                pipeline={pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
+                                                                studioOptions={studioOptions}
+                                                                setUpdate={setUpdate}
+                                                                update={update}
+                                                            />
+                                                            <ActionItem
+                                                                student={list}
+                                                                pipeline={pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(id ?? ''))}
+                                                                studioOptions={studioOptions}
+                                                                setUpdate={setUpdate}
+                                                                update={update}
+                                                            />
+                                                        </div>
                                                     </td>
 
                                                     <td className="relative whitespace-nowrap text-right text-sm font-medium ">

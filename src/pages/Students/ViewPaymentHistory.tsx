@@ -7,6 +7,7 @@ import Hashids from 'hashids';
 import { hashTheID } from '../../functions/shared';
 import PaymentInfoSlider from '../Payments/PaymentInfoSlider';
 import StudentsOnBillingAccount from './components/StudentsOnBillingAccount';
+import IconEye from '../../components/Icon/IconEye';
 
 export default function ViewPaymentHistory() {
     const { suid, students }: any = UserAuth();
@@ -133,6 +134,34 @@ export default function ViewPaymentHistory() {
                                                 className={`ml-auto badge whitespace-nowrap ${data.Status === 'Settled'
                                                         ? 'bg-success'
                                                         : data.Status === 'Pending'
+                    <div className="table-responsive rouned-lg mb-5">
+                        <table className="panel border rounded-lg">
+                            <thead>
+                                <tr>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Billing Name</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th className="text-right">View</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {paymentHistory?.map((data: any) => {
+                                    return (
+                                        <tr key={data.Id} className={`${!data.Id ? 'bg-primary-light' : data.Status === 'Settled' ? 'bg-success-light' : 'bg-danger-light'} `}>
+                                            <td className="font-bold">${data.Amount?.toFixed(2) || data.AmountPaid?.toFixed(2)}</td>
+                                            <td>{data.PaymentDate && formatWithTimeZone(data.PaymentDate, handleGetTimeZoneOfUser())}</td>
+                                            <td>
+                                                {data.CustomerFirstName || ''} {data.CustomerLastName || ''}
+                                            </td>
+                                            <td className={`text-xs font-bold ${data.Id ? 'text-info' : 'text-primary'}`}>{data.Id ? 'External Payment' : 'Internal Payment'}</td>
+                                            <td>
+                                                <span
+                                                    className={`ml-auto badge whitespace-nowrap ${
+                                                        data.Status === 'Settled'
+                                                            ? 'bg-success'
+                                                            : data.Status === 'Pending'
                                                             ? 'bg-warning'
                                                             : data.Status === 'In Progress'
                                                                 ? 'bg-info'
@@ -154,6 +183,27 @@ export default function ViewPaymentHistory() {
                             })}
                         </tbody>
                     </table>
+                                                >
+                                                    {data.Status || 'Internal'}
+                                                </span>
+                                            </td>
+                                            <td className="flex">
+                                                <div className="ml-auto">
+                                                    {data.Status === 'Failed' ? (
+                                                        <Link to={`/payments/view-late-payment/${suid}/${data.Id}`} className="text-danger hover:text-red-800 flex items-center gap-1">
+                                                          <IconEye /> View Payment
+                                                        </Link>
+                                                    ) : (
+                                                        <PaymentInfoSlider payID={data.Id} />
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </>

@@ -9,6 +9,7 @@ import Messages from '../pages/Spaces/Messages';
 import SpaceList from '../pages/Spaces/SpaceList';
 import AddSpace from '../pages/Spaces/AddSpace';
 import ViewSpace from '../pages/Spaces/ViewSpace';
+import StudentCheckIn from '../pages/Classes/StudentCheckin';
 
 const Overview = lazy(() => import('../pages/Overview'));
 const CompeteLegacyForms = lazy(() => import('../pages/Forms/CompeteLegacyForms'));
@@ -365,14 +366,28 @@ const routes = [
         element: <Ranks />,
     },
     {
-        path: '/classes/barcode-attendance',
+        path: '/classes/stealth-attendance/barcode-attendance',
         element: <BarcodeAttendance />,
         layout: 'blank',
     },
-
+    {
+        path: '/classes/barcode-attendance',
+        element: <BarcodeAttendance />,
+    },
+    {
+        path: '/classes/stealth-attendance/students',
+        element: <StudentCheckIn />,
+        layout: 'blank',
+    },
     {
         path: '/classes/stealth-attendance',
         element: <StealthAttendance />,
+        layout: 'blank',
+    },
+    
+    {
+        path: '/classes/stealth-attendance/teachers',
+        element: <Attendance />,
         layout: 'blank',
     },
     {

@@ -28,7 +28,6 @@ export default function ViewPayments() {
         try {
             getPaymentsByPipelineStep(id, suid).then((data) => {
                 setStudentsInPipeline(data);
-                console.log(data);
                 setLoading(false);
             });
         } catch (error) {
@@ -41,9 +40,9 @@ export default function ViewPayments() {
         showWarningMessage('Are you sure you want to ignore this payment?', 'Ignore Payment', 'Payment Ignored', 'Ignored!')
             .then(async (confirmed: boolean) => {
                 if (confirmed) {
-                    console.log(id);
                     const res = await ignorePayment(id);
-                   if (res.status === 200) {
+                 
+                   if (res === "Update was successful") {
                         setUpdate(!update);
                     } else {
                         console.error('Failed to ignore payment');

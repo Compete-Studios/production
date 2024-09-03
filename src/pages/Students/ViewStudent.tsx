@@ -512,7 +512,34 @@ const ViewStudent = () => {
                                     </button>
                                 )} */}
                             </div>
-                            <p className="font-normal text-xs ">Next Contact Date: {formatDate(student?.NextContactDate)}</p>
+                            {toUpdate?.nextContactDate ? (
+                                <div className="flex items-center gap-1">
+                                    <input
+                                        type="date"
+                                        className="form-input h-7"
+                                        value={student?.NextContactDate}                                        
+                                        onChange={(e) => setStudent({ ...student, NextContactDate: e.target.value })}
+                                    />
+                                    <button
+                                        className="btn btn-sm btn-info"
+                                        onClick={() => {
+                                            setToUpdate({ ...toUpdate, nextContactDate: false });
+                                            handleUpdateByColumn('NextContactDate');
+                                        }}
+                                    >
+                                        Save
+                                    </button>
+                                </div>
+                            ) : (
+                                <p className={`font-normal flex items-end gap-1 text-xs `}>
+                                    Next Contact Date: {student?.NextContactDate ? formatDate(student?.NextContactDate) : 'No barcode set'}{' '}
+                                    <span>
+                                        <button onClick={() => setToUpdate({ ...toUpdate, nextContactDate: true })}>
+                                            <IconEdit className="w-3 h-3 text-info" fill={true} />
+                                        </button>
+                                    </span>
+                                </p>
+                            )}
                             <p className="font-normal text-xs ">Created: {formatDate(student?.EntryDate)}</p>
                             <p className={`font-normal text-xs ${rank ? 'text-success' : 'text-danger'}`}>Rank: {rank ? rank : 'No rank set'}</p>
                             {update ? (

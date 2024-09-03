@@ -432,6 +432,7 @@ export default function PaymentInfoSlider({ payID }: any) {
                                                     <div className="panel p-0 relative">
                                                         <div className="p-5 pb-20">
                                                             <h2 className="text-xl">Late Payment Notes</h2>
+
                                                             {paymentNotes !== '' && (
                                                                 <div className="p-3 bg-dark-light/50 dark:bg-dark mt-2 border rounded-sm">
                                                                     {paymentNotes?.split('\n').map((note: any, index: any) => {

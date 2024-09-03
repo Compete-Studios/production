@@ -1713,3 +1713,15 @@ export const addCustomBarcodeId = async (data) => {
         throw error;
     }
 };
+
+export const updateSteps = async (data) => {
+    for (let i = 0; i < data.length; i++) {
+        try {
+            const response = await fetchData(`marketing-access/updatePipelineStepsOrder`, 'post', data[i]);
+            return response;
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
+};

@@ -29,8 +29,9 @@ const SearchPayments = () => {
     const [recordsData, setRecordsData] = useState(initialRecords);
     const [tempData, setTempData] = useState(initialRecords);
     const [search, setSearch] = useState('');
-    const [startDate, setStartDate] = useState<any>('04-01-2023');
-    const [endDate, setEndDate] = useState('05-01-2023');
+    // const set 7 days ago
+    const [startDate, setStartDate] = useState<any>(new Date(new Date().setDate(new Date().getDate() - 7)));
+    const [endDate, setEndDate] = useState(new Date());
     const [status, setStatus] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({ columnAccessor: 'id', direction: 'asc' });
 

@@ -14,6 +14,7 @@ import { showWarningMessage } from '../../functions/shared';
 import { getPaymentPipelineStepsByStudioId, deleteLatePaymentPipelineStep } from '../../functions/api';
 import { addLatePayment, getLatePaymentsFromPaysimple, TESTgetLatePaymentsFromPaysimple } from '../../functions/payments';
 import { formatDate } from '@fullcalendar/core';
+import ReorderSteps from '../Students/components/ReorderSteps';
 
 interface PipelineStep {
     PaymentPipelineStepId: number;
@@ -129,7 +130,8 @@ export default function LatePaymentPipeline() {
             <div className="mb-4.5 px-5 flex md:items-center md:flex-row flex-col gap-5">
                 <h2 className="text-xl">Late Payment Pipeline</h2>
 
-                <div className="gap-2 ltr:ml-auto rtl:mr-auto">
+                <div className="gap-2 ltr:ml-auto rtl:mr-auto flex items-center">
+                    <ReorderSteps type={3} />
                     <Link to="/payments/late-payment-pipeline/add-new-pipeline-step" type="button" className="btn btn-primary gap-2 ltr:ml-auto rtl:mr-auto">
                         <IconPlus />
                         Add a Pipeline Step

@@ -14,6 +14,7 @@ import { deletePipelineStep } from '../../functions/api';
 import { showWarningMessage } from '../../functions/shared';
 import IconMenuUsers from '../../components/Icon/Menu/IconMenuUsers';
 import ZapierModal from '../Marketing/ZapierModal';
+import ReorderSteps from '../Students/components/ReorderSteps';
 
 export default function ProspectPipeline() {
     const { prospectPipelineSteps, suid, update, setUpdate }: any = UserAuth();
@@ -53,7 +54,8 @@ export default function ProspectPipeline() {
                 </div> */}
                 <h2 className="text-xl">Prospect Pipline</h2>
 
-                <div className="gap-2 ltr:ml-auto rtl:mr-auto">
+                <div className="gap-2 ltr:ml-auto rtl:mr-auto flex items-center">
+                <ReorderSteps type={2} />
                     <Link to="/prospects/add-new-pipeline-step" type="button" className="btn btn-primary gap-2 ltr:ml-auto rtl:mr-auto">
                         <IconPlus />
                         Add a Pipeline Step

@@ -63,6 +63,7 @@ export default function ViewLatePayment() {
     const [paymentIDInfo, setPaymentIDInfo] = useState<any>({});
     const [paymentHistory, setPaymentHistory] = useState<any>([]);
     const [updateNotes, setUpdateNotes] = useState(false);
+    const [updateAllLPPNotes, setUpdateAllLPPNotes] = useState(false);
     const [student, setStudent] = useState<any>({});
     const [toEmail, setToEmail] = useState('');
     const [customerPaymentAccount, setCustomerPaymentAccount] = useState<any>([]);
@@ -430,6 +431,20 @@ export default function ViewLatePayment() {
         }
     };
 
+    const handleUpdateAllPaymentNotes = async () => {
+        try {
+            const res = await addPaymentNotes(paymentInfo.PaysimpleTransactionId, newNote);
+            if (res) {
+                console.log(res);
+                setPaymentNotes(newNote); // Update the paymentNotes state with the new string
+                setUpdateAllLPPNotes(false);
+                setNewNote('');
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     const handleGoToPayments = () => {
         const newID = parseInt(student?.Student_id) * parseInt(suid);
         navigate(`/students/${newID}/finish-billing-setup-options`);
@@ -753,29 +768,54 @@ export default function ViewLatePayment() {
                                                 </div>
                                                 <div className="panel p-0 relative">
                                                     <div className="p-5 pb-20">
-                                                        <h2 className="text-xl">Late Payment Notes</h2>
-                                                        <div className="p-3 bg-dark-light/50 dark:bg-dark mt-2 border rounded-sm">
-                                                            {paymentNotes?.split('\n').map((note: any, index: any) => {
-                                                                return (
-                                                                    <div key={index} className={`${note?.length > 1 && 'p-2 border-b border-dashed border-zinc-400 dark:border-gray-700'} `}>
-                                                                        <p>{note}</p>
-                                                                    </div>
-                                                                );
-                                                            })}
+                                                        <div className="flex items-center justify-between">
+                                                            <h2 className="text-xl">Late Payment Notes</h2>
+                                                            <button
+                                                                className="text-danger"
+                                                                onClick={() => {
+                                                                    setUpdateAllLPPNotes(true);
+                                                                    setNewNote(paymentNotes);
+                                                                }}
+                                                            >
+                                                                Update All Notes
+                                                            </button>
                                                         </div>
+                                                        {!updateAllLPPNotes && (
+                                                            <div className="p-3 bg-dark-light/50 dark:bg-dark mt-2 border rounded-sm">
+                                                                {paymentNotes?.split('\n').map((note: any, index: any) => {
+                                                                    return (
+                                                                        <div key={index} className={`${note?.length > 1 && 'p-2 border-b border-dashed border-zinc-400 dark:border-gray-700'} `}>
+                                                                            <p>{note}</p>
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        )}
+
                                                         <textarea className="form-textarea w-full h-20 mt-4" placeholder="Add a note" value={newNote} onChange={(e) => setNewNote(e.target.value)} />
                                                         {!newNote && <p className="text-danger text-xs text-center">*To add a new note begin typing</p>}
                                                     </div>
                                                     <div className="absolute bottom-0 right-0 left-0">
-                                                        <button
-                                                            className="cursor-pointer w-full p-5 border-t rounded-b-lg text-center font-semibold text-success hover:bg-success/10 whitespace-nowrap
+                                                        {updateAllLPPNotes ? (
+                                                            <button
+                                                                className="cursor-pointer w-full p-5 border-t rounded-b-lg text-center font-semibold text-success hover:bg-success/10 whitespace-nowrap
                                                     disabled:text-zinc-300 disabled:bg-dark-light
                                                     "
-                                                            onClick={handleAddNote}
-                                                            disabled={!newNote}
-                                                        >
-                                                            Save New Note
-                                                        </button>
+                                                                onClick={handleUpdateAllPaymentNotes}
+                                                            >
+                                                                Save Notes
+                                                            </button>
+                                                        ) : (
+                                                            <button
+                                                                className="cursor-pointer w-full p-5 border-t rounded-b-lg text-center font-semibold text-success hover:bg-success/10 whitespace-nowrap
+                                                    disabled:text-zinc-300 disabled:bg-dark-light
+                                                    "
+                                                                onClick={handleAddNote}
+                                                                disabled={!newNote}
+                                                            >
+                                                                Save New Note
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 </div>
                                                 <div className="panel p-0 relative">

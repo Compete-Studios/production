@@ -87,7 +87,6 @@ export default function BarcodeAttendance() {
                     <h1 className="text-2xl font-semibold text-gray-800 text-center ">Barcode Check-in</h1>
                     <p className="text-center text-gray-500 mb-12">Please scan or enter your barcode to take attendance</p>
                     <div>
-                        {student && <h1>{student.StudentId}</h1>}
                         <input 
                         id="barcode-input" 
                         type="text" 

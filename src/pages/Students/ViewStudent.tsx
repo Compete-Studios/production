@@ -467,6 +467,12 @@ const ViewStudent = () => {
         setStudent(updatedStudent);
     };
 
+    const handleClone = (e: any) => {
+        e.preventDefault();
+        console.log('Clone', uid);
+        navigate(`/students/add-student/${uid}`);
+    };
+
     console.log(student);
 
     return (
@@ -590,7 +596,7 @@ const ViewStudent = () => {
                         <SendQuickEmail student={student} name="Student" pipeline={pipeline} />
                         <SendQuickText student={student} name="Student" pipeline={pipeline} />
                         <SendQuickWaiver student={student} prospect={false} />
-                        <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left">Clone Student</button>
+                        <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left" onClick={(e: any) => handleClone(e)}>Clone Student</button>
                         {student?.activity ? (
                             <DeleteStudent
                                 student={student}
@@ -1235,9 +1241,13 @@ const ViewStudent = () => {
                             <Tab.Panel>
                                 <div className="active pt-5 panel">
                                     <div className="sm:flex sm:flex-wrap sm:flex-row">
-                                        {pipelineSteps.map((step: any) => {
+                                        {pipelineSteps?.map((step: any) => {
                                             return (
-                                                <label htmlFor={step.PipelineStepId} className="flex items-center cursor-pointer hover:bg-gray-100 p-1 sm:basis-1/2">
+                                                <label
+                                                    key={step.PipelineStepId}
+                                                    htmlFor={step.PipelineStepId}
+                                                    className="flex items-center cursor-pointer hover:bg-gray-100 p-1 sm:basis-1/2"
+                                                >
                                                     <input
                                                         type="radio"
                                                         name="pipeline"

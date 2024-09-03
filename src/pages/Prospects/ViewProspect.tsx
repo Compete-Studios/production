@@ -323,6 +323,12 @@ const ViewProspect = () => {
         navigate(`/prospects/activate/${uid}`);
     };
 
+    const handleClone = (e: any) => {
+        e.preventDefault();
+        console.log('Clone', uid);
+        navigate(`/prospects/add-prospect/${uid}`);
+    };
+
     return (
         <div>
             <div className="sm:flex sm:items-center sm:justify-between">
@@ -392,7 +398,7 @@ const ViewProspect = () => {
                         <SendQuickText student={student} pipeline={pipeline} name="Prospect" />
                         <SendQuickWaiver student={student} prospect={true} />
                         <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left">Create a Billing Account</button>
-                        <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left">Clone Prospect</button>
+                        <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left" onClick={(e: any) => handleClone(e)}>Clone Prospect</button>
                     </div>
                 </div>
                 <div className="md:col-span-9 sm:row-span-2">

@@ -5,7 +5,6 @@ import { setPageTitle } from '../../store/themeConfigSlice';
 import IconSearch from '../../components/Icon/IconSearch';
 import { UserAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { REACT_API_BASE_URL } from '../../constants';
 import { convertPhone, hashTheID } from '../../functions/shared';
 import IconUserPlus from '../../components/Icon/IconUserPlus';
 import IconPlus from '../../components/Icon/IconPlus';
@@ -13,7 +12,6 @@ import IconPlus from '../../components/Icon/IconPlus';
 const ViewStudents = () => {
     const { suid, students }: any = UserAuth();
     const [showLoading, setShowLoading] = useState(false);
-    const [activeOnly, setActiveOnly] = useState(true);    
 
     const dispatch = useDispatch();
     useEffect(() => {
@@ -140,7 +138,7 @@ const ViewStudents = () => {
                                         <td className="whitespace-nowrap">{convertPhone(contact.Phone)}</td>
                                         <td>
                                             <div className="flex gap-4 items-center justify-center">
-                                                <Link to={`/students/view-student/${hashTheID(contact.Student_ID)}/${hashTheID(suid)}`} type="button" className="btn btn-sm btn-outline-info">
+                                                <Link to={`/students/view-student/${hashTheID(contact.Student_ID)}/${hashTheID(suid)}`} type="button" className="btn btn-sm btn-info">
                                                     View
                                                 </Link>
                                                 {/* <Link to="/students/edit-student" type="button" className="btn btn-sm btn-outline-primary" onClick={() => editUser(contact)}>

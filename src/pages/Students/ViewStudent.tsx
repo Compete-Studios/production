@@ -28,10 +28,7 @@ import {
     updateStudentNotes,
     addCustomBarcodeId,
 } from '../../functions/api';
-import IconUser from '../../components/Icon/IconUser';
 import AddNoteModal from './AddNoteModal';
-import IconTrash from '../../components/Icon/IconTrash';
-import IconDollarSignCircle from '../../components/Icon/IconDollarSignCircle';
 import IconPlus from '../../components/Icon/IconPlus';
 import StudentsQuickPay from './StudentsQuickPay';
 import { convertPhone, hashTheID, showMessage, showWarningMessage, unHashTheID } from '../../functions/shared';
@@ -531,8 +528,8 @@ const ViewStudent = () => {
                                     </button>
                                 </div>
                             ) : (
-                                <p className={`font-normal flex items-end gap-1 text-xs `}>
-                                    Next Contact Date: {student?.NextContactDate ? formatDate(student?.NextContactDate) : 'No barcode set'}{' '}
+                                <p className={`font-normal flex items-end gap-1 text-xs ${!student?.NextContactDate && "text-danger"}`}>
+                                    Next Contact Date: {student?.NextContactDate ? formatDate(student?.NextContactDate) : 'No contact set'}{' '}
                                     <span>
                                         <button onClick={() => setToUpdate({ ...toUpdate, nextContactDate: true })}>
                                             <IconEdit className="w-3 h-3 text-info" fill={true} />

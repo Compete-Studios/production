@@ -934,7 +934,7 @@ export const updateMarketingMethod = async (data) => {
 
 export const dropMarketingMethod = async (methodId) => {
     try {
-        const response = await fetchData(`marketing-access/dropMarketingMethod/${methodId}`, 'delete');
+        const response = await fetchData(`marketing-access/dropMarketingMethod/${methodId}`, 'get');
         return { response, status: 200 };
     } catch (error) {
         console.error(error);

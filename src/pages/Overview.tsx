@@ -25,16 +25,16 @@ const Overview = () => {
     return (
         <div>
         <Tab.Group>
-            <Tab.List className="flex flex-wrap">
+            <Tab.List className="flex flex-wrap border-b border-zinc-300">
                 <Tab as={Fragment}>
                     {({ selected }) => (
                         <button
                             className={`${
-                                selected ? 'text-info !outline-none before:!w-full' : ''
+                                selected ? 'text-info !outline-none before:!w-full bg-white rounded-t-lg' : ''
                             } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
                         >
                             <IconMenuDashboard className="w-5 h-5 ltr:mr-2 rtl:ml-2" />
-                            Overview
+                           <span className='hidden sm:block'>Overview</span> 
                         </button>
                     )}
                 </Tab>
@@ -42,11 +42,11 @@ const Overview = () => {
                     {({ selected }) => (
                         <button
                             className={`${
-                                selected ? 'text-info !outline-none before:!w-full' : ''
+                                selected ? 'text-info !outline-none before:!w-full bg-white rounded-t-lg' : ''
                             } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
                         >
                             <IconUsers className="w-5 h-5 ltr:mr-2 rtl:ml-2" />
-                            Student Pipeline
+                            <span className='hidden sm:block'>Student Pipeline</span> 
                         </button>
                     )}
                 </Tab>
@@ -54,11 +54,11 @@ const Overview = () => {
                     {({ selected }) => (
                         <button
                             className={`${
-                                selected ? 'text-info !outline-none before:!w-full' : ''
+                                selected ? 'text-info !outline-none before:!w-full bg-white rounded-t-lg' : ''
                             } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
                         >
                             <IconUsersGroup className="w-5 h-5 ltr:mr-2 rtl:ml-2" />
-                            Prospect Pipeline
+                            <span className='hidden sm:block'>Prospect Pipeline</span> 
                         </button>
                     )}
                 </Tab>
@@ -67,11 +67,11 @@ const Overview = () => {
                     {({ selected }) => (
                         <button
                             className={`${
-                                selected ? 'text-info !outline-none before:!w-full' : ''
+                                selected ? 'text-info !outline-none before:!w-full bg-white rounded-t-lg' : ''
                             } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
                         >
                             <IconDollarSignCircle className="w-5 h-5 ltr:mr-2 rtl:ml-2" />
-                            Late Payment Pipeline
+                            <span className='hidden sm:block'>Late Payment Pipeline</span> 
                         </button>
                     )}
                 </Tab>

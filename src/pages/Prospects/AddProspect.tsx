@@ -7,7 +7,7 @@ import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import { addProspect, addProspectToClasses, addProspectToPrograms, addProspectToWaitingLists } from '../../functions/api';
 import { useNavigate } from 'react-router-dom';
-import { constFormateDateMMDDYYYY, formatDate, showMessage } from '../../functions/shared';
+import { constFormateDateMMDDYYYY, formatDate, hashTheID, showMessage } from '../../functions/shared';
 
 interface ProspectData {
     studioId: string;
@@ -31,7 +31,7 @@ interface ProspectData {
     birthdate: string;
 }
 
-const prospectInfoInit = {
+const prospectInfoInit: any = {
     studioId: '',
     fName: '',
     lName: '',
@@ -45,12 +45,12 @@ const prospectInfoInit = {
     notes: '',
     entryDate: constFormateDateMMDDYYYY(new Date()),
     currentPipelineStatus: '',
-    firstClassDate: constFormateDateMMDDYYYY(new Date()),
-    nextContactDate: constFormateDateMMDDYYYY(new Date()),
+    firstClassDate: null,
+    nextContactDate: null,
     age: '',
     parentName: '',
-    introDate: constFormateDateMMDDYYYY(new Date()),
-    birthdate: '01-01-2022',
+    introDate: null,
+    birthdate: null,
 };
 
 export default function AddProspect() {
@@ -104,40 +104,36 @@ export default function AddProspect() {
             state: prospectInfo.state,
             zip: prospectInfo.zip,
             notes: prospectInfo.notes,
-            entryDate: formatDate(prospectInfo.entryDate),
+            entryDate: prospectInfo.entryDate ? formatDate(prospectInfo.entryDate) : constFormateDateMMDDYYYY(new Date()),
             currentPipelineStatus: prospectInfo.currentPipelineStatus,
-            firstClassDate: formatDate(prospectInfo.firstClassDate),
-            nextContactDate: formatDate(prospectInfo.nextContactDate),
+            firstClassDate: prospectInfo.firstClassDate ? formatDate(prospectInfo.firstClassDate) : null,
+            nextContactDate: prospectInfo.nextContactDate ? formatDate(prospectInfo.nextContactDate) : null,
             age: prospectInfo.age,
             parentName: prospectInfo.parentName,
-            introDate: formatDate(prospectInfo.introDate),
-            birthdate: formatDate(prospectInfo.birthdate),
+            introDate: prospectInfo.introDate ? formatDate(prospectInfo.introDate) : null,
+            birthdate: prospectInfo.birthdate ? formatDate(prospectInfo.birthdate) : null,
         };
 
-        const classIDS = selectedClasses?.map((item: any) => item.ClassId);
-
+        const classIDS = selectedClasses?.map((item: any) => item.ClassId);  
         
-        console.log('Prospect Info:', prospectInfoData);
+        let prosID = '';
+     
         await addProspect(prospectInfoData).then((res) => {
             console.log('Prospect added:', res.output.NewProspectId);
             addProspectToClasses(res.output.NewProspectId, classIDS);
             addProspectToWaitingLists(res.output.NewProspectId, waitingListIDs);
             addProspectToPrograms(res.output.NewProspectId, programIds);
+            prosID = res.output.NewProspectId;
         });
         showMessage('Prospect added successfully', 'success');
-        navigate('/prospects/view-prospects');
+        navigate(`/prospects/view-prospect/${hashTheID(prosID)}/${hashTheID(suid)}`);
     };
 
     useEffect(() => {
         const prospectAge: any = new Date().getFullYear() - new Date(prospectInfo.birthdate).getFullYear();
         setProspectInfo({ ...prospectInfo, age: prospectAge });
     }, [prospectInfo.birthdate]);
-
-    const handleConvertDateToYYYYMMDD = (date: any) => {
-        const newDate = new Date(date);
-        const formattedDate = newDate.toISOString().substr(0, 10);
-        return formattedDate;
-    };
+ 
 
     const handleToggleWaitingList = (id: any) => {
         if (waitingListIDs.includes(id)) {
@@ -210,9 +206,9 @@ export default function AddProspect() {
                                 </select>
                             </div>
                             <div className="sm:col-span-2">
-                                <label htmlFor="entryDate">Contact Date</label>
+                                <label htmlFor="entryDate">Entry Date</label>
                                 <Flatpickr
-                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                    options={{ dateFormat: 'm-d-Y', position: 'auto right', allowInput: true  }}
                                     className="form-input"
                                     value={prospectInfo.entryDate}
                                     onChange={(date: any) => setProspectInfo({ ...prospectInfo, entryDate: date })}
@@ -222,7 +218,7 @@ export default function AddProspect() {
                                 <label htmlFor="introDate">Intro Date</label>
                                 <Flatpickr
                                     value={prospectInfo.introDate}
-                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                    options={{ dateFormat: 'm-d-Y', position: 'auto right', allowInput: true  }}
                                     className="form-input"
                                     onChange={(date: any) => setProspectInfo({ ...prospectInfo, introDate: date })}
                                 />
@@ -231,16 +227,17 @@ export default function AddProspect() {
                                 <label htmlFor="firstClassDate">First Class Date</label>
                                 <Flatpickr
                                     value={prospectInfo.firstClassDate}
-                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                    options={{ dateFormat: 'm-d-Y', position: 'auto right', allowInput: true }}
                                     className="form-input"
                                     onChange={(date: any) => setProspectInfo({ ...prospectInfo, firstClassDate: date })}
+                                    
                                 />
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="nextContactDate">Next Contact Date</label>
                                 <Flatpickr
                                     value={prospectInfo.nextContactDate}
-                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                    options={{ dateFormat: 'm-d-Y', position: 'auto right', allowInput: true  }}
                                     className="form-input"
                                     onChange={(date: any) => setProspectInfo({ ...prospectInfo, nextContactDate: date })}
                                 />
@@ -249,7 +246,7 @@ export default function AddProspect() {
                                 <label htmlFor="birthdate">Birthdate</label>
                                 <Flatpickr
                                     value={prospectInfo.birthdate}
-                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                    options={{ dateFormat: 'm-d-Y', position: 'auto right', allowInput: true  }}
                                     className="form-input"
                                     onChange={(date: any) => setProspectInfo({ ...prospectInfo, birthdate: date })}
                                 />

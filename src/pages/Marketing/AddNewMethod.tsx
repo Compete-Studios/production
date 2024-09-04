@@ -10,32 +10,28 @@ import { addMarketingMethod, addRoom } from '../../functions/api';
 import { showMessage } from '../../functions/shared';
 import { UserAuth } from '../../context/AuthContext';
 
-export default function AddNewMethod({ update }: any) {
-    const { suid }: any = UserAuth();
+export default function AddNewMethod() {
+    const { suid, update, setUpdate }: any = UserAuth();
     const [showQuickPayModal, setShowQuickPayModal] = useState(false);
-    const [roomData, setRoomData] = useState({
-        studioId: '',
-        name: '',
-        notes: '',
-        months: '',
-        amount: '',
-    });
+    const [name, setName] = useState('');
+    const [notes, setNotes] = useState('');
 
     const handleAddRoom = async () => {
-        roomData.studioId = suid;
+        const methodData = {
+            studioId: suid,
+            name,
+            notes,
+            amount: null,
+            months: '',
+        };
         try {
-            const response = await addMarketingMethod(roomData);
+            const response = await addMarketingMethod(methodData);
             if (response.status === 200) {
                 showMessage('Room added successfully');
-                setRoomData({
-                    studioId: '',
-                    name: '',
-                    notes: '',
-                    months: '',
-                    amount: '',
-                });
-                setShowQuickPayModal(false);
-                update();
+                setShowQuickPayModal(false);   
+                setUpdate(!update);      
+                setName('');
+                setNotes('');    
             } else {
                 showMessage('Failed to add room', 'error');
             }
@@ -85,9 +81,9 @@ export default function AddNewMethod({ update }: any) {
                                                 type="text"
                                                 id="roomname"
                                                 name="roomname"
-                                                value={roomData.name}
+                                                value={name}
                                                 className="form-input"
-                                                onChange={(e) => setRoomData({ ...roomData, name: e.target.value })}
+                                                onChange={(e) => setName(e.target.value)}
                                             />
                                         </div>
                                         <div>
@@ -96,9 +92,9 @@ export default function AddNewMethod({ update }: any) {
                                                 id="description"
                                                 rows={4}
                                                 name="description"
-                                                value={roomData.notes}
+                                                value={notes}
                                                 className="form-input"
-                                                onChange={(e) => setRoomData({ ...roomData, notes: e.target.value })}
+                                                onChange={(e) => setNotes(e.target.value)}
                                             />
                                         </div>
                                         <div className="flex">

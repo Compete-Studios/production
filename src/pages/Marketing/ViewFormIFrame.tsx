@@ -6,6 +6,7 @@ import IconX from '../../components/Icon/IconX';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import IconCopy from '../../components/Icon/IconCopy';
 import IconPencil from '../../components/Icon/IconPencil';
+import Tippy from '@tippyjs/react';
 
 export default function ViewFormIFrame({ formList }: any) {
     const [modal2, setModal2] = useState(false);
@@ -157,12 +158,15 @@ export default function ViewFormIFrame({ formList }: any) {
     return (
         <div className="">
             <div className="flex items-center justify-center">
-                <button type="button" onClick={() => setModal2(true)} className="text-primary hover:text-emerald-800 text-center flex items-center gap-x-1">
+            <Tippy content="View and Copy Code">
+                <button type="button" onClick={() => setModal2(true)} className="btn btn-sm btn-secondary hover:bg-indigo-800 gap-1">
+                View Code
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-code-slash" viewBox="0 0 16 16">
                         <path d="M10.478 1.647a.5.5 0 1 0-.956-.294l-4 13a.5.5 0 0 0 .956.294zM4.854 4.146a.5.5 0 0 1 0 .708L1.707 8l3.147 3.146a.5.5 0 0 1-.708.708l-3.5-3.5a.5.5 0 0 1 0-.708l3.5-3.5a.5.5 0 0 1 .708 0m6.292 0a.5.5 0 0 0 0 .708L14.293 8l-3.147 3.146a.5.5 0 0 0 .708.708l3.5-3.5a.5.5 0 0 0 0-.708l-3.5-3.5a.5.5 0 0 0-.708 0" />
                     </svg>{' '}
-                    View Code
+                  
                 </button>
+                </Tippy>
             </div>
             <Transition appear show={modal2} as={Fragment}>
                 <Dialog as="div" open={modal2} onClose={() => setModal2(false)}>

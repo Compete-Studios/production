@@ -268,7 +268,7 @@ export default function MarketingMetrics() {
                     </div>
                 </div>
             ) : (
-                <div className="panel h-full bg-gray-100 animate-pulse"></div>
+                <div className="panel h-full bg-gray-100 animate-pulse flex justify-center items-center">Loading Summary...</div>
             )}
         </div>
     );

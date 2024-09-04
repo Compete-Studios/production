@@ -92,10 +92,10 @@ export default function AddABillingAccount() {
                             </p>
                         </div>
                         <div className="text-right">
-                            <Link to={`/payments/${id}/${suid}/billing-accounts`} className="text-info hover:text-blue-800 ">
+                            <Link to={`/payments/${id}/${suid}/billing-accounts`} className="btn btn-info hover:bg-blue-800 ">
                                 Use an existing billing account
                             </Link>
-                            <button className="block text-secondary" onClick={autoFill}>
+                            <button className="block btn btn-secondary mt-2 hover:bg-indigo-600" onClick={autoFill}>
                                 Click here if its the same as the student's info
                             </button>
                         </div>

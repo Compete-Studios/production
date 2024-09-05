@@ -89,7 +89,7 @@ const ManageStudioAccounts = () => {
     const handleLogAllUsersOut = async (e: any) => {
         e.preventDefault();
         const response = await axios.get(`${REACT_API_BASE_URL}/admin-tools/fbMassLogout`);
-        console.log(response);
+     
         if (response.status === 200) {
             Swal.fire('Logged Out', 'All users have been logged out', 'success');
         } else {

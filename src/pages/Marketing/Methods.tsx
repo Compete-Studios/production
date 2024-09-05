@@ -7,6 +7,7 @@ import { UserAuth } from '../../context/AuthContext';
 import AddNewMethod from './AddNewMethod';
 import EditMethod from './EditMethod';
 import { dropMarketingMethod } from '../../functions/api';
+import Tippy from '@tippyjs/react';
 export default function ViewClasses() {
     const { marketingSources, update, setUpdate }: any = UserAuth();
     const dispatch = useDispatch();
@@ -106,9 +107,11 @@ export default function ViewClasses() {
                                         <div className="flex gap-4 items-start justify-end">
                                             <EditMethod MethodId={MethodId} Name={Name} Notes={Notes} />
                                             {/* <NavLink to="" className="flex"> */}
+                                            <Tippy content="Delete Method">
                                             <button type="button" className="text-danger hover:text-danger" onClick={(e: any) => deleteRow(MethodId)}>
                                                 <IconTrashLines />
                                             </button>
+                                            </Tippy>
                                             {/* </NavLink> */}
                                         </div>
                                     ),

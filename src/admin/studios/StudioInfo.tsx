@@ -22,7 +22,7 @@ const StudioInfo: React.FC<{ studioId: string }> = ({ studioId }) => {
 
     const handleUpdate = async () => {
         try {
-            console.log('STUDIO:', studio);
+         
             await updateStudioInDB(studioId, studio);
             showMessage('Contact info updated successfully');
         } catch (error) {

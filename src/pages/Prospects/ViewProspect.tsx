@@ -153,6 +153,8 @@ const ViewProspect = () => {
         // }
     };
 
+    console.log('student', student);
+
     const getClassesForStudent = async (studentID: any) => {
         try {
             const response = await getClassesByProspectId(studentID);

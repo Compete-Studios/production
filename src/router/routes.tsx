@@ -14,6 +14,12 @@ import StudentCheckIn from '../pages/Classes/StudentCheckin';
 const Overview = lazy(() => import('../pages/Overview'));
 const CompeteLegacyForms = lazy(() => import('../pages/Forms/CompeteLegacyForms'));
 
+// Dashboards
+const Main = lazy(() => import('../components/Dashboards/Main'));
+const Studio = lazy(() => import('../components/Dashboards/Studio'));
+const Payment = lazy(() => import('../components/Dashboards/Payment'));
+const Marketing = lazy(() => import('../components/Dashboards/Marketing'));
+
 // Reports
 const AllReports = lazy(() => import('../pages/Reports/AllReports'));
 const Birthdays = lazy(() => import('../pages/Reports/Birthday'));
@@ -228,6 +234,26 @@ const routes = [
         element: <Forms />,
         layout: 'blank',
     },
+
+    //dashboards
+    {
+        path: '/dashboard',
+        element: <Overview />,
+    },
+    {
+        path: '/marketing-dashboard',
+        element: <Marketing />,
+    },
+    {
+        path: '/studio-dashboard',
+        element: <Studio />,
+    },
+    {
+        path: '/payment-dashboard',
+        element: <Payment />,
+    },
+
+
 
     //payments
     {
@@ -635,11 +661,7 @@ const routes = [
         path: '/prospects/activate-as-student',
         element: <ActivateAsStudent />,
     },
-    //dashboard
-    {
-        path: '/dashboard',
-        element: <Overview />,
-    },
+    
     //facebook
     {
         path: '/facebook-add-creator',

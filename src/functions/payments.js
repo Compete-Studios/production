@@ -59,6 +59,16 @@ export const getCreditCard = async (customerId, studioId) => {
     }
 };
 
+export const updateCreditCard = async (cardData) => {
+    try {
+        const response = await fetchData(`paysimple-routes/updateCreditCard`, 'post', cardData);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 // ****FOR TESTING****
 // export const addCreditCardToCustomer = async (customerData) => {
 //     try {

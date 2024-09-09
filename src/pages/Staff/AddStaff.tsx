@@ -188,7 +188,7 @@ const AddStaff = () => {
                                 <label htmlFor="zip" className="ltr:mr-2 rtl:ml-2 w-1/3 mb-0">
                                     Select Classes
                                 </label>
-                                <Select placeholder="Select staff" className="flex-1" options={options} onChange={(e) => setClassValues(e)} isMulti />
+                                <Select placeholder="" className="flex-1" options={options} onChange={(e) => setClassValues(e)} isMulti />
                             </div>
                         </div>
                     </div>

@@ -150,7 +150,7 @@ export default function ViewClasses() {
                                                 <Link to={`/classes/view-roster/${rec.ClassId}/${suid}`} type="button" className="flex hover:text-orange-800 text-warning">
                                                     <IconUsers /> Roster
                                                 </Link>
-                                                {/* <ViewEditClass classId={rec.ClassId} nameOfClass={rec?.Name} /> */}
+                                                <ViewEditClass classId={rec.ClassId} nameOfClass={rec?.Name} />
                                                 <button type="button" className="flex text-danger hover:text-danger" onClick={() => handleDeleteClass(rec.ClassId)}>
                                                     <IconTrashLines /> Delete
                                                 </button>

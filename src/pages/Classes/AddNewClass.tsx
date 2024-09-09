@@ -26,7 +26,7 @@ export default function AddNewClass({color}: any) {
         return newDate;
     };
 
-    console.log('color', color);
+    //console.log('color', color);
     const [classToAdd, setClassToAdd] = useState({
         studioId: suid || 1000,
         name: '',

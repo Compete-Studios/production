@@ -1042,6 +1042,16 @@ export const updateClassByClassId = async (classData) => {
     }
 };
 
+export const updateClassAndSchedule = async (data) => {
+    try {
+        const response = await fetchData(`class-access/updateClassAndSchedule`, 'post', data);
+        return { response, status: 200 };
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const getStaffClassesByStaffId = async (staffId) => {
     try {
         const response = await fetchData(`staff-access/getStaffClassesByStaffId/${staffId}`, 'get');

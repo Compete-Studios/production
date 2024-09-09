@@ -62,6 +62,11 @@ export default function AddProspect() {
     const [waitingListIDs, setWaitingListIDs] = useState<any>([]);
     const [programIds, setProgramIds] = useState<any>([]);
 
+    const updatedPPSteps = prospectPipelineSteps? [
+        { StepName: 'No Status', PipelineStepId: 0 },
+        ...prospectPipelineSteps,
+    ] : [];
+
     const navigate = useNavigate();
     const { uid } = useParams<{ uid: string }>();
 
@@ -388,7 +393,7 @@ export default function AddProspect() {
                                     value={prospectInfo.currentPipelineStatus}
                                     onChange={(e) => setProspectInfo({ ...prospectInfo, currentPipelineStatus: e.target.value })}
                                 >
-                                    {prospectPipelineSteps?.map((step: any) => (
+                                    {updatedPPSteps?.map((step: any) => (
                                         <option key={step.PipelineStepId} value={step.PipelineStepId}>
                                             {step.StepName}
                                         </option>

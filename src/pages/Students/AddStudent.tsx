@@ -50,6 +50,11 @@ export default function AddStudent() {
     const [selectedWaitingLists, setSelectedWaitingLists] = useState([]);
     const [options, setOptions] = useState([]);
 
+    const updatedPipelineSteps = pipelineSteps ? [
+        { StepName: "No Status", pipelineStepId: 0 },
+        ...pipelineSteps
+    ] : [];
+
     const navigate = useNavigate();
 
     const { uid } = useParams<{ uid: string }>();
@@ -391,7 +396,7 @@ export default function AddStudent() {
                             <div className="sm:col-span-2">
                                 <label htmlFor="pipelineStatus">Pipeline Status</label>
                                 <select id="pipelineStatus" className="form-select text-white-dark" onChange={(e) => setStudentInfo({ ...studentInfo, currentPipelineStatus: e.target.value })}>
-                                    {pipelineSteps?.map((step: any) => (
+                                    {updatedPipelineSteps?.map((step: any) => (
                                         <option key={step.PipelineStepId} value={step.PipelineStepId}>
                                             {step.StepName}
                                         </option>

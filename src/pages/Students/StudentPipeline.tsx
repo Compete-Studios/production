@@ -8,9 +8,20 @@ import IconEdit from '../../components/Icon/IconEdit';
 import { Link } from 'react-router-dom';
 import { deleteStudentPipelineStep } from '../../functions/api';
 import { showCreationAlert, showWarningMessage } from '../../functions/shared';
+import IconSquareRotated from '../../components/Icon/IconSquareRotated';
+import { ReactSortable } from 'react-sortablejs';
+import { useEffect, useState } from 'react';
+import ReorderSteps from './components/ReorderSteps';
 
 export default function StudentPipeline() {
     const { pipelineSteps, suid, update, setUpdate }: any = UserAuth();
+    const [currentSteps, setCurrentSteps] = useState<any>([]);
+
+    useEffect(() => {
+        if (pipelineSteps) {
+            setCurrentSteps(pipelineSteps);
+        }
+    }, [pipelineSteps]);
 
     const handleDeleteStep = (prosid: any) => {
         showWarningMessage('Are you sure you want to delete this pipeline step?', 'Remove Pipeline Step', 'Your Pipeline Step has been removed successfully')
@@ -47,7 +58,8 @@ export default function StudentPipeline() {
                 </div> */}
                 <h2 className="text-xl">Student Pipeline</h2>
 
-                <div className="gap-2 ltr:ml-auto rtl:mr-auto">
+                <div className="gap-2 ltr:ml-auto rtl:mr-auto flex items-center">
+                    <ReorderSteps type={1} />
                     <Link to="/students/add-pipeline-step" type="button" className="btn btn-primary gap-2 ltr:ml-auto rtl:mr-auto">
                         <IconPlus />
                         Add a Pipeline Step
@@ -55,7 +67,7 @@ export default function StudentPipeline() {
                 </div>
             </div>
             <div className="table-responsive">
-                <table >
+                <table>
                     <thead>
                         <tr>
                             <th>Pipeline Step</th>

@@ -14,6 +14,8 @@ import IconEye from '../../components/Icon/IconEye';
 import IconNotesEdit from '../../components/Icon/IconNotesEdit';
 import IconTrashLines from '../../components/Icon/IconTrashLines';
 import ViewFormIFrame from './ViewFormIFrame';
+import { useDispatch } from 'react-redux';
+import { setPageTitle } from '../../store/themeConfigSlice';
 
 export default function CaptureForms() {
     const { suid }: any = UserAuth();
@@ -22,6 +24,24 @@ export default function CaptureForms() {
     const [forms, setForms] = useState([]);
     const [update, setUpdate] = useState(false);
     const [matchedFormIds, setMatchedFormIds] = useState<any>([]);
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('Capture Forms'));
+    });
+
+    const handleReturnCSS = (submissions: any, loads: any) => {
+        if (submissions && loads) {
+            if ((submissions / loads) * 100 >= 10) {
+                return 'text-success font-bold md:table-cell hidden';
+            } else  if ((submissions / loads) * 100 >= 2) {
+                return 'text-warning font-bold md:table-cell hidden';
+            } else {
+                return 'font-bold md:table-cell hidden';
+            }
+        } else {
+            return 'text-red-200 md:table-cell hidden';
+        }
+    };
 
     const getFromsFromFirebaseWithStudioID = async (suid: any) => {
         const idToString = suid.toString();
@@ -112,6 +132,8 @@ export default function CaptureForms() {
             });
     };
 
+    console.log(fbForms);
+
     return (
         <>
             <div className="px-4 sm:px-6 lg:px-8">
@@ -139,13 +161,17 @@ export default function CaptureForms() {
                                     <table className="min-w-full divide-y divide-gray-300">
                                         <thead className="bg-gray-50">
                                             <tr>
-                                                <th scope="col">Form Name</th>
-                                                <th scope="col">Get The Code</th>
-
-                                                <th scope="col">
-                                                    <span>View Performance Stats</span>
+                                                <th>Form Name</th>
+                                                <th className='md:table-cell hidden'>
+                                                    Form Submissions
                                                 </th>
-                                                <th scope="col">
+                                                <th className='md:table-cell hidden'>
+                                                    Form Loads
+                                                </th>
+                                                <th className='md:table-cell hidden'>
+                                                    Submit Percentage
+                                                </th>
+                                                <th >
                                                     <span className="sr-only">Delete</span>
                                                 </th>
                                             </tr>
@@ -154,23 +180,33 @@ export default function CaptureForms() {
                                             {fbForms?.map((list: any) => (
                                                 <tr key={list.id}>
                                                     <td>{list.formName}</td>
-                                                    <td>
-                                                        <ViewFormIFrame formList={list} />
-                                                    </td>
+                                                   
 
-                                                    <td>
-                                                        <Link to={`/marketing/capture-forms/stats/${list.id}`} className="text-info hover:text-blue-800 text-center w-full ">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-bar-chart-line" viewBox="0 0 16 16">
-                                                                <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1zm1 12h2V2h-2zm-3 0V7H7v7zm-5 0v-3H2v3z" />
-                                                            </svg>
-                                                        </Link>
+                                                    <td className={`${list.submissions ? "font-bold" : "text-red-200"} md:table-cell hidden`}>
+                                                       {list.submissions || 0}
+                                                    </td>
+                                                    <td className={`${list.loads ? "font-bold" : "text-red-200"} md:table-cell hidden`}>
+                                                        {list.loads || 0}
+                                                    </td>
+                                                    <td className={handleReturnCSS(list.submissions, list.loads)}>
+                                                        {(list.loads && list.submissions) ? `${((list.submissions / list.loads) * 100)?.toFixed(1)}%` : '0%'}
                                                     </td>
                                                     <td className="flex items-center justify-end gap-2">
+                                                   
+                                                    <ViewFormIFrame formList={list} />
+                                                   
                                                         <Tippy content="Preview Form">
                                                             <button className="text-info hover:text-blue-800" onClick={() => handlePreview(list.id)}>
                                                                 <IconEye />
                                                             </button>
                                                         </Tippy>
+                                                        {/* <Tippy content="View Stats">
+                                                        <Link to={`/marketing/capture-forms/stats/${list.id}`} className="text-info hover:text-blue-800 ">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-bar-chart-line" viewBox="0 0 16 16">
+                                                                <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1zm1 12h2V2h-2zm-3 0V7H7v7zm-5 0v-3H2v3z" />
+                                                            </svg>
+                                                        </Link>
+                                                        </Tippy> */}
                                                         <Tippy content="Edit Form">
                                                             <Link to={`/marketing/capture-forms/edit/${list.id}`} className="text-primary hover:text-emerald-800">
                                                                 <IconNotesEdit />
@@ -196,7 +232,7 @@ export default function CaptureForms() {
                                                             </button> */}
                                                     </td>
 
-                                                    <td colSpan={2} className="text-right">
+                                                    <td colSpan={5} className="text-right">
                                                         {matchedFormIds.includes(parseInt(list.FormId)) ? (
                                                             <div className="flex items-center justify-end text-white">
                                                                 <div>This form is a legacy form. Please update your site with the new form you created</div>

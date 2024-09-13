@@ -57,7 +57,7 @@ export default function Forms() {
             city: formInfo.city,
             state: formInfo.state,
             zip: formInfo.zip,
-            notes: formInfo.notes,
+            notes: form.notesText + '\n' + formInfo.notes,
             entryDate: formatDate(new Date()),
             currentPipelineStatus: form?.pipelineStep,
             firstClassDate: '',
@@ -67,8 +67,9 @@ export default function Forms() {
             introDate: '',
             birthdate: '',
         };
+        console.log(prospectInfoData, 'prospectInfoData');
         const response = await addProspect(prospectInfoData);
-       
+
         if (response?.output?.NewProspectId || response?.recordset?.[0]?.NewProspectId) {
             showMessage(form.successMessage ? form.successMessage : 'Form Submitted Successfully');
             const statsData = {
@@ -82,18 +83,25 @@ export default function Forms() {
             updateStats(id, statsData);
             updateFormSubmissionCounnt(id);
             setFormInfo(formInputs);
-            (window.top!.location.href = form?.successURL || '/');          
+            window.top!.location.href = form?.successURL || '/';
         } else {
             showErrorMessage('Error Submitting Form');
         }
-        // if (formInfo.email && form?.sendEmail) {
-        //     const emailData = {
-        //         to: formInfo.email,
-        //         from: form?.emailFrom || '',
-        //         subject: form?.defaultEmailSubject || 'Thank you for your interest',
-        //         html: form?.value || 'Thank you for your interest',
-        //     sendIndividualEmail(emailData);
-        // }
+        if (formInfo.email && form?.sendEmail) {
+            const emailDataToSend: any = {
+                to: formInfo.email,
+                from: form?.emailFrom || '',
+                subject: form?.defaultEmailSubject || 'Thank you for your interest',
+                html: form?.defaultEmailContent || 'Thank you for your interest',
+                deliverytime: null,
+            };
+            const data = {
+                studioId: form?.studioID,
+                email: emailDataToSend,
+            };
+            const res = await sendIndividualEmail(data);
+            console.log(res, 'res');
+        }
     };
 
     console.log(form, 'form');

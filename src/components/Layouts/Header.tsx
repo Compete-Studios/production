@@ -19,8 +19,6 @@ import IconArrowLeft from '../Icon/IconArrowLeft';
 import IconInfoCircle from '../Icon/IconInfoCircle';
 import IconBellBing from '../Icon/IconBellBing';
 import IconUser from '../Icon/IconUser';
-import IconMail from '../Icon/IconMail';
-import IconLockDots from '../Icon/IconLockDots';
 import IconLogout from '../Icon/IconLogout';
 import IconMenuDashboard from '../Icon/Menu/IconMenuDashboard';
 import IconCaretDown from '../Icon/IconCaretDown';
@@ -36,7 +34,6 @@ import AddStudentNote from '../../pages/Apps/AddStudentNote';
 import { UserAuth } from '../../context/AuthContext';
 import { getIncomingUnreadTextMessages, searchByValue, searchByValues, searchProspectsByValue, searchProspectsByValues } from '../../functions/api';
 import Select from 'react-select';
-import { handleGetTimeZoneOfUser } from '../../functions/dates';
 import IconSettings from '../Icon/IconSettings';
 import { deleteMessage, listenForMessages } from '../../firebase/firebaseFunctions';
 import IconListCheck from '../Icon/IconListCheck';
@@ -291,7 +288,6 @@ const Header = () => {
             });
             setSearchedStudentsAndProspects({ students, prospects });
         }
-
         setSearch(false);
         navigate('/search');
     };

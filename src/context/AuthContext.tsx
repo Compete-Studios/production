@@ -47,17 +47,6 @@ export default function AuthContextProvider({ children }: any) {
     });
     const [attendanceArr, setAttendanceArr] = useState<any>([]);
 
-    const getAllSpaces = async (uid: any) => {
-        const spacesRef = collection(db, 'spaces');
-        const uidToString = uid.toString();
-        const q = query(spacesRef, where('userID', '==', uidToString));
-        const querySnapshot = await getDocs(q);
-        let spacesArray: any[] = [];
-        querySnapshot.forEach((doc) => {
-            spacesArray.push({ ...doc.data(), id: doc.id });
-        });
-        setSpaces(spacesArray);
-    };
 
     const getAllStudentsAttendanceRecords = async (uid: any) => {
         const uidToString = uid.toString();

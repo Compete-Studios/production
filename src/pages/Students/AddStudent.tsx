@@ -9,7 +9,7 @@ import { addNewStudent, addStudentToClasses, addStudentToPrograms, addStudentToW
 import { Link, useNavigate } from 'react-router-dom';
 import { constFormateDateMMDDYYYY, formatDate } from '../../functions/shared';
 
-const studentInfoInit = {
+const studentInfoInit: any = {
     studioId: '',
     fName: '',
     lName: '',
@@ -23,14 +23,14 @@ const studentInfoInit = {
     city: '',
     state: '',
     zip: '',
-    birthdate: '01-01-2022',
+    birthdate: '',
     marketingMethod: '',
     notes: '',
-    nextContactDate: constFormateDateMMDDYYYY(new Date()),
+    nextContactDate: null,
     currentPipelineStatus: '',
-    firstClassDate: constFormateDateMMDDYYYY(new Date()),
-    originalContactDate: constFormateDateMMDDYYYY(new Date()),
-    introDate: constFormateDateMMDDYYYY(new Date()),
+    firstClassDate: '',
+    originalContactDate: '',
+    introDate: '',
 };
 
 const alertsInit = {
@@ -45,10 +45,9 @@ export default function AddStudent() {
     const { waitingLists, pipelineSteps, programs, classes, marketingSources, suid, toActivate }: any = UserAuth();
     const [alerts, setAlerts] = useState(alertsInit);
     const [studentInfo, setStudentInfo] = useState(studentInfoInit);
-    const [programsForStudent, setProgramsForStudent] = useState([]);
-    const [selectedClasses, setSelectedClasses] = useState([]);
-    const [selectedWaitingLists, setSelectedWaitingLists] = useState([]);
-    const [options, setOptions] = useState([]);
+    const [programsForStudent, setProgramsForStudent] = useState<any[]>([]);
+    const [selectedClasses, setSelectedClasses] = useState<any[]>([]);
+    const [selectedWaitingLists, setSelectedWaitingLists] = useState<any[]>([]);
 
     const updatedPipelineSteps = pipelineSteps ? [
         { StepName: "No Status", pipelineStepId: 0 },
@@ -106,7 +105,6 @@ export default function AddStudent() {
         const newPrograms = programs?.map((program: any) => {
             return { value: program.ProgramId, label: program.Name };
         });
-        setOptions(newPrograms);
     }, [programs]);
 
     const handleSelectClass = (e: any, item: any) => {
@@ -118,7 +116,7 @@ export default function AddStudent() {
         }
     };
 
-    const handleDeselctClass = (e, item) => {
+    const handleDeselctClass = (e: any, item: any) => {
         e.preventDefault();
         setSelectedClasses(selectedClasses.filter((i) => i !== item));
     };
@@ -132,7 +130,7 @@ export default function AddStudent() {
         }
     };
 
-    const handleDeselctProgram = (e, item) => {
+    const handleDeselctProgram = (e: any, item: any) => {
         e.preventDefault();
         setProgramsForStudent(programsForStudent.filter((i) => i !== item));
     };
@@ -174,11 +172,11 @@ export default function AddStudent() {
     const handleAddStudent = async (e: any) => {
         e.preventDefault();
 
-        studentInfo.nextContactDate = formatDate(studentInfo.nextContactDate);
-        studentInfo.birthdate = formatDate(studentInfo.birthdate);
-        studentInfo.firstClassDate = formatDate(studentInfo.firstClassDate);
-        studentInfo.originalContactDate = formatDate(studentInfo.originalContactDate);
-        studentInfo.introDate = formatDate(studentInfo.introDate);
+        studentInfo.nextContactDate = studentInfo.nextContactDate ? formatDate(studentInfo.nextContactDate) : null;
+        studentInfo.birthdate = studentInfo.birthdate ? formatDate(studentInfo.birthdate) : null;
+        studentInfo.firstClassDate = studentInfo.firstClassDate ? formatDate(studentInfo.firstClassDate) : null;
+        studentInfo.originalContactDate = studentInfo.originalContactDate ? formatDate(studentInfo.originalContactDate) : null;
+        studentInfo.introDate = studentInfo.introDate ? formatDate(studentInfo.introDate) : null;
         studentInfo.studioId = suid;
 
         const classIDs = selectedClasses.map((item: any) => item.ClassId);
@@ -201,11 +199,8 @@ export default function AddStudent() {
             scrollTop();
             return;
         } else {
-            addNewStudent(studentInfo).then((res) => {
-                console.log(res, 'new student');
-                console.log(programIds, 'programIds');
-                console.log(classIDs, 'classIDs');
-                console.log(waitingListIds, 'waitingListIds');
+            console.log('studentInfo', studentInfo);
+            addNewStudent(studentInfo).then((res) => {              
                 addStudentToPrograms(res.NewStudentId, programIds);
                 addStudentToClasses(res.NewStudentId, classIDs);
                 addStudentToWaitingLists(res.NewStudentId, waitingListIds);
@@ -230,10 +225,10 @@ export default function AddStudent() {
                     <span>Add Student</span>
                 </li>
             </ul>
-            <div className="panel bg-gray-100 max-w-5xl mx-auto mt-4">
+            <div className="panel bg-zinc-100 max-w-5xl mx-auto mt-4">
                 <div className="mb-5">
-                    <h5 className="font-semibold text-lg mb-4">Student Info</h5>
-                    <p>Use this option to add a new student to the system. </p>
+                    <h5 className="font-semibold text-lg">Student Info</h5>
+                    <p>Please fill out the Students Basic Information</p>
                 </div>
                 <div className="mb-5">
                     <form>
@@ -326,9 +321,10 @@ export default function AddStudent() {
                     </form>
                 </div>
             </div>
-            <div className="panel bg-gray-100 max-w-5xl mx-auto mt-4">
+            <div className="panel bg-zinc-100 max-w-5xl mx-auto mt-4">
                 <div className="mb-5">
-                    <h5 className="font-semibold text-lg mb-4">Additional Info</h5>
+                    <h5 className="font-semibold text-lg ">Additional Info</h5>
+                    <p>This is the additional information for the student</p>
                 </div>
                 <div className="mb-5">
                     <form>
@@ -357,7 +353,7 @@ export default function AddStudent() {
                                 <Flatpickr
                                     value={studentInfo.originalContactDate}
                                     className="form-input"
-                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                    options={{ dateFormat: 'm-d-Y', position: 'auto right', allowInput: true  }}
                                     onChange={(date: any) => setStudentInfo({ ...studentInfo, originalContactDate: date })}
                                 />
                             </div>
@@ -366,7 +362,7 @@ export default function AddStudent() {
                                 <Flatpickr
                                     value={studentInfo.introDate}
                                     className="form-input"
-                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                    options={{ dateFormat: 'm-d-Y', position: 'auto right', allowInput: true  }}
                                     onChange={(date: any) => setStudentInfo({ ...studentInfo, introDate: date })}
                                 />
                             </div>
@@ -375,7 +371,7 @@ export default function AddStudent() {
                                 <Flatpickr
                                     value={studentInfo.firstClassDate}
                                     className="form-input"
-                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                    options={{ dateFormat: 'm-d-Y', position: 'auto right', allowInput: true  }}
                                     onChange={(date: any) => setStudentInfo({ ...studentInfo, firstClassDate: date })}
                                 />
                             </div>
@@ -384,7 +380,7 @@ export default function AddStudent() {
                                 <Flatpickr
                                     value={studentInfo.nextContactDate}
                                     className="form-input"
-                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                    options={{ dateFormat: 'm-d-Y', position: 'auto right', allowInput: true  }}
                                     onChange={(date: any) => setStudentInfo({ ...studentInfo, nextContactDate: date })}
                                 />
                             </div>

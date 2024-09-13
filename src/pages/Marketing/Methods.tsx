@@ -5,31 +5,26 @@ import { setPageTitle } from '../../store/themeConfigSlice';
 import IconTrashLines from '../../components/Icon/IconTrashLines';
 import { UserAuth } from '../../context/AuthContext';
 import AddNewMethod from './AddNewMethod';
+import EditMethod from './EditMethod';
+import { dropMarketingMethod } from '../../functions/api';
 export default function ViewClasses() {
-    const { marketingSources }: any = UserAuth();
+    const { marketingSources, update, setUpdate }: any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Search Prospects'));
+        dispatch(setPageTitle('Marketing Methods'));
     });
 
-    const deleteRow = (id: any = null) => {
+    const deleteRow = async (id: any = null) => {
+        console.log('id', id);
         if (window.confirm('Are you sure want to delete selected row ?')) {
-            if (id) {
-                setRecords(marketingSources?.filter((user: any) => user.MethodId !== id));
-                setInitialRecords(marketingSources?.filter((user: any) => user.MethodId !== id));
+            const res = await dropMarketingMethod(id);
+            if (res.status === 200) {
+                console.log('Deleted');
                 setSearch('');
                 setSelectedRecords([]);
+                setUpdate(!update);
             } else {
-                let selectedRows = selectedRecords || [];
-                const ids = selectedRows.map((d: any) => {
-                    return d.MethodId;
-                });
-                const result = marketingSources?.filter((d: any) => !ids.includes(d.MethodId as never));
-                setRecords(result);
-                setInitialRecords(result);
-                setSearch('');
-                setSelectedRecords([]);
-                setPage(1);
+                console.log('Failed to delete');
             }
         }
     };
@@ -64,7 +59,7 @@ export default function ViewClasses() {
                 return item.Name.toLowerCase().includes(search.toLowerCase()) || item.Notes.toLowerCase().includes(search.toLowerCase());
             });
         });
-    }, [search]);
+    }, [search, marketingSources]);
 
     useEffect(() => {
         const data2 = initialRecords;
@@ -106,12 +101,12 @@ export default function ViewClasses() {
                                     accessor: 'action',
                                     title: 'Actions',
                                     sortable: false,
-                                    textAlignment: 'center',
-                                    render: ({ MethodId }) => (
-                                        <div className="flex gap-4 items-center w-max mx-auto ">
-                                           
+                                    textAlignment: 'right',
+                                    render: ({ MethodId, Name, Notes }) => (
+                                        <div className="flex gap-4 items-start justify-end">
+                                            <EditMethod MethodId={MethodId} Name={Name} Notes={Notes} />
                                             {/* <NavLink to="" className="flex"> */}
-                                            <button type="button" className="flex hover:text-danger" onClick={(e) => deleteRow(MethodId)}>
+                                            <button type="button" className="text-danger hover:text-danger" onClick={(e: any) => deleteRow(MethodId)}>
                                                 <IconTrashLines />
                                             </button>
                                             {/* </NavLink> */}

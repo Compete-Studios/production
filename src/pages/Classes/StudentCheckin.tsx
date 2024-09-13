@@ -87,7 +87,7 @@ export default function StudentCheckIn() {
                     <h1 className="text-2xl font-semibold text-gray-800 text-center ">Student Check-in</h1>
                     <p className="text-center text-gray-500 mb-12">Please enter your student code to check-in</p>
                     <div>
-                        {student && <h1>{student.StudentId}</h1>}
+                        
                         <input id="barcode-input" type="text" className="form-input h-12 text-xl" placeholder="Student Code" value={barcode} onKeyDown={handleKeyPress} onChange={handleBarcode} autoComplete='off'/>
                     </div>
                     <StudentSlider open={open} setOpen={setOpen} studentID={studentID} setBarcode={setBarcode}/>

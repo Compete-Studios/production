@@ -934,7 +934,7 @@ export const updateMarketingMethod = async (data) => {
 
 export const dropMarketingMethod = async (methodId) => {
     try {
-        const response = await fetchData(`marketing-access/dropMarketingMethod/${methodId}`, 'delete');
+        const response = await fetchData(`marketing-access/dropMarketingMethod/${methodId}`, 'get');
         return { response, status: 200 };
     } catch (error) {
         console.error(error);
@@ -1731,5 +1731,17 @@ export const addCustomBarcodeId = async (data) => {
     } catch (error) {
         console.error(error);
         throw error;
+    }
+};
+
+export const updateSteps = async (data) => {
+    for (let i = 0; i < data.length; i++) {
+        try {
+            const response = await fetchData(`marketing-access/updatePipelineStepsOrder`, 'post', data[i]);
+            return response;
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
     }
 };

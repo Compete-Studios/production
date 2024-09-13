@@ -80,15 +80,19 @@ export default function StudentSlider({ open, setOpen, studentID, setBarcode }: 
         setBarcode('');
     };
 
+    const onDismiss = () => {
+        setOpen(false);
+        setBarcode('');
+    };
+
     return (
         <>
             {/* <button className="text-info hover:text-blue-800 flex items-center gap-1" onClick={() => setOpen(true)}>
        View Payment
             </button> */}
             <Transition.Root show={open} as={Fragment}>
-                <Dialog className="relative z-50" onClose={setOpen}>
+                <Dialog className="relative z-50" onClose={onDismiss}>
                     <div className="fixed inset-0" />
-
                     <div className="fixed inset-0 overflow-hidden">
                         <div className="absolute inset-0 overflow-hidden">
                             <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
@@ -110,7 +114,7 @@ export default function StudentSlider({ open, setOpen, studentID, setBarcode }: 
                                                         <button
                                                             type="button"
                                                             className="relative rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none "
-                                                            onClick={() => setOpen(false)}
+                                                            onClick={onDismiss}
                                                         >
                                                             <span className="absolute -inset-2.5" />
                                                             <span className="sr-only">Close panel</span>

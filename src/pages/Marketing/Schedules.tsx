@@ -30,6 +30,8 @@ export default function Schedules() {
     const [dailyScheduleStudents, setDailyScheduleStudents] = useState<any>([]);
     const [dailyScheduleProspects, setDailyScheduleProspects] = useState<any>([]);
     const [studioOptions, setStudioOptions] = useState<any>([]);
+    const [noStudents, setNoStudents] = useState(false);
+    const [noProspects, setNoProspects] = useState(false);
     const [loading, setLoading] = useState(true);
     const [gettingStudents, setGettingStudents] = useState(true);
     const [gettingProspects, setGettingProspects] = useState(true);
@@ -50,6 +52,7 @@ export default function Schedules() {
         const dataJson = await data.json();
         if (dataJson.length > 0) {
             setDailyScheduleStudentSteps(dataJson);
+           
         } else {
             setDailyScheduleStudentSteps([]);
             setGettingStudents(false);
@@ -61,6 +64,7 @@ export default function Schedules() {
         const dataJson = await data.json();
         if (dataJson?.recordset?.length > 0) {
             setDailyScheduleProspectSteps(dataJson.recordset);
+           
         } else {
             setDailyScheduleProspectSteps([]);
             setGettingProspects(false);
@@ -77,13 +81,15 @@ export default function Schedules() {
     const handleGetNewSchedule = async () => {
         handleGetStudents();
         handleGetProspects();
+        setGettingStudents(true);
+        setGettingProspects(true);
     };
 
     useEffect(() => {
         if (!gettingStudents && !gettingProspects) {
-            setTimeout(() => {
-                setLoading(false);
-            }, 1000);
+            setLoading(false);
+        } else {
+            setLoading(true);
         }
     }, [gettingStudents, gettingProspects]);
 
@@ -125,7 +131,7 @@ export default function Schedules() {
             setDailyScheduleStudents(dailySS);
             setGettingStudents(false);
         } else {
-            setGettingStudents(false);
+            console.log('No students today');
         }
     };
 
@@ -173,13 +179,11 @@ export default function Schedules() {
                 // Converting the grouped students object to an array
                 const dailySP = Object.values(groupedStudents);
                 setDailyScheduleProspects(dailySP);
+                setGettingProspects(false);
             } catch (error) {
                 console.error('Error fetching prospects:', error);
-            } finally {
-                setGettingProspects(false);
             }
         } else {
-            setGettingProspects(false);
             console.log('No prospects today');
         }
     };
@@ -516,12 +520,8 @@ export default function Schedules() {
     };
 
     return (
-        <div className="grid grid-cols-1 gap-6 mb-6  border-t">
-            {loading ? (
-                <div className="panel bg-gray-100 animate-pulse h-full"></div>
-            ) : (
-                <Suspense fallback={<div>Loading...</div>}>
-                    <div className="hidden sm:flex items-center justify-between whitespace-nowrap mt-12">
+        <div className="mb-6 ">
+             <div className="hidden sm:flex items-center justify-between whitespace-nowrap mt-12">
                         <div className="flex items-center gap-4 sm:w-1/2 w-full">
                             <label htmlFor="scheduleDate">Next Contact Date</label>
                             <input
@@ -541,7 +541,12 @@ export default function Schedules() {
                             </button>
                         </div>
                     </div>
-                    <div className="panel p-0 ">
+            {loading ? (
+                <div className="panel bg-gray-100 animate-pulse h-48 mt-4 flex justify-center items-center">Getting Schedule...</div>
+            ) : (
+                <div>
+                   
+                    <div className="panel p-0 mt-6">
                         <div className="flex items-center justify-between py-5 px-5 bg-dark rounded-t-lg text-white">
                             <h5 className="font-semibold text-lg dark:text-white-light">Prospect Schedule</h5>
                             <div className="flex items-center gap-1">
@@ -622,79 +627,70 @@ export default function Schedules() {
                             </table>
                         </div>
                     </div>
-                </Suspense>
-            )}
-            {loading ? (
-                <div className="panel bg-gray-100 animate-pulse h-full"></div>
-            ) : (
-                <Suspense fallback={<div>Loading...</div>}>
-                    <div className="panel p-0">
-                        <div className="flex items-center justify-between py-5 px-5 bg-dark rounded-t-lg text-white">
-                            <h5 className="font-semibold text-lg dark:text-white-light">Students Schedule</h5>
-                            <div className="flex items-center gap-1">
-                                <div>
-                                    <UpdateScheduleSteps type="student" steps={dailyScheduleStudentSteps} studioID={suid} scheduleId={scheduleID} />
-                                </div>
-                                <Tippy content="Print Schedule">
-                                    <button type="button" onClick={handlePrintStudentSchedule} className="font-semibold hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-600">
-                                        <span className="flex items-center">
-                                            <IconPrinter className="w-5 h-5 text-white dark:text-white/70 hover:!text-primary" />
-                                        </span>
-                                    </button>
-                                </Tippy>
+                    <div className="panel p-0 mt-6">
+                    <div className="flex items-center justify-between py-5 px-5 bg-dark rounded-t-lg text-white">
+                        <h5 className="font-semibold text-lg dark:text-white-light">Students Schedule</h5>
+                        <div className="flex items-center gap-1">
+                            <div>
+                                <UpdateScheduleSteps type="student" steps={dailyScheduleStudentSteps} studioID={suid} scheduleId={scheduleID} />
                             </div>
-                        </div>
-                        <div className="table-responsive">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th className="ltr:rounded-l-md rtl:rounded-r-md">Pipeline Step</th>
-                                        <th>Name</th>
-                                        <th>Contact</th>
-                                        <th>Class</th>
-                                        <th className="ltr:rounded-r-md rtl:rounded-l-md">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {dailyScheduleStudents?.length > 0 ? (
-                                        dailyScheduleStudents?.map((student: any, index: any) => (
-                                            <tr key={index} className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
-                                                <td className="text-black dark:text-white flex-wra">
-                                                    <div>{student?.StepName}</div>
-                                                </td>
-                                                <td className="">
-                                                    <UpdateNotesForStudent student={student} update={update} setUpdate={setUpdate} />
-                                                </td>
-                                                <td>{student?.Contact1}</td>
-                                                <td>
-                                                    {student?.Classes?.map((className: string) => (
-                                                        <div key={className}>{className}</div>
-                                                    ))}
-                                                </td>
-                                                <td className="flex-wra">
-                                                    <Tippy content="View">
-                                                        <Link
-                                                            to={`/students/view-student/${hashTheID(student.Student_id)}/${hashTheID(suid)}`}
-                                                            className="flex hover:text-green-800 text-primary gap-1"
-                                                        >
-                                                            <IconEye /> View
-                                                        </Link>
-                                                    </Tippy>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
-                                            <td className="text-black dark:text-white flex-wra text-center" colSpan={5}>
-                                                <div>No Students Today</div>
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                            <Tippy content="Print Schedule">
+                                <button type="button" onClick={handlePrintStudentSchedule} className="font-semibold hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-600">
+                                    <span className="flex items-center">
+                                        <IconPrinter className="w-5 h-5 text-white dark:text-white/70 hover:!text-primary" />
+                                    </span>
+                                </button>
+                            </Tippy>
                         </div>
                     </div>
-                </Suspense>
+                    <div className="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th className="ltr:rounded-l-md rtl:rounded-r-md">Pipeline Step</th>
+                                    <th>Name</th>
+                                    <th>Contact</th>
+                                    <th>Class</th>
+                                    <th className="ltr:rounded-r-md rtl:rounded-l-md">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {dailyScheduleStudents?.length > 0 ? (
+                                    dailyScheduleStudents?.map((student: any, index: any) => (
+                                        <tr key={index} className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
+                                            <td className="text-black dark:text-white flex-wra">
+                                                <div>{student?.StepName}</div>
+                                            </td>
+                                            <td className="">
+                                                <UpdateNotesForStudent student={student} update={update} setUpdate={setUpdate} />
+                                            </td>
+                                            <td>{student?.Contact1}</td>
+                                            <td>
+                                                {student?.Classes?.map((className: string) => (
+                                                    <div key={className}>{className}</div>
+                                                ))}
+                                            </td>
+                                            <td className="flex-wra">
+                                                <Tippy content="View">
+                                                    <Link to={`/students/view-student/${hashTheID(student.Student_id)}/${hashTheID(suid)}`} className="flex hover:text-green-800 text-primary gap-1">
+                                                        <IconEye /> View
+                                                    </Link>
+                                                </Tippy>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
+                                        <td className="text-black dark:text-white flex-wra text-center" colSpan={5}>
+                                            <div>No Students Today</div>
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                </div>
             )}
         </div>
     );

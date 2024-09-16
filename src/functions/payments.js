@@ -217,7 +217,7 @@ export const voidAPayment = async (paymentData) => {
 
 export const getAllActivePaymentSchedules = async (studioId) => {
     try {
-        const response = await fetchData(`paysimple-test/getAllActivePaymentSchedules/${studioId}`, 'get');
+        const response = await fetchData(`paysimple-routes/getAllActivePaymentSchedules/${studioId}`, 'get');
         return response;
     } catch (error) {
         console.error(error);

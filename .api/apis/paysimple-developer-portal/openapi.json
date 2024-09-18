@@ -1,0 +1,28 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "PaySimple API 4.0-DO NOT DELETE",
+    "version": "unknown"
+  },
+  "servers": [
+    {
+      "url": "https://api.paysimple.com/v4"
+    }
+  ],
+  "components": {
+    "securitySchemes": {}
+  },
+  "security": [
+    {}
+  ],
+  "paths": {},
+  "x-readme": {
+    "headers": [
+      {
+        "key": "Content-Type",
+        "value": "application/json"
+      }
+    ]
+  },
+  "x-readme-fauxas": true
+}

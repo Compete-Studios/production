@@ -144,9 +144,9 @@ const ViewStudents = () => {
                                                 {/* <Link to="/students/edit-student" type="button" className="btn btn-sm btn-outline-primary" onClick={() => editUser(contact)}>
                                                     Edit
                                                 </Link> */}
-                                                <Link to="/students/delete-student" type="button" className="btn btn-sm btn-outline-danger" onClick={() => deleteUser(contact)}>
+                                                {/* <Link to="/students/delete-student" type="button" className="btn btn-sm btn-outline-danger" onClick={() => deleteUser(contact)}>
                                                     Delete
-                                                </Link>
+                                                </Link> */}
                                             </div>
                                         </td>
                                     </tr>

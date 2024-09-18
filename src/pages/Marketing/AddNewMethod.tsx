@@ -16,7 +16,7 @@ export default function AddNewMethod() {
     const [name, setName] = useState('');
     const [notes, setNotes] = useState('');
 
-    const handleAddRoom = async () => {
+    const handleAddMethod = async () => {
         const methodData = {
             studioId: suid,
             name,
@@ -27,17 +27,17 @@ export default function AddNewMethod() {
         try {
             const response = await addMarketingMethod(methodData);
             if (response.status === 200) {
-                showMessage('Room added successfully');
+                showMessage('Method added successfully');
                 setShowQuickPayModal(false);   
                 setUpdate(!update);      
                 setName('');
                 setNotes('');    
             } else {
-                showMessage('Failed to add room', 'error');
+                showMessage('Failed to add method', 'error');
             }
         } catch (error) {
             console.error(error);
-            showMessage('Failed to add room', 'error');
+            showMessage('Failed to add method', 'error');
         }
     };
 
@@ -98,7 +98,7 @@ export default function AddNewMethod() {
                                             />
                                         </div>
                                         <div className="flex">
-                                            <button type="button" className="ml-auto btn btn-primary" onClick={handleAddRoom}>
+                                            <button type="button" className="ml-auto btn btn-primary" onClick={handleAddMethod}>
                                                 Add Method
                                             </button>
                                         </div>

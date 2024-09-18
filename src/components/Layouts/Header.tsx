@@ -39,7 +39,7 @@ import { deleteMessage, listenForMessages } from '../../firebase/firebaseFunctio
 import IconListCheck from '../Icon/IconListCheck';
 
 const Header = () => {
-    const { setSearchedStudentsAndProspects, suid, studioInfo, isMaster, masters, setSelectedSuid, isAdmin, setShowLoading }: any = UserAuth();
+    const { setSearchedStudentsAndProspects, suid, studioInfo, isMaster, masters, setSelectedSuid, isAdmin, setShowLoading, mainSuid }: any = UserAuth();
     const [searchItem, setSearchItem] = useState('');
     const [studioInitials, setStudioInitials] = useState('');
     const [options, setOptions] = useState<any>([]);
@@ -48,6 +48,8 @@ const Header = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
+   
+  
     useEffect(() => {
         if (isMaster) {
             setOptions(masters.map((master: any) => ({ value: master.studioID, label: master.studioName })));
@@ -57,6 +59,8 @@ const Header = () => {
             setOptions([]);
         }
     }, [masters]);
+
+   
 
     const handleGetIncoming = async () => {
         const data = {
@@ -75,6 +79,7 @@ const Header = () => {
     useEffect(() => {
         handleGetIncoming();
     }, []);
+
 
 
     const handleSelectStudio = (value: any) => {
@@ -222,21 +227,24 @@ const Header = () => {
         searchValue2: '',
     });
 
+   
+
     const [numberOfSearchValues, setNumberOfSearchValues] = useState(0);
 
     useEffect(() => {
         // if search terms has a space
         if (searchItem.includes(' ')) {
             setSearchParams({
-                ...searchParams,
+                studioId: suid,
                 searchValue: searchItem.split(' ')[0],
                 searchValue2: searchItem.split(' ')[1],
             });
             setNumberOfSearchValues(2);
         } else {
             setSearchParams({
-                ...searchParams,
+                studioId: suid,
                 searchValue: searchItem,
+                searchValue2: '',
             });
             setNumberOfSearchValues(1);
         }
@@ -264,12 +272,13 @@ const Header = () => {
         setShowLoading(true);
         logout();
     };
-
+    
     const handleSearchUsers = async (e: any) => {
         e.preventDefault();
         setSearchedStudentsAndProspects({ students: [], prospects: [] });
         let students: any = [];
         let prospects: any = [];
+        console.log('searchParams', searchParams);
 
         if (numberOfSearchValues === 2) {
             await searchByValues(searchParams).then((response) => {

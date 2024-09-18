@@ -78,7 +78,8 @@ const StudentsInRank = () => {
                 return item.Name.toLowerCase().includes(search.toLowerCase());
             });
         });
-    }, [search, prospectRoster]);
+    }, [search, prospectRoster]);    
+
 
     return (
         <>

@@ -50,30 +50,6 @@ export default function ViewClasses() {
             });
     };
 
-    // const handleDeleteClasss = (id: any = null) => {
-    //     if (window.confirm('Are you sure want to delete this class?')) {
-    //         if (id) {
-    //             alert('Class Deleted');
-    //             setRecords(classes?.filter((user: any) => user.ClassId !== id));
-    //             setInitialRecords(classes?.filter((user: any) => user.ClassId !== id));
-    //             setSearch('');
-    //             setSelectedRecords([]);
-    //             dropClassByClassID(id);
-    //             setUpdate(!update);
-    //         } else {
-    //             let selectedRows = selectedRecords || [];
-    //             const ids = selectedRows.map((d: any) => {
-    //                 return d.ClassId;
-    //             });
-    //             const result = classes?.filter((d: any) => !ids.includes(d.ClassId as never));
-    //             setRecords(result);
-    //             setInitialRecords(result);
-    //             setSearch('');
-    //             setSelectedRecords([]);
-    //         }
-    //     }
-    // };
-
     const [initialRecords, setInitialRecords] = useState([]);
     const [records, setRecords] = useState(initialRecords);
     const [selectedRecords, setSelectedRecords] = useState<any>([]);
@@ -102,6 +78,8 @@ export default function ViewClasses() {
         const data2 = initialRecords;
         setRecords(sortStatus.direction === 'desc' ? data2.reverse() : data2);
     }, [sortStatus]);
+
+    console.log(classes)
 
     return (
         <div>

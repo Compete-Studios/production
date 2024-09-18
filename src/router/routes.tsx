@@ -14,6 +14,10 @@ import StudentCheckIn from '../pages/Classes/StudentCheckin';
 const Overview = lazy(() => import('../pages/Overview'));
 const CompeteLegacyForms = lazy(() => import('../pages/Forms/CompeteLegacyForms'));
 
+// Dashboards
+
+const Studio = lazy(() => import('../components/Dashboards/Studio'));
+
 // Reports
 const AllReports = lazy(() => import('../pages/Reports/AllReports'));
 const Birthdays = lazy(() => import('../pages/Reports/Birthday'));
@@ -229,6 +233,16 @@ const routes = [
         layout: 'blank',
     },
 
+    //dashboards
+    {
+        path: '/dashboard',
+        element: <Overview />,
+    },
+    {
+        path: '/payment-dashboard',
+        element: <Studio />,
+    },
+
     //payments
     {
         path: '/payments/search-payments',
@@ -384,7 +398,7 @@ const routes = [
         element: <StealthAttendance />,
         layout: 'blank',
     },
-    
+
     {
         path: '/classes/stealth-attendance/teachers',
         element: <Attendance />,
@@ -561,9 +575,8 @@ const routes = [
     {
         path: '/students/email-list-students',
         element: <EmailList />,
-
     },
-    
+
     {
         path: '/students/text-list-all-students',
         element: <TextList />,
@@ -635,11 +648,7 @@ const routes = [
         path: '/prospects/activate-as-student',
         element: <ActivateAsStudent />,
     },
-    //dashboard
-    {
-        path: '/dashboard',
-        element: <Overview />,
-    },
+
     //facebook
     {
         path: '/facebook-add-creator',

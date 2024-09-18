@@ -57,7 +57,7 @@ export default function UpdateScheduleSteps({ type, steps, studioID, ppStepId, s
                                             <p>
                                                 {pipelineSteps?.map((step: any) => {
                                                     return (
-                                                        <div key={step.Step_Id} className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 py-2">
+                                                        <div key={step.PipelineStepId} className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 py-2">
                                                             <div>
                                                                 <div className="font-semibold">{step.StepName}</div>
                                                                 <div className="text-sm line-clamp-1 max-w-96">{step.Description}</div>
@@ -81,7 +81,7 @@ export default function UpdateScheduleSteps({ type, steps, studioID, ppStepId, s
                                             <p>
                                                 {prospectPipelineSteps?.map((step: any) => {
                                                     return (
-                                                        <div key={step.Step_Id} className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 py-2">
+                                                        <div key={step.PipelineStepId} className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 py-2">
                                                             <div>
                                                                 <div className="font-semibold">{step.StepName}</div>
                                                                 <div className="text-sm line-clamp-1 max-w-96">{step.Description}</div>

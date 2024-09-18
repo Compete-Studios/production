@@ -92,6 +92,7 @@ export default function ViewStudentsInPipeline() {
                 console.error('Error:', error);
             });
     };
+    
 
     return (
         <>
@@ -200,14 +201,12 @@ export default function ViewStudentsInPipeline() {
                                                         </div>
                                                     </td>
 
-                                                    <td className="relative whitespace-nowrap text-right text-sm font-medium ">
+                                                    <td className="relative whitespace-nowrap text-right text-sm font-medium">
                                                         <div className="flex items-center gap-2">
                                                             <Link
                                                                 to={`/prospects/view-prospect/${hashTheID(list.ProspectId)}/${hashTheID(suid)}`}
                                                                 type="button"
-                                                                className={`btn btn-sm ${
-                                                                    new Date(list.NextContactDate) <= new Date() ? 'btn-success' : 'btn-outline-success dark:bg-gray-800 ml-auto'
-                                                                }`}
+                                                                className={`btn btn-sm btn-success dark:bg-gray-800 ml-auto`}
                                                             >
                                                                 View
                                                             </Link>

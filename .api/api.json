@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "apis": [
+    {
+      "identifier": "paysimple-developer-portal",
+      "source": "@paysimple-developer-portal/v1.1#fv6vw4al5ip3eo1",
+      "integrity": "sha512-oolZUfQEuN6vtA3MLQwDrEzCYrmkGOzNnucpz8djtaM0yIuV+ZVoSLUTYNzGBRCzwjscIUqg3xaTGy5dpI9cCQ==",
+      "installerVersion": "6.1.2"
+    }
+  ]
+}

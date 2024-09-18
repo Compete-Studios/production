@@ -532,6 +532,44 @@ export const addStaffMember = async (formData) => {
     }
 };
 
+export const addStaffToClass = async (staffId, classID) => {
+    try {
+        const response = await fetchData(`staff-access/addStaffToClass/${staffId}/${classID}`, 'get');
+        return { response, status: 200 };
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const addStaffToClasses = async (staffId, classIDs) => {
+    const data = {
+        staffId,
+        classIDs,
+    };
+    try {
+        const response = await fetchData('staff-access/addStaffToClasses', 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const addStaffIDSToClass = async (classId, staffIds) => {
+    const data = {
+        classId,
+        staffIds,
+    };
+    try {
+        const response = await fetchData('staff-access/addStaffIDSToClass', 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const loadStudioRooms = async (studioId) => {
     try {
         const response = await fetchData(`class-access/getRoomsByStudioId/${studioId}`, 'get');
@@ -1002,6 +1040,8 @@ export const updateStaffActivity = async (staffId, activityLevel) => {
     }
 };
 
+
+
 export const updateStaffMember = async (data) => {
     try {
         const response = await fetchData(`staff-access/updateStaffMember`, 'post', data);
@@ -1333,6 +1373,16 @@ export const getCountOfInactiveOrInactive = async (studioId, activity) => {
         throw error;
     }
 };
+
+export const getCountOfActiveProspects = async (studioId) => {
+    try {
+        const response = await fetchData(`marketing-access/getProspectsInAPipeline/${studioId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
 
 export const getStudentNameByPhone = async (phone, studioID) => {
     try {

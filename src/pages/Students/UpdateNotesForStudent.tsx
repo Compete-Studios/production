@@ -1,19 +1,10 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import 'flatpickr/dist/flatpickr.css';
-import { Tab } from '@headlessui/react';
 import IconX from '../../components/Icon/IconX';
-import IconBolt from '../../components/Icon/IconBolt';
-import IconMail from '../../components/Icon/IconMail';
-import IconMessage2 from '../../components/Icon/IconMessage2';
+
 import IconNotes from '../../components/Icon/IconNotes';
-import IconListCheck from '../../components/Icon/IconListCheck';
-import SendMail from './components/SendMail';
-import SendText from './components/SendText';
-import QuickUpdate from './components/QuickUpdate';
-import IconLink from '../../components/Icon/IconLink';
-import IconInfoCircle from '../../components/Icon/IconInfoCircle';
-import IconPlus from '../../components/Icon/IconPlus';
+
 import QuickNote from './components/QuickNote';
 import { UserAuth } from '../../context/AuthContext';
 
@@ -40,7 +31,7 @@ export default function UpdateNotesForStudent({ student, update, setUpdate }: an
         <div>
             <div>
              
-                <button className="flex hover:text-green-800 text-primary font-bold gap-1" onClick={() => setShowActionModal(true)}>
+                <button className="flex items-center hover:text-green-800 text-primary font-bold gap-1 text-left" onClick={() => setShowActionModal(true)}>
                     {student?.StudentName}{' '}
                     <span className="text-warning hover:yellow-900">
                         <IconNotes />

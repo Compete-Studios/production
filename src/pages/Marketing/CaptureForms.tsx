@@ -131,8 +131,7 @@ export default function CaptureForms() {
                 console.error('Error:', error);
             });
     };
-
-    console.log(fbForms);
+   
 
     return (
         <>

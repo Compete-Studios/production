@@ -13,49 +13,42 @@ import IconEdit from '../../components/Icon/IconEdit';
 import Tippy from '@tippyjs/react';
 
 export default function EditMethod({ MethodId, Name, Notes }: any) {
-    const { suid }: any = UserAuth();
+    const { suid, update, setUpdate  }: any = UserAuth();
     const [showQuickPayModal, setShowQuickPayModal] = useState(false);
-    const [methodData, setMethodData] = useState({
-        methodId: MethodId,
-        studioId: suid,
-        name: Name,
-        notes: Notes,
-        months: '',
-        amount: '',
-    });
+    const [name, setName] = useState('');
+    const [notes, setNotes] = useState('');
+    const [methodID, setMethodID] = useState('');
 
     useEffect(() => {
-        setMethodData({
-            methodId: MethodId,
-            studioId: suid,
-            name: Name,
-            notes: Notes,
-            months: '',
-            amount: '',
-        });
+        setName(Name);
+        setNotes(Notes);
+        setMethodID(MethodId);
     }, [MethodId, Name, Notes, suid]);
 
-    const handleAddRoom = async () => {
-        try {
-            const response = await updateMarketingMethod(methodData);
-            if (response.status === 200) {
-                showMessage('Room added successfully');
-                setMethodData({
-                    methodId: MethodId,
-                    studioId: suid,
-                    name: Name,
-                    notes: Notes,
-                    months: '',
-                    amount: '',
-                });
-                setShowQuickPayModal(false);
-            } else {
-                showMessage('Failed to add room', 'error');
-            }
-        } catch (error) {
-            console.error(error);
-            showMessage('Failed to add room', 'error');
-        }
+    const handleUpdateMethod = async () => {
+      const methodData = {
+        methodId: methodID,
+        studioId: suid,
+        name,
+        notes,
+        amount: null,
+        months: '',
+    };
+    try {
+      const response = await updateMarketingMethod(methodData);
+      if (response.status === 200) {
+          showMessage('Method updated successfully');
+          setShowQuickPayModal(false);   
+          setUpdate(!update);      
+          setName('');
+          setNotes('');    
+      } else {
+          showMessage('Failed to update method', 'error');
+      }
+  } catch (error) {
+      console.error(error);
+      showMessage('Failed to update method', 'error');
+  }
     };
 
     return (
@@ -99,9 +92,9 @@ export default function EditMethod({ MethodId, Name, Notes }: any) {
                                                 type="text"
                                                 id="roomname"
                                                 name="roomname"
-                                                value={methodData.name}
+                                                value={name}
                                                 className="form-input"
-                                                onChange={(e) => setMethodData({ ...methodData, name: e.target.value })}
+                                                onChange={(e) => setName(e.target.value)}
                                             />
                                         </div>
                                         <div>
@@ -110,14 +103,14 @@ export default function EditMethod({ MethodId, Name, Notes }: any) {
                                                 id="description"
                                                 rows={4}
                                                 name="description"
-                                                value={methodData.notes}
+                                                value={notes}
                                                 className="form-input"
-                                                onChange={(e) => setMethodData({ ...methodData, notes: e.target.value })}
+                                                onChange={(e) => setNotes(e.target.value)}
                                             />
                                         </div>
                                         <div className="flex">
-                                            <button type="button" className="ml-auto btn btn-primary" onClick={handleAddRoom}>
-                                                Add Method
+                                            <button type="button" className="ml-auto btn btn-primary" onClick={handleUpdateMethod}>
+                                                Update Method
                                             </button>
                                         </div>
                                     </div>

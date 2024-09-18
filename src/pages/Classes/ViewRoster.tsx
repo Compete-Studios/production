@@ -25,6 +25,7 @@ import IconTrashLines from '../../components/Icon/IconTrashLines';
 import IconEye from '../../components/Icon/IconEye';
 import { REACT_BASE_URL } from '../../constants';
 import BulkPay from '../Payments/BulkPay';
+import AddStaffToClass from './AddStaffToClass';
 
 const ViewRoster = () => {
     const { suid, classes, staff, setSelectedProspects, setSelectedStudents }: any = UserAuth();
@@ -102,7 +103,7 @@ const ViewRoster = () => {
     useEffect(() => {
         handleGetClassStaff();
         handleGetSchedule();
-    }, [classId]);
+    }, [classId, updatedClasses]);
 
     useEffect(() => {
         try {
@@ -140,43 +141,6 @@ const ViewRoster = () => {
         });
     }, [search, prospectRoster]);
 
-    const saveUser = () => {
-        if (!params.Name) {
-            showMessage('Name is required.', 'error');
-            return true;
-        }
-        if (!params.email) {
-            showMessage('Email is required.', 'error');
-            return true;
-        }
-        if (!params.Phone) {
-            showMessage('Phone is required.', 'error');
-            return true;
-        }
-
-        if (params.Student_ID) {
-            //update user
-            let user: any = filteredItems.find((d: any) => d.id === params.id);
-            user.name = params.Name;
-            user.email = params.email;
-            user.phone = params.Phone;
-        } else {
-            //add user
-            let maxUserId = filteredItems.length ? filteredItems.reduce((max: any, character: any) => (character.id > max ? character.id : max), filteredItems[0].id) : 0;
-
-            let user = {
-                Student_ID: maxUserId + 1,
-                Name: params.Name,
-                email: params.email,
-                Phone: params.Phone,
-            };
-            filteredItems.splice(0, 0, user);
-            //   searchContacts();
-        }
-
-        showMessage('User has been saved successfully.');
-    };
-
     const editUser = (user: any = null) => {
         const json = JSON.parse(JSON.stringify(defaultParams));
         setParams(json);
@@ -186,9 +150,8 @@ const ViewRoster = () => {
         }
     };
 
-    const deleteUser = (user: any = null) => {
-        setFilteredItems(filteredItems.filter((d: any) => d.id !== user.Student_ID));
-        showMessage('User has been deleted successfully.');
+    const handleHashAndGo = (id: any) => {
+        navigate(`/staff/edit-staff-member/${hashids.encode(id, suid)}`);
     };
 
     const handleDeleteFromClass = (uid: any) => {
@@ -332,7 +295,6 @@ const ViewRoster = () => {
         </html>`;
         return htmlForEmail;
     };
-
     return (
         <>
             {' '}
@@ -369,33 +331,27 @@ const ViewRoster = () => {
                             </div>
                         </div>
                         <div className="text-sm text-gray-500dark:text-gray-400 mb-4 gap-1">
-                            Instructors:
+                            <span className="flex items-center gap-2">
+                                Instructors: <AddStaffToClass classData={classData} updatedClasses={updatedClasses} setUpdatedClasses={setUpdatedClasses} />
+                            </span>
                             <div className="">
                                 {classStaff?.length > 0 ? (
                                     classStaff?.map((d: any, index: any) => (
-                                        <div className="block">
-                                            <span key={index} className="font-bold text-info">
+                                        <button className="block" key={index} onClick={(e: any) => handleHashAndGo(d.StaffId)}>
+                                            <span className="font-bold text-secondary hover:text-info">
                                                 {d.FirstName} {d.LastName}
                                                 {classStaff?.length > 1 && ','}
                                             </span>
-                                        </div>
+                                        </button>
                                     ))
                                 ) : (
-                                    <div className="font-bold text-danger flex items-center gap-1">
-                                        {' '}
-                                        No Assigned Instructor
-                                        <Tippy content="Assign Instructor">
-                                            <button>
-                                                <IconUserPlus className="ltr:mr-2 rtl:ml-2 text-info" />
-                                            </button>
-                                        </Tippy>
-                                    </div>
+                                    <div className="font-bold text-danger flex items-center gap-1"> No Assigned Instructor</div>
                                 )}
                             </div>
                         </div>
                         {classSchedule.map((d: any) => (
-                            <div className="text-sm text-gray-500 dark:text-gray-400 font-bold">
-                                <span key={d.ClassScheduleId}>
+                            <div className="text-sm text-gray-500 dark:text-gray-400 font-bold" key={d.ClassScheduleId}>
+                                <span>
                                     {' '}
                                     {d.DayOfWeek} {formatHoursFromDateTime(d.StartTime, handleGetTimeZoneOfUser())} - {formatHoursFromDateTime(d.EndTime, handleGetTimeZoneOfUser())}
                                 </span>
@@ -420,7 +376,7 @@ const ViewRoster = () => {
                                 <SendBulkText isButton={true} recipients={bulkRecipientsForText} displayAll={false} />
                             </div>
 
-                          <BulkPay students={studentRoster} prospects={prospectRoster} />
+                            <BulkPay students={studentRoster} prospects={prospectRoster} />
                         </div>
                     </div>
 
@@ -431,7 +387,6 @@ const ViewRoster = () => {
 
                 <div className="lg:flex items-start mt-4 gap-4">
                     <div className="grow panel p-0">
-                
                         <div className="panel p-0 border-0 overflow-hidden">
                             <div className="table-responsive">
                                 <table className="table-striped table-hover">
@@ -492,7 +447,12 @@ const ViewRoster = () => {
                                                     <td className="hidden px-3 py-4 text-sm text-gray-500 sm:table-cell">{contact.email}</td>
                                                     <td>
                                                         <div className="flex gap-4 items-center justify-end">
-                                                            <Link to={`/prospects/view-prospect/${hashTheID(contact.ProspectId)}/${hashTheID(suid)}`} type="button" className="btn btn-sm btn-outline-primary gap-1" onClick={() => editUser(contact)}>
+                                                            <Link
+                                                                to={`/prospects/view-prospect/${hashTheID(contact.ProspectId)}/${hashTheID(suid)}`}
+                                                                type="button"
+                                                                className="btn btn-sm btn-outline-primary gap-1"
+                                                                onClick={() => editUser(contact)}
+                                                            >
                                                                 <IconEye /> View
                                                             </Link>
                                                             <button type="button" className="btn btn-sm btn-outline-danger gap-1" onClick={() => handleDeleteProspectFromClass(contact.ProspectId)}>

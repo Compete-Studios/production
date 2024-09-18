@@ -221,11 +221,9 @@ export const logoutForAdmin = async () => {
     }
 };
 
-export const updateStudioIDForAdmimMimic = async (studioID) => {
-    const docRef = doc(db, 'users', 'competeAdmin');
-    await updateDoc(docRef, { studioID: [studioID] });
-    await logoutForAdmin();
-    await login('competeAdmin', '9911competeADMIN!@#$');
+export const updateStudioIDForAdmimMimic = async (studioID, id) => {
+    const docRef = doc(db, 'users', id);
+    await updateDoc(docRef, { tempID: studioID });
 };
 
 export const updateAttendanceForStudent = async (attendance, suid, classID) => {   

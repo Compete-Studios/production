@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { UserAuth } from '../../context/AuthContext';
 import IconEye from '../../components/Icon/IconEye';
@@ -6,53 +6,28 @@ import IconPrinter from '../../components/Icon/IconPrinter';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { REACT_API_BASE_URL } from '../../constants';
-import {
-    getProspectById,
-    getProspectsInScheduleByPipelineStep,
-    getProspectsInScheduleByPipelineStepFromArrayOfSteps,
-    getStudentsInScheduleByPipelineStep,
-    getStudentsInScheduleByPipelineStepFromArrayOfSteps,
-    getStudioOptions,
-} from '../../functions/api';
-import ActionItemForSchedule from './ActionItemForSchedule';
+import { getProspectById, getProspectsInScheduleByPipelineStepFromArrayOfSteps, getStudentsInScheduleByPipelineStepFromArrayOfSteps, getStudioOptions } from '../../functions/api';
 import { hashTheID } from '../../functions/shared';
-import IconLoader from '../../components/Icon/IconLoader';
 import IconNotes from '../../components/Icon/IconNotes';
 import UpdateNotesForStudent from '../Students/UpdateNotesForStudent';
-import QuickAction from './QuickAction';
-import IconNotesEdit from '../../components/Icon/IconNotesEdit';
 import UpdateScheduleSteps from './UpdateScheduleSteps';
 
 export default function Schedules() {
-    const { suid, scheduleID, update, setUpdate }: any = UserAuth();
+    const { suid, scheduleID, update, setUpdate, setScheduleID }: any = UserAuth();
     const [dailyScheduleStudentSteps, setDailyScheduleStudentSteps] = useState<any>([]);
     const [dailyScheduleProspectSteps, setDailyScheduleProspectSteps] = useState<any>([]);
     const [dailyScheduleStudents, setDailyScheduleStudents] = useState<any>([]);
     const [dailyScheduleProspects, setDailyScheduleProspects] = useState<any>([]);
-    const [studioOptions, setStudioOptions] = useState<any>([]);
-    const [noStudents, setNoStudents] = useState(false);
-    const [noProspects, setNoProspects] = useState(false);
     const [loading, setLoading] = useState(true);
     const [gettingStudents, setGettingStudents] = useState(true);
     const [gettingProspects, setGettingProspects] = useState(true);
     const [scheduleDate, setScheduleDate] = useState(new Date());
-
-    useEffect(() => {
-        try {
-            getStudioOptions(suid).then((res) => {
-                setStudioOptions(res.recordset[0]);
-            });
-        } catch (error) {
-            console.log(error);
-        }
-    }, [suid]);
 
     const handleGetStudents = async () => {
         const data = await fetch(`${REACT_API_BASE_URL}/daily-schedule-tools/getSPStepsForSchedule/${scheduleID}/${suid}`);
         const dataJson = await data.json();
         if (dataJson.length > 0) {
             setDailyScheduleStudentSteps(dataJson);
-           
         } else {
             setDailyScheduleStudentSteps([]);
             setGettingStudents(false);
@@ -64,19 +39,25 @@ export default function Schedules() {
         const dataJson = await data.json();
         if (dataJson?.recordset?.length > 0) {
             setDailyScheduleProspectSteps(dataJson.recordset);
-           
         } else {
             setDailyScheduleProspectSteps([]);
             setGettingProspects(false);
         }
     };
 
-    useEffect(() => {
-        if (scheduleID) {
-            handleGetStudents();
-            handleGetProspects();
-        }
-    }, [suid, scheduleID, update]);
+   
+
+   useEffect(() => {
+    if (scheduleID) {
+        // Reset loading states or any other relevant state here
+        setLoading(true);
+        setGettingStudents(true);
+        setGettingProspects(true);
+
+        handleGetStudents();
+        handleGetProspects();
+    }
+}, [suid, scheduleID, update]);
 
     const handleGetNewSchedule = async () => {
         handleGetStudents();
@@ -521,31 +502,30 @@ export default function Schedules() {
 
     return (
         <div className="mb-6 ">
-             <div className="hidden sm:flex items-center justify-between whitespace-nowrap mt-12">
-                        <div className="flex items-center gap-4 sm:w-1/2 w-full">
-                            <label htmlFor="scheduleDate">Next Contact Date</label>
-                            <input
-                                type="date"
-                                id="scheduleDate"
-                                value={scheduleDate.toISOString().split('T')[0]}
-                                onChange={(e) => setScheduleDate(new Date(e.target.value))}
-                                className="w-full border border-gray-300 rounded-md p-2"
-                            />
-                            <button onClick={handleGetNewSchedule} className="btn btn-primary ">
-                                Update Schedule
-                            </button>
-                        </div>
-                        <div>
-                            <button onClick={handlePrintBoth} className="btn btn-secondary gap-1">
-                                <IconPrinter /> Print Schedule
-                            </button>
-                        </div>
-                    </div>
+            <div className="hidden sm:flex items-center justify-between whitespace-nowrap mt-12">
+                <div className="flex items-center gap-4 sm:w-1/2 w-full">
+                    <label htmlFor="scheduleDate">Next Contact Date</label>
+                    <input
+                        type="date"
+                        id="scheduleDate"
+                        value={scheduleDate.toISOString().split('T')[0]}
+                        onChange={(e) => setScheduleDate(new Date(e.target.value))}
+                        className="w-full border border-gray-300 rounded-md p-2"
+                    />
+                    <button onClick={handleGetNewSchedule} className="btn btn-primary ">
+                        Update Schedule
+                    </button>
+                </div>
+                <div>
+                    <button onClick={handlePrintBoth} className="btn btn-secondary gap-1">
+                        <IconPrinter /> Print Schedule
+                    </button>
+                </div>
+            </div>
             {loading ? (
                 <div className="panel bg-gray-100 animate-pulse h-48 mt-4 flex justify-center items-center">Getting Schedule...</div>
             ) : (
                 <div>
-                   
                     <div className="panel p-0 mt-6">
                         <div className="flex items-center justify-between py-5 px-5 bg-dark rounded-t-lg text-white">
                             <h5 className="font-semibold text-lg dark:text-white-light">Prospect Schedule</h5>
@@ -628,68 +608,71 @@ export default function Schedules() {
                         </div>
                     </div>
                     <div className="panel p-0 mt-6">
-                    <div className="flex items-center justify-between py-5 px-5 bg-dark rounded-t-lg text-white">
-                        <h5 className="font-semibold text-lg dark:text-white-light">Students Schedule</h5>
-                        <div className="flex items-center gap-1">
-                            <div>
-                                <UpdateScheduleSteps type="student" steps={dailyScheduleStudentSteps} studioID={suid} scheduleId={scheduleID} />
+                        <div className="flex items-center justify-between py-5 px-5 bg-dark rounded-t-lg text-white">
+                            <h5 className="font-semibold text-lg dark:text-white-light">Students Schedule</h5>
+                            <div className="flex items-center gap-1">
+                                <div>
+                                    <UpdateScheduleSteps type="student" steps={dailyScheduleStudentSteps} studioID={suid} scheduleId={scheduleID} />
+                                </div>
+                                <Tippy content="Print Schedule">
+                                    <button type="button" onClick={handlePrintStudentSchedule} className="font-semibold hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-600">
+                                        <span className="flex items-center">
+                                            <IconPrinter className="w-5 h-5 text-white dark:text-white/70 hover:!text-primary" />
+                                        </span>
+                                    </button>
+                                </Tippy>
                             </div>
-                            <Tippy content="Print Schedule">
-                                <button type="button" onClick={handlePrintStudentSchedule} className="font-semibold hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-600">
-                                    <span className="flex items-center">
-                                        <IconPrinter className="w-5 h-5 text-white dark:text-white/70 hover:!text-primary" />
-                                    </span>
-                                </button>
-                            </Tippy>
                         </div>
-                    </div>
-                    <div className="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th className="ltr:rounded-l-md rtl:rounded-r-md">Pipeline Step</th>
-                                    <th>Name</th>
-                                    <th>Contact</th>
-                                    <th>Class</th>
-                                    <th className="ltr:rounded-r-md rtl:rounded-l-md">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {dailyScheduleStudents?.length > 0 ? (
-                                    dailyScheduleStudents?.map((student: any, index: any) => (
-                                        <tr key={index} className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
-                                            <td className="text-black dark:text-white flex-wra">
-                                                <div>{student?.StepName}</div>
-                                            </td>
-                                            <td className="">
-                                                <UpdateNotesForStudent student={student} update={update} setUpdate={setUpdate} />
-                                            </td>
-                                            <td>{student?.Contact1}</td>
-                                            <td>
-                                                {student?.Classes?.map((className: string) => (
-                                                    <div key={className}>{className}</div>
-                                                ))}
-                                            </td>
-                                            <td className="flex-wra">
-                                                <Tippy content="View">
-                                                    <Link to={`/students/view-student/${hashTheID(student.Student_id)}/${hashTheID(suid)}`} className="flex hover:text-green-800 text-primary gap-1">
-                                                        <IconEye /> View
-                                                    </Link>
-                                                </Tippy>
+                        <div className="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th className="ltr:rounded-l-md rtl:rounded-r-md">Pipeline Step</th>
+                                        <th>Name</th>
+                                        <th>Contact</th>
+                                        <th>Class</th>
+                                        <th className="ltr:rounded-r-md rtl:rounded-l-md">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {dailyScheduleStudents?.length > 0 ? (
+                                        dailyScheduleStudents?.map((student: any, index: any) => (
+                                            <tr key={index} className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
+                                                <td className="text-black dark:text-white flex-wra">
+                                                    <div>{student?.StepName}</div>
+                                                </td>
+                                                <td className="">
+                                                    <UpdateNotesForStudent student={student} update={update} setUpdate={setUpdate} />
+                                                </td>
+                                                <td>{student?.Contact1}</td>
+                                                <td>
+                                                    {student?.Classes?.map((className: string, index: any) => (
+                                                        <div key={index}>{className}</div>
+                                                    ))}
+                                                </td>
+                                                <td className="flex-wra">
+                                                    <Tippy content="View">
+                                                        <Link
+                                                            to={`/students/view-student/${hashTheID(student.Student_id)}/${hashTheID(suid)}`}
+                                                            className="flex hover:text-green-800 text-primary gap-1"
+                                                        >
+                                                            <IconEye /> View
+                                                        </Link>
+                                                    </Tippy>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
+                                            <td className="text-black dark:text-white flex-wra text-center" colSpan={5}>
+                                                <div>No Students Today</div>
                                             </td>
                                         </tr>
-                                    ))
-                                ) : (
-                                    <tr className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
-                                        <td className="text-black dark:text-white flex-wra text-center" colSpan={5}>
-                                            <div>No Students Today</div>
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
                 </div>
             )}
         </div>

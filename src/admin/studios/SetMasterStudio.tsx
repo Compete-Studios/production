@@ -71,7 +71,7 @@ const SetMasterStudio = () => {
                 //Add the selected sub-studios to the master studio
                 for (const studioId of subStudios) {
                     const result = await addStudioToMasterStudioRoster(masterStudio.Studio_Id, studioId);
-                    console.log('RESULT:', result);
+                 
                 }
                 showMessage(`${masterStudio.Studio_Name} has been designated as the master studio. The selected Sub-studios have been added to it successfully.`);
             }catch(error){

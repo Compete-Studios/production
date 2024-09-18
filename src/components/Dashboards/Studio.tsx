@@ -4,853 +4,468 @@ import ReactApexChart from 'react-apexcharts';
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../../store';
 import { setPageTitle } from '../../store/themeConfigSlice';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import IconHorizontalDots from '../../components/Icon/IconHorizontalDots';
 import IconEye from '../../components/Icon/IconEye';
-import IconBitcoin from '../../components/Icon/IconBitcoin';
-import IconEthereum from '../../components/Icon/IconEthereum';
-import IconLitecoin from '../../components/Icon/IconLitecoin';
-import IconBinance from '../../components/Icon/IconBinance';
-import IconTether from '../../components/Icon/IconTether';
-import IconSolana from '../../components/Icon/IconSolana';
-import IconCircleCheck from '../../components/Icon/IconCircleCheck';
-import IconInfoCircle from '../../components/Icon/IconInfoCircle';
+
 import { UserAuth } from '../../context/AuthContext';
-import { getCountOfActiveProspects } from '../../functions/api';
+import PageVisits from '../PageVisits';
+import Schedules from '../../pages/Marketing/Schedules';
+import { getLatePaymentCount, getNumberOfStudentsWithoutPaymentSchedules, getStudentIdFromBillingId } from '../../functions/manuals';
+import { formatDate } from '@fullcalendar/core';
+import { convertToUserLocalDate, handleGetTimeZoneOfUser } from '../../functions/dates';
+import IconNotes from '../Icon/IconNotes';
+import Tippy from '@tippyjs/react';
+import IconMinusCircle from '../Icon/IconMinusCircle';
+import QuickPayModal from '../../pages/Payments/QuickPayModal';
+import { Tab } from '@headlessui/react';
+import { hashTheID, showWarningMessage } from '../../functions/shared';
+import { getAllActivePaymentSchedules } from '../../functions/api';
+import ViewStudentSlider from '../ActionSliders/ViewStudentSlider';
+import { ignorePayment } from '../../functions/payments';
+import LatePaymentPipeline from '../../pages/Payments/LatePaymentPipeline';
+import LatePayments from '../PaymentDashboard/LatePayments';
+import PaySchedules from '../PaymentDashboard/PaySchedules';
+import SearchPayments from '../../pages/Payments/SearchPayments';
+import ViewPaymentDetails from '../PaymentDashboard/ViewPaymentDetails';
+import UpdateNotes from '../PaymentDashboard/UpdateNotes';
+import UpdatePaymentSchedule from '../PaymentDashboard/UpdatePaymentSchedule';
+import BillingAccounts from '../PaymentDashboard/BillingAccounts';
 
 const Studio = () => {
-    const { students, classes, staff, suid }: any = UserAuth();
-    const [prospectCount, setProspectCount] = useState(0);
+    const { students, suid }: any = UserAuth();
+    const [payments, setPayments] = useState<any>([]);
+    const [antPayments, setAntPayments] = useState<any>(null);
+    const [total, setTotal] = useState<any>(0);
+    const [noActiveStudents, setNoActiveStudents] = useState<any>([]);
+    const [toExpire, setToExpire] = useState<any>([]);
+    const [loadingDashboard, setLoadingDashboard] = useState<any>({
+        students: true,
+        classes: true,
+        staff: true,
+        total: true,
+    });
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Studio Dashboard'));
+        dispatch(setPageTitle('Payment Dashboard'));
     });
 
-    const handleGetProspectCount = async () => {
+    const handleGetLatePayments = async () => {
         try {
-            const response = await getCountOfActiveProspects(suid);
-            if (response.count) {
-                setProspectCount(response.count);
-            } else {
-                setProspectCount(0);
-            }
+            const res = await getLatePaymentCount(suid);
+            setPayments(res);
         } catch (error) {
-            console.log(error);
+            console.error('Error:', error);
         }
     };
 
     useEffect(() => {
-        handleGetProspectCount();
+        handleGetLatePayments();
     }, [suid]);
 
-    //bitcoinoption
-    const bitcoin: any = {
-        series: [
-            {
-                data: [21, 9, 36, 12, 44, 25, 59, 41, 25, 66],
-            },
-        ],
-        options: {
-            chart: {
-                height: 45,
-                type: 'line',
-                sparkline: {
-                    enabled: true,
-                },
-            },
-            stroke: {
-                width: 2,
-            },
-            markers: {
-                size: 0,
-            },
-            colors: ['#00ab55'],
-            grid: {
-                padding: {
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                },
-            },
-            tooltip: {
-                x: {
-                    show: false,
-                },
-                y: {
-                    title: {
-                        formatter: () => {
-                            return '';
-                        },
-                    },
-                },
-            },
-            responsive: [
-                {
-                    breakPoint: 576,
-                    options: {
-                        chart: {
-                            height: 95,
-                        },
-                        grid: {
-                            padding: {
-                                top: 45,
-                                bottom: 0,
-                                left: 0,
-                            },
-                        },
-                    },
-                },
-            ],
-        },
+    const handleGetStudentsWithoutSchedules = async () => {
+        try {
+            const res = await getNumberOfStudentsWithoutPaymentSchedules(suid);
+            setNoActiveStudents(res);
+        } catch (error) {
+            console.error('Error:', error);
+        }
     };
 
-    //ethereumoption
-    const ethereum: any = {
-        series: [
-            {
-                data: [44, 25, 59, 41, 66, 25, 21, 9, 36, 12],
-            },
-        ],
-        options: {
-            chart: {
-                height: 45,
-                type: 'line',
-                sparkline: {
-                    enabled: true,
-                },
-            },
-            stroke: {
-                width: 2,
-            },
-            markers: {
-                size: 0,
-            },
-            colors: ['#e7515a'],
-            grid: {
-                padding: {
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                },
-            },
-            tooltip: {
-                x: {
-                    show: false,
-                },
-                y: {
-                    title: {
-                        formatter: () => {
-                            return '';
-                        },
-                    },
-                },
-            },
-            responsive: [
-                {
-                    breakPoint: 576,
-                    options: {
-                        chart: {
-                            height: 95,
-                        },
-                        grid: {
-                            padding: {
-                                top: 45,
-                                bottom: 0,
-                                left: 0,
-                            },
-                        },
-                    },
-                },
-            ],
-        },
+    useEffect(() => {
+        handleGetStudentsWithoutSchedules();
+    }, [suid]);
+
+    const handleReturnDataWithEndDateInNext30Days = (data: any) => {
+        const next30Days = new Date();
+        next30Days.setDate(next30Days.getDate() + 30);
+
+        return data.filter((item: any) => {
+            const endDate = new Date(item.EndDate);
+            const startDate = new Date(item.StartDate);
+
+            // Compare the end date with next 30 days and ensure start and end dates are different
+            return endDate < next30Days && endDate.getTime() !== startDate.getTime();
+        });
     };
 
-    //litecoinoption
-    const litecoin: any = {
-        series: [
-            {
-                data: [9, 21, 36, 12, 66, 25, 44, 25, 41, 59],
-            },
-        ],
-        options: {
-            chart: {
-                height: 45,
-                type: 'line',
-                sparkline: {
-                    enabled: true,
-                },
-            },
-            stroke: {
-                width: 2,
-            },
-            markers: {
-                size: 0,
-            },
-            colors: ['#00ab55'],
-            grid: {
-                padding: {
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                },
-            },
-            tooltip: {
-                x: {
-                    show: false,
-                },
-                y: {
-                    title: {
-                        formatter: () => {
-                            return '';
-                        },
-                    },
-                },
-            },
-            responsive: [
-                {
-                    breakPoint: 576,
-                    options: {
-                        chart: {
-                            height: 95,
-                        },
-                        grid: {
-                            padding: {
-                                top: 45,
-                                bottom: 0,
-                                left: 0,
-                            },
-                        },
-                    },
-                },
-            ],
-        },
+    const handlegetExpireSchedules = async () => {
+        try {
+            const res = await getAllActivePaymentSchedules(suid);
+            if (res.Response.length > 0) {
+                const dataToSort: any = handleReturnDataWithEndDateInNext30Days(res.Response);
+
+                let expstudents = [];
+                for (let i = 0; i < dataToSort.length; i++) {
+                    const studentRes = await getStudentIdFromBillingId(dataToSort[i].CustomerId);
+
+                    const student = students.find((student: any) => student.PaysimpleCustomerId === studentRes[0].PaysimpleCustomerId);
+                    if (student) {
+                        expstudents.push({
+                            ...dataToSort[i],
+                            CustomerName: student.Name,
+                            StudentID: student.Student_ID,
+                        });
+                    }
+                }
+                setToExpire(expstudents);
+            } else {
+                console.log('No data found');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
     };
 
-    //binanceoption
-    const binance: any = {
-        series: [
-            {
-                data: [25, 44, 25, 59, 41, 21, 36, 12, 19, 9],
-            },
-        ],
-        options: {
-            chart: {
-                height: 45,
-                type: 'line',
-                sparkline: {
-                    enabled: true,
-                },
-            },
-            stroke: {
-                width: 2,
-            },
-            markers: {
-                size: 0,
-            },
-            colors: ['#e7515a'],
-            grid: {
-                padding: {
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                },
-            },
-            tooltip: {
-                x: {
-                    show: false,
-                },
-                y: {
-                    title: {
-                        formatter: () => {
-                            return '';
-                        },
-                    },
-                },
-            },
-            responsive: [
-                {
-                    breakPoint: 576,
-                    options: {
-                        chart: {
-                            height: 95,
-                        },
-                        grid: {
-                            padding: {
-                                top: 45,
-                                bottom: 0,
-                                left: 0,
-                            },
-                        },
-                    },
-                },
-            ],
-        },
+    useEffect(() => {
+        handlegetExpireSchedules();
+    }, [suid]);
+
+    const currentDate = new Date();
+    const thisMonthEndDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+
+    const [startDate, setStartDate] = useState(currentDate);
+    const [endDate, setEndDate] = useState(thisMonthEndDate);
+
+    const getPayments = async (startDate: any, endDate: any, studioId: string) => {
+        setLoadingDashboard({
+            ...loadingDashboard,
+            total: true,
+        });
+        try {
+            //Get all active payment schedules for the studio
+            const activeSchedules = await getAllActivePaymentSchedules(studioId);
+            //For all active schedules, filter out the ones that are within the given date range
+            if (activeSchedules.Meta.HttpStatus === 'OK' && activeSchedules.Meta.PagingDetails.TotalItems > 0) {
+                const filteredPayments = filterPaymentsByDate(activeSchedules.Response, startDate, endDate);
+                setAntPayments(filteredPayments.filteredPayments);
+                setTotal(filteredPayments.totalAmount);
+            } else {
+                setAntPayments([]);
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoadingDashboard({
+                ...loadingDashboard,
+                total: false,
+            });
+        }
     };
 
-    //tetheroption
-    const tether: any = {
-        series: [
-            {
-                data: [21, 59, 41, 44, 25, 66, 9, 36, 25, 12],
-            },
-        ],
-        options: {
-            chart: {
-                height: 45,
-                type: 'line',
-                sparkline: {
-                    enabled: true,
-                },
-            },
-            stroke: {
-                width: 2,
-            },
-            markers: {
-                size: 0,
-            },
-            colors: ['#00ab55'],
-            grid: {
-                padding: {
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                },
-            },
-            tooltip: {
-                x: {
-                    show: false,
-                },
-                y: {
-                    title: {
-                        formatter: () => {
-                            return '';
-                        },
-                    },
-                },
-            },
-            responsive: [
-                {
-                    breakPoint: 576,
-                    options: {
-                        chart: {
-                            height: 95,
-                        },
-                        grid: {
-                            padding: {
-                                top: 45,
-                                bottom: 0,
-                                left: 0,
-                            },
-                        },
-                    },
-                },
-            ],
-        },
+    const filterPaymentsByDate = (payments: any[], start: any, end: any) => {
+        // Convert start and end to Date objects for comparison
+        const startDate = new Date(start);
+        const endDate = new Date(end);
+
+        let totalAmount = 0;
+
+        const filteredPayments = payments.filter((payment) => {
+            const paymentStartDate = new Date(payment.StartDate);
+            const paymentEndDate = payment.EndDate ? new Date(payment.EndDate) : null;
+            const executionDay = payment.ExecutionFrequencyParameter;
+
+            // Check if the payment is active within the given range
+            const isActive = (!paymentEndDate && paymentStartDate <= endDate) || (paymentEndDate && paymentStartDate <= endDate && paymentEndDate >= startDate);
+
+            if (!isActive) {
+                return false;
+            }
+
+            // Check if the payment will run on the specified days within the date range
+            let current = new Date(startDate);
+            let paymentCount = 0;
+
+            while (current <= endDate) {
+                const month = current.getMonth();
+                const year = current.getFullYear();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const runDay = executionDay > daysInMonth ? daysInMonth : executionDay;
+
+                const runDate = new Date(year, month, runDay);
+                if (runDate >= startDate && runDate <= endDate) {
+                    paymentCount++;
+                }
+
+                // Move to the next month
+                current.setMonth(current.getMonth() + 1);
+            }
+
+            // Calculate the total amount for this payment
+            totalAmount += payment.PaymentAmount * paymentCount;
+
+            return paymentCount > 0;
+        });
+
+        return {
+            filteredPayments,
+            totalAmount,
+        };
     };
 
-    //solanaoption
-    const solana: any = {
-        series: [
-            {
-                data: [21, -9, 36, -12, 44, 25, 59, -41, 66, -25],
-            },
-        ],
-        options: {
-            chart: {
-                height: 45,
-                type: 'line',
-                sparkline: {
-                    enabled: true,
-                },
-            },
-            stroke: {
-                width: 2,
-            },
-            markers: {
-                size: 0,
-            },
-            colors: ['#e7515a'],
-            grid: {
-                padding: {
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                },
-            },
-            tooltip: {
-                x: {
-                    show: false,
-                },
-                y: {
-                    title: {
-                        formatter: () => {
-                            return '';
-                        },
-                    },
-                },
-            },
-            responsive: [
-                {
-                    breakPoint: 576,
-                    options: {
-                        chart: {
-                            height: 95,
-                        },
-                        grid: {
-                            padding: {
-                                top: 45,
-                                bottom: 0,
-                                left: 0,
-                            },
-                        },
-                    },
-                },
-            ],
-        },
-    };
-
-    const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
+    useEffect(() => {
+        getPayments(startDate, endDate, suid);
+    }, [suid]);
 
     return (
         <div>
-            <ul className="flex space-x-2 rtl:space-x-reverse">
-                <li>
-                    <Link to="#" className="text-primary hover:underline">
-                        Dashboard
-                    </Link>
-                </li>
-                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>Studio</span>
-                </li>
-            </ul>
-            <div className="pt-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-6 text-white">
-                    <div className="panel bg-gradient-to-r from-cyan-500 to-cyan-400">
-                        <div className="flex justify-between">
-                            <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold">Total Active Students</div>
-                            <div className="dropdown">
-                                <Dropdown
-                                    offset={[0, 5]}
-                                    placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
-                                    btnClassName="hover:opacity-80"
-                                    button={<IconHorizontalDots className="hover:opacity-80 opacity-70" />}
-                                >
-                                    <ul className="text-black dark:text-white-dark">
-                                        <li>
-                                            <Link to="/students/view-students" type="button" className="whitespace-nowrap">
-                                                View Students
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link to="/students/add-student" type="button">
-                                                Add Student
-                                            </Link>
-                                        </li>
-                                    </ul>
-                                </Dropdown>
-                            </div>
-                        </div>
-                        <div className="flex items-center mt-5">
-                            <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3"> {students?.length || 0} </div>
-                            <div className="badge bg-white/30">Students </div>
-                        </div>
-                        <Link to="/students/view-students" className="flex items-center font-semibold mt-5">
-                            <IconEye className="ltr:mr-2 rtl:ml-2 shrink-0" />
-                            View All
-                        </Link>
-                    </div>
+            {/* <div className="grid grid-cols-4 gap-2">
+                <QuickPayModal />
+            </div> */}
 
-                    {/* Sessions */}
-                    <div className="panel bg-gradient-to-r from-violet-500 to-violet-400">
-                        <div className="flex justify-between">
-                            <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold">Classes</div>
-                            <div className="dropdown">
-                                <Dropdown
-                                    offset={[0, 5]}
-                                    placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
-                                    btnClassName="hover:opacity-80"
-                                    button={<IconHorizontalDots className="hover:opacity-80 opacity-70" />}
-                                >
-                                    <ul className="text-black dark:text-white-dark">
-                                        <li>
-                                            <button type="button">View Report</button>
-                                        </li>
-                                        <li>
-                                            <button type="button">Edit Report</button>
-                                        </li>
-                                    </ul>
-                                </Dropdown>
-                            </div>
-                        </div>
-                        <div className="flex items-center mt-5">
-                            <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3"> {classes?.length || 0} </div>
-                            <div className="badge bg-white/30">Classes</div>
-                        </div>
-                        <Link to="/classes/view-classes" className="flex items-center font-semibold mt-5">
-                            <IconEye className="ltr:mr-2 rtl:ml-2 shrink-0" />
-                            View All
-                        </Link>
-                    </div>
+            <div className="grid grid-cols-1 gap-0.5 overflow-hidden rounded-2xl text-center sm:grid-cols-2 lg:grid-cols-4 ">
+                <div className="p-3 bg-gradient-to-r from-orange-500 to-orange-400 text-white">
+                    <div className="badge bg-white/30">Late Payments</div>
 
-                    {/*  Time On-Site */}
-                    <div className="panel bg-gradient-to-r from-blue-500 to-blue-400">
-                        <div className="flex justify-between">
-                            <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold">Staff</div>
-                            <div className="dropdown">
-                                <Dropdown
-                                    offset={[0, 5]}
-                                    placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
-                                    btnClassName="hover:opacity-80"
-                                    button={<IconHorizontalDots className="hover:opacity-80 opacity-70" />}
-                                >
-                                    <ul className="text-black dark:text-white-dark">
-                                        <li>
-                                            <button type="button">View Report</button>
-                                        </li>
-                                        <li>
-                                            <button type="button">Edit Report</button>
-                                        </li>
-                                    </ul>
-                                </Dropdown>
-                            </div>
-                        </div>
-                        <div className="flex items-center mt-5">
-                            <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3"> {staff?.length || 0} </div>
-                            <div className="badge bg-white/30">Staff Members</div>
-                        </div>
-                        <Link to="/staff/view-staff" className="flex items-center font-semibold mt-5">
-                            <IconEye className="ltr:mr-2 rtl:ml-2 shrink-0" />
-                            View All
-                        </Link>
-                    </div>
-
-                    {/* Bounce Rate */}
-                    <div className="panel bg-gradient-to-r from-fuchsia-500 to-fuchsia-400">
-                        <div className="flex justify-between">
-                            <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold">Prospects In Pipelines</div>
-                            <div className="dropdown">
-                                <Dropdown
-                                    offset={[0, 5]}
-                                    placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
-                                    btnClassName="hover:opacity-80"
-                                    button={<IconHorizontalDots className="hover:opacity-80 opacity-70" />}
-                                >
-                                    <ul className="text-black dark:text-white-dark">
-                                        <li>
-                                            <button type="button">View Report</button>
-                                        </li>
-                                        <li>
-                                            <button type="button">Edit Report</button>
-                                        </li>
-                                    </ul>
-                                </Dropdown>
-                            </div>
-                        </div>
-                        <div className="flex items-center mt-5">
-                            <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3"> {prospectCount} </div>
-                            <div className="badge bg-white/30">Prospects in a Pipeline</div>
-                        </div>
-                        <Link to="/prospects/prospect-pipeline" className="flex items-center font-semibold mt-5">
-                            <IconEye className="ltr:mr-2 rtl:ml-2 shrink-0" />
-                            View Pipeline
-                        </Link>
+                    <div className="text-center mt-2">
+                        <div className="text-2xl font-bold text-center">{payments?.length || 0}</div>
                     </div>
                 </div>
+                <div className="p-3 bg-gradient-to-r from-red-500 to-red-400 text-white ">
+                    <div className="badge bg-white/30">Outstanding Total</div>
 
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                    {/*  Favorites  */}
-                    <div>
-                        <div className="flex items-center mb-5 font-bold">
-                            <span className="text-lg">Favorites</span>
-                            <button type="button" className="ltr:ml-auto rtl:mr-auto text-primary hover:text-black dark:hover:text-white-dark">
-                                See All
-                            </button>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:mb-5">
-                            {/*  Bitcoin  */}
-                            <div className="panel">
-                                <div className="flex items-center font-semibold mb-5">
-                                    <div className="shrink-0 w-10 h-10 rounded-full grid place-content-center">
-                                        <IconBitcoin />
-                                    </div>
-                                    <div className="ltr:ml-2 rtl:mr-2">
-                                        <h6 className="text-dark dark:text-white-light">BTC</h6>
-                                        <p className="text-white-dark text-xs">Bitcoin</p>
-                                    </div>
-                                </div>
-                                <div className="mb-5 overflow-hidden">
-                                    <ReactApexChart series={bitcoin.series} options={bitcoin.options} type="line" height={45} />
-                                </div>
-                                <div className="flex justify-between items-center font-bold text-base">
-                                    $20,000 <span className="text-success font-normal text-sm">+0.25%</span>
-                                </div>
-                            </div>
-                            {/*  Ethereum*/}
-                            <div className="panel">
-                                <div className="flex items-center font-semibold mb-5">
-                                    <div className="shrink-0 w-10 h-10 bg-warning rounded-full grid place-content-center p-2">
-                                        <IconEthereum />
-                                    </div>
-                                    <div className="ltr:ml-2 rtl:mr-2">
-                                        <h6 className="text-dark dark:text-white-light">ETH</h6>
-                                        <p className="text-white-dark text-xs">Ethereum</p>
-                                    </div>
-                                </div>
-                                <div className="mb-5 overflow-hidden">
-                                    <ReactApexChart series={ethereum.series} options={ethereum.options} type="line" height={45} />
-                                </div>
-                                <div className="flex justify-between items-center font-bold text-base">
-                                    $21,000 <span className="text-danger font-normal text-sm">-1.25%</span>
-                                </div>
-                            </div>
-                            {/*  Litecoin*/}
-                            <div className="panel">
-                                <div className="flex items-center font-semibold mb-5">
-                                    <div className="shrink-0 w-10 h-10 rounded-full grid place-content-center">
-                                        <IconLitecoin />
-                                    </div>
-                                    <div className="ltr:ml-2 rtl:mr-2">
-                                        <h6 className="text-dark dark:text-white-light">LTC</h6>
-                                        <p className="text-white-dark text-xs">Litecoin</p>
-                                    </div>
-                                </div>
-                                <div className="mb-5 overflow-hidden">
-                                    <ReactApexChart series={litecoin.series} options={litecoin.options} type="line" height={45} />
-                                </div>
-                                <div className="flex justify-between items-center font-bold text-base">
-                                    $11,657 <span className="text-success font-normal text-sm">+0.25%</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {/*  Prices  */}
-                    <div>
-                        <div className="flex items-center mb-5 font-bold">
-                            <span className="text-lg">Live Prices</span>
-                            <button type="button" className="ltr:ml-auto rtl:mr-auto text-primary hover:text-black dark:hover:text-white-dark">
-                                See All
-                            </button>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
-                            {/*  Binance */}
-                            <div className="panel">
-                                <div className="flex items-center font-semibold mb-5">
-                                    <div className="shrink-0 w-10 h-10 rounded-full grid place-content-center">
-                                        <IconBinance />
-                                    </div>
-                                    <div className="ltr:ml-2 rtl:mr-2">
-                                        <h6 className="text-dark dark:text-white-light">BNB</h6>
-                                        <p className="text-white-dark text-xs">Binance</p>
-                                    </div>
-                                </div>
-                                <div className="mb-5 overflow-hidden">
-                                    <ReactApexChart series={binance.series} options={binance.options} type="line" height={45} />
-                                </div>
-                                <div className="flex justify-between items-center font-bold text-base">
-                                    $21,000 <span className="text-danger font-normal text-sm">-1.25%</span>
-                                </div>
-                            </div>
-                            {/*  Tether  */}
-                            <div className="panel">
-                                <div className="flex items-center font-semibold mb-5">
-                                    <div className="shrink-0 w-10 h-10 rounded-full grid place-content-center">
-                                        <IconTether />
-                                    </div>
-                                    <div className="ltr:ml-2 rtl:mr-2">
-                                        <h6 className="text-dark dark:text-white-light">USDT</h6>
-                                        <p className="text-white-dark text-xs">Tether</p>
-                                    </div>
-                                </div>
-                                <div className="mb-5 overflow-hidden">
-                                    <ReactApexChart series={tether.series} options={tether.options} type="line" height={45} />
-                                </div>
-                                <div className="flex justify-between items-center font-bold text-base">
-                                    $20,000 <span className="text-success font-normal text-sm">+0.25%</span>
-                                </div>
-                            </div>
-                            {/*  Solana */}
-                            <div className="panel">
-                                <div className="flex items-center font-semibold mb-5">
-                                    <div className="shrink-0 w-10 h-10 bg-warning rounded-full p-2 grid place-content-center">
-                                        <IconSolana />
-                                    </div>
-                                    <div className="ltr:ml-2 rtl:mr-2">
-                                        <h6 className="text-dark dark:text-white-light">SOL</h6>
-                                        <p className="text-white-dark text-xs">Solana</p>
-                                    </div>
-                                </div>
-                                <div className="mb-5 overflow-hidden">
-                                    <ReactApexChart series={solana.series} options={solana.options} type="line" height={45} />
-                                </div>
-                                <div className="flex justify-between items-center font-bold text-base">
-                                    $21,000 <span className="text-danger font-normal text-sm">-1.25%</span>
-                                </div>
-                            </div>
-                        </div>
+                    <div className="tect-center mt-2">
+                        <div className="text-2xl font-bold ltr:mr-3 rtl:ml-3"> ${payments?.reduce((acc: any, payment: any) => acc + parseInt(payment.Amount), 0) || 0} </div>
                     </div>
                 </div>
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                    <div className="grid gap-6 xl:grid-flow-row">
-                        {/*  Previous Statement  */}
-                        <div className="panel overflow-hidden">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <div className="text-lg font-bold">Previous Statement</div>
-                                    <div className="text-success"> Paid on June 27, 2022 </div>
-                                </div>
-                                <div className="dropdown">
-                                    <Dropdown
-                                        offset={[0, 5]}
-                                        placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
-                                        btnClassName="hover:opacity-80"
-                                        button={<IconHorizontalDots className="hover:opacity-80 opacity-70" />}
-                                    >
-                                        <ul>
-                                            <li>
-                                                <button type="button">View Report</button>
-                                            </li>
-                                            <li>
-                                                <button type="button">Edit Report</button>
-                                            </li>
-                                        </ul>
-                                    </Dropdown>
-                                </div>
-                            </div>
-                            <div className="relative mt-10">
-                                <div className="absolute -bottom-12 ltr:-right-12 rtl:-left-12 w-24 h-24">
-                                    <IconCircleCheck className="text-success opacity-20 w-full h-full" />
-                                </div>
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                                    <div>
-                                        <div className="text-primary">Card Limit</div>
-                                        <div className="mt-2 font-semibold text-2xl">$50,000.00</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-primary">Spent</div>
-                                        <div className="mt-2 font-semibold text-2xl">$15,000.00</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-primary">Minimum</div>
-                                        <div className="mt-2 font-semibold text-2xl">$2,500.00</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {/*  Current Statement */}
-                        <div className="panel overflow-hidden">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <div className="text-lg font-bold">Current Statement</div>
-                                    <div className="text-danger"> Must be paid before July 27, 2022 </div>
-                                </div>
-                                <div className="dropdown">
-                                    <Dropdown offset={[0, 5]} placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`} button={<IconHorizontalDots className="hover:opacity-80 opacity-70" />}>
-                                        <ul>
-                                            <li>
-                                                <button type="button">View Report</button>
-                                            </li>
-                                            <li>
-                                                <button type="button">Edit Report</button>
-                                            </li>
-                                        </ul>
-                                    </Dropdown>
-                                </div>
-                            </div>
-                            <div className="relative mt-10">
-                                <div className="absolute -bottom-12 ltr:-right-12 rtl:-left-12 w-24 h-24">
-                                    <IconInfoCircle className="text-danger opacity-20 w-24 h-full" />
-                                </div>
+                <div className="p-3 bg-gradient-to-r from-green-600 to-green-500 text-white ">
+                    <div className="badge bg-white/30">Anticipated Payments</div>
 
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                                    <div>
-                                        <div className="text-primary">Card Limit</div>
-                                        <div className="mt-2 font-semibold text-2xl">$50,000.00</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-primary">Spent</div>
-                                        <div className="mt-2 font-semibold text-2xl">$30,500.00</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-primary">Minimum</div>
-                                        <div className="mt-2 font-semibold text-2xl">$8,000.00</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div className="tect-center mt-2">
+                        <div className="text-2xl font-bold ltr:mr-3 rtl:ml-3"> ${total || 0}</div>
                     </div>
+                </div>
+                <div className="p-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white ">
+                    <div className="badge bg-white/30">Estimated # of Payments</div>
 
-                    {/*  Recent Transactions  */}
-                    <div className="panel">
-                        <div className="mb-5 text-lg font-bold">Recent Transactions</div>
-                        <div className="table-responsive">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th className="ltr:rounded-l-md rtl:rounded-r-md">ID</th>
-                                        <th>DATE</th>
-                                        <th>NAME</th>
-                                        <th>AMOUNT</th>
-                                        <th className="text-center ltr:rounded-r-md rtl:rounded-l-md">STATUS</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td className="font-semibold">#01</td>
-                                        <td className="whitespace-nowrap">Oct 08, 2021</td>
-                                        <td className="whitespace-nowrap">Eric Page</td>
-                                        <td>$1,358.75</td>
-                                        <td className="text-center">
-                                            <span className="badge bg-success/20 text-success rounded-full hover:top-0">Completed</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="font-semibold">#02</td>
-                                        <td className="whitespace-nowrap">Dec 18, 2021</td>
-                                        <td className="whitespace-nowrap">Nita Parr</td>
-                                        <td>-$1,042.82</td>
-                                        <td className="text-center">
-                                            <span className="badge bg-info/20 text-info rounded-full hover:top-0">In Process</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="font-semibold">#03</td>
-                                        <td className="whitespace-nowrap">Dec 25, 2021</td>
-                                        <td className="whitespace-nowrap">Carl Bell</td>
-                                        <td>$1,828.16</td>
-                                        <td className="text-center">
-                                            <span className="badge bg-danger/20 text-danger rounded-full hover:top-0">Pending</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="font-semibold">#04</td>
-                                        <td className="whitespace-nowrap">Nov 29, 2021</td>
-                                        <td className="whitespace-nowrap">Dan Hart</td>
-                                        <td>$1,647.55</td>
-                                        <td className="text-center">
-                                            <span className="badge bg-success/20 text-success rounded-full hover:top-0">Completed</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="font-semibold">#05</td>
-                                        <td className="whitespace-nowrap">Nov 24, 2021</td>
-                                        <td className="whitespace-nowrap">Jake Ross</td>
-                                        <td>$927.43</td>
-                                        <td className="text-center">
-                                            <span className="badge bg-success/20 text-success rounded-full hover:top-0">Completed</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="font-semibold">#06</td>
-                                        <td className="whitespace-nowrap">Jan 26, 2022</td>
-                                        <td className="whitespace-nowrap">Anna Bell</td>
-                                        <td>$250.00</td>
-                                        <td className="text-center">
-                                            <span className="badge bg-info/20 text-info rounded-full hover:top-0">In Process</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                    <div className="tect-center mt-2">
+                        <div className="text-2xl font-bold ltr:mr-3 rtl:ml-3"> {antPayments?.length || 0} </div>
+                    </div>
+                </div>
+                {/* <div className="panel space-y-3">
+                        <button type="button" className="btn btn-primary w-full">
+                            Primary
+                        </button>
+                        <button type="button" className="btn btn-primary w-full">
+                            Primary
+                        </button>
+                        <button type="button" className="btn btn-primary w-full">
+                            Primary
+                        </button>
+                        <button type="button" className="btn btn-primary w-full">
+                            Primary
+                        </button>
+                    </div> */}
+            </div>
+
+            <div className="">
+                {/*  Recent Transactions  */}
+                <div className="">
+                    <div className="">
+                        <Tab.Group>
+                            <div className="mb-0">
+                                <Tab.List className="mt-3 flex flex-wrap gap-1 justify-start border-b border-white-light dark:border-[#191e3a]">
+                                    <Tab as={Fragment}>
+                                        {({ selected }) => (
+                                            <button
+                                                className={`${
+                                                    selected ? '!border-white-light !border-b-white text-primary !outline-none dark:!border-[#191e3a] dark:!border-b-black bg-white ' : 'bg-white/40 hover:text-success'
+                                                }  -mb-[1px] block border border-transparent p-3.5 py-2 hover:border-white-light hover:border-b-white dark:hover:border-[#191e3a] dark:hover:border-b-black rounded-t-lg`}
+                                            >
+                                                Late Payments
+                                            </button>
+                                        )}
+                                    </Tab>
+                                    <Tab as={Fragment}>
+                                        {({ selected }) => (
+                                            <button
+                                                className={`${
+                                                    selected ? '!border-white-light !border-b-white text-primary !outline-none dark:!border-[#191e3a] dark:!border-b-black bg-white ' : 'bg-white/40 hover:text-success'
+                                                }  -mb-[1px] block border border-transparent p-3.5 py-2 hover:border-white-light hover:border-b-white dark:hover:border-[#191e3a] dark:hover:border-b-black rounded-t-lg`}
+                                            >
+                                                Late Payment Pipeline
+                                            </button>
+                                        )}
+                                    </Tab>
+                                    <Tab as={Fragment}>
+                                        {({ selected }) => (
+                                            <button
+                                                className={`${
+                                                    selected ? '!border-white-light !border-b-white text-primary !outline-none dark:!border-[#191e3a] dark:!border-b-black bg-white ' : 'bg-white/40 hover:text-success'
+                                                }  -mb-[1px] block border border-transparent p-3.5 py-2 hover:border-white-light hover:border-b-white dark:hover:border-[#191e3a] dark:hover:border-b-black rounded-t-lg`}
+                                            >
+                                                Students Without Schedules
+                                            </button>
+                                        )}
+                                    </Tab>
+                                    <Tab as={Fragment}>
+                                        {({ selected }) => (
+                                            <button
+                                                className={`${
+                                                    selected ? '!border-white-light !border-b-white text-primary !outline-none dark:!border-[#191e3a] dark:!border-b-black bg-white ' : 'bg-white/40 hover:text-success'
+                                                }  -mb-[1px] block border border-transparent p-3.5 py-2 hover:border-white-light hover:border-b-white dark:hover:border-[#191e3a] dark:hover:border-b-black rounded-t-lg`}
+                                            >
+                                                Expiring Schedules
+                                            </button>
+                                        )}
+                                    </Tab>
+                                    <Tab as={Fragment}>
+                                        {({ selected }) => (
+                                            <button
+                                                className={`${
+                                                    selected ? '!border-white-light !border-b-white text-primary !outline-none dark:!border-[#191e3a] dark:!border-b-black bg-white ' : 'bg-white/40 hover:text-success'
+                                                }  -mb-[1px] block border border-transparent p-3.5 py-2 hover:border-white-light hover:border-b-white dark:hover:border-[#191e3a] dark:hover:border-b-black rounded-t-lg`}
+                                            >
+                                                Payment Schedules
+                                            </button>
+                                        )}
+                                    </Tab>
+                                    <Tab as={Fragment}>
+                                        {({ selected }) => (
+                                            <button
+                                                className={`${
+                                                    selected ? '!border-white-light !border-b-white text-primary !outline-none dark:!border-[#191e3a] dark:!border-b-black bg-white ' : 'bg-white/40 hover:text-success'
+                                                }  -mb-[1px] block border border-transparent p-3.5 py-2 hover:border-white-light hover:border-b-white dark:hover:border-[#191e3a] dark:hover:border-b-black rounded-t-lg`}
+                                            >
+                                                Search Payments
+                                            </button>
+                                        )}
+                                    </Tab>
+                                    <Tab as={Fragment}>
+                                        {({ selected }) => (
+                                            <button
+                                                className={`${
+                                                    selected ? '!border-white-light !border-b-white text-primary !outline-none dark:!border-[#191e3a] dark:!border-b-black bg-white ' : 'bg-white/40 hover:text-success'
+                                                }  -mb-[1px] block border border-transparent p-3.5 py-2 hover:border-white-light hover:border-b-white dark:hover:border-[#191e3a] dark:hover:border-b-black rounded-t-lg`}
+                                            >
+                                                Billing Accounts
+                                            </button>
+                                        )}
+                                    </Tab>
+                                </Tab.List>
+                            </div>
+
+                            <Tab.Panels>
+                                <Tab.Panel>
+                                    <LatePayments payments={payments} setPayments={setPayments} />
+                                </Tab.Panel>
+                                <Tab.Panel>
+                                    <LatePaymentPipeline />
+                                </Tab.Panel>
+                                <Tab.Panel>
+                                    <div className="panel">
+                                        <div className="mb-5 text-lg font-bold">Students Without Payment Schedules</div>
+                                        <div className="table-responsive">
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th className="ltr:rounded-l-md rtl:rounded-r-md">NAME</th>
+
+                                                        <th>CONTACT</th>
+                                                        <th className="text-right">ACTIONS</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {noActiveStudents?.map((payment: any, index: number) => (
+                                                        <tr key={index}>
+                                                            <td className="font-semibold">
+                                                                {' '}
+                                                                {payment.First_Name} {payment.Last_Name}
+                                                            </td>
+
+                                                            <td className="whitespace-nowrap">
+                                                                <div>{payment.email}</div>
+                                                                <div>{payment.Phone}</div>
+                                                            </td>
+                                                            <td className="flex items-center gap-2">
+                                                                <Tippy content="View Student">
+                                                                    <Link to={`/students/view-student/${hashTheID(payment.Student_Id)}/${hashTheID(suid)}`} type="button" className="text-info ml-auto">
+                                                                        <IconEye />
+                                                                    </Link>
+                                                                </Tippy>
+                                                                <ViewStudentSlider student={payment} />
+                                                                <Tippy content="Retry Payment">
+                                                                    <Link to={`/payments/view-late-payment/${suid}/${payment.PaysimpleTransactionId}`} type="button" className="text-success">
+                                                                        <svg
+                                                                            xmlns="http://www.w3.org/2000/svg"
+                                                                            width="16"
+                                                                            height="16"
+                                                                            fill="currentColor"
+                                                                            className="bi bi-credit-card-2-front"
+                                                                            viewBox="0 0 16 16"
+                                                                        >
+                                                                            <path d="M14 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" />
+                                                                            <path d="M2 5.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5" />
+                                                                        </svg>
+                                                                    </Link>
+                                                                </Tippy>
+                                                                <Tippy content="Ignore Payment">
+                                                                    <Link to={`/payments/view-late-payment/${suid}/${payment.PaysimpleTransactionId}`} type="button" className="text-danger">
+                                                                        <svg
+                                                                            xmlns="http://www.w3.org/2000/svg"
+                                                                            width="16"
+                                                                            height="16"
+                                                                            fill="currentColor"
+                                                                            className="bi bi-dash-circle"
+                                                                            viewBox="0 0 16 16"
+                                                                        >
+                                                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                                                                            <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8" />
+                                                                        </svg>
+                                                                    </Link>
+                                                                </Tippy>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </Tab.Panel>
+                                <Tab.Panel>
+                                    <div className="panel rounded-t-none">
+                                        <div className="mb-5 text-lg font-bold">Expiring Payments</div>
+                                        <div className="table-responsive">
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th className="ltr:rounded-l-md rtl:rounded-r-md">ID</th>
+                                                        <th>END DATE</th>
+                                                        <th>STUDENT</th>
+                                                        <th>AMOUNT</th>
+                                                        <th className="text-right">ACTIONS</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {toExpire?.map((payment: any, index: number) => (
+                                                        <tr key={index}>
+                                                            <td className="font-semibold">#{payment.Id}</td>
+                                                            <td className="whitespace-nowrap">{formatDate(payment.EndDate)}</td>
+                                                            <td className="whitespace-nowrap">{payment.CustomerName}</td>
+                                                            <td className="font-bold">${payment.PaymentAmount}</td>
+                                                            <td className="flex items-center justify-end gap-2">
+                                                                <ViewPaymentDetails payID={payment.Id} />
+                                                                <UpdateNotes payID={payment.Id} />
+                                                                <UpdatePaymentSchedule payID={payment.Id} />
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </Tab.Panel>
+                                <Tab.Panel>
+                                    <PaySchedules />
+                                </Tab.Panel>
+                                <Tab.Panel>
+                                    <SearchPayments />
+                                </Tab.Panel>
+                                <Tab.Panel>
+                                    <BillingAccounts />
+                                </Tab.Panel>
+                            </Tab.Panels>
+                        </Tab.Group>
                     </div>
                 </div>
             </div>

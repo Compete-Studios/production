@@ -1,42 +1,32 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import 'flatpickr/dist/flatpickr.css';
 import IconX from '../../components/Icon/IconX';
-
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
 import IconNotes from '../../components/Icon/IconNotes';
-
-import QuickNote from './components/QuickNote';
+import QuickNote from '../../pages/Students/components/QuickNote';
+import IconEye from '../Icon/IconEye';
 import { UserAuth } from '../../context/AuthContext';
 
-export default function UpdateNotesForStudent({ student, update, setUpdate }: any) {
-    const {students}: any = UserAuth();
+export default function ViewStudentSlider({ student }: any) {
     const [showActionModal, setShowActionModal] = useState(false);
-    const [studentToUpdate, setStudentToUpdate] = useState<any>({});
-
-
-    const handleGetStudent = async () => {
-        const newStudent = students.find((thestudent: any) => thestudent.Student_ID === student.Student_id);        
-        setStudentToUpdate({
-            ...newStudent,
-            StudentId: newStudent.Student_ID,
-        });
-    };
-
-    useEffect(() => {
-        handleGetStudent();
-    }, [student]);
-    
 
     return (
         <div>
-            <div>
-             
-                <button className="flex items-center hover:text-green-800 text-primary font-bold gap-1 text-left" onClick={() => setShowActionModal(true)}>
-                    {student?.StudentName}{' '}
-                    <span className="text-warning hover:yellow-900">
+            <div className="hidden md:flex items-center gap-2 justify-end">
+                <Tippy content="Update Notes">
+                    <button type="button" className="text-warning hover:text-orange-600" onClick={() => setShowActionModal(true)}>
                         <IconNotes />
-                    </span>
-                </button>
+                    </button>
+                </Tippy>
+            </div>
+            <div className="md:hidden flex items-center gap-2 justify-end">
+                <Tippy content="View Notes">
+                    <button type="button" className="btn btn-warning btn-sm flex items-center gap-1 h-8" onClick={() => setShowActionModal(true)}>
+                        <IconNotes fill={true} />
+                    </button>
+                </Tippy>
             </div>
             <Transition.Root show={showActionModal} as={Fragment}>
                 <Dialog className="relative z-50" onClose={setShowActionModal}>
@@ -62,15 +52,13 @@ export default function UpdateNotesForStudent({ student, update, setUpdate }: an
                                                     <div className="flex items-start justify-between space-x-3">
                                                         <div className="space-y-1">
                                                             <Dialog.Title className="text-lg font-medium bg-[#fbfbfb] dark:bg-[#121c2c] ">
-                                                                Update Notes 
+                                                               Update Notes
                                                             </Dialog.Title>
-                                                            <p className="text-sm text-gray-500">
-                                                                Update notes for the student
-                                                            </p>
+                                                            <p className="text-sm text-gray-500">This action toolbar allows you to quickly email, text, add notes, or update the student step.</p>
                                                             <h4 className="text-lg font-medium text-gray-900 dark:text-white-dark pt-4">
                                                                 Student:{' '}
                                                                 <span className="text-secondary">
-                                                                    {student?.StudentName}
+                                                                    {student?.FName} {student?.LName}
                                                                 </span>
                                                             </h4>
                                                         </div>
@@ -87,11 +75,7 @@ export default function UpdateNotesForStudent({ student, update, setUpdate }: an
 
                                                 {/* Divider container */}
                                                 <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0 px-5">
-                                                    <QuickNote 
-                                                    student={studentToUpdate} 
-                                                    setShowActionModal={setShowActionModal} 
-                                                    setUpdate={setUpdate} 
-                                                    update={update} />
+                                                    <QuickNote student={student} setShowActionModal={setShowActionModal}  />
                                                 </div>
                                             </div>
                                         </form>

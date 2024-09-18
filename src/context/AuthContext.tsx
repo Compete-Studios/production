@@ -4,6 +4,8 @@ import { REACT_API_BASE_URL } from '../constants';
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import blanklogo from '../assets/blanklogo.png';
+import { addLatePayment, getLatePaymentsFromPaysimple } from '../functions/payments';
+import { formatDate } from '@fullcalendar/core';
 
 const UserContext: any = createContext<any>(null);
 
@@ -238,6 +240,64 @@ export default function AuthContextProvider({ children }: any) {
             setShowLoading(true);
         }
     }, [fetchLoading, globalLoading]);
+
+    const addNewLatePayments = async (studID: any) => {
+        console.log('Adding new late payments');
+        try {
+            const newPayments = await getLatePaymentsFromPaysimple(studID);
+            //Make sure studioId is an int before proceeding
+            const stId = parseInt(studID, 10);
+            //Construct the payment object and add it to our db
+            if (newPayments.Response && newPayments.Response.length > 0) {
+                for (const payment of newPayments.Response) {
+                    let paymentDate = new Date(payment.PaymentDate);
+                    const paymentData = {
+                        studioId: stId,
+                        paysimpleTransactionId: payment.Id,
+                        retriedTransactionId: 0,
+                        ignoreThisPayment: false,
+                        paysimpleCustomerId: payment.CustomerId,
+                        customerName: payment.CustomerFirstName + ' ' + payment.CustomerLastName,
+                        amount: payment.Amount,
+                        date: formatDate(paymentDate),
+                        notes: '',
+                        nextContactDate: '',
+                    };
+
+                    try {
+                        await addLatePayment(paymentData);
+                    } catch (error) {
+                        console.error(error);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setUpdate(!update);
+        }
+    };
+
+    useEffect(() => {  
+
+        // Initialize pipeline state with latePayementPipeline if it's available
+        if (latePayementPipeline.length > 0 && suid) {
+
+            //Check when the last time we fetched new late payments was
+            //If >15 minutes, fetch new late payments
+            const stringToRemember = 'lastAddNewLatePaymentsRun' + suid;
+            const lastRun: any = localStorage.getItem(stringToRemember);
+            const fifteenMinutes = 15 * 60 * 1000;
+            const now: any = new Date().getTime();
+
+            if (!lastRun || now - lastRun >= fifteenMinutes) {
+                addNewLatePayments(suid);
+                localStorage.setItem(stringToRemember, now);
+            }
+            
+        }
+        
+    }, []);
 
     const handleCheckUserForAdmin = async (id: any, main: any) => {
         try {

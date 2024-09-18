@@ -56,7 +56,9 @@ export default function ViewPayments() {
                 // Handle error if any
                 console.error('Error:', error);
             });
-    };
+    };  
+
+    console.log(studentsInPipeline);
 
     return (
         <>

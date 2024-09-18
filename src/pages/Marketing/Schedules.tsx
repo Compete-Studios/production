@@ -45,19 +45,17 @@ export default function Schedules() {
         }
     };
 
-   
+    useEffect(() => {
+        if (scheduleID) {
+            // Reset loading states or any other relevant state here
+            setLoading(true);
+            setGettingStudents(true);
+            setGettingProspects(true);
 
-   useEffect(() => {
-    if (scheduleID) {
-        // Reset loading states or any other relevant state here
-        setLoading(true);
-        setGettingStudents(true);
-        setGettingProspects(true);
-
-        handleGetStudents();
-        handleGetProspects();
-    }
-}, [suid, scheduleID, update]);
+            handleGetStudents();
+            handleGetProspects();
+        }
+    }, [suid, scheduleID, update]);
 
     const handleGetNewSchedule = async () => {
         handleGetStudents();
@@ -502,7 +500,7 @@ export default function Schedules() {
 
     return (
         <div className="mb-6 ">
-            <div className="hidden sm:flex items-center justify-between whitespace-nowrap mt-12">
+            <div className="hidden sm:flex items-center justify-between whitespace-nowrap mt-4">
                 <div className="flex items-center gap-4 sm:w-1/2 w-full">
                     <label htmlFor="scheduleDate">Next Contact Date</label>
                     <input
@@ -525,8 +523,8 @@ export default function Schedules() {
             {loading ? (
                 <div className="panel bg-gray-100 animate-pulse h-48 mt-4 flex justify-center items-center">Getting Schedule...</div>
             ) : (
-                <div>
-                    <div className="panel p-0 mt-6">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-2 mt-4">
+                    <div className="panel p-0">
                         <div className="flex items-center justify-between py-5 px-5 bg-dark rounded-t-lg text-white">
                             <h5 className="font-semibold text-lg dark:text-white-light">Prospect Schedule</h5>
                             <div className="flex items-center gap-1">
@@ -547,11 +545,10 @@ export default function Schedules() {
                             <table className="">
                                 <thead>
                                     <tr>
-                                        <th className="ltr:rounded-l-md rtl:rounded-r-md">Pipeline Step</th>
-                                        <th>Name</th>
+                                        <th className="ltr:rounded-l-md rtl:rounded-r-md">Name</th>
+                                        <th>Classes</th>
                                         <th>Parent Name</th>
-                                        <th>Class</th>
-                                        <th className="ltr:rounded-r-md rtl:rounded-l-md">Actions</th>
+                                        <th className="text-right">Pipeline Step</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -559,15 +556,10 @@ export default function Schedules() {
                                         dailyScheduleProspects?.map((prospect: any, index: any) => (
                                             <tr key={index} className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
                                                 <td className="min-w-[150px] text-black dark:text-white">
-                                                    <div className="flex items-center">
-                                                        <span className="whitespace-nowrap">{prospect?.StepName}</span>
-                                                    </div>
-                                                </td>
-                                                <td>
                                                     <Tippy content="View Propsect">
                                                         <Link
                                                             to={`/prospects/view-prospect/${hashTheID(prospect.Student_id)}/${hashTheID(suid)}`}
-                                                            className="flex hover:text-green-800 text-primary font-bold gap-1"
+                                                            className="flex hover:text-green-800 text-primary font-bold gap-1 ml-auto"
                                                         >
                                                             {prospect?.StudentName}{' '}
                                                             <span className="text-warning hover:yellow-900">
@@ -576,24 +568,13 @@ export default function Schedules() {
                                                         </Link>
                                                     </Tippy>
                                                 </td>
-                                                <td>{prospect?.Contact1}</td>
                                                 <td>
                                                     {prospect?.Classes?.map((className: string, index: any) => (
                                                         <div key={index}>{className}</div>
                                                     ))}
                                                 </td>
-                                                <td className="flex gap-1 staff-center w-max mx-auto ">
-                                                    {/* <QuickAction student={prospect} /> */}
-                                                    <Tippy content="View Prospect">
-                                                        <NavLink
-                                                            to={`/prospects/view-prospect/${hashTheID(prospect.Student_id)}/${hashTheID(suid)}`}
-                                                            className="flex text-primary hover:text-primary/90 gap-1"
-                                                        >
-                                                            {' '}
-                                                            <IconEye />
-                                                        </NavLink>
-                                                    </Tippy>
-                                                </td>
+                                                <td>{prospect?.Contact1}</td>
+                                                <td className="text-right">{prospect?.StepName}</td>
                                             </tr>
                                         ))
                                     ) : (
@@ -607,7 +588,7 @@ export default function Schedules() {
                             </table>
                         </div>
                     </div>
-                    <div className="panel p-0 mt-6">
+                    <div className="panel p-0 ">
                         <div className="flex items-center justify-between py-5 px-5 bg-dark rounded-t-lg text-white">
                             <h5 className="font-semibold text-lg dark:text-white-light">Students Schedule</h5>
                             <div className="flex items-center gap-1">
@@ -627,38 +608,29 @@ export default function Schedules() {
                             <table>
                                 <thead>
                                     <tr>
-                                        <th className="ltr:rounded-l-md rtl:rounded-r-md">Pipeline Step</th>
-                                        <th>Name</th>
+                                        <th className="ltr:rounded-l-md rtl:rounded-r-md">Name</th>
+                                        <th>Classes</th>
                                         <th>Contact</th>
-                                        <th>Class</th>
-                                        <th className="ltr:rounded-r-md rtl:rounded-l-md">Actions</th>
+                                        <th className="ltr:rounded-r-md rtl:rounded-l-md">Pipeline Step</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {dailyScheduleStudents?.length > 0 ? (
                                         dailyScheduleStudents?.map((student: any, index: any) => (
                                             <tr key={index} className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
-                                                <td className="text-black dark:text-white flex-wra">
-                                                    <div>{student?.StepName}</div>
-                                                </td>
-                                                <td className="">
+                                                <td className="min-w-[150px] text-black dark:text-white">
                                                     <UpdateNotesForStudent student={student} update={update} setUpdate={setUpdate} />
                                                 </td>
-                                                <td>{student?.Contact1}</td>
                                                 <td>
+                                                    {' '}
                                                     {student?.Classes?.map((className: string, index: any) => (
                                                         <div key={index}>{className}</div>
                                                     ))}
                                                 </td>
-                                                <td className="flex-wra">
-                                                    <Tippy content="View">
-                                                        <Link
-                                                            to={`/students/view-student/${hashTheID(student.Student_id)}/${hashTheID(suid)}`}
-                                                            className="flex hover:text-green-800 text-primary gap-1"
-                                                        >
-                                                            <IconEye /> View
-                                                        </Link>
-                                                    </Tippy>
+                                                <td>{student?.Contact1}</td>
+                                               
+                                                <td className="text-right">
+                                                   {student?.StepName}
                                                 </td>
                                             </tr>
                                         ))

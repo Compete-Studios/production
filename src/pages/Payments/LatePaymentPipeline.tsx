@@ -47,14 +47,14 @@ export default function LatePaymentPipeline() {
 
             //Check when the last time we fetched new late payments was
             //If >15 minutes, fetch new late payments
-            const lastRun: any = localStorage.getItem('lastAddNewLatePaymentsRun');
-            const fifteenMinutes = 15 * 60 * 1000;
-            const now: any = new Date().getTime();
+            // const lastRun: any = localStorage.getItem('lastAddNewLatePaymentsRun');
+            // const fifteenMinutes = 15 * 60 * 1000;
+            // const now: any = new Date().getTime();
 
-            if (!lastRun || now - lastRun >= fifteenMinutes) {
-                addNewLatePayments();
-                localStorage.setItem('lastAddNewLatePaymentsRun', now);
-            }
+            // if (!lastRun || now - lastRun >= fifteenMinutes) {
+            //     addNewLatePayments();
+            //     localStorage.setItem('lastAddNewLatePaymentsRun', now);
+            // }
             
         }
     }, []);
@@ -76,54 +76,54 @@ export default function LatePaymentPipeline() {
             });
     };
 
-    const addNewLatePayments = async () => {
-        setFetching(true);
-        try {
-            const newPayments = await getLatePaymentsFromPaysimple(suid);
-            //Make sure studioId is an int before proceeding
-            const stId = parseInt(suid, 10);
-            //Construct the payment object and add it to our db
-            if (newPayments.Response && newPayments.Response.length > 0) {
-                for (const payment of newPayments.Response) {
-                    let paymentDate = new Date(payment.PaymentDate);
-                    const paymentData = {
-                        studioId: stId,
-                        paysimpleTransactionId: payment.Id,
-                        retriedTransactionId: 0,
-                        ignoreThisPayment: false,
-                        paysimpleCustomerId: payment.CustomerId,
-                        customerName: payment.CustomerFirstName + ' ' + payment.CustomerLastName,
-                        amount: payment.Amount,
-                        date: formatDate(paymentDate),
-                        notes: '',
-                        nextContactDate: '',
-                    };
+    // const addNewLatePayments = async () => {
+    //     setFetching(true);
+    //     try {
+    //         const newPayments = await getLatePaymentsFromPaysimple(suid);
+    //         //Make sure studioId is an int before proceeding
+    //         const stId = parseInt(suid, 10);
+    //         //Construct the payment object and add it to our db
+    //         if (newPayments.Response && newPayments.Response.length > 0) {
+    //             for (const payment of newPayments.Response) {
+    //                 let paymentDate = new Date(payment.PaymentDate);
+    //                 const paymentData = {
+    //                     studioId: stId,
+    //                     paysimpleTransactionId: payment.Id,
+    //                     retriedTransactionId: 0,
+    //                     ignoreThisPayment: false,
+    //                     paysimpleCustomerId: payment.CustomerId,
+    //                     customerName: payment.CustomerFirstName + ' ' + payment.CustomerLastName,
+    //                     amount: payment.Amount,
+    //                     date: formatDate(paymentDate),
+    //                     notes: '',
+    //                     nextContactDate: '',
+    //                 };
                     
-                    try {
-                        await addLatePayment(paymentData);
-                    } catch (error) {
-                    console.error(error);
-                    }
-                }
-            }
-            // Refetch the late payment pipeline with the updated payments
-            const pipelineRes: PipelineResponse = await getPaymentPipelineStepsByStudioId(suid);
-            if (Array.isArray(pipelineRes.recordset)) {
-                //Update the local LPP
-                setPipeline(pipelineRes.recordset);
-                //update the global LPP
-                setUpdate(!update);
+    //                 try {
+    //                     await addLatePayment(paymentData);
+    //                 } catch (error) {
+    //                 console.error(error);
+    //                 }
+    //             }
+    //         }
+    //         // Refetch the late payment pipeline with the updated payments
+    //         const pipelineRes: PipelineResponse = await getPaymentPipelineStepsByStudioId(suid);
+    //         if (Array.isArray(pipelineRes.recordset)) {
+    //             //Update the local LPP
+    //             setPipeline(pipelineRes.recordset);
+    //             //update the global LPP
+    //             setUpdate(!update);
 
-            } else {
-                console.error("Error: pipelineRes does not contain a valid recordset array", pipelineRes);
-            }
-        } catch (error) {
-            console.error(error);
-        }
-        finally {
-            setFetching(false);
-        }
-    };
+    //         } else {
+    //             console.error("Error: pipelineRes does not contain a valid recordset array", pipelineRes);
+    //         }
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    //     finally {
+    //         setFetching(false);
+    //     }
+    // };
 
     return (
         <div className="panel px-0 pb-0 border-white-light dark:border-[#1b2e4b]">

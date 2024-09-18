@@ -77,6 +77,21 @@ export const updateForm = async (id, data) => {
     }
 };
 
+export const getWebsiteCount = async (id) => {
+    const month = new Date().toLocaleString("default", { month: "short" }).toUpperCase();
+    const year = new Date().getFullYear();
+    const date = `${month}${year}`
+    const idToString = id.toString() + date;
+    const docRef = doc(db, 'webstats', idToString);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        return { count: docSnap.data().count, status: 200 };
+    } else {
+        return { status: 404 };
+    }
+};
+
+
 export const storeReportToFirebase = async (data) => {
     try {
         const docRef = collection(db, 'issues');

@@ -15,10 +15,8 @@ const Overview = lazy(() => import('../pages/Overview'));
 const CompeteLegacyForms = lazy(() => import('../pages/Forms/CompeteLegacyForms'));
 
 // Dashboards
-const Main = lazy(() => import('../components/Dashboards/Main'));
+
 const Studio = lazy(() => import('../components/Dashboards/Studio'));
-const Payment = lazy(() => import('../components/Dashboards/Payment'));
-const Marketing = lazy(() => import('../components/Dashboards/Marketing'));
 
 // Reports
 const AllReports = lazy(() => import('../pages/Reports/AllReports'));
@@ -241,19 +239,9 @@ const routes = [
         element: <Overview />,
     },
     {
-        path: '/marketing-dashboard',
-        element: <Marketing />,
-    },
-    {
-        path: '/studio-dashboard',
+        path: '/payment-dashboard',
         element: <Studio />,
     },
-    {
-        path: '/payment-dashboard',
-        element: <Payment />,
-    },
-
-
 
     //payments
     {
@@ -410,7 +398,7 @@ const routes = [
         element: <StealthAttendance />,
         layout: 'blank',
     },
-    
+
     {
         path: '/classes/stealth-attendance/teachers',
         element: <Attendance />,
@@ -587,9 +575,8 @@ const routes = [
     {
         path: '/students/email-list-students',
         element: <EmailList />,
-
     },
-    
+
     {
         path: '/students/text-list-all-students',
         element: <TextList />,
@@ -661,7 +648,7 @@ const routes = [
         path: '/prospects/activate-as-student',
         element: <ActivateAsStudent />,
     },
-    
+
     //facebook
     {
         path: '/facebook-add-creator',

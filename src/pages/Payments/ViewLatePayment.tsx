@@ -115,6 +115,8 @@ export default function ViewLatePayment() {
         setLoadingData((prevState) => ({ ...prevState, overall: overallLoading }));
     };
 
+ 
+
     const handleGetCustomerInfo = async (customerID: any) => {
         try {
             getStudentIdFromPaysimpleCustomerId(customerID).then(async (res) => {
@@ -274,6 +276,7 @@ export default function ViewLatePayment() {
     const getTheLatePaymentInfo = async () => {
         try {
             const res = await getLatePayment(id);
+            console.log(id, 'res');
             setPaymentInfo(res[0]);
             setMutablePaymentInfo(res[0]);
             setCurrentPipeline(res[0].CurrentPipelineStatus);
@@ -282,6 +285,7 @@ export default function ViewLatePayment() {
                 customerId: res[0].PaysimpleCustomerId,
                 studioId: suid,
             };
+            console.log(data, 'data');
             handleGetPaymentHistory(data);
             getBillingInfo(res[0].PaysimpleCustomerId, suid);
             if (res[0].PaysimpleTransactionId) {

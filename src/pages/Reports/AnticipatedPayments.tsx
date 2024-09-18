@@ -175,7 +175,7 @@ const AnticipatedPayments = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {payments.map((payment: any, index: number) => (
+                            {payments?.map((payment: any, index: number) => (
                                 <tr key={index}>
                                     <td>{payment.CustomerFirstName} {payment.CustomerLastName}</td>
                                     <td>{payment.PaymentAmount}</td>

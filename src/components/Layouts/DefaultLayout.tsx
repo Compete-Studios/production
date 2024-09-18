@@ -75,7 +75,6 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
                     </div>
                 )} */}
                 {showLoader && (
-                    /* From Uiverse.io by Nawsome */
                     <div className="screen_loader fixed inset-0 bg-[#fafafa] dark:bg-[#060818] z-[60] grid place-content-center animate__animated">
                         <div className="socket">
                             <div className="gel center-gel">
@@ -266,7 +265,7 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
                                 <div className="hex-brick h3"></div>
                             </div>
                         </div>
-                        <h3 className="text-center text-xl font-bold text-black dark:text-white-dark">Loading...</h3>
+                        
                     </div>
                 )}
                 <div className="fixed bottom-6 ltr:right-6 rtl:left-6 z-50">

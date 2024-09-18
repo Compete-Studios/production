@@ -1,61 +1,15 @@
-import React, { Fragment, useState } from 'react';
+import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import 'flatpickr/dist/flatpickr.css';
-import { Tab } from '@headlessui/react';
 import IconX from '../../components/Icon/IconX';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import IconNotes from '../../components/Icon/IconNotes';
-import IconListCheck from '../../components/Icon/IconListCheck';
-import SendMail from './components/SendMail';
-import SendText from './components/SendText';
-import QuickUpdate from './components/QuickUpdate';
-import IconLink from '../../components/Icon/IconLink';
-import IconInfoCircle from '../../components/Icon/IconInfoCircle';
-import IconPlus from '../../components/Icon/IconPlus';
+
 import QuickNote from './components/QuickNote';
 
-export default function ActionItemNote({ student, pipeline, studioOptions, update, setUpdate }: any) {
+export default function ActionItemNote({ student, pipeline, update, setUpdate }: any) {
     const [showActionModal, setShowActionModal] = useState(false);
-    const [expandedDescription, setExpandedDescription] = useState(false);
-    const [defaultTab, setDefaultTab] = useState(0);
-
-    const description = pipeline?.Description || '';
-
-    const toggleDescription = () => {
-        setExpandedDescription(!expandedDescription);
-    };
-
-    const renderDescription = () => {
-        if (!description) return null;
-
-        const lines = description.split('\n');
-        const maxLines = 3;
-
-        if (lines.length <= maxLines || expandedDescription) {
-            return (
-                <div>
-                    Description: <span className="text-primary">{description}</span>
-                    {expandedDescription && (
-                        <button className="text-info px-5 mt-1 underline" onClick={toggleDescription}>
-                            Read Less
-                        </button>
-                    )}
-                </div>
-            );
-        } else {
-            return (
-                <div>
-                    <p>
-                        Description: <span className="text-primary">{description?.slice(0, description.indexOf('\n', description.indexOf('\n') + 1))}</span>
-                        <button className="text-info px-5 mt-1 underline" onClick={toggleDescription}>
-                            Read more
-                        </button>
-                    </p>
-                </div>
-            );
-        }
-    };
 
     return (
         <div>
@@ -65,10 +19,10 @@ export default function ActionItemNote({ student, pipeline, studioOptions, updat
                 </button>
             </div>
             <div className="md:hidden flex items-center gap-2 justify-end">
-            <Tippy content="View Notes">
-                <button type="button" className="btn btn-warning btn-sm flex items-center gap-1 h-8" onClick={() => setShowActionModal(true)}>
-                    <IconNotes fill={true} /> 
-                </button>
+                <Tippy content="View Notes">
+                    <button type="button" className="btn btn-warning btn-sm flex items-center gap-1 h-8" onClick={() => setShowActionModal(true)}>
+                        <IconNotes fill={true} />
+                    </button>
                 </Tippy>
             </div>
             <Transition.Root show={showActionModal} as={Fragment}>
@@ -98,7 +52,12 @@ export default function ActionItemNote({ student, pipeline, studioOptions, updat
                                                                 Action Email <span className="font-bold text-primary">{pipeline?.StepName}</span>{' '}
                                                             </Dialog.Title>
                                                             <p className="text-sm text-gray-500">This action toolbar allows you to quickly email, text, add notes, or update the student step.</p>
-                                                            <h4 className="text-lg font-medium text-gray-900 dark:text-white-dark pt-4">Student: <span className='text-secondary'>{student?.FName} {student?.LName}</span></h4> 
+                                                            <h4 className="text-lg font-medium text-gray-900 dark:text-white-dark pt-4">
+                                                                Student:{' '}
+                                                                <span className="text-secondary">
+                                                                    {student?.FName} {student?.LName}
+                                                                </span>
+                                                            </h4>
                                                         </div>
 
                                                         <div className="flex h-7 items-center">

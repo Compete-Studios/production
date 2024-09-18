@@ -134,7 +134,12 @@ export default function EmailClassModal({ classuid, recipients, type, displayAll
                             <IconSend />
                             Email Class
                         </>
-                    ) : (
+                    ) : type === 'program' ? (
+                        <>
+                            <IconSend />
+                            Email Program
+                        </>
+                    )  : (
                         'Email This List'
                     )}
                 </button>

@@ -47,6 +47,8 @@ export default function ViewStudentsInPipeline() {
         navigate('/students/view-student');
     };
 
+ 
+
     return (
         <>
             <ul className="flex space-x-2 rtl:space-x-reverse">

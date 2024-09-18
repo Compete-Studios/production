@@ -33,6 +33,7 @@ export default function AddNewClass({ color }: any) {
     };
     const [staffs, setStaffs] = useState([]);
 
+
     const [classToAdd, setClassToAdd] = useState({
         studioId: suid || 1000,
         name: '',

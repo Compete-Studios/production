@@ -493,7 +493,7 @@ const routes = [
         element: <ViewStudents />,
     },
     {
-        path: '/students/add-student',
+        path: '/students/add-student/:uid?',
         element: <AddStudent />,
     },
     {
@@ -605,7 +605,7 @@ const routes = [
         element: <ViewProspects />,
     },
     {
-        path: '/prospects/add-prospect',
+        path: '/prospects/add-prospect/:uid?',
         element: <AddProspect />,
     },
     {

@@ -6,7 +6,7 @@ import 'swiper/css/navigation';
 import Select from 'react-select';
 import 'swiper/css/pagination';
 import IconPlus from '../../components/Icon/IconPlus';
-import { addClassAndSchedule, getStaffByClassId, getTheClassScheduleByClassId, loadStudioRooms } from '../../functions/api';
+import { addClassAndSchedule, getStaffByClassId, getTheClassScheduleByClassId, loadStudioRooms, updateClassAndSchedule } from '../../functions/api';
 import { UserAuth } from '../../context/AuthContext';
 import IconEdit from '../../components/Icon/IconEdit';
 import IconX from '../../components/Icon/IconX';
@@ -18,13 +18,26 @@ import { showErrorMessage, showMessage } from '../../functions/shared';
 import { formatHoursFromDateTime, handleGetTimeZoneOfUser } from '../../functions/dates';
 import IconTrashLines from '../../components/Icon/IconTrashLines';
 
+interface Room {
+    RoomId: number;
+    Name: string;
+}
+
+interface Class {
+    ClassId: number;
+    Name: string;
+    Description: string;
+    EnrollmentLimit: number;
+    Notes: string;
+}
+
 export default function ViewEditClass({ classId, nameOfClass }: any) {
     const { suid, setUpdate, update, classes, staff }: any = UserAuth();
     const [modal21, setModal21] = useState(false);
     const [classData, setClassData] = useState({});
     const [staffData, setStaffData] = useState([]);
     const [classSchedule, setClassSchedule] = useState([]);
-    const [rooms, setRooms] = useState([]);
+    const [rooms, setRooms] = useState<Room[]>([]);
     const [startTime, setStartTime] = useState<any>({
         hours: 12,
         minutes: 0,
@@ -38,12 +51,13 @@ export default function ViewEditClass({ classId, nameOfClass }: any) {
 
     const [classToAdd, setClassToAdd] = useState({
         studioId: suid || 1000,
+        classId: classId,
         name: '',
         description: '',
         notes: '',
-        enrollmentLimit: '',
+        enrollmentLimit: 100,
         dayOfWeek: '',
-        dayIndex: '',
+        dayIndex: 0,
         startTime: '',
         endTime: '',
         roomId: '',
@@ -58,14 +72,13 @@ export default function ViewEditClass({ classId, nameOfClass }: any) {
 
     const daysOfTheWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-    // useEffect(() => {
-    //     setClassData(classes.find((d: any) => d.ClassId === parseInt(classId ?? '')));
-    // }, [classId, classes]);
+    useEffect(() => {
+        setClassData(classes.find((d: any) => d.ClassId === parseInt(classId ?? '')));
+    }, [classId, classes]);
 
     const handleGetClassStaff = async () => {
         try {
             const res = await getStaffByClassId(classId);
-            console.log(res, 'console.log(res);');
             if (res) {
                 const staffObj = res.map((st: any) => {
                     return { value: st.StaffId[0], label: st?.LastName + ', ' + st?.FirstName };
@@ -91,21 +104,21 @@ export default function ViewEditClass({ classId, nameOfClass }: any) {
     };
 
     useEffect(() => {
-        // handleGetClassStaff();
-        // handleGetSchedule();
+        handleGetClassStaff();
+        handleGetSchedule();
     }, []);
 
     //edit class
     useEffect(() => {
-        const classForEditing = classes.find((c) => c.ClassId === classId);
+        const classForEditing = classes.find((c: any) => c.ClassId === classId);
         if (classForEditing) {
-            // setClassToAdd({
-            //     description: classForEditing.Description,
-            //     name: classForEditing.Name,
-            //     enrollmentLimit: classForEditing.EnrollmentLimit,
-            //     notes: classForEditing.Notes,
-            //     classId: classForEditing.ClassId,
-            // });
+            setClassToAdd({
+                ...classToAdd,
+                name: classForEditing.Name,
+                description: classForEditing.Description,
+                enrollmentLimit: classForEditing.EnrollmentLimit,
+                notes: classForEditing.Notes,
+             });
         }
     }, [classId, classes, modal21]);
 
@@ -116,77 +129,79 @@ export default function ViewEditClass({ classId, nameOfClass }: any) {
 
     const getTheSchedule = async (cuid: any) => {
         getTheClassScheduleByClassId(cuid).then((response) => {
-            // setClassToAdd({
-            //     ...classToAdd,
-            //     dayOfWeek: response.DayOfWeek,
-            //     dayIndex: response.DayIndex,
-            //     startTime: getTimeOnlyfromZulueStamp(response.StartTime),
-            //     endTime: getTimeOnlyfromZulueStamp(response.EndTime),
-            //     roomId: response.RoomId,
-            // });
+            setClassToAdd({
+                ...classToAdd,
+                dayOfWeek: response.DayOfWeek,
+                dayIndex: response.DayIndex,
+                startTime: getTimeOnlyfromZulueStamp(response.StartTime),
+                endTime: getTimeOnlyfromZulueStamp(response.EndTime),
+                roomId: response.RoomId,
+            });
         });
     };
 
 
 
-    // const getStudioRooms = async () => {
-    //     try {
-    //         const response = await loadStudioRooms(suid);
-    //         const data =  response;
-    //         setRooms(data.recordset);
-    //         return data;
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     getStudioRooms();
-    // }, [suid]);
+    const getStudioRooms = async () => {
+        try {
+            const response = await loadStudioRooms(suid);
+            const data =  response;
+            setRooms(data.recordset);
+            return data;
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     useEffect(() => {
-        // setClassToAdd({ ...classToAdd, studioId: suid });
-        // const newStaffObj = staff.map((st: any) => {
-        //     return { value: st.StaffId, label: st.Name };
-        // });
-        // setOptions(newStaffObj);
+        getStudioRooms();
+    }, [suid]);
+
+    useEffect(() => {
+        setClassToAdd({ ...classToAdd, studioId: suid });
+        const newStaffObj = staff.map((st: any) => {
+            return { value: st.StaffId, label: st.Name };
+        });
+        setOptions(newStaffObj);
     }, [suid]);
 
     const handleEnrollmentLimit = (e: any) => {
         e.preventDefault();
-        // const enrollInt: any = parseInt(e.target.value);
-        // if (enrollInt > 0) {
-        //     setClassToAdd({ ...classToAdd, enrollmentLimit: enrollInt });
-        // } else {
-        //     setClassToAdd({ ...classToAdd, enrollmentLimit: 0 });
-        // }
+        const enrollInt: any = parseInt(e.target.value);
+        if (enrollInt > 0) {
+            setClassToAdd({ ...classToAdd, enrollmentLimit: enrollInt });
+        } else {
+            setClassToAdd({ ...classToAdd, enrollmentLimit: 0 });
+        }
     };
 
-    const handleAddAClass = () => {
+    const handleUpdateClass = () => {
         // Add your code here to add a class
-        // setIsLoading(true);
-        // addClassAndSchedule(classToAdd).then((response) => {
-        //     try {
-        //         if (response.status === 200) {
-        //             setIsLoading(false);
-        //             setUpdate(!update);
-        //             setModal21(false);
-        //             showMessage('Class has been saved successfully.');
-        //         } else {
-        //             console.error('Error adding class');
-        //             setIsLoading(false);
-        //             setUpdate(!update);
-        //             setModal21(false);
-        //             showErrorMessage('Error adding class');
-        //         }
-        //     } catch (error) {
-        //         console.error('Error adding class');
-        //         setIsLoading(false);
-        //         setUpdate(!update);
-        //         setModal21(false);
-        //         showErrorMessage('Error adding class');
-        //     }
-        // });
+        setIsLoading(true);
+        console.log(classToAdd, 'classToAdd');
+        updateClassAndSchedule(classToAdd).then((response) => {
+            console.log(response, 'response');
+            try {
+                if (response.status === 200) {
+                    setIsLoading(false);
+                    setUpdate(!update);
+                    setModal21(false);
+                    showMessage('Class has been saved successfully.');
+                } else {
+                    console.error('Error updating class');
+                    setIsLoading(false);
+                    setUpdate(!update);
+                    setModal21(false);
+                    showErrorMessage('Error updating class');
+                }
+            } catch (error) {
+                console.error('Error UPDATING class');
+                setIsLoading(false);
+                setUpdate(!update);
+                setModal21(false);
+                showErrorMessage('Error updating class');
+            }
+        });
     };
 
     return (
@@ -197,7 +212,7 @@ export default function ViewEditClass({ classId, nameOfClass }: any) {
                 </button>
             </Tippy>
 
-            {/* <Transition appear show={modal21} as={Fragment}>
+            <Transition appear show={modal21} as={Fragment}>
                 <Dialog
                     as="div"
                     open={modal21}
@@ -353,7 +368,7 @@ export default function ViewEditClass({ classId, nameOfClass }: any) {
                                                             value={classToAdd.endTime}
                                                             className="form-input"
                                                             onChange={(date4) => {
-                                                                setClassToAdd({ ...classToAdd, endTime: new Date(date4).toISOString() });
+                                                                setClassToAdd({ ...classToAdd, endTime: new Date(date4[0]).toISOString() });
                                                             }}
                                                         />
                                                     </div>
@@ -387,7 +402,7 @@ export default function ViewEditClass({ classId, nameOfClass }: any) {
                                                     onChange={(e) => setClassToAdd({ ...classToAdd, description: e.target.value })}
                                                 ></textarea>
                                             </div>
-                                            <button type="button" className="btn btn-primary w-full" onClick={() => setModal21(false)} disabled={isLoading}>
+                                            <button type="button" className="btn btn-primary w-full" onClick={handleUpdateClass}>
                                                 Update Class
                                             </button>
                                         </form>
@@ -397,7 +412,7 @@ export default function ViewEditClass({ classId, nameOfClass }: any) {
                         </div>
                     </div>
                 </Dialog>
-            </Transition> */}
+            </Transition>
         </div>
     );
 }

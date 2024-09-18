@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { UserAuth } from '../../context/AuthContext';
 import Swal from 'sweetalert2';
 import 'swiper/css';
 import Select from 'react-select';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
-import { addProspect, addProspectToClasses, addProspectToPrograms, addProspectToWaitingLists } from '../../functions/api';
+import { addProspect, addProspectToClasses, addProspectToPrograms, addProspectToWaitingLists, getProspectById } from '../../functions/api';
 import { useNavigate } from 'react-router-dom';
 import { constFormateDateMMDDYYYY, formatDate, hashTheID, showMessage } from '../../functions/shared';
 
@@ -61,8 +62,57 @@ export default function AddProspect() {
     const [waitingListIDs, setWaitingListIDs] = useState<any>([]);
     const [programIds, setProgramIds] = useState<any>([]);
 
+    const updatedPPSteps = prospectPipelineSteps? [
+        { StepName: 'No Status', PipelineStepId: 0 },
+        ...prospectPipelineSteps,
+    ] : [];
+
     const navigate = useNavigate();
-    
+    const { uid } = useParams<{ uid: string }>();
+
+    const unHashTheID = (id: any) => {
+        return parseInt(id) / 123456789;
+    };
+
+    useEffect(() => {
+        const getProspectInfo = async () => {
+            if (uid) {
+                try {
+                    const prospectId = unHashTheID(uid);
+                    console.log('Unhashed ID:', prospectId);
+                    const info = await getProspectById(prospectId);
+                    console.log('Fetched Prospect Info:', info);
+                    setProspectInfo((prev) => ({
+                        ...prev,
+                        fName: info.FName || prev.fName,
+                        lName: info.LName || prev.lName,
+                        phone: info.Phone || prev.phone,
+                        email: info.Email || prev.email,
+                        address: info.Address || prev.address,
+                        city: info.City || prev.city,
+                        state: info.State || prev.state,
+                        zip: info.Zip || prev.zip,
+                        notes: info.Notes || prev.notes,
+                        parentName: info.ParentName || prev.parentName,
+                        birthdate: info.Birthdate || prev.birthdate,
+                        currentPipelineStatus: info.PipelineStatus || prev.currentPipelineStatus,
+                        entryDate: info.EntryDate || prev.entryDate,
+                        introDate: info.IntroDate || prev.introDate,
+                        firstClassDate: info.FirstClassDate || prev.firstClassDate,
+                        nextContactDate: info.NextContactDate || prev.nextContactDate,
+                       
+                    }));
+                    console.log('Updated Prospect Info:', prospectInfo);
+                } catch (error) {
+                    console.error('Error fetching prospect info:', error);
+                }
+            }
+        };
+
+        getProspectInfo();
+    }, [uid]);
+
+
     useEffect(() => {
         const newPrograms = programs?.map((program: any) => {
             return { value: program.ProgramId, label: program.Name };
@@ -71,7 +121,7 @@ export default function AddProspect() {
     }, [programs]);
 
     useEffect(() => {
-        setProspectInfo({ ...prospectInfo, studioId: suid });
+        setProspectInfo((prev) => ({ ...prev, studioId: suid }));
         console.log('SUID:', suid);
     }, [suid]);
 
@@ -131,7 +181,7 @@ export default function AddProspect() {
 
     useEffect(() => {
         const prospectAge: any = new Date().getFullYear() - new Date(prospectInfo.birthdate).getFullYear();
-        setProspectInfo({ ...prospectInfo, age: prospectAge });
+        setProspectInfo((prev) => ({ ...prev, age: prospectAge }));
     }, [prospectInfo.birthdate]);
  
 
@@ -155,11 +205,25 @@ export default function AddProspect() {
                         <div className="mb-5 grid grid-cols-1 sm:grid-cols-4 gap-4">
                             <div className="sm:col-span-2">
                                 <label htmlFor="first">First Name</label>
-                                <input id="first" type="text" placeholder="First Name" className="form-input" onChange={(e) => setProspectInfo({ ...prospectInfo, fName: e.target.value })} />
+                                <input
+                                    id="first"
+                                    type="text"
+                                    placeholder="First Name"
+                                    className="form-input"
+                                    value={prospectInfo.fName}
+                                    onChange={(e) => setProspectInfo({ ...prospectInfo, fName: e.target.value })}
+                                />
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="last">Last Name</label>
-                                <input id="last" type="text" placeholder="Last Name" className="form-input" onChange={(e) => setProspectInfo({ ...prospectInfo, lName: e.target.value })} />
+                                <input
+                                    id="last"
+                                    type="text"
+                                    placeholder="Last Name"
+                                    className="form-input"
+                                    value={prospectInfo.lName}
+                                    onChange={(e) => setProspectInfo({ ...prospectInfo, lName: e.target.value })}
+                                />
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="parentName">Parent Name</label>
@@ -168,36 +232,85 @@ export default function AddProspect() {
                                     type="text"
                                     placeholder="Parent Name"
                                     className="form-input"
+                                    value={prospectInfo.parentName}
                                     onChange={(e) => setProspectInfo({ ...prospectInfo, parentName: e.target.value })}
                                 />
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="phone">Phone</label>
-                                <input id="phone" type="text" placeholder="Phone" className="form-input" onChange={(e) => setProspectInfo({ ...prospectInfo, phone: e.target.value })} />
+                                <input
+                                    id="phone"
+                                    type="text"
+                                    placeholder="Phone"
+                                    className="form-input"
+                                    value={prospectInfo.phone}
+                                    onChange={(e) => setProspectInfo({ ...prospectInfo, phone: e.target.value })}
+                                />
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="email">Email</label>
-                                <input id="email" type="text" placeholder="Email" className="form-input" onChange={(e) => setProspectInfo({ ...prospectInfo, email: e.target.value })} />
+                                <input
+                                    id="email"
+                                    type="text"
+                                    placeholder="Email"
+                                    className="form-input"
+                                    value={prospectInfo.email}
+                                    onChange={(e) => setProspectInfo({ ...prospectInfo, email: e.target.value })}
+                                />
                             </div>
                             <div className="sm:col-span-4">
                                 <label htmlFor="address">Address</label>
-                                <input id="address" type="text" placeholder="Address" className="form-input" onChange={(e) => setProspectInfo({ ...prospectInfo, address: e.target.value })} />
+                                <input
+                                    id="address"
+                                    type="text"
+                                    placeholder="Address"
+                                    className="form-input"
+                                    value={prospectInfo.address}
+                                    onChange={(e) => setProspectInfo({ ...prospectInfo, address: e.target.value })}
+                                />
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="city">City</label>
-                                <input id="city" type="text" placeholder="City" className="form-input" onChange={(e) => setProspectInfo({ ...prospectInfo, city: e.target.value })} />
+                                <input
+                                    id="city"
+                                    type="text"
+                                    placeholder="City"
+                                    className="form-input"
+                                    value={prospectInfo.city}
+                                    onChange={(e) => setProspectInfo({ ...prospectInfo, city: e.target.value })}
+                                />
                             </div>
                             <div className="sm:col-span-1">
                                 <label htmlFor="state">State</label>
-                                <input id="state" type="text" placeholder="State" className="form-input" onChange={(e) => setProspectInfo({ ...prospectInfo, state: e.target.value })} />
+                                <input
+                                    id="state"
+                                    type="text"
+                                    placeholder="State"
+                                    className="form-input"
+                                    value={prospectInfo.state}
+                                    onChange={(e) => setProspectInfo({ ...prospectInfo, state: e.target.value })}
+                                />
                             </div>
                             <div className="sm:col-span-1">
                                 <label htmlFor="zip">Zip</label>
-                                <input id="zip" type="text" placeholder="Zip" className="form-input" onChange={(e) => setProspectInfo({ ...prospectInfo, zip: e.target.value })} />
+                                <input
+                                    id="zip"
+                                    type="text"
+                                    placeholder="Zip"
+                                    className="form-input"
+                                    value={prospectInfo.zip}
+                                    onChange={(e) => setProspectInfo({ ...prospectInfo, zip: e.target.value })}
+                                />
                             </div>
+
                             <div className="sm:col-span-full">
                                 <label htmlFor="contactMethod">Contact Method</label>
-                                <select id="marketingMethod" className="form-select " onChange={(e: any) => setProspectInfo({ ...prospectInfo, contactMethod: e.target.value })}>
+                                <select
+                                    id="marketingMethod"
+                                    className="form-select"
+                                    value={prospectInfo.contactMethod}
+                                    onChange={(e: any) => setProspectInfo({ ...prospectInfo, contactMethod: parseInt(e.target.value) })}
+                                >
                                     {marketingSources?.map((source: any) => (
                                         <option key={source.MethodId} value={source.MethodId}>
                                             {source.Name}
@@ -253,7 +366,14 @@ export default function AddProspect() {
                             </div>
                             <div className="sm:col-span-full">
                                 <label htmlFor="notes">Notes</label>
-                                <textarea id="notes" rows={4} placeholder="Notes" className="form-textarea" onChange={(e) => setProspectInfo({ ...prospectInfo, notes: e.target.value })} />
+                                <textarea
+                                    id="notes"
+                                    rows={4}
+                                    placeholder="Notes"
+                                    className="form-textarea"
+                                    value={prospectInfo.notes}
+                                    onChange={(e) => setProspectInfo({ ...prospectInfo, notes: e.target.value })}
+                                />
                             </div>
                             <div className="sm:col-span-2 sm:row-span-2">
                                 <label htmlFor="waitingList">Waiting List</label>
@@ -271,8 +391,13 @@ export default function AddProspect() {
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="pipelineStatus">Pipeline Status</label>
-                                <select id="pipelineStatus" className="form-select" onChange={(e) => setProspectInfo({ ...prospectInfo, currentPipelineStatus: e.target.value })}>
-                                    {prospectPipelineSteps?.map((step: any) => (
+                                <select
+                                    id="pipelineStatus"
+                                    className="form-select"
+                                    value={prospectInfo.currentPipelineStatus}
+                                    onChange={(e) => setProspectInfo({ ...prospectInfo, currentPipelineStatus: e.target.value })}
+                                >
+                                    {updatedPPSteps?.map((step: any) => (
                                         <option key={step.PipelineStepId} value={step.PipelineStepId}>
                                             {step.StepName}
                                         </option>

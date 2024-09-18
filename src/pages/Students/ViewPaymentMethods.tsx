@@ -5,12 +5,12 @@ import visaIcon from '../../assets/creditcardicons/visa.svg';
 import amexIcon from '../../assets/creditcardicons/amex.svg';
 import discoverIcon from '../../assets/creditcardicons/discover.svg';
 import genericIcon from '../../assets/creditcardicons/generic.svg';
-import { useParams } from 'react-router-dom';
-import { getAllCustomerPaymentAccounts } from '../../functions/payments';
+import { getAllCustomerPaymentAccounts, updateCreditCard } from '../../functions/payments';
 import { UserAuth } from '../../context/AuthContext';
 import Tippy from '@tippyjs/react';
 import IconX from '../../components/Icon/IconX';
 import IconTrashLines from '../../components/Icon/IconTrashLines';
+import { showMessage, showErrorMessage } from '../../functions/shared';
 
 const bgcssColors: any = [
     'bg-gradient-to-r from-cyan-200 via-teal-300 to-cyan-300',
@@ -26,19 +26,20 @@ const cardIcons: any = {
     Discover: discoverIcon,
     Generic: genericIcon,
 };
+
 export default function ViewPaymentMethods({ payID }: any) {
     const [viewCards, setViewCards] = useState(false);
     const { suid }: any = UserAuth();
-
     const [defaultCard, setDefaultCard] = useState<any>('');
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<any>(null);
     const [cards, setCards] = useState<any>([]);
     const [bankAccounts, setBankAccounts] = useState<any>([]);
+    const [editedExpirationDates, setEditedExpirationDates] = useState<{ [key: string]: string }>({});
+    const [editingExpirationCardId, setEditingExpirationCardId] = useState<string | null>(null); // State to track editing status
 
     useEffect(() => {
         console.log(payID);
         getAllCustomerPaymentAccounts(payID, suid).then((response) => {
-            console.log(response?.Response);
             if (response?.Response?.CreditCardAccounts?.length > 0) {
                 setSelectedPaymentMethod(response?.Response?.CreditCardAccounts[0]?.Id);
                 setCards(response?.Response?.CreditCardAccounts);
@@ -62,7 +63,67 @@ export default function ViewPaymentMethods({ payID }: any) {
         }
     }, [cards]);
 
-    console.log(cards)
+    // Handle input change for the expiration date
+    const handleExpirationDateChange = (cardId: string, value: string) => {
+        setEditedExpirationDates((prev) => ({
+            ...prev,
+            [cardId]: value,
+        }));
+    };
+
+    const handleExpirationDateEdit = (cardId: string) => {
+        setEditingExpirationCardId(cardId);
+    };
+
+    const handleExpirationDateBlur = () => {
+        // Exit editing mode when the input loses focus
+        setEditingExpirationCardId(null);
+    };
+
+    const handleSave = async (card: any) => {
+        console.log('BEGIN SAVE', card);
+
+        // Default the expiration date and check if it has changed
+        let expDate = card.ExpirationDate;
+        const hasExpirationDateChanged = editedExpirationDates[card?.Id] !== undefined && editedExpirationDates[card?.Id] !== card.ExpirationDate;
+
+        if (hasExpirationDateChanged) {
+            expDate = editedExpirationDates[card?.Id];
+        }
+
+        // Check if the default status has changed
+        const hasDefaultStatusChanged = card.Id !== defaultCard && defaultCard !== '';
+
+        console.log('hasExpirationDateChanged', hasExpirationDateChanged, 'hasDefaultStatusChanged', hasDefaultStatusChanged);
+
+        // Run the save logic only if expiration date or default status has changed
+        if (hasExpirationDateChanged || hasDefaultStatusChanged) {
+            console.log('UPDATING CARD', card);
+
+            const cardData = {
+                studioId: suid,
+                customerId: card.CustomerId,
+                creditCardId: card.Id,
+                ccNumber: card.CreditCardNumber,
+                expDate: expDate,
+                isDefault: card.Id === defaultCard,
+                billingZip: card.BillingZip?.toString(),
+            };
+
+            try {
+                const response = await updateCreditCard(cardData);
+                if (response.Status === 200) {
+                    showMessage('Payment Method Updated', 'success');
+                } else {
+                    showErrorMessage('Error updating payment method');
+                }
+            } catch (error) {
+                showErrorMessage('Error updating payment method');
+            } 
+        }
+        setViewCards(false);
+    };
+
 
     return (
         <div>
@@ -99,17 +160,13 @@ export default function ViewPaymentMethods({ payID }: any) {
                                     <div className="p-5">
                                         <div className="grid sm:grid-cols-2 xl:grid-cols-3 grid-cols-1 gap-4">
                                             {cards?.map((card: any, index: number) => {
-                                                // Replace asterisks with bullets
                                                 const maskedCardNumber = card?.CreditCardNumber.replace(/\*/g, '•');
                                                 return (
-                                                    <div className='relative'>
-                                                        
+                                                    <div className="relative" key={card?.Id}>
                                                         <div className="flex items-center w-full">
                                                             <div
-                                                                key={card?.Id}
-                                                                className={`relative block w-full rounded-lg hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-white p-4 ${
-                                                                    bgcssColors[index % bgcssColors.length]
-                                                                }`}
+                                                                className={`relative block w-full rounded-lg hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-white p-4 ${bgcssColors[index % bgcssColors.length]
+                                                                    }`}
                                                             >
                                                                 <img src={cardIcons[card?.Issuer] || cardIcons['Generic']} alt={card?.Issuer} className="w-12 h-auto" />
                                                                 <div className="mt-4">
@@ -120,7 +177,23 @@ export default function ViewPaymentMethods({ payID }: any) {
                                                                         </div>
                                                                         <div>
                                                                             <label className="text-sm text-zinc-500">Expires</label>
-                                                                            <div className="text-lg font-semibold text-zinc-950 -mt-2">{card?.ExpirationDate}</div>
+                                                                            {editingExpirationCardId === card?.Id ? (
+                                                                                <input
+                                                                                    type="text"
+                                                                                    className="text-lg font-semibold text-zinc-950 -mt-2 bg-white border border-gray-300 rounded p-1"
+                                                                                    value={editedExpirationDates[card?.Id] || card?.ExpirationDate}
+                                                                                    onChange={(e) => handleExpirationDateChange(card?.Id, e.target.value)}
+                                                                                    onBlur={() => handleExpirationDateBlur()}
+                                                                                    autoFocus
+                                                                                />
+                                                                            ) : (
+                                                                                <div
+                                                                                    className="text-lg font-semibold text-zinc-950 -mt-2 cursor-pointer"
+                                                                                    onClick={() => handleExpirationDateEdit(card?.Id)}
+                                                                                >
+                                                                                    {card?.ExpirationDate}
+                                                                                </div>
+                                                                            )}
                                                                         </div>
                                                                     </div>
                                                                     <div className="flex items-center justify-between mt-4">
@@ -146,11 +219,11 @@ export default function ViewPaymentMethods({ payID }: any) {
                                                             </div>
                                                         </div>
                                                         <div className='absolute right-0'>
-                                                        <Tippy content="Remove Card" placement="top">
-                                                        <button >
-                                                          <IconTrashLines className='w-6 h-6 text-danger hover:text-red-800' />
-                                                        </button>
-                                                        </Tippy>
+                                                            <Tippy content="Remove Card" placement="top">
+                                                                <button>
+                                                                    <IconTrashLines className='w-6 h-6 text-danger hover:text-red-800' />
+                                                                </button>
+                                                            </Tippy>
                                                         </div>
                                                     </div>
                                                 );
@@ -160,9 +233,16 @@ export default function ViewPaymentMethods({ payID }: any) {
                                             <button type="button" className="btn btn-outline-danger" onClick={() => setViewCards(false)}>
                                                 Discard
                                             </button>
-                                            <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setViewCards(false)}>
-                                                Save
-                                            </button>
+                                            {cards?.map((card: any) => (
+                                                <button
+                                                    key={card?.Id}
+                                                    type="button"
+                                                    className="btn btn-primary ltr:ml-4 rtl:mr-4"
+                                                    onClick={() => handleSave(card)}
+                                                >
+                                                    Save
+                                                </button>
+                                            ))}
                                         </div>
                                     </div>
                                 </Dialog.Panel>

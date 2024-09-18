@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { UserAuth } from '../../context/AuthContext';
 import Select from 'react-select';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import Swal from 'sweetalert2';
-import { addNewStudent, addStudentToClasses, addStudentToPrograms, addStudentToWaitingLists } from '../../functions/api';
+import { addNewStudent, addStudentToClasses, addStudentToPrograms, addStudentToWaitingLists, getStudentInfo } from '../../functions/api';
 import { Link, useNavigate } from 'react-router-dom';
 import { constFormateDateMMDDYYYY, formatDate } from '../../functions/shared';
 
@@ -48,7 +49,57 @@ export default function AddStudent() {
     const [selectedClasses, setSelectedClasses] = useState<any[]>([]);
     const [selectedWaitingLists, setSelectedWaitingLists] = useState<any[]>([]);
 
+    const updatedPipelineSteps = pipelineSteps ? [
+        { StepName: "No Status", pipelineStepId: 0 },
+        ...pipelineSteps
+    ] : [];
+
     const navigate = useNavigate();
+
+    const { uid } = useParams<{ uid: string }>();
+
+    const unHashTheID = (id: any) => {
+        return parseInt(id) / 123456789;
+    };
+
+    useEffect(() => {
+        const getProspectInfo = async () => {
+            if (uid) {
+                try {
+                    const studentId = unHashTheID(uid);
+                    console.log('Unhashed ID:', studentId);
+                    const info = await getStudentInfo(studentId);
+                    console.log('Fetched Student Info:', info);
+                    setStudentInfo((prev) => ({
+                        ...prev,
+                        fName: info.First_Name || prev.fName,
+                        lName: info.Last_Name || prev.lName,
+                        phone: info.Phone || prev.phone,
+                        phone2: info.Phone2 || prev.phone2,
+                        email: info.email || prev.email,
+                        address: info.mailingaddr || prev.address,
+                        city: info.City || prev.city,
+                        state: info.State || prev.state,
+                        zip: info.Zip || prev.zip,
+                        notes: info.Notes || prev.notes,
+                        contact1: info.Contact1 || prev.contact1,
+                        contact2: info.Contact2 || prev.contact2,
+                        birthdate: info.Birthdate || prev.birthdate,
+                        currentPipelineStatus: info.PipelineStatus || prev.currentPipelineStatus,
+                        introDate: info.IntroDate || prev.introDate,
+                        firstClassDate: info.FirstClassDate || prev.firstClassDate,
+                        nextContactDate: info.NextContactDate || prev.nextContactDate,
+
+                    }));
+                    console.log('Updated student Info:', studentInfo);
+                } catch (error) {
+                    console.error('Error fetching prospect info:', error);
+                }
+            }
+        };
+
+        getProspectInfo();
+    }, [uid]);
 
     useEffect(() => {
         const newPrograms = programs?.map((program: any) => {
@@ -160,7 +211,7 @@ export default function AddStudent() {
         }
     };
 
-    
+
 
     return (
         <div>
@@ -188,6 +239,7 @@ export default function AddStudent() {
                                     id="first"
                                     type="text"
                                     className={`form-input ${alerts.firstName && 'border-danger bg-red-50'} `}
+                                    value={studentInfo.fName}
                                     onChange={(e) => setStudentInfo({ ...studentInfo, fName: e.target.value })}
                                 />
                                 <p className="text-danger text-xs ml-1">{alerts.firstName && 'First name is required'}</p>
@@ -198,21 +250,28 @@ export default function AddStudent() {
                                     id="last"
                                     type="text"
                                     className={`form-input ${alerts.lastName && 'border-danger bg-red-50'} `}
+                                    value={studentInfo.lName}
                                     onChange={(e) => setStudentInfo({ ...studentInfo, lName: e.target.value })}
                                 />
                                 <p className="text-danger text-xs ml-1">{alerts.lastName && 'Last name is required'}</p>
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="contact1">Contact 1</label>
-                                <input id="contact1" type="text" className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, contact1: e.target.value })} />
+                                <input id="contact1" type="text" className="form-input"
+                                    value={studentInfo.contact1}
+                                onChange={(e) => setStudentInfo({ ...studentInfo, contact1: e.target.value })} />
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="contact2">Contact 2</label>
-                                <input id="contact2" type="text" className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, contact2: e.target.value })} />
+                                <input id="contact2" type="text" className="form-input"
+                                    value={studentInfo.contact2}
+                                onChange={(e) => setStudentInfo({ ...studentInfo, contact2: e.target.value })} />
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="phone">Mobile Phone</label>
-                                <input id="phone" type="text" className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, phone: e.target.value })} />
+                                <input id="phone" type="text" className="form-input" 
+                                value={studentInfo.phone}
+                                onChange={(e) => setStudentInfo({ ...studentInfo, phone: e.target.value })} />
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="phone">Home Phone</label>
@@ -224,13 +283,16 @@ export default function AddStudent() {
                                     id="email"
                                     type="text"
                                     className={`form-input ${alerts.email && 'border-danger bg-red-50'} `}
+                                    value={studentInfo.email}
                                     onChange={(e) => setStudentInfo({ ...studentInfo, email: e.target.value })}
                                 />
                                 <p className="text-danger text-xs ml-1">{alerts.email && 'Email is required'}</p>
                             </div>
                             <div className="sm:col-span-3">
                                 <label htmlFor="address">Address</label>
-                                <input id="address" type="text" className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, address: e.target.value })} />
+                                <input id="address" type="text" className="form-input"
+                                value={studentInfo.address}
+                                onChange={(e) => setStudentInfo({ ...studentInfo, address: e.target.value })} />
                             </div>
                             <div className="">
                                 <label htmlFor="address2">Address 2</label>
@@ -238,15 +300,22 @@ export default function AddStudent() {
                             </div>
                             <div className="sm:col-span-2">
                                 <label htmlFor="city">City</label>
-                                <input id="city" type="text" placeholder="City" className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, city: e.target.value })} />
+                                <input id="city" type="text" placeholder="City"
+                                 className="form-input"
+                                 value={studentInfo.city}
+                                 onChange={(e) => setStudentInfo({ ...studentInfo, city: e.target.value })} />
                             </div>
                             <div className="sm:col-span-1">
                                 <label htmlFor="state">State</label>
-                                <input id="state" type="text" placeholder="State" className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, state: e.target.value })} />
+                                <input id="state" type="text" placeholder="State" className="form-input"
+                                value={studentInfo.state}
+                                onChange={(e) => setStudentInfo({ ...studentInfo, state: e.target.value })} />
                             </div>
                             <div className="sm:col-span-1">
                                 <label htmlFor="zip">Zip</label>
-                                <input id="zip" type="text" placeholder="Zip" className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, zip: e.target.value })} />
+                                <input id="zip" type="text" placeholder="Zip"
+                                value={studentInfo.zip}
+                                className="form-input" onChange={(e) => setStudentInfo({ ...studentInfo, zip: e.target.value })} />
                             </div>
                         </div>
                     </form>
@@ -323,7 +392,7 @@ export default function AddStudent() {
                             <div className="sm:col-span-2">
                                 <label htmlFor="pipelineStatus">Pipeline Status</label>
                                 <select id="pipelineStatus" className="form-select text-white-dark" onChange={(e) => setStudentInfo({ ...studentInfo, currentPipelineStatus: e.target.value })}>
-                                    {pipelineSteps?.map((step: any) => (
+                                    {updatedPipelineSteps?.map((step: any) => (
                                         <option key={step.PipelineStepId} value={step.PipelineStepId}>
                                             {step.StepName}
                                         </option>
@@ -349,8 +418,8 @@ export default function AddStudent() {
                                     </label>
                                 ))}
                             </div>
-                           
-                 
+
+
                             <div className="sm:col-span-2">
                                 <label htmlFor="classes">Programs</label>
                                 <div className="col-span-full flex items-center border p-4 bg-info/20 rounded-md border-com">

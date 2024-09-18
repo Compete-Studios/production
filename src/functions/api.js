@@ -1082,6 +1082,16 @@ export const updateClassByClassId = async (classData) => {
     }
 };
 
+export const updateClassAndSchedule = async (data) => {
+    try {
+        const response = await fetchData(`class-access/updateClassAndSchedule`, 'post', data);
+        return { response, status: 200 };
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const getStaffClassesByStaffId = async (staffId) => {
     try {
         const response = await fetchData(`staff-access/getStaffClassesByStaffId/${staffId}`, 'get');
@@ -1163,6 +1173,16 @@ export const addAStudentToProgram = async (programData) => {
 export const dropStudentFromProgram = async (programId, studentId) => {
     try {
         const response = await fetchData(`class-access/dropStudentFromProgram/${programId}/${studentId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const dropStudentFromBillingAccount = async (studentId, paysimpleCustomerId) => {
+    try {
+        const response = await fetchData(`billing-account-access/deleteBillingAccount/${paysimpleCustomerId}/${studentId}`, 'get');
         return response;
     } catch (error) {
         console.error(error);

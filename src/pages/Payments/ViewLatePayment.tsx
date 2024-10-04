@@ -115,24 +115,23 @@ export default function ViewLatePayment() {
         setLoadingData((prevState) => ({ ...prevState, overall: overallLoading }));
     };
 
- 
-
     const handleGetCustomerInfo = async (customerID: any) => {
         try {
-            getStudentIdFromPaysimpleCustomerId(customerID).then(async (res) => {
-                if (res.recordset) {
-                    const studentID = await res.recordset[0].studentId;
-                    await getStudentInfo(studentID).then((res) => {
-                        setStudent(res);
-                        setToEmail(res.email);
-                    });
-                    await handleGetInternalPayments(studentID);
-                    setLoadingData((prevState) => ({ ...prevState, student: false }));
-                } else {
-                    console.log('Error getting payment info');
-                    setLoadingData((prevState) => ({ ...prevState, student: false }));
-                }
-            });
+            const customerInfo = await getStudentIdFromPaysimpleCustomerId(customerID);
+            console.log(customerInfo, "customerInfo");
+            if (customerInfo.recordset) {
+                
+                const studentID = await customerInfo.recordset[0].studentId;
+                await getStudentInfo(studentID).then((res) => {
+                    setStudent(res);
+                    setToEmail(res.email);
+                });
+                await handleGetInternalPayments(studentID);
+                setLoadingData((prevState) => ({ ...prevState, student: false }));
+            } else {
+                console.log('Error getting payment info');
+                setLoadingData((prevState) => ({ ...prevState, student: false }));
+            }
         } catch (error) {
             console.log('error', error);
             setLoadingData((prevState) => ({ ...prevState, student: false }));
@@ -179,9 +178,12 @@ export default function ViewLatePayment() {
     }, [paysimplehistory, internalHistory]);
 
     const handleGetPaymentInfo = async (payID: any) => {
+        console.log(payID, 'payID');
+        console.log(suid, 'suid');
         try {
             const res = await getPaymentByID(payID, suid);
-            if (res.Meta.HttpStatusCode) {
+            console.log(res, 'res');
+            if (res.Meta.HttpStatusCode === 200) {
                 setPaymentIDInfo(res.Response);
                 handleGetCustomerInfo(res.Response.CustomerId);
                 setLoadingData((prevState) => ({ ...prevState, paymentIDInfo: false }));
@@ -196,15 +198,17 @@ export default function ViewLatePayment() {
                         }
                     });
                 } else {
-                    getAllCustomerPaymentAccounts(res.Response.CustomerId, suid).then((res2) => {
-                        if (res2.Response) {
-                            setCustomerPaymentAccount(res2?.Response?.AchAccounts);
-                            setLoadingData((prevState) => ({ ...prevState, customerPaymentAccount: false }));
-                        } else {
-                            console.log('Error getting payment info');
-                            setLoadingData((prevState) => ({ ...prevState, customerPaymentAccount: false }));
-                        }
-                    });
+                    console.log('ACH');
+                    setPaymentIDInfo(res.Response);
+                    // getAllCustomerPaymentAccounts(res.Response.CustomerId, suid).then((res2) => {
+                    //     if (res2.Response) {
+                    //         setCustomerPaymentAccount(res2?.Response?.AchAccounts);
+                    //         setLoadingData((prevState) => ({ ...prevState, customerPaymentAccount: false }));
+                    //     } else {
+                    //         console.log('Error getting payment info');
+                    //         setLoadingData((prevState) => ({ ...prevState, customerPaymentAccount: false }));
+                    //     }
+                    // });
                 }
             } else {
                 alert('Error getting payment info');
@@ -218,6 +222,7 @@ export default function ViewLatePayment() {
         }
     };
 
+   
     useEffect(() => {
         if (paymentIDInfo && suid && student?.Student_id) {
             setMessage1(`${REACT_BASE_URL}payments/resolve-payment/${hashids.encode(paymentIDInfo?.Id, suid, student?.Student_id)}`);
@@ -276,7 +281,6 @@ export default function ViewLatePayment() {
     const getTheLatePaymentInfo = async () => {
         try {
             const res = await getLatePayment(id);
-            console.log(id, 'res');
             setPaymentInfo(res[0]);
             setMutablePaymentInfo(res[0]);
             setCurrentPipeline(res[0].CurrentPipelineStatus);

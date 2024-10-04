@@ -51,8 +51,7 @@ export default function ViewPaymentInfo() {
         Generic: genericIcon,
     };
 
-    const handleGetCustomerInfo = async (customerID: any) => {
-        console.log('customerID', customerID);
+    const handleGetCustomerInfo = async (customerID: any) => {     
         try {
             getStudentIdFromPaysimpleCustomerId(customerID).then((res) => {
                 if (res.recordset) {

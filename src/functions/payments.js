@@ -175,8 +175,8 @@ export const updatePaymentSchedule = async (paymentData) => {
 
 export const getPaymentByID = async (paymentId, suid) => {
     try {
-        const response = await fetchData(`paysimple-helper/getPayment/${paymentId}/${suid}`, 'get');
-        return response;
+        const response = await fetchData(`psall/getPayment/${suid}/${paymentId}`, 'get');
+        return response
     } catch (error) {
         console.error(error);
         throw error;

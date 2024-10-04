@@ -570,6 +570,20 @@ export const addStaffIDSToClass = async (classId, staffIds) => {
     }
 };
 
+export const updateStaffIDStoClass = async (classId, staffIds) => {
+    const data = {
+        classId,
+        staffIds,
+    };
+    try {
+        const response = await fetchData('staff-access/updateStaffIDStoClass', 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const loadStudioRooms = async (studioId) => {
     try {
         const response = await fetchData(`class-access/getRoomsByStudioId/${studioId}`, 'get');
@@ -1040,8 +1054,6 @@ export const updateStaffActivity = async (staffId, activityLevel) => {
     }
 };
 
-
-
 export const updateStaffMember = async (data) => {
     try {
         const response = await fetchData(`staff-access/updateStaffMember`, 'post', data);
@@ -1086,6 +1098,16 @@ export const updateClassAndSchedule = async (data) => {
     try {
         const response = await fetchData(`class-access/updateClassAndSchedule`, 'post', data);
         return { response, status: 200 };
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const dropClassScheduleByScheduleId = async (scheduleId) => {
+    try {
+        const response = await fetchData(`class-access/dropClassScheduleByScheduleId/${scheduleId}`, 'get');
+        return response;
     } catch (error) {
         console.error(error);
         throw error;
@@ -1382,7 +1404,7 @@ export const getCountOfActiveProspects = async (studioId) => {
         console.error(error);
         throw error;
     }
-}
+};
 
 export const getStudentNameByPhone = async (phone, studioID) => {
     try {

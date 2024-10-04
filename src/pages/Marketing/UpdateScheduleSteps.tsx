@@ -16,7 +16,7 @@ export default function UpdateScheduleSteps({ type, steps, studioID, ppStepId, s
         } else {
             setSelectedSteps((prev: any) => [...prev, step]);
         }
-    };
+    };    
 
     return (
         <div>

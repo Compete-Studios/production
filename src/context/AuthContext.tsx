@@ -357,6 +357,7 @@ export default function AuthContextProvider({ children }: any) {
                 marketingSources,
                 searchedStudentsAndProspects,
                 setSearchedStudentsAndProspects,
+                setLatePayementPipeline,
                 showLoading,
                 prospectIntros,
                 studioInfo,

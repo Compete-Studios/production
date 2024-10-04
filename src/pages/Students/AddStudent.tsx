@@ -29,7 +29,7 @@ const studentInfoInit: any = {
     nextContactDate: null,
     currentPipelineStatus: '',
     firstClassDate: '',
-    originalContactDate: '',
+    originalContactDate: new Date(),
     introDate: '',
 };
 
@@ -70,7 +70,7 @@ export default function AddStudent() {
                     console.log('Unhashed ID:', studentId);
                     const info = await getStudentInfo(studentId);
                     console.log('Fetched Student Info:', info);
-                    setStudentInfo((prev) => ({
+                    setStudentInfo((prev: any) => ({
                         ...prev,
                         fName: info.First_Name || prev.fName,
                         lName: info.Last_Name || prev.lName,

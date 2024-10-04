@@ -31,11 +31,11 @@ export default function ViewClasses() {
                 if (confirmed) {
                     const dropRes = await dropClassByClassID(id);
                     if (dropRes.status === 200) {
-                    setRecords(classes?.filter((user: any) => user.ClassId !== id));
-                    setInitialRecords(classes?.filter((user: any) => user.ClassId !== id));
-                    setSearch('');
-                    setSelectedRecords([]);                    
-                    setUpdate(!update);
+                        setRecords(classes?.filter((user: any) => user.ClassId !== id));
+                        setInitialRecords(classes?.filter((user: any) => user.ClassId !== id));
+                        setSearch('');
+                        setSelectedRecords([]);
+                        setUpdate(!update);
                     } else {
                         console.error('Error:', dropRes);
                     }
@@ -78,8 +78,6 @@ export default function ViewClasses() {
         const data2 = initialRecords;
         setRecords(sortStatus.direction === 'desc' ? data2.reverse() : data2);
     }, [sortStatus]);
-
-    console.log(classes)
 
     return (
         <div>

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import 'tippy.js/dist/tippy.css';
 import { useDispatch } from 'react-redux';
 import { Tab } from '@headlessui/react';
@@ -17,9 +17,12 @@ import Studio from '../components/Dashboards/Studio';
 import { convertPhone } from '../functions/shared';
 import { UserAuth } from '../context/AuthContext';
 import IconMail from '../components/Icon/IconMail';
+import { updateAllUsers } from '../firebase/firebaseFunctions';
+import NewUpdateAlert from '../admin/studios/NewUpdateAlert';
 
 const Overview = () => {
-    const { studioInfo }: any = UserAuth();
+    const { studioInfo, user }: any = UserAuth();
+   
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Dashboard'));
@@ -27,21 +30,21 @@ const Overview = () => {
 
     return (
         <div>
+            <NewUpdateAlert />           
             <div className="mb-4">
                 <div className="lg:flex lg:items-start lg:justify-between">
                     <p className="text-white-dark dark:text-white font-bold">
                         <span className="text-dark dark:text-zinc-400">{studioInfo?.Studio_Name}</span>
                     </p>
                     <p className="text-dark dark:text-zinc-400 font-bold lg:flex lg:items-center gap-1">
-                        <IconMail className='hidden lg:block'/> {studioInfo?.Contact_Email}
+                        <IconMail className="hidden lg:block" /> {studioInfo?.Contact_Email}
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="hidden lg:block ml-2" viewBox="0 0 16 16">
                             <path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.6 17.6 0 0 0 4.168 6.608 17.6 17.6 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.68.68 0 0 0-.58-.122l-2.19.547a1.75 1.75 0 0 1-1.657-.459L5.482 8.062a1.75 1.75 0 0 1-.46-1.657l.548-2.19a.68.68 0 0 0-.122-.58zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.68.68 0 0 0 .178.643l2.457 2.457a.68.68 0 0 0 .644.178l2.189-.547a1.75 1.75 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.6 18.6 0 0 1-7.01-4.42 18.6 18.6 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877z" />
                         </svg>
-                        <span className='block'>{convertPhone(studioInfo?.Contact_Number)}</span>
-                        
+                        <span className="block">{convertPhone(studioInfo?.Contact_Number)}</span>
                     </p>
                 </div>
-                <div className="lg:flex lg:items-start lg:justify-between">
+                <div className="lg:flex lg:items-start lg:justify-between ">
                     <p className="text-white-dark dark:text-white font-semibold">
                         <span className="text-dark dark:text-zinc-400">{studioInfo?.Contact_Address} </span>
                         <span className="text-dark dark:text-zinc-400">
@@ -49,8 +52,8 @@ const Overview = () => {
                         </span>
                     </p>
                 </div>
-            </div> <MarketingMetrics />
-           
+            </div>{' '}
+            <MarketingMetrics />
             <Tab.Group>
                 <Tab.List className="flex flex-wrap border-b border-zinc-300">
                     <Tab as={Fragment}>
@@ -108,23 +111,23 @@ const Overview = () => {
 
                 <Tab.Panels>
                     <Tab.Panel>
-                        <div className="active pt-5">                         
+                        <div className="active ">
                             <Schedules />
                         </div>
                     </Tab.Panel>
                     <Tab.Panel>
-                        <div className="pt-5">
+                        <div className="">
                             <StudentPipeline />
                         </div>
                     </Tab.Panel>
                     <Tab.Panel>
-                        <div className="pt-5">
+                        <div className="">
                             <ProspectPipeline />
                         </div>
                     </Tab.Panel>
 
                     <Tab.Panel>
-                        <div className="pt-5">
+                        <div className="">
                             <LatePaymentPipeline />
                         </div>
                     </Tab.Panel>

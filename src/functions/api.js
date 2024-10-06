@@ -1084,6 +1084,17 @@ export const updateStudioInDB = async (studioId, studioData) => {
     }
 };
 
+export const updateStudioOptionsPicture = async (studioData) => {
+    try {
+        const response = await fetchData(`studio-access/updateStudioOptionsPicture`, 'post', studioData);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+
 export const updateClassByClassId = async (classData) => {
     try {
         const response = await fetchData(`class-access/updateClassByClassId`, 'post', classData);

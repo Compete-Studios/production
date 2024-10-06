@@ -500,9 +500,9 @@ export default function Schedules() {
 
     return (
         <div className="mb-6 ">
-            <div className="hidden sm:flex items-center justify-between whitespace-nowrap mt-4">
+            <div className="hidden sm:flex items-center justify-between whitespace-nowrap mt-4 bg-white p-4 rounded-lg shadow">
                 <div className="flex items-center gap-4 sm:w-1/2 w-full">
-                    <label htmlFor="scheduleDate">Next Contact Date</label>
+                    {/* <label htmlFor="scheduleDate">Next Contact Date</label> */}
                     <input
                         type="date"
                         id="scheduleDate"

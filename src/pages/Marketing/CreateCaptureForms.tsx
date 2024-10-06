@@ -27,7 +27,6 @@ const formInfoInit = {
     Zip: '',
     Age: '',
     Notes: '',
-    AdditionalInfo: '',
     IncludeCaptcha: '',
     SendEmailNotification: '',
     BackgroundColor: '',
@@ -62,7 +61,6 @@ const formInfoSelected = {
     Zip: false,
     Age: false,
     Notes: true,
-    AdditionalInfo: false,
     IncludeCaptcha: false,
     SendEmailNotification: false,
     BackgroundColor: false,
@@ -636,26 +634,6 @@ export default function CreateCaptureForms() {
                                                         formInfo?.Notes ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
                                                     } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
                                                 >
-                                                    Notes
-                                                </div>
-                                            </button>
-                                            <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, AdditionalInfo: !formInfo.AdditionalInfo })}>
-                                                <div>
-                                                    {formInfo?.AdditionalInfo ? (
-                                                        <div className="text-success">
-                                                            <IconCircleCheck fill={true} />
-                                                        </div>
-                                                    ) : (
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                                                        </svg>
-                                                    )}{' '}
-                                                </div>
-                                                <div
-                                                    className={`${
-                                                        formInfo?.AdditionalInfo ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
-                                                    } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
-                                                >
                                                     Additional Info
                                                 </div>
                                             </button>
@@ -970,21 +948,14 @@ export default function CreateCaptureForms() {
 
                             {formInfo.Notes && (
                                 <div className="sm:col-span-full">
-                                    <label htmlFor="email">Notes</label>
+                                    <label htmlFor="email">Additional Info</label>
                                     <div className="mt-2">
                                         <textarea rows={4} name="comment" id="comment" className={`form-textarea w-full ${mem.rounded}`} defaultValue={''} />
                                     </div>
                                 </div>
                             )}
 
-                            {formInfo.AdditionalInfo && (
-                                <div className="sm:col-span-full">
-                                    <label htmlFor="email">Addition Info</label>
-                                    <div className="mt-2">
-                                        <textarea rows={4} name="comment" id="comment" className={`form-textarea w-full ${mem.rounded}`} defaultValue={''} />
-                                    </div>
-                                </div>
-                            )}
+                           
 
                             <button className={`btn ${selectedColor?.btn}  ${heightOption?.height} ${heightOption.text} ${mem?.rounded} sm:col-span-full`}>Submit</button>
                         </div>

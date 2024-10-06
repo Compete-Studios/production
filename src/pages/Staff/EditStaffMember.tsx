@@ -6,9 +6,12 @@ import 'flatpickr/dist/flatpickr.css';
 import { useDispatch } from 'react-redux';
 import Select from 'react-select';
 import { UserAuth } from '../../context/AuthContext';
-import { formatDate, showErrorMessage, showMessage } from '../../functions/shared';
+import { convertPhone, formatDate, showErrorMessage, showMessage } from '../../functions/shared';
 import { addStaffMember, getStaffClassesByStaffId, updateStaffMember } from '../../functions/api';
 import Hashids from 'hashids';
+import StaffProfilePic from './StaffProfilePic';
+import EmailStaffMember from './EmailStaffMember';
+import SendTextToStaffMember from './SendTextToStaffMember';
 
 interface AddStaffProps {
     staffId: string;
@@ -43,7 +46,7 @@ const staffInit = {
 };
 
 const EditStaffMember = () => {
-    const { classes, suid, update, setUpdate, staff  }: any = UserAuth();
+    const { classes, suid, update, setUpdate, staff }: any = UserAuth();
     const dispatch = useDispatch();
     const [staffInfo, setstaffInfo] = useState<AddStaffProps>(staffInit);
     const [date1, setDate1] = useState<any>('2000-07-05');
@@ -111,22 +114,34 @@ const EditStaffMember = () => {
     }, [staffID]);
 
     const handleUpdateStaff = () => {
-    
         staffInfo.classes = classValues.map((c: any) => c.value);
         staffInfo.birthdate = formatDate(date1);
         console.log(staffInfo);
         updateStaffMember(staffInfo).then((response) => {
             console.log(response);
             setUpdate(!update);
-            showMessage('Staff Member Updated Successfully');   
+            showMessage('Staff Member Updated Successfully');
         });
     };
-console.log(staffInfo)
-    
+
     return (
         <div className="flex xl:flex-row flex-col gap-2.5 max-w-5xl mx-auto">
             <div className="panel px-0 flex-1 py-6 ltr:xl:mr-6 rtl:xl:ml-6">
-                <h2 className="text-xl px-5 font-bold">Add Staff</h2>
+                <div className="p-4 flex items-start gap-4">
+                    <div>
+                    <StaffProfilePic student={staffInfo} setStudent={setstaffInfo} />
+                    </div>
+                    <div>
+                        <div className="text-lg font-bold">{staffInfo.firstName + ' ' + staffInfo.lastName}</div>
+                        <div className="text-sm">{staffInfo.email}</div>
+                        <div className="text-sm">{convertPhone(staffInfo.phone)}</div>    
+                        <EmailStaffMember toemail={staffInfo.email} />
+                        <SendTextToStaffMember phone={staffInfo.phone}  />                    
+                    </div>
+                </div>
+
+                <h2 className="text-xl px-5 font-bold">Edit Staff</h2>
+
                 <div className="mt-8 px-4">
                     <div className="flex justify-between lg:flex-row flex-col">
                         <div className="lg:w-1/2 w-full ltr:lg:mr-6 rtl:lg:ml-6 mb-6">
@@ -257,10 +272,7 @@ console.log(staffInfo)
                                 <label htmlFor="zip" className="ltr:mr-2 rtl:ml-2 w-1/3 mb-0">
                                     Select Classes
                                 </label>
-                                <Select placeholder="Select staff" className="flex-1" 
-                                options={options} 
-                                value={classValues}
-                                onChange={(e) => setClassValues(e)} isMulti />
+                                <Select placeholder="Select staff" className="flex-1" options={options} value={classValues} onChange={(e) => setClassValues(e)} isMulti />
                             </div>
                         </div>
                     </div>

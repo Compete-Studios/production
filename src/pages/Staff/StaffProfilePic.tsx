@@ -1,10 +1,10 @@
 import React, { useRef, useState } from 'react';
-import IconUser from '../../../components/Icon/IconUser';
+import IconUser from '../../components/Icon/IconUser';
 import Tippy from '@tippyjs/react';
-import IconSave from '../../../components/Icon/IconSave';
-import { uploadProfilePic } from '../../../firebase/firebaseFunctions';
+import IconSave from '../../components/Icon/IconSave';
+import { uploadProfilePic } from '../../firebase/firebaseFunctions';
 
-export default function StudentProfilePic({ student, setStudent }: any) {
+export default function StaffProfilePic({ student, setStudent }: any) {
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [profilePic, setProfilePic] = useState('');
     const [created, setCreated] = useState(false);
@@ -82,7 +82,7 @@ export default function StudentProfilePic({ student, setStudent }: any) {
         <div>
             {created ? (
                 <>
-                    <div className="flex items-center p-3.5 rounded-t-lg text-white bg-info">
+                    <div className="w-64 flex items-center p-3.5 rounded-t-lg text-white bg-info">
                         <span className="text-white w-6 h-6 mr-2 ">
                             <IconSave />
                         </span>
@@ -91,9 +91,9 @@ export default function StudentProfilePic({ student, setStudent }: any) {
                             Save Image
                         </button>
                     </div>
-                    <div className="relative">
+                    <div className="relative w-64">
                         <input type="file" accept="image/*" onChange={handleFileUpload} style={{ display: 'none' }} ref={fileInputRef} />
-                        <img className="w-full h-64 object-cover object-center  " src={tempPic} alt="Profile" />
+                        <img className="w-64 h-64 object-cover object-center  " src={tempPic} alt="Profile" />
                         <button className="absolute top-0 right-0 p-1 m-1 bg-info shadow rounded-full text-white">
                             <Tippy content="Take New Profile Picture">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -122,7 +122,7 @@ export default function StudentProfilePic({ student, setStudent }: any) {
             ) : student?.ProfilePicUrl ? (
                 <div className="relative">
                     <input type="file" accept="image/*" onChange={handleFileUpload} style={{ display: 'none' }} ref={fileInputRef} />
-                    <img className="w-full aspect-square sm:h-64 object-cover object-center rounded-lg  lg:rounded-t-lg lg:rounded-none shadow" src={student?.ProfilePicUrl} alt="Profile" />
+                    <img className="w-32 h-32 object-cover object-center rounded-lg  lg:rounded-t-lg lg:rounded-none shadow" src={student?.ProfilePicUrl} alt="Profile" />
                     <button className="absolute top-0 right-0 p-1 m-1 bg-info shadow rounded-full text-white">
                         <Tippy content="Take New Profile Picture">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -150,9 +150,9 @@ export default function StudentProfilePic({ student, setStudent }: any) {
             ) : (
                 <>
                     <input type="file" accept="image/*" onChange={handleFileUpload} style={{ display: 'none' }} ref={fileInputRef} />
-                    <div className="w-full">
-                        <div className="relative flex items-center justify-center p-4 bg-primary-light/20 rounded-t-lg">
-                            <IconUser className="w-20 h-20 text-zinc-500" />
+                    <div className="w-32 h-32 mb-4">
+                        <div className="relative w-32 h-32 flex items-center justify-center p-4 bg-primary-light/20 rounded-t-lg">
+                            <IconUser className="w-24 h-24 text-zinc-500" />
                             <div className="absolute right-2 bottom-2 flex items-center gap-2">
                                 <Tippy content="Take Profile Picture">
                                     <button>

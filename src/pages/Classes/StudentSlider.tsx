@@ -131,7 +131,7 @@ export default function StudentSlider({ open, setOpen, studentID, setBarcode }: 
                                                             <div>
                                                                 <div className="-m-1 flex">
                                                                     <div className="inline-flex overflow-hidden rounded-lg border-4 border-white">
-                                                                        <img alt="" src="/assets/images/blankProfile.jpg" className="h-24 w-24 flex-shrink-0 sm:h-40 sm:w-40 lg:h-48 lg:w-48" />
+                                                                        <img alt="" src={student?.ProfilePicUrl ? student?.ProfilePicUrl : "/assets/images/blankProfile.jpg"} className="h-24 w-24 flex-shrink-0 sm:h-40 sm:w-40 lg:h-48 lg:w-48 object-cover object-center" />
                                                                     </div>
                                                                 </div>
                                                             </div>

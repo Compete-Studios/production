@@ -15,6 +15,7 @@ import 'tippy.js/dist/tippy.css';
 import { showWarningMessage } from '../../functions/shared';
 import { getStaffByStudioId, updateStaffActivity } from '../../functions/api';
 import IconBolt from '../../components/Icon/IconBolt';
+import IconEye from '../../components/Icon/IconEye';
 
 const ViewStaff = () => {
     const { staff, suid, update, setUpdate }: any = UserAuth();
@@ -204,12 +205,12 @@ const ViewStaff = () => {
                                     textAlignment: 'center',
                                     render: ({ StaffId, FirstName, ActivityLevel }: any) => (
                                         <div className="flex gap-4 staff-center w-max mx-auto">
-                                            <Tippy content="View Staff Member">
-                                                <button className="flex text-primary hover:text-emerald-800" onClick={() => handleHashAndGo(StaffId)}>
-                                                    <IconEdit className="w-4.5 h-4.5" />
+                                            <Tippy content="View/Edit Staff Member">
+                                                <button className="flex text-info hover:text-blue-800" onClick={() => handleHashAndGo(StaffId)}>
+                                                    <IconEye className="w-5 h-5" />
                                                 </button>
                                             </Tippy>
-                                            <ViewStaffMember staffID={StaffId} />
+                                            {/* <ViewStaffMember staffID={StaffId} /> */}
                                             {/* <NavLink to="" className="flex"> */}
                                             {ActivityLevel === 1 ? (
                                                 <Tippy content="Deactivate Staff Member">

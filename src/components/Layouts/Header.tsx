@@ -39,7 +39,7 @@ import { deleteMessage, listenForMessages } from '../../firebase/firebaseFunctio
 import IconListCheck from '../Icon/IconListCheck';
 
 const Header = () => {
-    const { setSearchedStudentsAndProspects, suid, studioInfo, isMaster, masters, setSelectedSuid, isAdmin, setShowLoading, mainSuid }: any = UserAuth();
+    const { setSearchedStudentsAndProspects, suid, studioInfo, isMaster, masters, setSelectedSuid, isAdmin, setShowLoading, studioOptions }: any = UserAuth();
     const [searchItem, setSearchItem] = useState('');
     const [studioInitials, setStudioInitials] = useState('');
     const [options, setOptions] = useState<any>([]);
@@ -48,8 +48,6 @@ const Header = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-   
-  
     useEffect(() => {
         if (isMaster) {
             setOptions(masters.map((master: any) => ({ value: master.studioID, label: master.studioName })));
@@ -59,8 +57,6 @@ const Header = () => {
             setOptions([]);
         }
     }, [masters]);
-
-   
 
     const handleGetIncoming = async () => {
         const data = {
@@ -79,8 +75,6 @@ const Header = () => {
     useEffect(() => {
         handleGetIncoming();
     }, []);
-
-
 
     const handleSelectStudio = (value: any) => {
         setSelected(value);
@@ -227,8 +221,6 @@ const Header = () => {
         searchValue2: '',
     });
 
-   
-
     const [numberOfSearchValues, setNumberOfSearchValues] = useState(0);
 
     useEffect(() => {
@@ -272,7 +264,7 @@ const Header = () => {
         setShowLoading(true);
         logout();
     };
-    
+
     const handleSearchUsers = async (e: any) => {
         e.preventDefault();
         setSearchedStudentsAndProspects({ students: [], prospects: [] });
@@ -302,7 +294,7 @@ const Header = () => {
     };
 
     return (
-        <header className={`z-40 ${themeConfig.semidark && themeConfig.menu === 'horizontal' ? 'dark' : ''}`}>
+        <header className={`z-40 ${themeConfig.semidark && themeConfig.menu === 'horizontal' ? 'dark' : ''}`}>      
             <div className="shadow-sm">
                 <div className="relative bg-white flex w-full items-center px-5 py-2.5 dark:bg-black">
                     <div className="horizontal-logo flex lg:hidden justify-between items-center ltr:mr-2 rtl:ml-2">
@@ -585,7 +577,9 @@ const Header = () => {
                                             })}
                                             <li>
                                                 <div className="p-4">
-                                                    <Link to="/marketing/view-text-messages/recieved" className="btn btn-primary text-center justify-center block w-full btn-small">Read All Notifications</Link>
+                                                    <Link to="/marketing/view-text-messages/recieved" className="btn btn-primary text-center justify-center block w-full btn-small">
+                                                        Read All Notifications
+                                                    </Link>
                                                 </div>
                                             </li>
                                         </>
@@ -608,17 +602,27 @@ const Header = () => {
                                 placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
                                 btnClassName="relative group block"
                                 button={
-                                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-info">
-                                        <span className="text-sm font-medium leading-none text-white">{studioInitials || 'S'}</span>
-                                    </span>
+                                    <>
+                                        {studioOptions?.Image1Url ? (
+                                            <img className="w-9 h-9 rounded-full object-cover object-center" src={studioOptions?.Image1Url} alt="profile" />
+                                        ) : (
+                                            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-info">
+                                                <span className="text-sm font-medium leading-none text-white">{studioInitials || 'S'}</span>
+                                            </span>
+                                        )}
+                                    </>
                                 }
                             >
                                 <ul className="text-dark dark:text-white-dark !py-0 w-[230px] font-semibold dark:text-white-light/90">
                                     <li>
                                         <div className="flex items-center px-4 py-4">
+                                        {studioOptions?.Image1Url ? (
+                                            <img className="w-10 h-10 p-0.5 object-cover object-center bg-zinc-100 rounded-md " src={studioOptions?.Image1Url} alt="profile" />
+                                        ) : (
                                             <span className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-primary">
                                                 <span className="text-white">{studioInitials || 'S'}</span>
                                             </span>
+                                        )}
 
                                             <div className="ltr:pl-4 rtl:pr-4 truncate">
                                                 <h4 className="text-base">

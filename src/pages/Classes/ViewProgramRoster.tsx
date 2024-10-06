@@ -48,6 +48,8 @@ const ViewProgramRoster = () => {
 
     const { prID, uid }: any = useParams<any>();
 
+
+
     const changeValue = (e: any) => {
         const { value, id } = e.target;
         setParams({ ...params, [id]: value });
@@ -57,9 +59,10 @@ const ViewProgramRoster = () => {
 
     const programName = programs?.find((program: any) => parseInt(program.ProgramId) === parseInt(prID))?.Name;
 
+
     useEffect(() => {
         try {
-            if (suid === uid) {
+            if (parseInt(suid) === parseInt(uid)) {
                 getStudentsByProgramId(prID).then((res) => {
                     setStudentRoster(res.recordset);
                 });

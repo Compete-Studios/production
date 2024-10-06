@@ -5,6 +5,8 @@ import { setPageTitle } from '../../store/themeConfigSlice';
 import { Fragment, Suspense, useEffect, useState } from 'react';
 import IconPencilPaper from '../../components/Icon/IconPencilPaper';
 import IconCalendar from '../../components/Icon/IconCalendar';
+import Flatpickr from 'react-flatpickr';
+import 'flatpickr/dist/flatpickr.css';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import IconHorizontalDots from '../../components/Icon/IconHorizontalDots';
@@ -31,7 +33,7 @@ import {
 import AddNoteModal from './AddNoteModal';
 import IconPlus from '../../components/Icon/IconPlus';
 import StudentsQuickPay from './StudentsQuickPay';
-import { convertPhone, hashTheID, showMessage, showWarningMessage, unHashTheID } from '../../functions/shared';
+import { convertPhone, formatDateForStudentEdit, hashTheID, showMessage, showWarningMessage, unHashTheID } from '../../functions/shared';
 import { formatDate } from '@fullcalendar/core';
 import { getAllCustomerPaymentAccounts } from '../../functions/payments';
 import UpdateContactPopUp from './UpdateContactPopUp';
@@ -56,6 +58,7 @@ import Hashids from 'hashids';
 import ViewActivePaymentSchedules from './ViewActivePaymentSchedules';
 import IconUser from '../../components/Icon/IconUser';
 import StudentProfilePic from './StudentCards/StudentProfilePic';
+import { formatWithTimeZone, handleGetTimeZoneOfUser } from '../../functions/dates';
 
 interface UpdateValues {
     [key: string]: any;
@@ -104,6 +107,7 @@ const ViewStudent = () => {
     const [pipeline, setPipeline] = useState<any>([]);
     const [updateBilling, setUpdateBilling] = useState<boolean>(false);
     const [updated, setUpdated] = useState<boolean>(false);
+    const [loadingPic, setLoadingPic] = useState<boolean>(true);
     const hashids = new Hashids();
     const dispatch = useDispatch();
     useEffect(() => {
@@ -238,6 +242,68 @@ const ViewStudent = () => {
         }
     };
 
+    const handleUpdateNextContactDate = async (column: string) => {
+        const data = {
+            studentId: unHashTheID(uid),
+            columnName: column,
+            value: student.NextContactDate ? formatDateForStudentEdit(student.NextContactDate) : null,
+        };
+        try {
+            console.log(data);
+            const response = await updateStudentByColumn(data);
+            setStudent({ ...student, NextContactDate: student.NextContactDate[0] });
+            console.log(response);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    const handleUpdateFirstClassDate = async (column: string) => {
+        const data = {
+            studentId: unHashTheID(uid),
+            columnName: column,
+            value: student.FirstClassDate ? formatDateForStudentEdit(student.FirstClassDate) : null,
+        };
+        try {
+            console.log(data);
+            const response = await updateStudentByColumn(data);
+            setStudent({ ...student, FirstClassDate: student.FirstClassDate[0] });
+            console.log(response);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const handleUpdateIntroContactDate = async (column: string) => {
+        const data = {
+            studentId: unHashTheID(uid),
+            columnName: column,
+            value: student.IntroDate ? formatDateForStudentEdit(student.IntroDate) : null,
+        };
+        try {
+            console.log(data);
+            const response = await updateStudentByColumn(data);
+            setStudent({ ...student, IntroDate: student.IntroDate[0] });
+            console.log(response);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    const handleUpdateBirthDate = async (column: string) => {
+        const data = {
+            studentId: unHashTheID(uid),
+            columnName: column,
+            value: student.Birthdate ? formatDateForStudentEdit(student.Birthdate) : null,
+        };
+        try {
+            console.log(data);
+            const response = await updateStudentByColumn(data);
+            setStudent({ ...student, Birthdate: student.Birthdate[0] });
+            console.log(response);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     const getPaymentSchedules = async (paySimpleID: any, studioId: any) => {
         setPaymentSchedules([]);
         setPaymentsLoading(true);
@@ -355,7 +421,7 @@ const ViewStudent = () => {
         scrollTop();
     }, []);
 
-    console.log(student)
+    console.log(student);
 
     const handleDeleteFromClass = (classID: any) => {
         showWarningMessage('Are you sure you want to remove this student from this class?', 'Remove Student From Class', 'Your student has been removed from the class')
@@ -440,6 +506,9 @@ const ViewStudent = () => {
         if (!suid) return;
         const hashedStudent = parseInt(student?.Student_id) * 548756 * parseInt(suid);
         setHasedRefID(hashedStudent);
+        if (student?.ProfilePicUrl) {
+            setLoadingPic(false);
+        }
     }, [student]);
 
     const payHistoryIds = hashids.encode(paySimpleInfo, student?.Student_id);
@@ -499,7 +568,9 @@ const ViewStudent = () => {
                 {/* CONTACT INFO */}
                 <div className="hidden lg:block panel p-0 lg:min-w-80 lg:max-w-96 divide-y divide-y-zinc-600 ">
                     {/* ProfilePic */}
-                    <StudentProfilePic />
+
+                    <StudentProfilePic student={student} setStudent={setStudent} />
+
                     <div className="flex items-start justify-between mb-5 p-4">
                         <div>
                             <div className="font-semibold  text-2xl">
@@ -523,12 +594,26 @@ const ViewStudent = () => {
                             </div>
                             {toUpdate?.nextContactDate ? (
                                 <div className="flex items-center gap-1">
-                                    <input type="date" className="form-input h-7" value={student?.NextContactDate} onChange={(e) => setStudent({ ...student, NextContactDate: e.target.value })} />
+                                    <Flatpickr
+                                        value={student.NextContactDate}
+                                        className="form-input h-7"
+                                        options={{ dateFormat: 'm-d-Y', position: 'auto right'}}
+                                        onChange={(date: any) => setStudent({ ...student, NextContactDate: date })}
+                                    />
+                                    <button
+                                        className="btn btn-sm btn-danger"
+                                        onClick={() => {
+                                            setStudent({ ...student, NextContactDate: null });
+                                            handleUpdateByColumn('NextContactDate');
+                                        }}
+                                    >
+                                        Clear
+                                    </button>
                                     <button
                                         className="btn btn-sm btn-info"
                                         onClick={() => {
                                             setToUpdate({ ...toUpdate, nextContactDate: false });
-                                            handleUpdateByColumn('NextContactDate');
+                                            handleUpdateNextContactDate('NextContactDate');
                                         }}
                                     >
                                         Save
@@ -536,7 +621,7 @@ const ViewStudent = () => {
                                 </div>
                             ) : (
                                 <p className={`font-normal flex items-end gap-1 text-xs ${!student?.NextContactDate && 'text-danger'}`}>
-                                    Next Contact Date: {student?.NextContactDate ? formatDate(student?.NextContactDate) : 'No contact set'}{' '}
+                                    Next Contact Date: {student?.NextContactDate ? formatWithTimeZone(student?.NextContactDate, handleGetTimeZoneOfUser()) : 'No contact set'}{' '}
                                     <span>
                                         <button onClick={() => setToUpdate({ ...toUpdate, nextContactDate: true })}>
                                             <IconEdit className="w-3 h-3 text-info" fill={true} />
@@ -751,7 +836,9 @@ const ViewStudent = () => {
                                             <p className="font-normal text-sm">{convertPhoneNumber(student?.Phone2)}</p>
 
                                             <p className={`font-normal text-md mt-4 ${student?.activity ? 'text-success' : 'text-danger'}`}>{student?.activity ? 'Active' : 'Inactive'}</p>
-                                            <p className="font-normal text-xs ">Next Contact Date: {formatDate(student?.NextContactDate)}</p>
+                                            <p className="font-normal text-xs ">
+                                                Next Contact Date: {student?.NextContactDate ? formatWithTimeZone(student?.NextContactDate, handleGetTimeZoneOfUser()) : 'No contact set'}{' '}
+                                            </p>
                                             <p className="font-normal text-xs ">Created: {formatDate(student?.EntryDate)}</p>
                                             <p className={`font-normal text-xs ${rank ? 'text-success' : 'text-danger'}`}>Rank: {rank ? rank : 'No rank set'}</p>
                                             <p className={`font-normal text-xs ${barcode ? 'text-success' : 'text-danger'}`}>Barcode ID: {barcode ? barcode : 'No barcode set'}</p>
@@ -759,6 +846,7 @@ const ViewStudent = () => {
                                                 Pipeline Step: <span className={`font-normal text-xs ${pipeline?.StepName ? 'text-success' : 'text-danger'}`}>{pipeline?.StepName}</span>
                                             </p>
                                         </div>
+                                        <StudentProfilePic student={student} setStudent={setStudent} />
                                     </div>
                                     <div className="p-4">
                                         <div className="text-zinc-500 underline">Studio</div>
@@ -890,10 +978,10 @@ const ViewStudent = () => {
                                             </div>
                                         )}
                                         {updateNotes && (
-                                            <div className='p-4'>
-                                            <button className="btn btn-primary ml-auto" onClick={() => handleSaveNotes()}>
-                                                Save Notes
-                                            </button>
+                                            <div className="p-4">
+                                                <button className="btn btn-primary ml-auto" onClick={() => handleSaveNotes()}>
+                                                    Save Notes
+                                                </button>
                                             </div>
                                         )}
                                     </div>
@@ -1141,27 +1229,38 @@ const ViewStudent = () => {
                                             )}
                                             <p className="font-bold ">Next Contact Date:</p>
                                             {toUpdate?.nextContactDate ? (
-                                                <input
-                                                    type="date"
-                                                    className="form-input"
-                                                    value={student?.NextContactDate}
-                                                    onChange={(e) => setStudent({ ...student, NextContactDate: e.target.value })}
+                                                <Flatpickr
+                                                    value={student.NextContactDate}
+                                                    className="form-input h-7"
+                                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                                    onChange={(date: any) => setStudent({ ...student, NextContactDate: date })}
                                                 />
                                             ) : (
                                                 <p className={`font-normal ${!student?.NextContactDate && 'text-danger'}`}>
-                                                    {student?.NextContactDate ? formatDate(student?.NextContactDate) : 'No Contact Date Set'}
+                                                    {student?.NextContactDate ? formatWithTimeZone(student?.NextContactDate, handleGetTimeZoneOfUser()) : 'No contact set'}{' '}
                                                 </p>
                                             )}
                                             {toUpdate?.nextContactDate ? (
-                                                <button
-                                                    className="ml-auto text-info hover:text-blue-900"
-                                                    onClick={() => {
-                                                        setToUpdate({ ...toUpdate, nextContactDate: false });
-                                                        handleUpdateByColumn('NextContactDate');
-                                                    }}
-                                                >
-                                                    Save
-                                                </button>
+                                                <div className="flex items-center gap-2">
+                                                    <button
+                                                        className="btn btn-sm btn-danger"
+                                                        onClick={() => {
+                                                            setStudent({ ...student, NextContactDate: null });
+                                                            handleUpdateByColumn('NextContactDate');
+                                                        }}
+                                                    >
+                                                        Clear
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-sm btn-info hover:bg-blue-900"
+                                                        onClick={() => {
+                                                            setToUpdate({ ...toUpdate, nextContactDate: false });
+                                                            handleUpdateNextContactDate('NextContactDate');
+                                                        }}
+                                                    >
+                                                        Save
+                                                    </button>
+                                                </div>
                                             ) : (
                                                 <button className="ml-auto text-info hover:text-blue-900" onClick={() => setToUpdate({ ...toUpdate, nextContactDate: true })}>
                                                     <IconEdit className="w-4 h-4" />
@@ -1169,41 +1268,78 @@ const ViewStudent = () => {
                                             )}
                                             <p className="font-bold ">Intro Date:</p>
                                             {toUpdate?.IntroDate ? (
-                                                <input type="date" className="form-input" value={student?.IntroDate} onChange={(e) => setStudent({ ...student, IntroDate: e.target.value })} />
+                                                <Flatpickr
+                                                    value={student.IntroDate}
+                                                    className="form-input h-7"
+                                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                                    onChange={(date: any) => setStudent({ ...student, IntroDate: date })}
+                                                />
                                             ) : (
-                                                <p className={`font-normal ${!student?.IntroDate && 'text-danger'}`}>{student?.IntroDate ? formatDate(student?.IntroDate) : 'No Intro Date Set'}</p>
+                                                <p className={`font-normal ${!student?.IntroDate && 'text-danger'}`}>
+                                                    {student?.IntroDate ? formatWithTimeZone(student?.IntroDate, handleGetTimeZoneOfUser()) : 'No Intro Date set'}
+                                                </p>
                                             )}
                                             {toUpdate?.IntroDate ? (
-                                                <button
-                                                    className="ml-auto text-info hover:text-blue-900"
-                                                    onClick={() => {
-                                                        setToUpdate({ ...toUpdate, IntroDate: false });
-                                                        handleUpdateByColumn('IntroDate');
-                                                    }}
-                                                >
-                                                    Save
-                                                </button>
+                                                <div className="flex items-center gap-2">
+                                                    <button
+                                                        className="btn btn-sm btn-danger"
+                                                        onClick={() => {
+                                                            setStudent({ ...student, IntroDate: null });
+                                                            handleUpdateByColumn('IntroDate');
+                                                        }}
+                                                    >
+                                                        Clear
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-sm btn-info hover:bg-blue-900"
+                                                        onClick={() => {
+                                                            setToUpdate({ ...toUpdate, IntroDate: false });
+                                                            handleUpdateIntroContactDate('IntroDate');
+                                                        }}
+                                                    >
+                                                        Save
+                                                    </button>
+                                                </div>
                                             ) : (
                                                 <button className="ml-auto text-info hover:text-blue-900" onClick={() => setToUpdate({ ...toUpdate, IntroDate: true })}>
                                                     <IconEdit className="w-4 h-4" />
                                                 </button>
                                             )}
-                                            <p className="font-bold ">Birthday:</p>
+                                            <p className="font-bold ">Birthday: 
+
+                                            </p>
                                             {toUpdate?.Birthdate ? (
-                                                <input type="date" className="form-input" value={student?.Birthdate} onChange={(e) => setStudent({ ...student, Birthdate: e.target.value })} />
+                                                 <Flatpickr
+                                                 value={student.Birthdate}
+                                                 className="form-input h-7"
+                                                 options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                                 onChange={(date: any) => setStudent({ ...student, Birthdate: date })}
+                                             />
                                             ) : (
-                                                <p className={`font-normal ${!student?.Birthdate && 'text-danger'}`}>{student?.Birthdate ? formatDate(student?.Birthdate) : 'No Birthdate Set'}</p>
+                                                <p className={`font-normal ${!student?.Birthdate && 'text-danger'}`}> {student?.Birthdate ? formatWithTimeZone(student?.Birthdate, handleGetTimeZoneOfUser()) : 'No Intro Date set'}
+                                                </p>
                                             )}
                                             {toUpdate?.Birthdate ? (
-                                                <button
-                                                    className="ml-auto text-info hover:text-blue-900"
-                                                    onClick={() => {
-                                                        setToUpdate({ ...toUpdate, Birthdate: false });
-                                                        handleUpdateByColumn('Birthdate');
-                                                    }}
-                                                >
-                                                    Save
-                                                </button>
+                                               <div className="flex items-center gap-2">
+                                               <button
+                                                   className="btn btn-sm btn-danger"
+                                                   onClick={() => {
+                                                       setStudent({ ...student, Birthdate: null });
+                                                       handleUpdateByColumn('Birthdate');
+                                                   }}
+                                               >
+                                                   Clear
+                                               </button>
+                                               <button
+                                                   className="btn btn-sm btn-info hover:bg-blue-900"
+                                                   onClick={() => {
+                                                       setToUpdate({ ...toUpdate, Birthdate: false });
+                                                       handleUpdateBirthDate('Birthdate');
+                                                   }}
+                                               >
+                                                   Save
+                                               </button>
+                                           </div>
                                             ) : (
                                                 <button className="ml-auto text-info hover:text-blue-900" onClick={() => setToUpdate({ ...toUpdate, Birthdate: true })}>
                                                     <IconEdit className="w-4 h-4" />
@@ -1245,29 +1381,43 @@ const ViewStudent = () => {
                                             )}
                                             <p className="font-bold ">First Class Date:</p>
                                             {toUpdate?.FirstClassDate ? (
-                                                <input
-                                                    type="date"
-                                                    className="form-input"
-                                                    value={student?.FirstClassDate}
-                                                    onChange={(e) => setStudent({ ...student, FirstClassDate: e.target.value })}
+                                                <Flatpickr
+                                                    value={student.FirstClassDate}
+                                                    className="form-input h-7"
+                                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                                    onChange={(date: any) => setStudent({ ...student, FirstClassDate: date })}
                                                 />
                                             ) : (
                                                 <p className={`font-normal ${!student?.FirstClassDate && 'text-danger'}`}>
-                                                    {student?.FirstClassDate ? formatDate(student?.FirstClassDate) : 'No First Class Date Set'}
+                                                    {student?.FirstClassDate ? formatWithTimeZone(student?.FirstClassDate, handleGetTimeZoneOfUser()) : 'No First Class Date set'}
                                                 </p>
                                             )}
                                             {toUpdate?.FirstClassDate ? (
-                                                <button
-                                                    className="ml-auto text-info hover:text-blue-900"
-                                                    onClick={() => {
-                                                        setToUpdate({ ...toUpdate, FirstClassDate: false });
-                                                        handleUpdateByColumn('FirstClassDate');
-                                                    }}
-                                                >
-                                                    Save
-                                                </button>
+                                                <div className="flex items-center gap-2 ml-auto">
+                                                    <button
+                                                        className="btn btn-sm btn-danger"
+                                                        onClick={() => {
+                                                            setStudent({ ...student, FirstClassDate: null });
+                                                            handleUpdateByColumn('FirstClassDate');
+                                                        }}
+                                                    >
+                                                        Clear
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-sm btn-info hover:bg-blue-900"
+                                                        onClick={() => {
+                                                            setToUpdate({ ...toUpdate, FirstClassDate: false });
+                                                            handleUpdateFirstClassDate('FirstClassDate');
+                                                        }}
+                                                    >
+                                                        Save
+                                                    </button>
+                                                </div>
                                             ) : (
-                                                <button className="ml-auto text-info hover:text-blue-900" onClick={() => setToUpdate({ ...toUpdate, FirstClassDate: true })}>
+                                                <button className="ml-auto text-info hover:text-blue-900" 
+                                                onClick={() => {
+                                                    setToUpdate({ ...toUpdate, FirstClassDate: true });
+                                                    }}>
                                                     <IconEdit className="w-4 h-4" />
                                                 </button>
                                             )}

@@ -1,7 +1,21 @@
 import { addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
 import { db, storage } from './firebase';
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { login, logout } from './auth';
+import { updateStudentByColumn, updateStudioOptionsPicture } from '../functions/api';
+
+const generateRandomID = () => {
+    const characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let randomID = "";
+  
+    for (let i = 0; i < 16; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      randomID += characters.charAt(randomIndex);
+    }
+    return randomID;
+  };
+  
 
 export const saveFromToFirebase = async (data, id) => {
     try {
@@ -40,11 +54,32 @@ export const getFormsFromFirebase = async (id) => {
     }
 };
 
-export const createEvent = async (data, suid) => {
-    const collectionTitle = 'events' + suid;
+export const createEvent = async (data, suid) => { 
+    const did = generateRandomID();
     try {
-        const docRef = collection(db, collectionTitle);
-        await addDoc(docRef, data);
+        const docRef = doc(db, "events", suid, "calandar", did);
+        const docToSave = { ...data, did };
+        await setDoc(docRef, docToSave);
+        return true;
+    } catch (error) {
+        return error.message;
+    }
+};
+
+export const deleteEvent = async (id, suid) => {
+    try {
+        const docRef = doc(db, "events", suid, "calandar", id);
+        await deleteDoc(docRef);
+        return true;
+    } catch (error) {
+        return error.message;
+    }
+};
+
+export const updateEvent = async (id, data, suid) => {
+    try {
+        const docRef = doc(db, "events", suid, "calandar", id);
+        await updateDoc(docRef, data);
         return true;
     } catch (error) {
         return error.message;
@@ -78,9 +113,9 @@ export const updateForm = async (id, data) => {
 };
 
 export const getWebsiteCount = async (id) => {
-    const month = new Date().toLocaleString("default", { month: "short" }).toUpperCase();
+    const month = new Date().toLocaleString('default', { month: 'short' }).toUpperCase();
     const year = new Date().getFullYear();
-    const date = `${month}${year}`
+    const date = `${month}${year}`;
     const idToString = id.toString() + date;
     const docRef = doc(db, 'webstats', idToString);
     const docSnap = await getDoc(docRef);
@@ -90,7 +125,6 @@ export const getWebsiteCount = async (id) => {
         return { status: 404 };
     }
 };
-
 
 export const storeReportToFirebase = async (data) => {
     try {
@@ -150,6 +184,42 @@ export const updateSprint = async (id, data) => {
         return false;
     }
 };
+
+
+export const updateAllUsers = async () => {
+  const collectionRef = collection(db, "users"); // Reference to your collection
+  
+  try {
+    // Step 1: Fetch all documents in the collection
+    const querySnapshot = await getDocs(collectionRef);
+    
+    // Step 2: Loop through each document and update it
+    const updatePromises = querySnapshot.docs.map(async (document) => {
+      const docRef = doc(db, "users", document.id);
+      
+      // Update with your desired changes
+      await updateDoc(docRef, {
+        // Add your field updates here
+        newUpdate: true, 
+      });
+    });
+    
+    // Step 3: Wait for all updates to complete
+    await Promise.all(updatePromises);
+    console.log("All documents updated successfully!");
+    
+  } catch (error) {
+    console.error("Error updating documents: ", error);
+  }
+};
+
+export const updateUserNew = async (id) => {
+    const docRef = doc(db, 'users', id);
+    await updateDoc(docRef, { newUpdate: false });
+};
+
+
+
 
 // export const updateStudio = async (studioId, studioData) => {
 //     const idString = studioId.toString();
@@ -241,21 +311,20 @@ export const updateStudioIDForAdmimMimic = async (studioID, id) => {
     await updateDoc(docRef, { tempID: studioID });
 };
 
-export const updateAttendanceForStudent = async (attendance, suid, classID) => {   
+export const updateAttendanceForStudent = async (attendance, suid, classID) => {
     const refDocLabel = suid + classID;
     const docRef2 = doc(db, 'attendance', refDocLabel);
-    const res = await setDoc(docRef2, { [attendance.splicesonlyfirst6]: attendance.checks }, { merge: true });   
+    const res = await setDoc(docRef2, { [attendance.splicesonlyfirst6]: attendance.checks }, { merge: true });
     return res;
 };
 
 export const updateAttendanceForBarcode = async (attendance, suid, classID, arrVar) => {
-    console.log("arrVar", arrVar);
+    console.log('arrVar', arrVar);
     const refDocLabel = suid + classID;
     const docRef2 = doc(db, 'attendance', refDocLabel);
     const res = await setDoc(docRef2, { [arrVar]: arrayUnion(attendance) }, { merge: true });
     return res;
 };
-
 
 export const getAttendanceByClassFB = async (suid, classID) => {
     const refDocLabel = suid + classID;
@@ -268,5 +337,48 @@ export const getAttendanceByClassFB = async (suid, classID) => {
     }
 };
 
+export const uploadProfilePic = async (file, id, type) => {
+    const storeID = id.toString() + type;
+    const storageRef = ref(storage, `profilePics/${storeID}`);
+    await uploadBytes(storageRef, file)
+        .then((snapshot) => {
+            console.log('Uploaded a blob or file!', snapshot);
+        })
+        .catch((error) => {
+            console.error('Error uploading file: ', error);
+        });
+    const url = await getDownloadURL(storageRef);
+    const data = {
+        studentId: id,
+        columnName: 'ProfilePicUrl',
+        value: url,
+        studioId: id,
+    };
+    if (type === 'student') {
+        await updateStudentByColumn(data);
+    } else if (type === 'studio') {
+        await updateStudioOptionsPicture(data);
+    } else {
+        console.log('error');
+    }
+    return url;
+};
 
-
+export const deleteImage = async (id, type) => {
+    const storeID = id.toString() + type;
+    const storageRef = ref(storage, `profilePics/${storeID}`);
+    await deleteObject(storageRef);
+    const data = {
+        studentId: id,
+        columnName: 'ProfilePicUrl',
+        value: '',
+        studioId: id,
+    };
+    if (type === 'student') {
+        await updateStudentByColumn(data);
+    } else if (type === 'studio') {
+        await updateStudioOptionsPicture(data);
+    } else {
+        console.log('error');
+    }
+};

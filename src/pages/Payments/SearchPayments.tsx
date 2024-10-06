@@ -38,8 +38,6 @@ const SearchPayments = () => {
     const [payments, setPayments] = useState<any>([]);
     const [settledPayments, setSettledPayments] = useState<any>(0);
 
-    
-
     const handleCountSettledPayments = (payments: any) => {
         const totalSettledPayments = payments.filter((payment: any) => payment.Status === 'Settled');
         setSettledPayments(totalSettledPayments.length);
@@ -135,7 +133,6 @@ const SearchPayments = () => {
         }
     };
 
-
     useEffect(() => {
         getPayments(suid, startDate, endDate, status)
             .then((response) => {
@@ -169,9 +166,22 @@ const SearchPayments = () => {
                 </a>
             </div> */}
             <div className="panel ">
+                {payments?.length >= 300 && (
+                    <div className="relative mb-4 flex items-center border p-3.5 rounded before:absolute before:top-1/2 ltr:before:left-0 rtl:before:right-0 rtl:before:rotate-180 before:-mt-2 before:border-l-8 before:border-t-8 before:border-b-8 before:border-t-transparent before:border-b-transparent before:border-l-inherit text-warning bg-warning-light !border-warning ltr:border-l-[64px] rtl:border-r-[64px] dark:bg-warning-dark-light">
+                        <span className="absolute ltr:-left-11 rtl:-right-11 inset-y-0 text-white w-6 h-6 m-auto">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-exclamation-diamond" viewBox="0 0 16 16">
+                                <path d="M6.95.435c.58-.58 1.52-.58 2.1 0l6.515 6.516c.58.58.58 1.519 0 2.098L9.05 15.565c-.58.58-1.519.58-2.098 0L.435 9.05a1.48 1.48 0 0 1 0-2.098zm1.4.7a.495.495 0 0 0-.7 0L1.134 7.65a.495.495 0 0 0 0 .7l6.516 6.516a.495.495 0 0 0 .7 0l6.516-6.516a.495.495 0 0 0 0-.7L8.35 1.134z" />
+                                <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z" />
+                            </svg>
+                        </span>
+                        <span className="ltr:pr-2 rtl:pl-2">
+                            <strong className="ltr:mr-1 rtl:ml-1">Search Limit Exceeded!</strong>Search Payments is limited to 300 records. Please narrow your search criteria.
+                        </span>
+                    </div>
+                )}
                 <div className="mb-4.5 flex md:items-center md:flex-row flex-col gap-5">
                     <div className="flex items-center gap-5">
-                        <h2 className="text-xl">Studio Payment History</h2>
+                        <h2 className="text-xl">Studio Payment History </h2>
                     </div>
                     <div className="ltr:ml-auto rtl:mr-auto">
                         <div className="flex items-center gap-5">
@@ -273,10 +283,7 @@ const SearchPayments = () => {
                                     render: ({ Id, Status }: any) => (
                                         <div className="flex items-center justify-end gap-2">
                                             {Status === 'Failed' ? (
-                                                <Link
-                                                    to={`/payments/view-late-payment/${suid}/${Id}`}
-                                                    className="text-info hover:text-blue-800 flex items-center gap-1"
-                                                >
+                                                <Link to={`/payments/view-late-payment/${suid}/${Id}`} className="text-info hover:text-blue-800 flex items-center gap-1">
                                                     <IconEye /> View Payment
                                                 </Link>
                                             ) : (

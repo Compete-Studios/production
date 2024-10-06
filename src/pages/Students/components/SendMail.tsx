@@ -19,8 +19,6 @@ export default function SendMail({ pipeline, studioOptions, student, setShowActi
     const [emailData, setEmailData] = useState<any>(emailDataInit);
     const [emailHtml, setEmailHtml] = useState<any>('');
 
-    console.log(emailHtml);
-
     useEffect(() => {
         if (pipeline) {
             setEmailData({ ...emailData, subject: pipeline?.DefaultEmailSubject, to: isPrpospect ? student?.Email : student?.email, from: studioOptions?.EmailFromAddress });

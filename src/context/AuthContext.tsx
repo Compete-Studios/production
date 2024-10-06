@@ -37,6 +37,7 @@ export default function AuthContextProvider({ children }: any) {
     const [students, setStudents] = useState<any>([]);
     const [fbForms, setFBForms] = useState<any>([]);
     const [masterStudio, setMasterStudio] = useState<any>(null);
+    const [currentUsername, setCurrentUsername] = useState<any>(null);
     const [layout, setLayout] = useState<any>({});
     const [spaces, setSpaces] = useState<any>([]);
     const [update, setUpdate] = useState(false);
@@ -106,16 +107,15 @@ export default function AuthContextProvider({ children }: any) {
     };
 
     const handleGetEvents = async (id: any) => {
-        const collectionTitle = 'events' + id;
         try {
-            const docRef = collection(db, collectionTitle);
+            const docRef = collection(db, 'events', id, 'calandar');
             const querySnapshot = await getDocs(docRef);
-            const fetchedEvents = [];
+            let fetchedEvents: any = [];
             querySnapshot.forEach((doc) => {
-                const docWithId = { ...doc.data(), id: doc.id };
+                const docWithId = { ...doc.data(), did: doc.id };
                 fetchedEvents.push(docWithId);
             });
-            return events;
+            setEvents(fetchedEvents);
         } catch (error: any) {
             return error.message;
         }
@@ -140,7 +140,6 @@ export default function AuthContextProvider({ children }: any) {
         const studioScheduleOptions = await fetchRecordSet(`${REACT_API_BASE_URL}/daily-schedule-tools/getDailyScheduleByStudioId/${suid}`, setDailySchedule);
         getAllStudentsAttendanceRecords(suid);
         handleGetEvents(suid);
-
         if (classRes && staffRes && pipeLineRes && programRes && waitingListRes && studPipesRes && marketingRes && introRes && paymentsRes && studioRes && optionsRes && studioScheduleOptions) {
             setFetchLoading(false);
             setShowLoader(false);
@@ -278,11 +277,9 @@ export default function AuthContextProvider({ children }: any) {
         }
     };
 
-    useEffect(() => {  
-
+    useEffect(() => {
         // Initialize pipeline state with latePayementPipeline if it's available
         if (latePayementPipeline.length > 0 && suid) {
-
             //Check when the last time we fetched new late payments was
             //If >15 minutes, fetch new late payments
             const stringToRemember = 'lastAddNewLatePaymentsRun' + suid;
@@ -294,9 +291,7 @@ export default function AuthContextProvider({ children }: any) {
                 addNewLatePayments(suid);
                 localStorage.setItem(stringToRemember, now);
             }
-            
         }
-        
     }, []);
 
     const handleCheckUserForAdmin = async (id: any, main: any) => {
@@ -328,6 +323,7 @@ export default function AuthContextProvider({ children }: any) {
             if (currentUser) {
                 setIsLoggedIn(true);
                 console.log('It ran again', selectedSuid);
+                setCurrentUsername(currentUser.displayName);
                 handleCheckUserForAdmin(currentUser.displayName, currentUser.photoURL);
                 setMainSuid(currentUser.photoURL);
             } else {
@@ -365,6 +361,7 @@ export default function AuthContextProvider({ children }: any) {
                 scheduleID,
                 latePayementPipeline,
                 studioOptions,
+                setStudioOptions,
                 isMaster,
                 masters,
                 selectedSuid,
@@ -390,6 +387,7 @@ export default function AuthContextProvider({ children }: any) {
                 mainSuid,
                 showLoader,
                 setShowLoader,
+                currentUsername
             }}
         >
             {children}

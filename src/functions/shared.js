@@ -41,6 +41,13 @@ export const formatDate = (date) => {
     return formattedDate;
 };
 
+export const formatDateForStudentEdit = (date) => {
+    const newDate = new Date(date);
+    const formattedDate = newDate.toISOString().substr(0, 10);
+    return formattedDate;
+};
+
+
 export const hashTheID = (id) => {
     return parseInt(id) * 123456789;
 };

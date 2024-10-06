@@ -31,16 +31,6 @@ export const createNewPaySimpleCustomer = async (customerData) => {
     }
 };
 
-export const getCustomerInfo = async (customerId, studioId) => {
-    try {
-        const response = await fetchData(`paysimple-helper/getCustomerInfo/${customerId}/${studioId}`, 'get');
-        return response;
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
-};
-
 export const addCreditCardToCustomer = async (customerData) => {
     try {
         const response = await fetchData(`paysimple-helper/addCreditCardToCustomer`, 'post', customerData);
@@ -79,6 +69,16 @@ export const updateCreditCard = async (cardData) => {
     }
 };
 
+// ****FOR TESTING****
+// export const addCreditCardToCustomer = async (customerData) => {
+//     try {
+//         const response = await fetchData(`paysimple-test/addCreditCardToCustomer`, 'post', customerData);
+//         return response;
+//     } catch (error) {
+//         throw error;
+//     }
+// };
+
 export const addBankAccountToCustomer = async (customerData) => {
     try {
         const response = await fetchData(`paysimple-helper/addBankAccountToCustomer`, 'post', customerData);
@@ -88,6 +88,17 @@ export const addBankAccountToCustomer = async (customerData) => {
         throw error;
     }
 };
+
+// ****FOR TESTING****
+// export const addBankAccountToCustomer = async (customerData) => {
+//     try {
+//         const response = await fetchData(`paysimple-test/addBankAccountToCustomer`, 'post', customerData);
+//         return response;
+//     } catch (error) {
+//         console.error(error);
+//         throw error;
+//     }
+// };
 
 export const getCustomerPayments = async (data) => {
     try {
@@ -99,6 +110,17 @@ export const getCustomerPayments = async (data) => {
     }
 };
 
+// ****FOR TESTING****
+// export const getCustomerPayments = async (data) => {
+//     try {
+//         const response = await fetchData(`paysimple-test/getCustomerPayments`, 'post', data);
+//         return response;
+//     } catch (error) {
+//         console.error(error);
+//         throw error;
+//     }
+// }
+
 export const getAllCustomerPaymentAccounts = async (customerId, studioId) => {
     try {
         const response = await fetchData(`paysimple-helper/getAllCustomerPaymentAccounts/${customerId}/${studioId}`, 'get');
@@ -108,6 +130,17 @@ export const getAllCustomerPaymentAccounts = async (customerId, studioId) => {
         throw error;
     }
 };
+
+// ****FOR TESTING****
+// export const getAllCustomerPaymentAccounts = async (customerId, studioId) => {
+//     try {
+//         const response = await fetchData(`paysimple-test/getAllCustomerPaymentAccounts/${customerId}/${studioId}`, 'get');
+//         return response;
+//     } catch (error) {
+//         console.error(error);
+//         throw error;
+//     }
+// };
 
 export const createPaymentSchedule = async (paymentData) => {
     try {
@@ -129,6 +162,17 @@ export const updatePaymentSchedule = async (paymentData) => {
     }
 };
 
+// ****FOR TESTING****
+// export const createPaymentSchedule = async (paymentData) => {
+//     try {
+//         const response = await fetchData(`paysimple-test/createPaymentSchedule`, 'post', paymentData);
+//         return response;
+//     } catch (error) {
+//         console.error(error);
+//         throw error;
+//     }
+// };
+
 export const getPaymentByID = async (paymentId, suid) => {
     try {
         const response = await fetchData(`psall/getPayment/${suid}/${paymentId}`, 'get');
@@ -139,6 +183,17 @@ export const getPaymentByID = async (paymentId, suid) => {
     }
 };
 
+// ****FOR TESTING****
+// export const getPaymentByID = async (paymentId, suid) => {
+//     try {
+//         const response = await fetchData(`paysimple-test/getPayment/${paymentId}/${suid}`, 'get');
+//         return response;
+//     } catch (error) {
+//         console.error(error);
+//         throw error;
+//     }
+// };
+
 export const voidAPayment = async (paymentData) => {
     try {
         const response = await fetchData(`paysimple-helper/voidPayment`, 'post', paymentData);
@@ -148,6 +203,17 @@ export const voidAPayment = async (paymentData) => {
         throw error;
     }
 };
+
+// ****FOR TESTING****
+// export const voidAPayment = async (paymentData) => {
+//     try {
+//         const response = await fetchData(`paysimple-test/voidPayment`, 'post', paymentData);
+//         return response;
+//     } catch (error) {
+//         console.error(error);
+//         throw error;
+//     }
+// };
 
 export const getAllActivePaymentSchedules = async (studioId) => {
     try {

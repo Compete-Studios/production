@@ -50,12 +50,12 @@ const Snapshot = () => {
 
     useEffect(() => {
         dispatch(setPageTitle('Snapshot'));
-        handleDateChange();
+        getSnapshot();
     }, [dispatch]);
 
     const formatDate = (date: Date) => date.toISOString().split("T")[0];
 
-    const getSnapshot = useCallback(async () => {
+    const getSnapshot = async () => {
         setLoading(true);
         try {
             const formattedStartDate = formatDate(startDate);
@@ -74,10 +74,6 @@ const Snapshot = () => {
         } finally {
             setLoading(false);
         }
-    }, [startDate, endDate, suid]);
-
-    const handleDateChange = () => {
-        getSnapshot();
     };
 
     const handleCategoryClick = async (category: any) => {
@@ -138,7 +134,7 @@ const Snapshot = () => {
                     <button
                         type="submit"
                         className="rounded-sm bg-blue-500 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 flex items-center"
-                        onClick={handleDateChange}
+                        onClick={getSnapshot}
                     >
                         Update
                     </button>

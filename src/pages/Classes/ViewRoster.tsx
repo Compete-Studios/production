@@ -297,8 +297,7 @@ const ViewRoster = () => {
         </html>`;
         return htmlForEmail;
     };
-
-    console.log(studentRoster)
+  
     return (
         <>
             {' '}

@@ -68,7 +68,7 @@ export default function SendTextToStaffMember({ phone }: any) {
                 phone: phone,
                 studioId: suid,
             };
-            console.log(textData, "textData")
+            console.log(textData, 'textData');
             const res = await getTextLogsByStudioIdAndPhoneNumber(textData);
             setTexts(res.recordset);
             console.log(res, 'res');
@@ -83,15 +83,16 @@ export default function SendTextToStaffMember({ phone }: any) {
             chatBox.scrollTop = chatBox.scrollHeight;
         }
     };
+
     useEffect(() => {
         if (texts.length > 0) {
             handleScrollToBottomOfTexts();
         }
-    }, [texts]);
+    }, [texts, isOpen]);
 
     useEffect(() => {
         handleGetTexts();
-    }, [suid]);
+    }, [suid, phone]);
 
     useEffect(() => {
         setTextMessage({
@@ -122,6 +123,7 @@ export default function SendTextToStaffMember({ phone }: any) {
             message: '',
         });
         setTexts([...texts, { Body: textMessage.message, CreationDate: new Date(), ToNumber: textMessage.to }]);
+        setIsOpen(false);
     };
 
     const handleRemoveOneBeginingOfFromPhoneNumber = (number: any) => {
@@ -166,83 +168,63 @@ export default function SendTextToStaffMember({ phone }: any) {
                                             <IconX className="w-5 h-5" />
                                         </button>
                                     </div>
-                                    <PerfectScrollbar className="relative h-full sm:h-[calc(100vh_-_200px)] chat-conversation-box" id="chat">
-                                        <div className="space-y-5 px-6 pb-44 sm:min-h-[300px] min-h-[400px]">
+                                    <PerfectScrollbar className="relative h-full sm:h-[calc(100vh_-_200px)] chat-conversation-box">
+                                        <div className="space-y-5 px-6 pb-96 sm:min-h-[300px] min-h-[400px]">
                                             <>
-                                                {loading && (
-                                                    <div className="flex items-center justify-center h-96">
-                                                        <IconChatDot className="w-20 h-20 text-gray-300 dark:text-gray-700 " />
-                                                    </div>
-                                                )}
-                                                {allTexts?.length > numberOfTextsToDisplay ? (
-                                                    <div className="flex items-center justify-center py-12">
-                                                        <button type="button" className="mx-auto text-info hover:text-blue-900">
-                                                            Load More
-                                                        </button>
-                                                    </div>
-                                                ) : (
-                                                    <div className="flex items-center justify-center py-12">
-                                                        <span className="mx-auto text-info">No More Messages</span>
-                                                    </div>
-                                                )}
-
-                                                <div className="space-y-6">
-                                                    {texts?.map((message: any, index: any) => {
-                                                        return (
-                                                            <div key={index}>
-                                                                <div
-                                                                    className={`flex items-start gap-3 ${
-                                                                        message.FromNumber === handleRemoveOneBeginingOfFromPhoneNumber(studioOptions?.TextFromNumber) ? 'justify-end' : ''
-                                                                    }`}
-                                                                >
-                                                                    <div className="space-y-2">
-                                                                        <div className="flex items-center gap-3">
-                                                                            {message.FromNumber === handleRemoveOneBeginingOfFromPhoneNumber(studioOptions?.TextFromNumber) && (
-                                                                                <div className="text-xs text-white-dark ltr:text-right rtl:text-left">
-                                                                                    {generateTimeAgoWithDateTimeStamp(message.CreationDate) || ''}
-                                                                                </div>
-                                                                            )}
-                                                                            <div
-                                                                                className={`dark:bg-gray-800 w-96 p-4 py-2 rounded-md break-all bg-black/10 ${
-                                                                                    message.FromNumber === handleRemoveOneBeginingOfFromPhoneNumber(studioOptions?.TextFromNumber)
-                                                                                        ? 'ltr:rounded-br-none rtl:rounded-bl-none !bg-secondary text-white'
-                                                                                        : 'ltr:rounded-bl-none rtl:rounded-br-none'
-                                                                                }`}
-                                                                            >
-                                                                                {message.Body}
-                                                                            </div>
-                                                                            {message.FromNumber !== handleRemoveOneBeginingOfFromPhoneNumber(studioOptions?.TextFromNumber) && (
-                                                                                <div className="text-xs text-white-dark ltr:text-right rtl:text-left">
-                                                                                    {generateTimeAgoWithDateTimeStamp(message.CreationDate) || ''}
-                                                                                </div>
-                                                                            )}
+                                                {texts?.map((message: any, index: any) => {
+                                                    return (
+                                                        <div key={index}>
+                                                            <div
+                                                                className={`flex items-start gap-3 ${
+                                                                    handleRemoveOneBeginingOfFromPhoneNumber(phone) === handleRemoveOneBeginingOfFromPhoneNumber(message.ToNumber) ? 'justify-end' : ''
+                                                                }`}
+                                                            >
+                                                                <div className="space-y-2">
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div
+                                                                            className={`dark:bg-gray-800 w-96 p-4 py-2 rounded-md break-all bg-black/10 ${
+                                                                                handleRemoveOneBeginingOfFromPhoneNumber(phone) === handleRemoveOneBeginingOfFromPhoneNumber(message.ToNumber)
+                                                                                    ? 'ltr:rounded-br-none rtl:rounded-bl-none !bg-primary text-white'
+                                                                                    : 'ltr:rounded-bl-none rtl:rounded-br-none'
+                                                                            }`}
+                                                                        >
+                                                                            {message.Body}
                                                                         </div>
+                                                                    </div>
+                                                                    <div
+                                                                        className={`text-xs text-white-dark ${
+                                                                            handleRemoveOneBeginingOfFromPhoneNumber(phone) === handleRemoveOneBeginingOfFromPhoneNumber(message.ToNumber)
+                                                                                ? 'ltr:text-right rtl:text-left'
+                                                                                : ''
+                                                                        }`}
+                                                                    >
+                                                                        {generateTimeAgoWithDateTimeStamp(message.CreationDate) || '5h ago'}
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        );
-                                                    })}
-                                                </div>
+                                                        </div>
+                                                    );
+                                                })}
                                             </>
-                                            <div className="p-4 fixed bottom-0 left-0 w-full bg-white">
-                                                <div className="sm:flex w-full space-x-3 rtl:space-x-reverse items-center">
-                                                    <div className="relative flex items-center w-full">
-                                                        <textarea
-                                                            className="form-input rounded-md border-0 bg-[#f4f4f4] pr-12 focus:outline-none py-2"
-                                                            placeholder="Type a message"
-                                                            rows={2}
-                                                            value={textMessage.message}
-                                                            onChange={(e) => setTextMessage({ ...textMessage, message: e.target.value })}
-                                                        />
-                                                        <button type="button" className="h-full px-4 text-gray-400 hover:text-gray-500">
-                                                            {' '}
-                                                            <IconSend />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
                                     </PerfectScrollbar>
+                                    <div className="p-4 absolute bottom-0 left-0 w-full bg-white">
+                <div className="sm:flex w-full space-x-3 rtl:space-x-reverse items-center">
+                    <div className="relative flex-1">
+                        <textarea
+                            className="form-input rounded-md border-0 bg-[#f4f4f4] pr-12 focus:outline-none py-2"
+                            placeholder="Type a message"
+                            rows={8}
+                            value={textMessage.message}
+                            onChange={(e) => setTextMessage({ ...textMessage, message: e.target.value })}
+                            onKeyUp={sendMessageHandle}
+                        />
+                    </div>
+                </div>
+                <button type="button" className="btn btn-info ml-auto gap-1" onClick={() => sendMessage()}>
+                    <IconSend /> Send Text
+                </button>
+            </div>
                                 </Dialog.Panel>
                             </Transition.Child>
                         </div>

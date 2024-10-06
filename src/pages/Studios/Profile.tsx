@@ -63,6 +63,8 @@ export default function Profile() {
         showMessage('Successfully updated!');
     };
 
+    console.log(studioOptions, 'studioInfo');
+
     return (
         <>
             <div className="max-w-xl mx-auto panel p-0">

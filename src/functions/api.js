@@ -634,6 +634,17 @@ export const updateStudentRank = async (data) => {
     }
 };
 
+export const dropStudentFromRank = async (studentId, rankId) => {
+    console.log('dropStudentFromRank', studentId, rankId);
+    try {
+        const response = await fetchData(`ranks/dropStudentFromRank/${studentId}/${rankId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const addProspect = async (prospect) => {
     try {
         const response = await fetchData(`marketing-access/addProspect`, 'post', prospect);
@@ -678,6 +689,36 @@ export const getStudentsInScheduleByPipelineStepFromArrayOfSteps = async (data) 
 export const addPPStepToDailySchedule = async (data) => {
     try {
         const response = await fetchData(`daily-schedule-tools/addPPStepToDailySchedule`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const removePPStepFromDailySchedule = async (data) => {
+    try {
+        const response = await fetchData(`daily-schedule-tools/removePPStepFromDailySchedule`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const removeSPStepFromDailySchedule = async (data) => {
+    try {
+        const response = await fetchData(`daily-schedule-tools/removeSPStepFromDailySchedule`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const addSPStepToDailySchedule = async (data) => {
+    try {
+        const response = await fetchData(`daily-schedule-tools/addSPStepToDailySchedule`, 'post', data);
         return response;
     } catch (error) {
         console.error(error);
@@ -1828,3 +1869,5 @@ export const updateSteps = async (data) => {
         }
     }
 };
+
+

@@ -5,17 +5,15 @@ import { login, logout } from './auth';
 import { updateStudentByColumn, updateStudioOptionsPicture } from '../functions/api';
 
 const generateRandomID = () => {
-    const characters =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let randomID = "";
-  
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let randomID = '';
+
     for (let i = 0; i < 16; i++) {
-      const randomIndex = Math.floor(Math.random() * characters.length);
-      randomID += characters.charAt(randomIndex);
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        randomID += characters.charAt(randomIndex);
     }
     return randomID;
-  };
-  
+};
 
 export const saveFromToFirebase = async (data, id) => {
     try {
@@ -25,6 +23,37 @@ export const saveFromToFirebase = async (data, id) => {
     } catch (error) {
         console.log(error);
         return false;
+    }
+};
+
+export const getFormFromFirebase = async (id) => {
+    try {
+        const docRef = doc(db, 'forms', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return docSnap.data();
+        } else {
+            return [];
+        }
+    } catch (error) {
+        console.log(error);
+        return [];
+    }
+};
+
+export const getAllFormSubmissions = async (id) => {
+    try {
+        const docRef = collection(db, 'forms', id, 'stats');
+        const querySnapshot = await getDocs(docRef);
+        const forms = [];
+        querySnapshot.forEach((doc) => {
+            const docWithId = { ...doc.data(), id: doc.id };
+            forms.push(docWithId);
+        });
+        return forms;
+    } catch (error) {
+        console.log(error);
+        return [];
     }
 };
 
@@ -54,10 +83,10 @@ export const getFormsFromFirebase = async (id) => {
     }
 };
 
-export const createEvent = async (data, suid) => { 
+export const createEvent = async (data, suid) => {
     const did = generateRandomID();
     try {
-        const docRef = doc(db, "events", suid, "calandar", did);
+        const docRef = doc(db, 'events', suid, 'calandar', did);
         const docToSave = { ...data, did };
         await setDoc(docRef, docToSave);
         return true;
@@ -68,7 +97,7 @@ export const createEvent = async (data, suid) => {
 
 export const deleteEvent = async (id, suid) => {
     try {
-        const docRef = doc(db, "events", suid, "calandar", id);
+        const docRef = doc(db, 'events', suid, 'calandar', id);
         await deleteDoc(docRef);
         return true;
     } catch (error) {
@@ -78,7 +107,7 @@ export const deleteEvent = async (id, suid) => {
 
 export const updateEvent = async (id, data, suid) => {
     try {
-        const docRef = doc(db, "events", suid, "calandar", id);
+        const docRef = doc(db, 'events', suid, 'calandar', id);
         await updateDoc(docRef, data);
         return true;
     } catch (error) {
@@ -185,41 +214,36 @@ export const updateSprint = async (id, data) => {
     }
 };
 
-
 export const updateAllUsers = async () => {
-  const collectionRef = collection(db, "users"); // Reference to your collection
-  
-  try {
-    // Step 1: Fetch all documents in the collection
-    const querySnapshot = await getDocs(collectionRef);
-    
-    // Step 2: Loop through each document and update it
-    const updatePromises = querySnapshot.docs.map(async (document) => {
-      const docRef = doc(db, "users", document.id);
-      
-      // Update with your desired changes
-      await updateDoc(docRef, {
-        // Add your field updates here
-        newUpdate: true, 
-      });
-    });
-    
-    // Step 3: Wait for all updates to complete
-    await Promise.all(updatePromises);
-    console.log("All documents updated successfully!");
-    
-  } catch (error) {
-    console.error("Error updating documents: ", error);
-  }
+    const collectionRef = collection(db, 'users'); // Reference to your collection
+
+    try {
+        // Step 1: Fetch all documents in the collection
+        const querySnapshot = await getDocs(collectionRef);
+
+        // Step 2: Loop through each document and update it
+        const updatePromises = querySnapshot.docs.map(async (document) => {
+            const docRef = doc(db, 'users', document.id);
+
+            // Update with your desired changes
+            await updateDoc(docRef, {
+                // Add your field updates here
+                newUpdate: true,
+            });
+        });
+
+        // Step 3: Wait for all updates to complete
+        await Promise.all(updatePromises);
+        console.log('All documents updated successfully!');
+    } catch (error) {
+        console.error('Error updating documents: ', error);
+    }
 };
 
 export const updateUserNew = async (id) => {
     const docRef = doc(db, 'users', id);
     await updateDoc(docRef, { newUpdate: false });
 };
-
-
-
 
 // export const updateStudio = async (studioId, studioData) => {
 //     const idString = studioId.toString();

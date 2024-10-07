@@ -80,7 +80,6 @@ export default function AddStudentProspectToProgram({ programId, studentRoster, 
     };
 
     const handleAddToClass = async () => {
-        console.log(selectedStudents);
         for (let i = 0; i < selectedStudents.length; i++) {
             const classData = {
                 studentId: selectedStudents[i].value,

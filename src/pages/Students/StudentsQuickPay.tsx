@@ -10,6 +10,8 @@ import { addInternalPayment, runPaymentForCustomer } from '../../functions/payme
 import Swal from 'sweetalert2';
 import { formatDate } from '../../functions/shared';
 import { useNavigate } from 'react-router-dom';
+import Tippy from '@tippyjs/react';
+import IconDollarSign from '../../components/Icon/IconDollarSign';
 
 interface CreditCard {
     Id: number;
@@ -142,9 +144,11 @@ export default function StudentsQuickPay({ student, suid, title = 'Quick Pay', i
     return (
         <div>
             <div>
-                <button className="uppercase font-lg font-bold w-full hover:bg-success-light p-4 text-left" onClick={() => setShowQuickPayModal(true)}>
-                    {title}
-                </button>
+                <Tippy content="Quick Pay" placement="top">
+                    <button type="button" className="btn btn-success w-10 h-10 p-0 rounded-full" onClick={() => setShowQuickPayModal(true)}>
+                        <IconDollarSign />
+                    </button>
+                </Tippy>
             </div>
             <Transition appear show={showQuickPayModal} as={Fragment}>
                 <Dialog as="div" open={showQuickPayModal} onClose={() => setShowQuickPayModal(false)} className="relative z-[51]">

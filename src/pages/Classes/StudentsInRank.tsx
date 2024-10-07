@@ -8,13 +8,14 @@ import IconSearch from '../../components/Icon/IconSearch';
 import IconUser from '../../components/Icon/IconUser';
 import IconX from '../../components/Icon/IconX';
 import { Link, useParams } from 'react-router-dom';
-import { getProspectsByProgramId, getStudentsByProgramId, getStudentsByRankId } from '../../functions/api';
+import { dropStudentFromRank, getProspectsByProgramId, getStudentsByProgramId, getStudentsByRankId } from '../../functions/api';
 import { UserAuth } from '../../context/AuthContext';
 import IconSend from '../../components/Icon/IconSend';
 import IconPrinter from '../../components/Icon/IconPrinter';
 import IconMessage from '../../components/Icon/IconMessage';
 import IconDollarSignCircle from '../../components/Icon/IconDollarSignCircle';
-import { hashTheID } from '../../functions/shared';
+import { hashTheID, showWarningMessage } from '../../functions/shared';
+import AddStudentToRank from './AddStudentToRank';
 
 const StudentsInRank = () => {
     const { suid }: any = UserAuth();
@@ -26,7 +27,7 @@ const StudentsInRank = () => {
     const [studentRoster, setStudentRoster] = useState<any>([]);
     const [prospectRoster, setProspectRoster] = useState<any>([]);
 
-    const [value, setValue] = useState<any>('list');
+    const [update, setUpdate] = useState<any>(false);
     const [defaultParams] = useState({
         id: null,
         name: '',
@@ -49,7 +50,7 @@ const StudentsInRank = () => {
 
     useEffect(() => {
         try {
-            if (suid === uid) {
+            if (suid) {
                 getStudentsByRankId(rkID).then((res) => {
                     setStudentRoster(res);
                 });
@@ -59,7 +60,7 @@ const StudentsInRank = () => {
         } catch (error) {
             console.error(error);
         }
-    }, [rkID, suid, uid]);
+    }, [rkID, suid, uid, update]);
 
     const [filteredItems, setFilteredItems] = useState<any>(studentRoster);
     const [filteredProspects, setFilteredProspects] = useState<any>(prospectRoster);
@@ -78,8 +79,25 @@ const StudentsInRank = () => {
                 return item.Name.toLowerCase().includes(search.toLowerCase());
             });
         });
-    }, [search, prospectRoster]);    
+    }, [search, prospectRoster]);
 
+    const handleDropFromRank = (id: any) => {
+        showWarningMessage('Are you sure want to remove student from rank?', 'Remove from Rank', 'Your student has been removed')
+            .then(async (confirmed: boolean) => {
+                if (confirmed) {
+                    const dropRes = await dropStudentFromRank(id, rkID);
+                    setUpdate(!update);
+                    console.log('dropRes', dropRes);
+                } else {
+                    // User canceled the action
+                    console.log('User canceled');
+                }
+            })
+            .catch((error) => {
+                // Handle error if any
+                console.error('Error:', error);
+            });
+    };
 
     return (
         <>
@@ -105,12 +123,11 @@ const StudentsInRank = () => {
                         <div className="flex sm:flex-row flex-col sm:items-center justify-end sm:gap-3 gap-4 w-full sm:w-auto mt-3">
                             <input type="text" placeholder="Search Students" className="form-input py-2 ltr:pr-11 rtl:pl-11 peer" value={search} onChange={(e) => setSearch(e.target.value)} />
                             <button type="button" className="absolute ltr:right-[11px] rtl:left-[11px] top-1/2 -translate-y-1/2 peer-focus:text-primary ">
-                                <IconSearch className="mx-auto" />
+                         
                             </button>
-                            <button type="button" className="btn btn-primary w-full">
-                                <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
-                                Add Student To Rank
-                            </button>
+                            <div className="w-full">
+                                <AddStudentToRank rkID={rkID} studentRoster={studentRoster} update={update} setUpdate={setUpdate} />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -152,10 +169,12 @@ const StudentsInRank = () => {
 
                                             <td>
                                                 <div className="flex gap-4 items-center justify-center">
-                                                    <Link  to={`/students/view-student/${hashTheID(contact.Student_ID)}/${hashTheID(suid)}`} type="button" className="btn btn-sm btn-outline-primary">
+                                                    <Link to={`/students/view-student/${hashTheID(contact.Student_ID)}/${hashTheID(suid)}`} type="button" className="btn btn-sm btn-outline-primary">
                                                         Info
                                                     </Link>
-                                                    <button type="button" className="btn btn-sm btn-outline-danger">
+                                                    <button type="button" className="btn btn-sm btn-outline-danger"
+                                                        onClick={() => handleDropFromRank(contact.Student_ID)}
+                                                    >
                                                         Remove
                                                     </button>
                                                 </div>

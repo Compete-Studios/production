@@ -34,7 +34,7 @@ export const createNewPaySimpleCustomer = async (customerData) => {
 export const addCreditCardToCustomer = async (customerData) => {
     try {
         const response = await fetchData(`paysimple-helper/addCreditCardToCustomer`, 'post', customerData);
-        return response;
+        return {response: response, status: 200};
     } catch (error) {
         throw error;
     }

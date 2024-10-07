@@ -14,6 +14,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import QuickUpdate from '../components/QuickUpdate';
 import SendMail from '../components/SendMail';
+import IconMail from '../../../components/Icon/IconMail';
 
 interface EmailData {
     to: string;
@@ -80,9 +81,11 @@ export default function SendQuickEmail({ student, name, pipeline, isProspect = f
     return (
         <div>
             <div>
-                <button className="uppercase font-lg font-bold w-full hover:bg-info-light p-4 text-left" onClick={() => setShowEmailModal(true)}>
-                    Email {name}
-                </button>
+                <Tippy content="Send Email" placement="top">
+                    <button type="button" className="btn btn-info w-10 h-10 p-0 rounded-full" onClick={() => setShowEmailModal(true)}>
+                        <IconMail />
+                    </button>  
+                </Tippy>
             </div>
 
             <Transition.Root show={showEmailModal} as={Fragment}>

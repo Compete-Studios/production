@@ -23,6 +23,8 @@ export default function Schedules() {
     const [gettingProspects, setGettingProspects] = useState(true);
     const [scheduleDate, setScheduleDate] = useState(new Date());
 
+    console.log('scheduleID', scheduleID);
+
     const handleGetStudents = async () => {
         const data = await fetch(`${REACT_API_BASE_URL}/daily-schedule-tools/getSPStepsForSchedule/${scheduleID}/${suid}`);
         const dataJson = await data.json();

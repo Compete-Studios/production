@@ -39,7 +39,11 @@ export default function Forms() {
     useEffect(() => {
         handleGetFormFromFB(id);
         if (!isLoggedIn) {
-            updateLoadCount(id);
+            const currentMonth = new Date().getMonth() + 1;
+            const currentYear = new Date().getFullYear();
+            const date = `${currentMonth}${currentYear}`;
+            console.log(date, 'date');
+            updateLoadCount(id, date);
         }
     }, [id]);
 
@@ -81,7 +85,10 @@ export default function Forms() {
                 date: new Date(),
             };
             updateStats(id, statsData);
-            updateFormSubmissionCounnt(id);
+            const currentMonth = new Date().getMonth() + 1;
+            const currentYear = new Date().getFullYear();
+            const date = `${currentMonth}${currentYear}`;
+            updateFormSubmissionCounnt(id, date);
             setFormInfo(formInputs);
             window.top!.location.href = form?.successURL || '/';
         } else {
@@ -104,7 +111,6 @@ export default function Forms() {
         }
     };
 
-    console.log(form, 'form');
 
     return (
         <div className={`${form?.selectedColor?.bg} min-h-screen h-full `}>

@@ -9,6 +9,7 @@ import { UserAuth } from '../../../context/AuthContext';
 import { sendAText } from '../../../functions/api';
 import { showErrorMessage, showMessage } from '../../../functions/shared';
 import SendText from '../components/SendText';
+import IconMessage from '../../../components/Icon/IconMessage';
 
 interface TextMessage {
     to: string;
@@ -86,9 +87,11 @@ export default function SendQuickText({ student, name, pipeline }: any) {
     return (
         <div>
             <div>
-             
-                    <button className="uppercase font-lg font-bold w-full hover:bg-danger-light p-4 text-left" onClick={() => setShowChatModal(true)}>Text {name}</button>
-             
+                <Tippy content="Send Text" placement="top">
+                    <button type="button" className="btn btn-secondary w-10 h-10 p-0 rounded-full" onClick={() => setShowChatModal(true)}>
+                        <IconMessage />
+                    </button>
+                </Tippy>
             </div>
             <Transition.Root show={showChatModal} as={Fragment}>
                 <Dialog className="relative z-50" onClose={setShowChatModal}>
@@ -117,7 +120,12 @@ export default function SendQuickText({ student, name, pipeline }: any) {
                                                                 Action Text <span className="font-bold text-primary">{pipeline?.StepName}</span>{' '}
                                                             </Dialog.Title>
                                                             <p className="text-sm text-gray-500">This action toolbar allows you to quickly email, text, add notes, or update the student step.</p>
-                                                            <h4 className="text-lg font-medium text-gray-900 dark:text-white-dark pt-4">Student: <span className='text-secondary'>{student?.First_Name} {student?.Last_Name}</span></h4> 
+                                                            <h4 className="text-lg font-medium text-gray-900 dark:text-white-dark pt-4">
+                                                                Student:{' '}
+                                                                <span className="text-secondary">
+                                                                    {student?.First_Name} {student?.Last_Name}
+                                                                </span>
+                                                            </h4>
                                                         </div>
 
                                                         <div className="flex h-7 items-center">
@@ -132,7 +140,7 @@ export default function SendQuickText({ student, name, pipeline }: any) {
 
                                                 {/* Divider container */}
                                                 <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0">
-                                                    <SendText defaultText={pipeline} student={student}  />
+                                                    <SendText defaultText={pipeline} student={student} />
                                                 </div>
                                             </div>
                                         </form>

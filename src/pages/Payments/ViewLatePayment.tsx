@@ -58,6 +58,14 @@ export default function ViewLatePayment() {
     const [loading, setLoading] = useState(true);
     const [message1, setMessage1] = useState<any>('https://www.competestudio.pro/resolve-payment/0');
 
+    const [customerID, setCustomerID] = useState('');
+    const [paymentID, setPaymentID] = useState('');
+    const [billingInfo, setBillingInfo] = useState<any>({});
+
+    useEffect(() => {
+        setPaymentID(id);
+    }, [id]);
+
     const [paymentInfo, setPaymentInfo] = useState<any>({});
     const [mutablePaymentInfo, setMutablePaymentInfo] = useState<any>({});
     const [paymentIDInfo, setPaymentIDInfo] = useState<any>({});
@@ -81,7 +89,7 @@ export default function ViewLatePayment() {
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
     const [defaultTab, setDefaultTab] = useState<any>(0);
     const [defaultCard, setDefaultCard] = useState<any>('');
-    const [billingInfo, setBillingInfo] = useState<any>({});
+    const [billingData, setBillingData] = useState<any>({});
     const [loadingData, setLoadingData] = useState({
         student: true,
         paymentInfo: true,
@@ -116,11 +124,11 @@ export default function ViewLatePayment() {
     };
 
     const handleGetCustomerInfo = async (customerID: any) => {
+        console.log('customerID', customerID);
         try {
             const customerInfo = await getStudentIdFromPaysimpleCustomerId(customerID);
-            console.log(customerInfo, "customerInfo");
+            console.log('customerInfo', customerInfo);
             if (customerInfo.recordset) {
-                
                 const studentID = await customerInfo.recordset[0].studentId;
                 await getStudentInfo(studentID).then((res) => {
                     setStudent(res);
@@ -129,7 +137,7 @@ export default function ViewLatePayment() {
                 await handleGetInternalPayments(studentID);
                 setLoadingData((prevState) => ({ ...prevState, student: false }));
             } else {
-                console.log('Error getting payment info');
+                console.log('Error getting payment info');                
                 setLoadingData((prevState) => ({ ...prevState, student: false }));
             }
         } catch (error) {
@@ -141,7 +149,6 @@ export default function ViewLatePayment() {
     };
 
     const handleGetPaymentHistory = async (data: any) => {
-        console.log(data, 'data');
         try {
             const res = await getCustomerPayments(data);
             setPaysimpleHistory(res?.Response);
@@ -178,13 +185,18 @@ export default function ViewLatePayment() {
     }, [paysimplehistory, internalHistory]);
 
     const handleGetPaymentInfo = async (payID: any) => {
-        console.log(payID, 'payID');
-        console.log(suid, 'suid');
         try {
             const res = await getPaymentByID(payID, suid);
-            console.log(res, 'res');
+            console.log(res.Response, 'res');
             if (res.Meta.HttpStatusCode === 200) {
                 setPaymentIDInfo(res.Response);
+                setCustomerID(res.Response.CustomerId);
+                setBillingData(res.Response);
+                setStudent({
+                    Student_id: 0,
+                    First_Name: res.Response.CustomerFirstName,
+                    Last_Name: res.Response.CustomerLastName
+                });
                 handleGetCustomerInfo(res.Response.CustomerId);
                 setLoadingData((prevState) => ({ ...prevState, paymentIDInfo: false }));
                 if (res.Response.PaymentType === 'CC') {
@@ -198,7 +210,6 @@ export default function ViewLatePayment() {
                         }
                     });
                 } else {
-                    console.log('ACH');
                     setPaymentIDInfo(res.Response);
                     // getAllCustomerPaymentAccounts(res.Response.CustomerId, suid).then((res2) => {
                     //     if (res2.Response) {
@@ -222,7 +233,6 @@ export default function ViewLatePayment() {
         }
     };
 
-   
     useEffect(() => {
         if (paymentIDInfo && suid && student?.Student_id) {
             setMessage1(`${REACT_BASE_URL}payments/resolve-payment/${hashids.encode(paymentIDInfo?.Id, suid, student?.Student_id)}`);
@@ -289,7 +299,7 @@ export default function ViewLatePayment() {
                 customerId: res[0].PaysimpleCustomerId,
                 studioId: suid,
             };
-            console.log(data, 'data');
+
             handleGetPaymentHistory(data);
             getBillingInfo(res[0].PaysimpleCustomerId, suid);
             if (res[0].PaysimpleTransactionId) {
@@ -407,7 +417,6 @@ export default function ViewLatePayment() {
         try {
             const res = await updateLatePaymentDateStepID(data);
             if (res) {
-                console.log(res);
                 showMessage('Pipeline Updated');
                 setUpdate(!update);
             }
@@ -430,7 +439,6 @@ export default function ViewLatePayment() {
             const newNotes = `${paymentNotes}\n${newNote}`; // Create a new string with the new note appended
             const res = await addPaymentNotes(paymentInfo.PaysimpleTransactionId, newNotes);
             if (res) {
-                console.log(res);
                 setPaymentNotes(newNotes); // Update the paymentNotes state with the new string
                 setNewNote('');
             }
@@ -443,7 +451,6 @@ export default function ViewLatePayment() {
         try {
             const res = await addPaymentNotes(paymentInfo.PaysimpleTransactionId, newNote);
             if (res) {
-                console.log(res);
                 setPaymentNotes(newNote); // Update the paymentNotes state with the new string
                 setUpdateAllLPPNotes(false);
                 setNewNote('');
@@ -478,7 +485,6 @@ export default function ViewLatePayment() {
                 if (confirmed) {
                     try {
                         // Run the payment on the same card
-                        console.log(newPaymentInfo, 'newPaymentInfo');
                         const res = await runPaymentForCustomer(newPaymentInfo);
                         const response = res.Response;
 
@@ -605,7 +611,9 @@ export default function ViewLatePayment() {
                     </div>
                     <div className="flex items-center justify-between mt-4">
                         <div>
-                            <h4 className="text-lg font-semibold">Payment Information</h4>
+                            <h4 className="text-lg font-semibold">
+                                Payment Information {customerID} {paymentID}
+                            </h4>
                         </div>
                     </div>
                     <div className="mt-5">

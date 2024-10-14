@@ -331,6 +331,11 @@ const ViewProspect = () => {
         navigate(`/prospects/add-prospect/${uid}`);
     };
 
+    const handleAddBillingAccount = (e: any) => {
+        e.preventDefault();
+        navigate(`/prospects/add-billing-account/${uid}`);
+    };
+
     return (
         <div>
             <div className="sm:flex sm:items-center sm:justify-between">
@@ -399,7 +404,12 @@ const ViewProspect = () => {
                         />
                         <SendQuickText student={student} pipeline={pipeline} name="Prospect" />
                         <SendQuickWaiver student={student} prospect={true} />
-                        <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left">Create a Billing Account</button>
+                        <button
+                            className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left"
+                            onClick={(e: any) => handleAddBillingAccount(e)}
+                        >
+                            Create a Billing Account
+                        </button>
                         <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left" onClick={(e: any) => handleClone(e)}>Clone Prospect</button>
                     </div>
                 </div>

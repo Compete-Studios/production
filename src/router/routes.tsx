@@ -184,6 +184,8 @@ const TextPipelineStep = lazy(() => import('../pages/Prospects/TextPipelineStep'
 const AddProspectsToEmailList = lazy(() => import('../pages/Prospects/AddProspectsToEmailList'));
 const ActivateAsStudent = lazy(() => import('../pages/Prospects/ActivateAsStudent'));
 const ViewProspect = lazy(() => import('../pages/Prospects/ViewProspect'));
+const AddABillingAccountForProspect = lazy(() => import('../pages/Prospects/AddBillingAccountForProspect'));
+const FinishedBillingOptionsForProspect = lazy(() => import('../pages/Prospects/FinishBillingOptionsForProspect'));
 
 //Admin components
 const ViewStudios = lazy(() => import('../admin/studios/ViewStudios'));
@@ -647,6 +649,14 @@ const routes = [
     {
         path: '/prospects/activate-as-student',
         element: <ActivateAsStudent />,
+    },
+    {
+        path: '/prospects/add-billing-account/:id',
+        element: <AddABillingAccountForProspect />,
+    },
+    {
+        path: '/prospects/finish-billing-account/:id',
+        element: <FinishedBillingOptionsForProspect />,
     },
 
     //facebook

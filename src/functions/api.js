@@ -273,6 +273,16 @@ export const getStudentBillingAccounts = async (studentId) => {
     }
 };
 
+export const getProspectBillingAccount = async (prospectId) => {
+    try {
+        const response = await fetchData(`billing-account-access/getProspectBillingAccount/${prospectId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const getPaysimpleCustomerIdFromStudentId = async (customerID, studioID) => {
     try {
         const response = await fetchData(`paysimple-helper/getCustomerInfo/${customerID}/${studioID}`, 'get');
@@ -1327,6 +1337,16 @@ export const createNewInvoice = async (data) => {
 export const addBillingAccount = async (data) => {
     try {
         const response = await fetchData(`billing-account-access/addBillingAccount`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const addProspectBillingAccount = async (data) => {
+    try {
+        const response = await fetchData(`billing-account-access/addProspectBillingAccount`, 'post', data);
         return response;
     } catch (error) {
         console.error(error);

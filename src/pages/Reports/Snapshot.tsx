@@ -57,15 +57,22 @@ const Snapshot = () => {
 
     const getSnapshot = async () => {
         setLoading(true);
+        console.log("Getting snapshot data...");
         try {
             const formattedStartDate = formatDate(startDate);
             const formattedEndDate = formatDate(endDate);
+            const data = {
+                startDate: formattedStartDate,
+                endDate: formattedEndDate,
+                studioId: suid
+            }
+            console.log("Data: ", data);
             const [firstContacts, intros, firstClasses, enrollments, withdrawals] = await Promise.all([
-                getFirstContactStudents(formattedStartDate, formattedEndDate, suid),
-                getStudentIntros(formattedStartDate, formattedEndDate, suid),
-                getStudentFirstClasses(formattedStartDate, formattedEndDate, suid),
-                getStudentEnrollments(formattedStartDate, formattedEndDate, suid),
-                getStudentWithdrawals(formattedStartDate, formattedEndDate, suid)
+                getFirstContactStudents(data),
+                getStudentIntros(data),
+                getStudentFirstClasses(data),
+                getStudentEnrollments(data),
+                getStudentWithdrawals(data)
             ]);
 
             setSnapshotData({ firstContacts, intros, firstClasses, enrollments, withdrawals });

@@ -1674,9 +1674,9 @@ export const deleteForm = async (formId) => {
     }
 };
 
-export const getStudioSnapShot = async (startDate, endDate, suid) => {
+export const getStudioSnapShot = async (data) => {
     try {
-        const response = await fetchData(`reports/getStudioSnapshot/${startDate}/${endDate}/${suid}`, 'get');
+        const response = await fetchData(`reports/getStudioSnapshot`, 'post', data);
         return response.recordset[0];
     } catch (error) {
         console.error(error);
@@ -1684,9 +1684,9 @@ export const getStudioSnapShot = async (startDate, endDate, suid) => {
     }
 };
 
-export const getFirstContactStudents = async (startDate, endDate, suid) => {
+export const getFirstContactStudents = async (data) => {
     try {
-        const response = await fetchData(`reports/getFirstContactStudents/${startDate}/${endDate}/${suid}`, 'get');
+        const response = await fetchData(`reports/getFirstContactStudents`, 'post', data);
         return response.recordset;
     } catch (error) {
         console.error(error);
@@ -1694,9 +1694,9 @@ export const getFirstContactStudents = async (startDate, endDate, suid) => {
     }
 };
 
-export const getFirstContactProspects = async (startDate, endDate, suid) => {
+export const getFirstContactProspects = async (data) => {
     try {
-        const response = await fetchData(`reports/getFirstContactProspects/${startDate}/${endDate}/${suid}`, 'get');
+        const response = await fetchData(`reports/getFirstContactProspects`, 'post', data);
         return response.recordset;
     } catch (error) {
         console.error(error);
@@ -1704,9 +1704,9 @@ export const getFirstContactProspects = async (startDate, endDate, suid) => {
     }
 };
 
-export const getStudentIntros = async (startDate, endDate, suid) => {
+export const getStudentIntros = async (data) => {
     try {
-        const response = await fetchData(`reports/getStudentIntros/${startDate}/${endDate}/${suid}`, 'get');
+        const response = await fetchData(`reports/getStudentIntros`, 'post', data);
         return response.recordset;
     } catch (error) {
         console.error(error);
@@ -1714,9 +1714,9 @@ export const getStudentIntros = async (startDate, endDate, suid) => {
     }
 };
 
-export const getProspectIntros = async (startDate, endDate, suid) => {
+export const getProspectIntros = async (data) => {
     try {
-        const response = await fetchData(`reports/getProspectIntros/${startDate}/${endDate}/${suid}`, 'get');
+        const response = await fetchData(`reports/getProspectIntros`, 'post', data);
         return response.recordset;
     } catch (error) {
         console.error(error);
@@ -1724,9 +1724,9 @@ export const getProspectIntros = async (startDate, endDate, suid) => {
     }
 };
 
-export const getStudentFirstClasses = async (startDate, endDate, suid) => {
+export const getStudentFirstClasses = async (data) => {
     try {
-        const response = await fetchData(`reports/getStudentFirstClasses/${startDate}/${endDate}/${suid}`, 'get');
+        const response = await fetchData(`reports/getStudentFirstClasses`, 'post', data);
         return response.recordset;
     } catch (error) {
         console.error(error);
@@ -1734,9 +1734,9 @@ export const getStudentFirstClasses = async (startDate, endDate, suid) => {
     }
 };
 
-export const getProspectFirstClasses = async (startDate, endDate, suid) => {
+export const getProspectFirstClasses = async (data) => {
     try {
-        const response = await fetchData(`reports/getProspectFirstClasses/${startDate}/${endDate}/${suid}`, 'get');
+        const response = await fetchData(`reports/getProspectFirstClasses`, 'post', data);
         return response.recordset;
     } catch (error) {
         console.error(error);
@@ -1744,9 +1744,10 @@ export const getProspectFirstClasses = async (startDate, endDate, suid) => {
     }
 };
 
-export const getStudentEnrollments = async (startDate, endDate, suid) => {
+export const getStudentEnrollments = async (data) => {
     try {
-        const response = await fetchData(`reports/getStudentEnrollments/${startDate}/${endDate}/${suid}`, 'get');
+        console.log('get student enrollments  ', data);
+        const response = await fetchData(`reports/getStudentEnrollments`, 'post', data);
         return response.recordset;
     } catch (error) {
         console.error(error);
@@ -1754,9 +1755,9 @@ export const getStudentEnrollments = async (startDate, endDate, suid) => {
     }
 };
 
-export const getStudentWithdrawals = async (startDate, endDate, suid) => {
+export const getStudentWithdrawals = async (data) => {
     try {
-        const response = await fetchData(`reports/getStudentWithdrawals/${startDate}/${endDate}/${suid}`, 'get');
+        const response = await fetchData(`reports/getStudentWithdrawals`, 'post', data);
         return response.recordset;
     } catch (error) {
         console.error(error);

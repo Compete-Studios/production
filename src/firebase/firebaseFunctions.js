@@ -3,11 +3,25 @@ import { db, storage } from './firebase';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { login, logout } from './auth';
 
+// export const saveFromToFirebase = async (data, id) => {
+//     try {
+//         const docRef = collection(db, 'forms');
+//         await addDoc(docRef, data);
+//         return true;
+//     } catch (error) {
+//         console.log(error);
+//         return false;
+//     }
+// };
+
 export const saveFromToFirebase = async (data, id) => {
     try {
-        const docRef = collection(db, 'forms');
-        await addDoc(docRef, data);
-        return true;
+        const docRef = await addDoc(collection(db, 'forms'), data);
+        // Return success status and the id of the newly created form
+        return {
+            success: true,
+            id: docRef.id
+        };
     } catch (error) {
         console.log(error);
         return false;

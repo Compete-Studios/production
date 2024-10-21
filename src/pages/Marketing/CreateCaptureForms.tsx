@@ -194,10 +194,12 @@ export default function CreateCaptureForms() {
         } else {
             const response = await saveFromToFirebase(formData);
             if (response) {
+                const newFormId = response.id;
                 setTimeout(() => {
                     setLoading(false);
                     showMessage('Form Saved Successfully!');
-                    navigate('/marketing/capture-forms');
+                    console.log('newFormId', newFormId);
+                    navigate(`/marketing/capture-forms/${newFormId}`);
                 }, 5000);
             } else {
                 alert('Error Saving Form');

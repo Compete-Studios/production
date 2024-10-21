@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { UserAuth } from '../../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { deleteForm, getUserFormsByStudioId } from '../../functions/api';
 import { showWarningMessage } from '../../functions/shared';
 import { Loader } from '@mantine/core';
@@ -24,10 +24,14 @@ export default function CaptureForms() {
     const [forms, setForms] = useState([]);
     const [update, setUpdate] = useState(false);
     const [matchedFormIds, setMatchedFormIds] = useState<any>([]);
+    const [selectedForm, setSelectedForm] = useState<any>(null); 
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Capture Forms'));
     });
+
+    // We'll have the id of a newly created form if coming from /CreateCaptureForm
+    const { id } = useParams<{ id: string }>();
 
     const handleReturnCSS = (submissions: any, loads: any) => {
         if (submissions && loads) {
@@ -76,11 +80,19 @@ export default function CaptureForms() {
                 setForms(data.recordset);
                 setLoading(false);
             });
+            //If we have an id param, show the iframe of the newly created form
+            if (id && fbForms.length > 0) {
+                console.log('id:', id);
+                const matchedForm = fbForms.find((form: any) => form.id === id);
+                if (matchedForm) {
+                    setSelectedForm(matchedForm);
+                }
+            }
         } catch (error) {
             console.error(error);
             setLoading(false);
         }
-    }, [suid, update]);
+    }, [suid, update, id]);
 
     const handlePreview = (id: any) => {
         window.open(`${REACT_BASE_URL}form/${id}`, '_blank');
@@ -192,7 +204,8 @@ export default function CaptureForms() {
                                                     </td>
                                                     <td className="flex items-center justify-end gap-2">
                                                    
-                                                    <ViewFormIFrame formList={list} />
+                                                        <ViewFormIFrame formList={list} autoOpen={id === list.id} />
+
                                                    
                                                         <Tippy content="Preview Form">
                                                             <button className="text-info hover:text-blue-800" onClick={() => handlePreview(list.id)}>
@@ -262,6 +275,12 @@ export default function CaptureForms() {
                         </div>
                     </div>
                 )}
+
+                {/* Automatically trigger modal if selectedForm is set */}
+                {selectedForm && (
+                    <ViewFormIFrame formList={selectedForm} autoOpen={true} />
+                )}
+
             </div>
         </>
     );

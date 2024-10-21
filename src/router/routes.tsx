@@ -704,7 +704,7 @@ const routes = [
     },
 
     {
-        path: '/marketing/capture-forms',
+        path: '/marketing/capture-forms/:id?',
         element: <CaptureForms />,
     },
     {

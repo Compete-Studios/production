@@ -8,10 +8,16 @@ import IconCopy from '../../components/Icon/IconCopy';
 import IconPencil from '../../components/Icon/IconPencil';
 import Tippy from '@tippyjs/react';
 
-export default function ViewFormIFrame({ formList }: any) {
-    const [modal2, setModal2] = useState(false);
+export default function ViewFormIFrame({ formList, autoOpen }: any) {
+    const [modal2, setModal2] = useState(autoOpen || false);
     const [message2, setMessage2] = useState<any>('');
     const [howManyTrue, setHowManyTrue] = useState(0);
+
+    useEffect(() => {
+        if (autoOpen) {
+            setModal2(true);  // Automatically open modal if autoOpen is true
+        }
+    }, [autoOpen]);
 
     useEffect(() => {
         // Count the number of true fields

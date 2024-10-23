@@ -503,9 +503,9 @@ const ViewStudent = () => {
 
                         <Tab.Panels>
                             <Tab.Panel>
-                                <div className="grid md:grid-cols-8 grid-cols-1 gap-4 mt-4">
+                                <div className="grid sm:grid-cols-8 grid-cols-1 gap-4 mt-4">
                                     {/* STUDENT CARD */}
-                                    <div className="panel p-0 2xl:col-span-2 md:col-span-3 h-full flex flex-col justify-between">
+                                    <div className="panel p-0 xl:col-span-2 md:col-span-3 h-full flex flex-col justify-between">
                                         {/* ProfilePic */}
                                         <div>
                                             <StudentProfilePic student={student} setStudent={setStudent} />
@@ -618,7 +618,7 @@ const ViewStudent = () => {
                                         </div>
                                     </div>
                                     {/* NOTES */}
-                                    <div className="panel p-0 md:col-span-5 2xl:col-span-4">
+                                    <div className="panel p-0 md:col-span-5 xl:col-span-4">
                                         <div className="flex rounded-t-lg items-center justify-between gap-4 p-5 bg-zinc-100">
                                             <h3 className="font-bold">Notes</h3>
                                             <div className="flex items-center gap-4">
@@ -695,7 +695,7 @@ const ViewStudent = () => {
                                         )}
                                     </div>
                                     {/* PIPELINE STEPS */}
-                                    <div className="panel p-0 2xl:col-span-2 2xl:row-span-2 xl:col-span-5 md:col-span-4">
+                                    <div className="panel p-0 xl:col-span-2 xl:row-span-2 md:col-span-4">
                                         <div className="flex items-center justify-between gap-4 p-5 bg-zinc-100 rounded-t-lg">
                                             <h3 className="font-bold">Pipeline Step</h3>
                                             {toUpdate?.StudentPipelineStatus && (
@@ -758,7 +758,7 @@ const ViewStudent = () => {
                                         )}
                                     </div>
                                     {/* SCHEDULE AND CLASSES */}
-                                    <div className="panel p-0  2xl:col-span-3 xl:col-span-5 md:col-span-4">
+                                    <div className="panel p-0  xl:col-span-3 md:col-span-4">
                                         <div className="flex items-center justify-between gap-4 p-5 bg-zinc-100 rounded-t-lg">
                                             <h5 className="font-bold">Schedule and Classes</h5>
                                         </div>

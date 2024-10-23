@@ -594,6 +594,16 @@ export const loadStudioRooms = async (studioId) => {
     }
 };
 
+export const getRoomByRoomId = async (roomId) => {
+    try {
+        const response = await fetchData(`class-access/getRoomByRoomId/${roomId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const getProgramsByStudioID = async (studioId) => {
     try {
         const response = await fetchData(`class-access/getProgramsByStudioId/${studioId}`, 'get');

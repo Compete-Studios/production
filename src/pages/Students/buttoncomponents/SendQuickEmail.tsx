@@ -37,6 +37,7 @@ export default function SendQuickEmail({ student, name, pipeline, isProspect = f
     const [showEmailModal, setShowEmailModal] = useState<boolean>(false);
     const [emailData, setEmailData] = useState<EmailData>(emailDataInit);
     const [emailHtml, setEmailHtml] = useState<any>('');
+    
 
     useEffect(() => {
         if (pipeline) {

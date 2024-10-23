@@ -190,13 +190,13 @@ export default function StudentBillingDetails({ student }: any) {
         handleGetPaymentMethods(paySimpleInfo);
     }, [paySimpleInfo, suid, updated]);
 
-    console.log(creditCards)
+    console.log(creditCards);
 
     return (
-        <div className="pt-5 grid grid-cols-6 gap-4">
+        <div className="pt-5 grid md:grid-cols-12 col-span-1 gap-4">
             {/* BILLING INFO */}
 
-            <div className="panel p-0 col-span-2">
+            <div className="panel p-0 md:col-span-3">
                 <div className="flex items-center justify-between p-5">
                     <h5 className="font-semibold text-lg dark:text-white-light">Billing Info</h5>
                     {updateBilling ? (
@@ -260,7 +260,7 @@ export default function StudentBillingDetails({ student }: any) {
             </div>
 
             {/* ACTIVE PAYMENT SCHEDULES */}
-            <div className="col-span-4">
+            <div className="md:col-span-5">
                 {paymentsLoading ? (
                     <div className="panel">
                         <div className="flex items-center justify-center h-24">
@@ -330,44 +330,43 @@ export default function StudentBillingDetails({ student }: any) {
                     </div>
                 )}
             </div>
-            <div className="panel col-span-3">
-     
-            </div>
-            <div className="col-span-3 panel p-0">
+            {/* Payment Methods */}
+            <div className="md:col-span-4 p-0">
                 <div className="flex rounded-t-lg items-center justify-between gap-4 p-5 bg-zinc-100">
                     <h3 className="font-bold text-lg">Payment Methods</h3>
                 </div>
-                <div>
+                <div className='panel p-0'>
                     {creditCards?.length > 0 && (
-                        <div className="panel">
-                            <h4 className="font-bold text-lg p-5">Credit Cards</h4>
-                            <div className="table-responsive">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Card Number</th>
-                                            <th>Expiration Date</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {creditCards?.map((card: any, index: any) => {
-                                            return (
-                                                <tr key={index}>
-                                                    <td>{card.CreditCardNumber}</td>
-                                                    <td>{card.ExpirationDate}</td>
-                                                    <td>
-                                                        <button className="btn btn-info btn-sm">Edit</button>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
+                        <div className="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Card Number</th>
+                                        <th>Expiration Date</th>
+                                        <th>Remove</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {creditCards?.map((card: any, index: any) => {
+                                        return (
+                                            <tr key={index}>
+                                                <td>{card.CreditCardNumber}</td>
+                                                <td>{card.ExpirationDate}</td>
+                                                <td>
+                                                    <button className="btn btn-danger btn-sm">Delete</button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
                         </div>
                     )}
                 </div>
+            </div>
+            {/* PAYMENT HISTORY */}
+            <div className="panel md:col-span-4">
+                <h5 className="font-semibold text-lg dark:text-white-light">Payment History</h5>
             </div>
         </div>
     );

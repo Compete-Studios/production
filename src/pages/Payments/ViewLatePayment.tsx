@@ -234,12 +234,12 @@ export default function ViewLatePayment() {
     };
 
     useEffect(() => {
-        if (paymentIDInfo && suid && student?.Student_id) {
-            setMessage1(`${REACT_BASE_URL}payments/resolve-payment/${hashids.encode(paymentIDInfo?.Id, suid, student?.Student_id)}`);
+        if (paymentID && suid) {
+            setMessage1(`${REACT_BASE_URL}payments/resolve-payment/${hashids.encode(paymentID, suid, student?.Student_id)}`);
         } else {
             console.log('Error getting payment info');
         }
-    }, [paymentIDInfo, suid, student?.Student_id]);
+    }, [paymentID, suid, student?.Student_id]);
 
     const getBillingInfo = async (paySimpleID: any, studioId: any) => {
         try {
@@ -612,7 +612,7 @@ export default function ViewLatePayment() {
                     <div className="flex items-center justify-between mt-4">
                         <div>
                             <h4 className="text-lg font-semibold">
-                                Payment Information {customerID} {paymentID}
+                                Payment Information
                             </h4>
                         </div>
                     </div>

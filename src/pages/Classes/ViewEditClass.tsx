@@ -241,8 +241,6 @@ export default function ViewEditClass({ classId, nameOfClass }: any) {
         }
     }, [endHour, endMinute, endAMPM]);
 
-    console.log(modal21 ? staffs : '');
-
     const handleUpdateClass = async () => {
         // Add your code here to add a class
         setIsLoading(true);

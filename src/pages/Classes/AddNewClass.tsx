@@ -70,6 +70,7 @@ export default function AddNewClass({ color }: any) {
         // Combine into 4-digit military time
         return `${formattedHour}${formattedMinute}`;
     };
+    
     useEffect(() => {
         if (startHour && startMinute && startAMPM) {
             const startTime = handleConvertTime(startHour, startMinute, startAMPM);
@@ -138,24 +139,37 @@ export default function AddNewClass({ color }: any) {
             setIsLoading(false);
             showErrorMessage('Please enter an end time');
             return;
+        } else if (classToAdd.unformatedEnd === '' && classToAdd.unformatedStart === '') {
+            setIsLoading(false);
+            showErrorMessage('Please enter a start and end time');
+            return;
         } else {
             try {
                 const res = await addClassAndSchedule(classToAdd);
-                console.log(res);
                 if (res.status === 200) {
                     await addStaffIDSToClass(res.response, staffs);
                     setIsLoading(false);
                     setUpdate(!update);
                     setModal21(false);
+                    setClassToAdd({
+                        studioId: suid || 1000,
+                        name: '',
+                        description: '',
+                        notes: '',
+                        enrollmentLimit: '',
+                        dayOfWeek: '',
+                        dayIndex: '',
+                        roomId: '',
+                        unformatedStart: '',
+                        unformatedEnd: '',
+                    });
                     showMessage('Class has been saved successfully.');
                 } else {
-                    console.error('Error adding class');
                     setIsLoading(false);
                     setUpdate(!update);
                     showErrorMessage('Error adding class');
                 }
             } catch (error) {
-                console.error('Error adding class');
                 setIsLoading(false);
                 setUpdate(!update);
                 showErrorMessage('Error adding class');

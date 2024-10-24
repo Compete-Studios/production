@@ -206,7 +206,7 @@ export const getAllBookings = async (spaceID) => {
     return bookingsArray;
 };
 
-export const updateBooking = async (id, data, userID) => {
+export const updateBooking = async (id: any, data: any, userID: any) => {
     const bookingRef = doc(db, 'bookings', id);
     const userRef = doc(db, 'users', userID);
     await updateDoc(bookingRef, {
@@ -225,19 +225,21 @@ export const updateStats = async (id: any, data: any) => {
     return { status: 'success' };
 };
 
-export const updateFormSubmissionCounnt = async (id: any) => {
+export const updateFormSubmissionCounnt = async (id: any, month: any) => {
     const formRef = doc(db, 'forms', id);
     await updateDoc(formRef, {
         submissions: increment(1),
+        [month]: increment(1),
     });
 
     return { status: 'success' };
 };
 
-export const updateLoadCount = async (id: any) => {
+export const updateLoadCount = async (id: any, month: any) => {
     const formRef = doc(db, 'forms', id);
     await updateDoc(formRef, {
         loads: increment(1),
+        [month]: increment(1),
     });
 
     return { status: 'success' };

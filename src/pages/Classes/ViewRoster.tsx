@@ -28,7 +28,7 @@ import BulkPay from '../Payments/BulkPay';
 import AddStaffToClass from './AddStaffToClass';
 
 const ViewRoster = () => {
-    const { suid, classes, staff, setSelectedProspects, setSelectedStudents }: any = UserAuth();
+    const { suid, classes, staff }: any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('View Roster'));
@@ -61,6 +61,7 @@ const ViewRoster = () => {
 
     const { classId, uid } = useParams<any>();
 
+
     const changeValue = (e: any) => {
         const { value, id } = e.target;
         setParams({ ...params, [id]: value });
@@ -72,6 +73,7 @@ const ViewRoster = () => {
 
     useEffect(() => {
         if (classId) {
+            console.log(classId);
             setHashedID(hashids.encode(classId));
         }
     }, [classId]);
@@ -107,7 +109,7 @@ const ViewRoster = () => {
 
     useEffect(() => {
         try {
-            if (suid === uid) {
+            if (suid.toString() === uid) {
                 getStudentsByClassId(classId).then((res) => {
                     setStudentRoster(res);
                 });
@@ -295,6 +297,7 @@ const ViewRoster = () => {
         </html>`;
         return htmlForEmail;
     };
+  
     return (
         <>
             {' '}

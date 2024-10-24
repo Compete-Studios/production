@@ -1,4 +1,6 @@
+import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
+import IconEye from '../Icon/IconEye';
 import { useEffect, useState } from 'react';
 import { listAllCustomers } from '../../functions/paymentsAll';
 import { UserAuth } from '../../context/AuthContext';
@@ -6,8 +8,13 @@ import { formatDate } from '@fullcalendar/core';
 import IconNotes from '../Icon/IconNotes';
 import { Link } from 'react-router-dom';
 import { DataTable } from 'mantine-datatable';
+import ViewPaymentDetails from './ViewPaymentDetails';
 import UpdateNotes from './UpdateNotes';
+import UpdatePaymentSchedule from './UpdatePaymentSchedule';
+import PausePayment from './PausePayment';
+import ResumeSchedule from './ResumeSchedule';
 import ViewCustomer from './ViewCustomer';
+import UpdateCustomer from './UpdateCustomer';
 import ViewBillingInfo from './ViewBillingInfo';
 
 export default function BillingAccounts() {
@@ -116,7 +123,7 @@ export default function BillingAccounts() {
                                         <td className="flex items-center justify-end gap-2">
                                             <ViewCustomer customerID={Id} />
                                             <UpdateNotes payID={Id} />
-                                            {/* <UpdateCustomer customerID={Id} /> */}
+                                            <UpdateCustomer customerID={Id} />
                                             <ViewBillingInfo customerID={Id} />
                                         </td>
                                     ),

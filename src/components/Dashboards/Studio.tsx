@@ -232,7 +232,7 @@ const Studio = () => {
                     <div className="badge bg-white/30">Anticipated Payments</div>
 
                     <div className="tect-center mt-2">
-                        <div className="text-2xl font-bold ltr:mr-3 rtl:ml-3"> ${total || 0}</div>
+                        <div className="text-2xl font-bold ltr:mr-3 rtl:ml-3"> ${total?.toFixed(0) || 0}</div>
                     </div>
                 </div>
                 <div className="p-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white ">

@@ -1,14 +1,14 @@
-import { Dialog, Transition, Tab } from '@headlessui/react';
+import { Dialog, Transition } from '@headlessui/react';
 import { useState, Fragment, useEffect } from 'react';
+import { ReactSortable } from 'react-sortablejs';
 import IconSquareRotated from '../../../components/Icon/IconSquareRotated';
 import IconX from '../../../components/Icon/IconX';
-import { ReactSortable } from 'react-sortablejs';
 import { UserAuth } from '../../../context/AuthContext';
 import IconMenuDragAndDrop from '../../../components/Icon/Menu/IconMenuDragAndDrop';
-import { updateSteps } from '../../../functions/api';
+import { updateLatePaymentSteps, updateProspectPipelineSteps, updateStudentPipelineSteps } from '../../../functions/manuals';
 
 export default function ReorderSteps({ type }: any) {
-    const { pipelineSteps, prospectPipelineSteps, latePayementPipeline, setUpdate }: any = UserAuth();
+    const { pipelineSteps, prospectPipelineSteps, latePayementPipeline, setUpdate, update }: any = UserAuth();
     const [modal1, setModal1] = useState(false);
     const [steps, setSteps] = useState<any>([]);
 
@@ -22,11 +22,47 @@ export default function ReorderSteps({ type }: any) {
         } else {
             setSteps([]);
         }
-    }, [pipelineSteps]);
+    }, [pipelineSteps, prospectPipelineSteps, latePayementPipeline, type]);
 
-    // const saveSteps = async () => {
-    //     const res = await updateSteps(steps, type);
-    // };
+    const handleSortUpdate = (newSteps: any) => {
+        // Update PlacementOrdinal to match index + 1
+        const updatedSteps = newSteps.map((step: any, index: number) => ({
+            ...step,
+            PlacementOrdinal: index + 1, // You can adjust this if you want to start from 0
+        }));
+        setSteps(updatedSteps);
+    };
+
+    const saveSteps = async (e: any) => {
+        e.preventDefault();
+        if (type === 1) {
+            const res = await updateStudentPipelineSteps(steps);
+            if (res.status === 200) {
+                setUpdate(!update);
+                setModal1(false);
+            } else {
+                console.error('Failed to update steps');
+            }
+        } else if (type === 2) {
+            const res = await updateProspectPipelineSteps(steps);
+            if (res.status === 200) {
+                setUpdate(!update);
+                setModal1(false);
+            } else {
+                console.error('Failed to update steps');
+            }
+        } else if (type === 3) {
+            const res = await updateLatePaymentSteps(steps);
+            if (res.status === 200) {
+                setUpdate(!update);
+                setModal1(false);
+            } else {
+                console.error('Failed to update steps');
+            }
+        } else {
+            console.error('Invalid type');
+        }
+    };
 
     return (
         <div>
@@ -59,21 +95,19 @@ export default function ReorderSteps({ type }: any) {
                                         </button>
                                     </div>
                                     <div className="p-5">
-                                        <ReactSortable list={steps} setList={setSteps}>
-                                            {steps?.map((data: any) => {
-                                                return (
-                                                    <div key={data.PlacementOrdinal} className="w-full border rounded-md p-1 mb-1 flex items-center gap-1">
-                                                        <IconMenuDragAndDrop className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-                                                        <div className="whitespace-nowrap cursor-pointer focus:cursor-grab">{data.StepName || data.PipelineStepName}</div>
-                                                    </div>
-                                                );
-                                            })}
+                                        <ReactSortable list={steps} setList={handleSortUpdate}>
+                                            {steps?.map((data: any) => (
+                                                <div key={data.PlacementOrdinal} className="w-full border rounded-md p-1 mb-1 flex items-center gap-1">
+                                                    <IconMenuDragAndDrop className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                                                    <div className="whitespace-nowrap cursor-pointer focus:cursor-grab">{data.StepName || data.PipelineStepName}</div>
+                                                </div>
+                                            ))}
                                         </ReactSortable>
                                         <div className="flex justify-end items-center mt-8">
                                             <button type="button" className="btn btn-outline-danger" onClick={() => setModal1(false)}>
                                                 Discard
                                             </button>
-                                            <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setModal1(false)}>
+                                            <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={saveSteps}>
                                                 Save
                                             </button>
                                         </div>

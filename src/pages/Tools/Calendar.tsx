@@ -11,26 +11,19 @@ import { setPageTitle } from '../../store/themeConfigSlice';
 import IconPlus from '../../components/Icon/IconPlus';
 import IconX from '../../components/Icon/IconX';
 import { UserAuth } from '../../context/AuthContext';
-import { createEvent } from '../../firebase/firebaseFunctions';
+import { createEvent, deleteEvent, updateEvent } from '../../firebase/firebaseFunctions';
 
 const Calendar = () => {
     const { suid, events, setEvents }: any = UserAuth();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Calendar'));
-    });
-    const now = new Date();
-    const getMonth = (dt: Date, add: number = 0) => {
-        let month = dt.getMonth() + 1 + add;
-        const str = (month < 10 ? '0' + month : month).toString();
-        return str;
-        // return dt.getMonth() < 10 ? '0' + month : month;
-    };
+    });   
 
     const [isAddEventModal, setIsAddEventModal] = useState(false);
     const [minStartDate, setMinStartDate] = useState<any>('');
     const [minEndDate, setMinEndDate] = useState<any>('');
-    const defaultParams = { id: null, title: '', start: '', end: '', description: '', type: 'primary' };
+    const defaultParams = { id: null, title: '', start: '', end: '', description: '', type: 'primary', did: '' };
     const [params, setParams] = useState<any>(defaultParams);
     const dateFormat = (dt: any) => {
         dt = new Date(dt);
@@ -54,6 +47,7 @@ const Calendar = () => {
                 end: dateFormat(obj.end),
                 type: obj.classNames ? obj.classNames[0] : 'primary',
                 description: obj.extendedProps ? obj.extendedProps.description : '',
+                did: obj.extendedProps.did ? obj.extendedProps.did : '',
             });
             setMinStartDate(new Date());
             setMinEndDate(dateFormat(obj.start));
@@ -84,25 +78,22 @@ const Calendar = () => {
         if (!params.end) {
             return true;
         }
-        // if (params.id) {
-        //     //update event
-        //     let dataevent = events || [];
-        //     let event: any = dataevent.find((d: any) => d.id === parseInt(params.id));
-        //     event.title = params.title;
-        //     event.start = params.start;
-        //     event.end = params.end;
-        //     event.description = params.description;
-        //     event.className = params.type;
-
-        //     setEvents([]);
-        //     setTimeout(() => {
-        //         setEvents(dataevent);
-        //     });
-        // } 
-        else {
+        if (params.id) {
+            //update event 
+            let dataevent = events || [];
+            let event: any = dataevent.find((d: any) => d.id === parseInt(params.id));
+            event.title = params.title;
+            event.start = params.start;
+            event.end = params.end;
+            event.description = params.description;
+            event.className = params.type;
+            setEvents([]);
+            setTimeout(() => {
+                setEvents(dataevent);
+            });
+            updateEvent(params.did, event, suid);
+        } else {
             //add event
-
-            
             let event = {
                 id: events.length + 1,
                 title: params.title,
@@ -110,10 +101,10 @@ const Calendar = () => {
                 end: params.end,
                 description: params.description,
                 className: params.type,
+                did: params.did,
             };
-            console.log(event)
+            console.log(event);
             createEvent(event, suid);
-            localStorage.setItem('qued', 'true');
             let dataevent = events || [];
             dataevent = dataevent.concat([event]);
             setTimeout(() => {
@@ -123,6 +114,15 @@ const Calendar = () => {
         showMessage('Event has been saved successfully.');
         setIsAddEventModal(false);
     };
+
+    const handleDeleteEvent = async (id: any) => {
+        console.log(id);
+        const newEvents = events.filter((event: any) => event.did !== id);
+        setEvents(newEvents);
+        await deleteEvent(id, suid);
+        showMessage('Event has been deleted successfully.');
+    };
+
     const startDateChange = (event: any) => {
         const dateStr = event.target.value;
         if (dateStr) {
@@ -148,7 +148,6 @@ const Calendar = () => {
             padding: '10px 20px',
         });
     };
-    
 
     return (
         <div>
@@ -360,6 +359,29 @@ const Calendar = () => {
                                                 </div>
                                             </div>
                                             <div className="flex justify-end items-center !mt-8">
+                                                {params.id && (
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-danger mr-auto"
+                                                        onClick={() => {
+                                                            Swal.fire({
+                                                                title: 'Are you sure?',
+                                                                text: 'You want to delete this event?',
+                                                                icon: 'warning',
+                                                                showCancelButton: true,
+                                                                confirmButtonText: 'Yes, delete it!',
+                                                                cancelButtonText: 'No, keep it',
+                                                            }).then((result) => {
+                                                                if (result.isConfirmed) {
+                                                                    handleDeleteEvent(params.did);
+                                                                    setIsAddEventModal(false);
+                                                                }
+                                                            });
+                                                        }}
+                                                    >
+                                                        Delete Event
+                                                    </button>
+                                                )}
                                                 <button type="button" className="btn btn-outline-danger" onClick={() => setIsAddEventModal(false)}>
                                                     Cancel
                                                 </button>

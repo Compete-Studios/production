@@ -26,7 +26,6 @@ const formInfoSelected = {
     Zip: false,
     Age: false,
     Notes: false,
-    AdditionalInfo: false,
     IncludeCaptcha: false,
     SendEmailNotification: false,
     BackgroundColor: false,
@@ -67,10 +66,10 @@ const colors = [
 ];
 
 const heightOptions = [
-    { name: 'Short', height: 'h-10', text: 'text-sm'},
-    { name: 'Medium', height: 'h-12', text: 'text-md'},
-    { name: 'Tall', height: 'h-14', text: 'text-base'},
-    { name: 'Extra Tall', height: 'h-20', text: 'text-2xl'},
+    { name: 'Short', height: 'h-10', text: 'text-sm' },
+    { name: 'Medium', height: 'h-12', text: 'text-md' },
+    { name: 'Tall', height: 'h-14', text: 'text-base' },
+    { name: 'Extra Tall', height: 'h-20', text: 'text-2xl' },
 ];
 
 const widthOptions = [
@@ -131,7 +130,7 @@ export default function EditCaptureForm() {
 
     const handleGetForms = async () => {
         try {
-            const response = await getForm(id) as FormResponse;
+            const response = (await getForm(id)) as FormResponse;
             console.log(response);
             if (!response) {
                 return;
@@ -185,7 +184,7 @@ export default function EditCaptureForm() {
         redirect,
         successURL,
         successMessage,
-        notesText,        
+        notesText,
     };
 
     const navigate = useNavigate();
@@ -257,61 +256,61 @@ export default function EditCaptureForm() {
                 </div>
             </div>
             <h4 className=" text-2xl font-semibold mt-4">Form Details</h4>
-                <p className="mb-4 text-xs">
-                    In just a couple of simple steps Compete Studio can create a small piece of code that you can place on your site to capture visitors' contact information. You can select the type
-                    of info you're collecting, and when someone fills out the form on your site their information is entered directly as a prospect into your account.
-                </p>
+            <p className="mb-4 text-xs">
+                In just a couple of simple steps Compete Studio can create a small piece of code that you can place on your site to capture visitors' contact information. You can select the type of
+                info you're collecting, and when someone fills out the form on your site their information is entered directly as a prospect into your account.
+            </p>
             <div className="grid sm:grid-cols-2 sm:gap-2 mt-8">
                 <div className="drop-shadow">
                     <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
-                    <Tab.List className="mt-3 flex flex-wrap border-b border-white-light dark:border-[#191e3a]">
-                                <Tab as={Fragment}>
-                                    {({ selected }) => (
-                                        <button
-                                            className={`${selected ? '!border-white-light !border-b-white bg-zinc-100 text-primary !outline-none  rounded-t-lg' : ''}
+                        <Tab.List className="mt-3 flex flex-wrap border-b border-white-light dark:border-[#191e3a]">
+                            <Tab as={Fragment}>
+                                {({ selected }) => (
+                                    <button
+                                        className={`${selected ? '!border-white-light !border-b-white bg-zinc-100 text-primary !outline-none  rounded-t-lg' : ''}
                     dark:hover:border-b-black -mb-[1px] block  p-3.5 py-2 hover:text-primary `}
-                                        >
-                                            Description
-                                        </button>
-                                    )}
-                                </Tab>
-                                <Tab as={Fragment}>
-                                    {({ selected }) => (
-                                        <button
-                                            className={`${selected ? '!border-white-light !border-b-white  text-primary bg-zinc-100 !outline-none  rounded-t-lg' : ''}
+                                    >
+                                        Description
+                                    </button>
+                                )}
+                            </Tab>
+                            <Tab as={Fragment}>
+                                {({ selected }) => (
+                                    <button
+                                        className={`${selected ? '!border-white-light !border-b-white  text-primary bg-zinc-100 !outline-none  rounded-t-lg' : ''}
                     dark:hover:border-b-black -mb-[1px] block  p-3.5 py-2 hover:text-primary`}
-                                        >
-                                            Displayed Values
-                                        </button>
-                                    )}
-                                </Tab>
-                                <Tab as={Fragment}>
-                                    {({ selected }) => (
-                                        <button
-                                            className={`${selected ? '!border-white-light !border-b-white  text-primary bg-zinc-100 !outline-none  rounded-t-lg' : ''}
+                                    >
+                                        Displayed Values
+                                    </button>
+                                )}
+                            </Tab>
+                            <Tab as={Fragment}>
+                                {({ selected }) => (
+                                    <button
+                                        className={`${selected ? '!border-white-light !border-b-white  text-primary bg-zinc-100 !outline-none  rounded-t-lg' : ''}
                     dark:hover:border-b-black -mb-[1px] block  p-3.5 py-2 hover:text-primary`}
-                                        >
-                                            Style
-                                        </button>
-                                    )}
-                                </Tab>
-                                <Tab as={Fragment}>
-                                    {({ selected }) => (
-                                        <button
-                                            className={`${selected ? '!border-white-light !border-b-white  text-primary bg-zinc-100 !outline-none  rounded-t-lg' : ''}
+                                    >
+                                        Style
+                                    </button>
+                                )}
+                            </Tab>
+                            <Tab as={Fragment}>
+                                {({ selected }) => (
+                                    <button
+                                        className={`${selected ? '!border-white-light !border-b-white  text-primary bg-zinc-100 !outline-none  rounded-t-lg' : ''}
                     dark:hover:border-b-black -mb-[1px] block  p-3.5 py-2 hover:text-primary`}
-                                        >
-                                            Submission
-                                        </button>
-                                    )}
-                                </Tab>
-                            </Tab.List>
+                                    >
+                                        Submission
+                                    </button>
+                                )}
+                            </Tab>
+                        </Tab.List>
 
                         <Tab.Panels>
                             <Tab.Panel>
-                                <div className="active p-5 bg-zinc-100">                                    
-                                <h5 className="text-xl font-medium">Give Your Form a Name</h5>
-                                <p className="text-gray-500 mb-2">It's a good idea to give your form a recognizable name that will help you to keep track of what it does and where it is.</p>
+                                <div className="active p-5 bg-zinc-100">
+                                    <h5 className="text-xl font-medium">Give Your Form a Name</h5>
+                                    <p className="text-gray-500 mb-2">It's a good idea to give your form a recognizable name that will help you to keep track of what it does and where it is.</p>
                                     <input
                                         type="text"
                                         className={`form-input w-full ${alertFormName && 'borderr bg-danger-light border-danger'}`}
@@ -352,7 +351,7 @@ export default function EditCaptureForm() {
                                             </label>
                                             <p className="text-gray-500 mb-2 text-xs">This is the email that will be sent to the prospect when they fill out the form.</p>
                                             <div className="">
-                                                <ReactQuill theme="snow" className='bg-white' value={value} onChange={setValue} />
+                                                <ReactQuill theme="snow" className="bg-white" value={value} onChange={setValue} />
                                             </div>
                                         </>
                                     )}
@@ -363,78 +362,10 @@ export default function EditCaptureForm() {
                                     <h4 className=" text-2xl font-semibold">Form Values</h4>
                                     <p className="mb-4 text-xs">Select the values that you would like to collect from the prospect when they fill out the form.</p>
                                     <div className="space-y-4">
-                                            <div>
-                                                <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, FriendlyName: !formInfo.FriendlyName })}>
-                                                    <div>
-                                                        {formInfo?.FriendlyName ? (
-                                                            <div className="text-success">
-                                                                <IconCircleCheck fill={true} />
-                                                            </div>
-                                                        ) : (
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                                                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                                                            </svg>
-                                                        )}{' '}
-                                                    </div>
-                                                    <div
-                                                        className={`${
-                                                            formInfo?.FriendlyName ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
-                                                        } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
-                                                    >
-                                                        Headline
-                                                    </div>
-                                                </button>
-                                                {formInfo?.FriendlyName && (
-                                                    <div className="mt-2">
-                                                        <input
-                                                            type="text"
-                                                            className={`form-input w-full ${alertFormName && 'borderr bg-danger-light border-danger'}`}
-                                                            placeholder="Form Headline"
-                                                            onChange={(e) => setFormHeadline(e.target.value)}
-                                                        />
-                                                        <p className="text-gray-500 mb-2 text-xs text-center">This is the headline that will be displayed at the top of the form.</p>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div>
-                                                <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, FormDescription: !formInfo.FormDescription })}>
-                                                    <div>
-                                                        {formInfo?.FormDescription ? (
-                                                            <div className="text-success">
-                                                                <IconCircleCheck fill={true} />
-                                                            </div>
-                                                        ) : (
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                                                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                                                            </svg>
-                                                        )}{' '}
-                                                    </div>
-                                                    <div
-                                                        className={`${
-                                                            formInfo?.FormDescription ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
-                                                        } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
-                                                    >
-                                                        Form Description
-                                                    </div>
-                                                </button>
-                                                {formInfo?.FormDescription && (
-                                                    <div className="mt-2">
-                                                        <textarea
-                                                            rows={4}
-                                                            name="description"
-                                                            id="description"
-                                                            className="form-textarea w-full"
-                                                            placeholder={'Description of Form'}
-                                                            onChange={(e) => setFormDescription(e.target.value)}
-                                                        />
-                                                        <p className="text-gray-500 mb-2 text-xs text-center">This is the description that will be displayed at the top of the form.</p>
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, Name: !formInfo.Name })}>
+                                        <div>
+                                            <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, FriendlyName: !formInfo.FriendlyName })}>
                                                 <div>
-                                                    {formInfo?.Name ? (
+                                                    {formInfo?.FriendlyName ? (
                                                         <div className="text-success">
                                                             <IconCircleCheck fill={true} />
                                                         </div>
@@ -446,234 +377,282 @@ export default function EditCaptureForm() {
                                                 </div>
                                                 <div
                                                     className={`${
-                                                        formInfo?.Name ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
+                                                        formInfo?.FriendlyName ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
                                                     } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
                                                 >
-                                                    First Name
+                                                    Headline
                                                 </div>
                                             </button>
-                                            <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, LastName: !formInfo.LastName })}>
-                                                <div>
-                                                    {formInfo?.LastName ? (
-                                                        <div className="text-success">
-                                                            <IconCircleCheck fill={true} />
-                                                        </div>
-                                                    ) : (
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                                                        </svg>
-                                                    )}{' '}
+                                            {formInfo?.FriendlyName && (
+                                                <div className="mt-2">
+                                                    <input
+                                                        type="text"
+                                                        className={`form-input w-full ${alertFormName && 'borderr bg-danger-light border-danger'}`}
+                                                        placeholder="Form Headline"
+                                                        onChange={(e) => setFormHeadline(e.target.value)}
+                                                    />
+                                                    <p className="text-gray-500 mb-2 text-xs text-center">This is the headline that will be displayed at the top of the form.</p>
                                                 </div>
-                                                <div
-                                                    className={`${
-                                                        formInfo?.LastName ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
-                                                    } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
-                                                >
-                                                    Last Name
-                                                </div>
-                                            </button>
-
-                                            <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, Email: !formInfo.Email })}>
-                                                <div>
-                                                    {formInfo?.Email ? (
-                                                        <div className="text-success">
-                                                            <IconCircleCheck fill={true} />
-                                                        </div>
-                                                    ) : (
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                                                        </svg>
-                                                    )}{' '}
-                                                </div>
-                                                <div
-                                                    className={`${
-                                                        formInfo?.Email ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
-                                                    } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
-                                                >
-                                                    Email
-                                                </div>
-                                            </button>
-                                            <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, Phone: !formInfo.Phone })}>
-                                                <div>
-                                                    {formInfo?.Phone ? (
-                                                        <div className="text-success">
-                                                            <IconCircleCheck fill={true} />
-                                                        </div>
-                                                    ) : (
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                                                        </svg>
-                                                    )}{' '}
-                                                </div>
-                                                <div
-                                                    className={`${
-                                                        formInfo?.Phone ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
-                                                    } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
-                                                >
-                                                    Phone Number
-                                                </div>
-                                            </button>
-                                            <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, Address: !formInfo.Address })}>
-                                                <div>
-                                                    {formInfo?.Address ? (
-                                                        <div className="text-success">
-                                                            <IconCircleCheck fill={true} />
-                                                        </div>
-                                                    ) : (
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                                                        </svg>
-                                                    )}{' '}
-                                                </div>
-                                                <div
-                                                    className={`${
-                                                        formInfo?.Address ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
-                                                    } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
-                                                >
-                                                    Address
-                                                </div>
-                                            </button>
-                                            <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, City: !formInfo.City })}>
-                                                <div>
-                                                    {formInfo?.City ? (
-                                                        <div className="text-success">
-                                                            <IconCircleCheck fill={true} />
-                                                        </div>
-                                                    ) : (
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                                                        </svg>
-                                                    )}{' '}
-                                                </div>
-                                                <div
-                                                    className={`${
-                                                        formInfo?.City ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
-                                                    } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
-                                                >
-                                                    City
-                                                </div>
-                                            </button>
-                                            <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, State: !formInfo.State })}>
-                                                <div>
-                                                    {formInfo?.State ? (
-                                                        <div className="text-success">
-                                                            <IconCircleCheck fill={true} />
-                                                        </div>
-                                                    ) : (
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                                                        </svg>
-                                                    )}{' '}
-                                                </div>
-                                                <div
-                                                    className={`${
-                                                        formInfo?.State ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
-                                                    } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
-                                                >
-                                                    State
-                                                </div>
-                                            </button>
-                                            <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, Zip: !formInfo.Zip })}>
-                                                <div>
-                                                    {formInfo?.Zip ? (
-                                                        <div className="text-success">
-                                                            <IconCircleCheck fill={true} />
-                                                        </div>
-                                                    ) : (
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                                                        </svg>
-                                                    )}{' '}
-                                                </div>
-                                                <div
-                                                    className={`${
-                                                        formInfo?.Zip ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
-                                                    } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
-                                                >
-                                                    Zip
-                                                </div>
-                                            </button>
-                                            <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, Age: !formInfo.Age })}>
-                                                <div>
-                                                    {formInfo?.Age ? (
-                                                        <div className="text-success">
-                                                            <IconCircleCheck fill={true} />
-                                                        </div>
-                                                    ) : (
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                                                        </svg>
-                                                    )}{' '}
-                                                </div>
-                                                <div
-                                                    className={`${
-                                                        formInfo?.Age ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
-                                                    } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
-                                                >
-                                                    Age
-                                                </div>
-                                            </button>
-                                            <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, ParentName: !formInfo.ParentName })}>
-                                                <div>
-                                                    {formInfo?.ParentName ? (
-                                                        <div className="text-success">
-                                                            <IconCircleCheck fill={true} />
-                                                        </div>
-                                                    ) : (
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                                                        </svg>
-                                                    )}{' '}
-                                                </div>
-                                                <div
-                                                    className={`${
-                                                        formInfo?.ParentName ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
-                                                    } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
-                                                >
-                                                    Parents Name
-                                                </div>
-                                            </button>
-                                            <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, Notes: !formInfo.Notes })}>
-                                                <div>
-                                                    {formInfo?.Notes ? (
-                                                        <div className="text-success">
-                                                            <IconCircleCheck fill={true} />
-                                                        </div>
-                                                    ) : (
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                                                        </svg>
-                                                    )}{' '}
-                                                </div>
-                                                <div
-                                                    className={`${
-                                                        formInfo?.Notes ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
-                                                    } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
-                                                >
-                                                    Notes
-                                                </div>
-                                            </button>
-                                            <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, AdditionalInfo: !formInfo.AdditionalInfo })}>
-                                                <div>
-                                                    {formInfo?.AdditionalInfo ? (
-                                                        <div className="text-success">
-                                                            <IconCircleCheck fill={true} />
-                                                        </div>
-                                                    ) : (
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                                                        </svg>
-                                                    )}{' '}
-                                                </div>
-                                                <div
-                                                    className={`${
-                                                        formInfo?.AdditionalInfo ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
-                                                    } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
-                                                >
-                                                    Additional Info
-                                                </div>
-                                            </button>
+                                            )}
                                         </div>
+                                        <div>
+                                            <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, FormDescription: !formInfo.FormDescription })}>
+                                                <div>
+                                                    {formInfo?.FormDescription ? (
+                                                        <div className="text-success">
+                                                            <IconCircleCheck fill={true} />
+                                                        </div>
+                                                    ) : (
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                                                        </svg>
+                                                    )}{' '}
+                                                </div>
+                                                <div
+                                                    className={`${
+                                                        formInfo?.FormDescription ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
+                                                    } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
+                                                >
+                                                    Form Description
+                                                </div>
+                                            </button>
+                                            {formInfo?.FormDescription && (
+                                                <div className="mt-2">
+                                                    <textarea
+                                                        rows={4}
+                                                        name="description"
+                                                        id="description"
+                                                        className="form-textarea w-full"
+                                                        placeholder={'Description of Form'}
+                                                        onChange={(e) => setFormDescription(e.target.value)}
+                                                    />
+                                                    <p className="text-gray-500 mb-2 text-xs text-center">This is the description that will be displayed at the top of the form.</p>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, Name: !formInfo.Name })}>
+                                            <div>
+                                                {formInfo?.Name ? (
+                                                    <div className="text-success">
+                                                        <IconCircleCheck fill={true} />
+                                                    </div>
+                                                ) : (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                                                    </svg>
+                                                )}{' '}
+                                            </div>
+                                            <div
+                                                className={`${
+                                                    formInfo?.Name ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
+                                                } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
+                                            >
+                                                First Name
+                                            </div>
+                                        </button>
+                                        <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, LastName: !formInfo.LastName })}>
+                                            <div>
+                                                {formInfo?.LastName ? (
+                                                    <div className="text-success">
+                                                        <IconCircleCheck fill={true} />
+                                                    </div>
+                                                ) : (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                                                    </svg>
+                                                )}{' '}
+                                            </div>
+                                            <div
+                                                className={`${
+                                                    formInfo?.LastName ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
+                                                } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
+                                            >
+                                                Last Name
+                                            </div>
+                                        </button>
+
+                                        <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, Email: !formInfo.Email })}>
+                                            <div>
+                                                {formInfo?.Email ? (
+                                                    <div className="text-success">
+                                                        <IconCircleCheck fill={true} />
+                                                    </div>
+                                                ) : (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                                                    </svg>
+                                                )}{' '}
+                                            </div>
+                                            <div
+                                                className={`${
+                                                    formInfo?.Email ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
+                                                } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
+                                            >
+                                                Email
+                                            </div>
+                                        </button>
+                                        <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, Phone: !formInfo.Phone })}>
+                                            <div>
+                                                {formInfo?.Phone ? (
+                                                    <div className="text-success">
+                                                        <IconCircleCheck fill={true} />
+                                                    </div>
+                                                ) : (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                                                    </svg>
+                                                )}{' '}
+                                            </div>
+                                            <div
+                                                className={`${
+                                                    formInfo?.Phone ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
+                                                } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
+                                            >
+                                                Phone Number
+                                            </div>
+                                        </button>
+                                        <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, Address: !formInfo.Address })}>
+                                            <div>
+                                                {formInfo?.Address ? (
+                                                    <div className="text-success">
+                                                        <IconCircleCheck fill={true} />
+                                                    </div>
+                                                ) : (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                                                    </svg>
+                                                )}{' '}
+                                            </div>
+                                            <div
+                                                className={`${
+                                                    formInfo?.Address ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
+                                                } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
+                                            >
+                                                Address
+                                            </div>
+                                        </button>
+                                        <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, City: !formInfo.City })}>
+                                            <div>
+                                                {formInfo?.City ? (
+                                                    <div className="text-success">
+                                                        <IconCircleCheck fill={true} />
+                                                    </div>
+                                                ) : (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                                                    </svg>
+                                                )}{' '}
+                                            </div>
+                                            <div
+                                                className={`${
+                                                    formInfo?.City ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
+                                                } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
+                                            >
+                                                City
+                                            </div>
+                                        </button>
+                                        <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, State: !formInfo.State })}>
+                                            <div>
+                                                {formInfo?.State ? (
+                                                    <div className="text-success">
+                                                        <IconCircleCheck fill={true} />
+                                                    </div>
+                                                ) : (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                                                    </svg>
+                                                )}{' '}
+                                            </div>
+                                            <div
+                                                className={`${
+                                                    formInfo?.State ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
+                                                } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
+                                            >
+                                                State
+                                            </div>
+                                        </button>
+                                        <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, Zip: !formInfo.Zip })}>
+                                            <div>
+                                                {formInfo?.Zip ? (
+                                                    <div className="text-success">
+                                                        <IconCircleCheck fill={true} />
+                                                    </div>
+                                                ) : (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                                                    </svg>
+                                                )}{' '}
+                                            </div>
+                                            <div
+                                                className={`${
+                                                    formInfo?.Zip ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
+                                                } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
+                                            >
+                                                Zip
+                                            </div>
+                                        </button>
+                                        <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, Age: !formInfo.Age })}>
+                                            <div>
+                                                {formInfo?.Age ? (
+                                                    <div className="text-success">
+                                                        <IconCircleCheck fill={true} />
+                                                    </div>
+                                                ) : (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                                                    </svg>
+                                                )}{' '}
+                                            </div>
+                                            <div
+                                                className={`${
+                                                    formInfo?.Age ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
+                                                } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
+                                            >
+                                                Age
+                                            </div>
+                                        </button>
+                                        <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, ParentName: !formInfo.ParentName })}>
+                                            <div>
+                                                {formInfo?.ParentName ? (
+                                                    <div className="text-success">
+                                                        <IconCircleCheck fill={true} />
+                                                    </div>
+                                                ) : (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                                                    </svg>
+                                                )}{' '}
+                                            </div>
+                                            <div
+                                                className={`${
+                                                    formInfo?.ParentName ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
+                                                } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
+                                            >
+                                                Parents Name
+                                            </div>
+                                        </button>
+                                        <button className="flex items-center gap-2 w-full" onClick={() => setFormInfo({ ...formInfo, Notes: !formInfo.Notes })}>
+                                            <div>
+                                                {formInfo?.Notes ? (
+                                                    <div className="text-success">
+                                                        <IconCircleCheck fill={true} />
+                                                    </div>
+                                                ) : (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                                                    </svg>
+                                                )}{' '}
+                                            </div>
+                                            <div
+                                                className={`${
+                                                    formInfo?.Notes ? 'bg-info text-white ' : 'bg-white outline outline-info text-info hover:bg-info-light'
+                                                } rounded-md h-10 xl:w-1/2 w-full flex items-center justify-start p-3`}
+                                            >
+                                                Additional Info
+                                            </div>
+                                        </button>
+                                    </div>
                                 </div>
                             </Tab.Panel>
                             <Tab.Panel>
@@ -780,88 +759,81 @@ export default function EditCaptureForm() {
                                 <div className="p-5 bg-zinc-100">
                                     <h4 className=" text-2xl font-semibold">Form Submission</h4>
                                     <p className="mb-4 text-xs">
-                                        Select the type of submission you would like to have when someone fills out the form. You can choose to have the form redirect to a URL, or display a
-                                        success message.
-                                        </p>
+                                        Select the type of submission you would like to have when someone fills out the form. You can choose to have the form redirect to a URL, or display a success
+                                        message.
+                                    </p>
                                     <label className="inline-flex">
-                                        <input 
-                                        type="radio" 
-                                        checked={redirect}
-                                        name="default_radio" 
-                                        className="form-radio text-success" 
-                                        onChange={() => setRedirect(true)}
-                                        />
+                                        <input type="radio" checked={redirect} name="default_radio" className="form-radio text-success" onChange={() => setRedirect(true)} />
                                         <span>Success URL</span>
                                     </label>
-                                    <input 
-                                    type="text" 
-                                    className={`form-input w-full ${(alertURL && redirect) && 'borderr bg-danger-light border-danger'}`}
-                                    placeholder="Success URL" 
-                                    value={successURL}
-                                    onChange={(e) => setSuccessURL(e.target.value)}
-                                    onClick={() => setAlertURL(false)}
+                                    <input
+                                        type="text"
+                                        className={`form-input w-full ${alertURL && redirect && 'borderr bg-danger-light border-danger'}`}
+                                        placeholder="Success URL"
+                                        value={successURL}
+                                        onChange={(e) => setSuccessURL(e.target.value)}
+                                        onClick={() => setAlertURL(false)}
                                     />
-                                    {(alertURL && redirect) && <p className="text-danger text-xs">Selected URL is Required</p>}
+                                    {alertURL && redirect && <p className="text-danger text-xs">Selected URL is Required</p>}
                                     <label className="inline-flex mt-6">
-                                        <input 
-                                        type="radio" 
-                                        name="default_radio" 
-                                        checked={!redirect}
-                                        className="form-radio text-secondary" 
-                                        onChange={() => setRedirect(false)}
-                                        />
+                                        <input type="radio" name="default_radio" checked={!redirect} className="form-radio text-secondary" onChange={() => setRedirect(false)} />
                                         <span>Success Message</span>
                                     </label>
-                                    <textarea 
-                                    rows={4} 
-                                    name="description" 
-                                    id="description" 
-                                    className={`form-input w-full ${(alertMessage && !redirect) && 'borderr bg-danger-light border-danger'}`}
-                                    value={successMessage}
-                                    placeholder={'Success Message'} 
-                                    onChange={(e) => setSuccessMessage(e.target.value)}
-                                    onClick={() => setAlertMessage(false)}
+                                    <textarea
+                                        rows={4}
+                                        name="description"
+                                        id="description"
+                                        className={`form-input w-full ${alertMessage && !redirect && 'borderr bg-danger-light border-danger'}`}
+                                        value={successMessage}
+                                        placeholder={'Success Message'}
+                                        onChange={(e) => setSuccessMessage(e.target.value)}
+                                        onClick={() => setAlertMessage(false)}
                                     />
-                                    {(alertMessage && !redirect) && <p className="text-danger text-xs">Success Message is Required</p>}
+                                    {alertMessage && !redirect && <p className="text-danger text-xs">Success Message is Required</p>}
                                     <label htmlFor="form-name" className="mt-6">
-                                            Notes Text
-                                        </label>
-                                        <p className="text-gray-500 mb-2 text-xs">
-                                            When this form is submitted it can automatically enter some text into the "notes" section of the database record. You might want to do this to help keep
-                                            track of which form was filled out, or to distinguish one entry from another. It can be something like "kids program" or "advanced ballet." Later you can
-                                            search the record in Compete Studio based on these entries. If you don't care about this functionality, you can just leave this box blank and move on to the
-                                            next step.
-                                        </p>
-                                        <textarea
-                                            rows={4}
-                                            name="description"
-                                            id="description"
-                                            className="form-textarea w-full"
-                                            placeholder={'Notes Text'}
-                                            value={notesText}
-                                            onChange={(e) => setNotesText(e.target.value)}
-                                        />
+                                        Notes Text
+                                    </label>
+                                    <p className="text-gray-500 mb-2 text-xs">
+                                        When this form is submitted it can automatically enter some text into the "notes" section of the database record. You might want to do this to help keep track
+                                        of which form was filled out, or to distinguish one entry from another. It can be something like "kids program" or "advanced ballet." Later you can search the
+                                        record in Compete Studio based on these entries. If you don't care about this functionality, you can just leave this box blank and move on to the next step.
+                                    </p>
+                                    <textarea
+                                        rows={4}
+                                        name="description"
+                                        id="description"
+                                        className="form-textarea w-full"
+                                        placeholder={'Notes Text'}
+                                        value={notesText}
+                                        onChange={(e) => setNotesText(e.target.value)}
+                                    />
                                 </div>
                             </Tab.Panel>
                         </Tab.Panels>
                     </Tab.Group>
                 </div>
                 <div className="">
-                <h3 className="text-2xl font-semibold text-center text-primary mb-4">Form Preview</h3>
+                    <h3 className="text-2xl font-semibold text-center text-primary mb-4">Form Preview</h3>
 
                     <div className={`p-5 ${selectedColor?.bg} ${mem.rounded} ${selectedWidth.width} shadow shadow-zinc-400 grid max-w-2xl mx-auto grid-cols-1 sm:grid-cols-6 gap-4`}>
-                    {(formInfo.FriendlyName || formInfo.FormDescription) && (
-                                <div className="sm:col-span-full">
-                                    {formInfo.FriendlyName && <div className="text-2xl font-semibold text-center">{formHeadline || 'Headline'}</div>}
-                                    {formInfo.FormDescription && <p className="text-gray-500 mb-2 text-xs text-center">{formDescription || 'Form Description'}</p>}
-                                </div>
-                            )}
+                        {(formInfo.FriendlyName || formInfo.FormDescription) && (
+                            <div className="sm:col-span-full">
+                                {formInfo.FriendlyName && <div className="text-2xl font-semibold text-center">{formHeadline || 'Headline'}</div>}
+                                {formInfo.FormDescription && <p className="text-gray-500 mb-2 text-xs text-center">{formDescription || 'Form Description'}</p>}
+                            </div>
+                        )}
 
                         {formInfo.Name && (
                             <div className={`${formInfo.Name && formInfo.LastName ? 'sm:col-span-3' : 'sm:col-span-full'}`}>
                                 <label htmlFor="first-name">First name</label>
                                 <div className="mt-2">
-                                    <input type="text" name="first-name" id="first-name" autoComplete="given-name" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
+                                    <input
+                                        type="text"
+                                        name="first-name"
+                                        id="first-name"
+                                        autoComplete="given-name"
+                                        className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`}
+                                    />
                                 </div>
                             </div>
                         )}
@@ -870,7 +842,13 @@ export default function EditCaptureForm() {
                             <div className={`${formInfo.Name && formInfo.LastName ? 'sm:col-span-3' : 'sm:col-span-full'}`}>
                                 <label htmlFor="last-name">Last name</label>
                                 <div className="mt-2">
-                                    <input type="text" name="last-name" id="last-name" autoComplete="family-name" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
+                                    <input
+                                        type="text"
+                                        name="last-name"
+                                        id="last-name"
+                                        autoComplete="family-name"
+                                        className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`}
+                                    />
                                 </div>
                             </div>
                         )}
@@ -897,7 +875,13 @@ export default function EditCaptureForm() {
                             <div className="sm:col-span-full">
                                 <label htmlFor="street-address">Mailing address</label>
                                 <div className="mt-2">
-                                    <input type="text" name="street-address" id="street-address" autoComplete="street-address" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
+                                    <input
+                                        type="text"
+                                        name="street-address"
+                                        id="street-address"
+                                        autoComplete="street-address"
+                                        className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`}
+                                    />
                                 </div>
                             </div>
                         )}
@@ -906,7 +890,13 @@ export default function EditCaptureForm() {
                             <div className={`${formInfo.State && formInfo.Zip ? 'sm:col-span-3' : formInfo.State || formInfo.Zip ? 'col-span-3' : 'sm:col-span-full'}`}>
                                 <label htmlFor="city">City</label>
                                 <div className="mt-2">
-                                    <input type="text" name="city" id="city" autoComplete="address-level2" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
+                                    <input
+                                        type="text"
+                                        name="city"
+                                        id="city"
+                                        autoComplete="address-level2"
+                                        className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`}
+                                    />
                                 </div>
                             </div>
                         )}
@@ -915,7 +905,13 @@ export default function EditCaptureForm() {
                             <div className={`${formInfo.City && formInfo.Zip ? 'sm:col-span-1' : 'sm:col-span-3'}`}>
                                 <label htmlFor="region">State</label>
                                 <div className="mt-2">
-                                    <input type="text" name="region" id="region" autoComplete="address-level1" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
+                                    <input
+                                        type="text"
+                                        name="region"
+                                        id="region"
+                                        autoComplete="address-level1"
+                                        className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`}
+                                    />
                                 </div>
                             </div>
                         )}
@@ -924,7 +920,13 @@ export default function EditCaptureForm() {
                             <div className={`${formInfo.City && formInfo.State ? 'sm:col-span-2' : 'sm:col-span-3'}`}>
                                 <label htmlFor="postal-code">ZIP / Postal code</label>
                                 <div className="mt-2">
-                                    <input type="text" name="postal-code" id="postal-code" autoComplete="postal-code" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
+                                    <input
+                                        type="text"
+                                        name="postal-code"
+                                        id="postal-code"
+                                        autoComplete="postal-code"
+                                        className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`}
+                                    />
                                 </div>
                             </div>
                         )}
@@ -933,7 +935,13 @@ export default function EditCaptureForm() {
                             <div className="sm:col-span-3">
                                 <label htmlFor="first-name">Parent Name</label>
                                 <div className="mt-2">
-                                    <input type="text" name="first-name" id="first-name" autoComplete="given-name" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
+                                    <input
+                                        type="text"
+                                        name="first-name"
+                                        id="first-name"
+                                        autoComplete="given-name"
+                                        className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`}
+                                    />
                                 </div>
                             </div>
                         )}
@@ -942,21 +950,18 @@ export default function EditCaptureForm() {
                             <div className="sm:col-span-3">
                                 <label htmlFor="first-name">Age Of Student</label>
                                 <div className="mt-2">
-                                    <input type="text" name="first-name" id="first-name" autoComplete="given-name" className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`} />
+                                    <input
+                                        type="text"
+                                        name="first-name"
+                                        id="first-name"
+                                        autoComplete="given-name"
+                                        className={`form-input w-full ${mem.rounded} ${heightOption?.height} ${heightOption.text}`}
+                                    />
                                 </div>
                             </div>
                         )}
 
                         {formInfo.Notes && (
-                            <div className="sm:col-span-full">
-                                <label htmlFor="email">Notes</label>
-                                <div className="mt-2">
-                                    <textarea rows={4} name="comment" id="comment" className={`form-textarea w-full ${mem.rounded}`} defaultValue={''} />
-                                </div>
-                            </div>
-                        )}
-
-                        {formInfo.AdditionalInfo && (
                             <div className="sm:col-span-full">
                                 <label htmlFor="email">Addition Info</label>
                                 <div className="mt-2">

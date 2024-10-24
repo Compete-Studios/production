@@ -31,7 +31,7 @@ const addOneToFrontOfNumber = (numVal: string) => {
     return newNumber;
 };
 
-export default function SendBulkText({ recipients, bodyMessage = null, isButton = false, displayAll = true }: any) {
+export default function SendBulkText({ recipients, bodyMessage = null, isButton = false, displayAll = true, type = null }: any) {
     const { suid }: any = UserAuth();
     const [openBulk, setOpenBulk] = useState(false);
     const [textMessage, setTextMessage] = useState<TextMessage>(textInit);
@@ -119,7 +119,26 @@ export default function SendBulkText({ recipients, bodyMessage = null, isButton 
                                                 <IconX className="h-6 w-6" />
                                             </button>
                                         </div>
+                                        {
+                                            (type === 'all' && (
+                                                <div className='m-5'>
+                                                <div className="mb-4 relative flex items-center border p-3.5 rounded text-warning bg-warning-light border-warning ltr:border-l-[64px] rtl:border-r-[64px] dark:bg-warning-dark-light w-full">
+                                                    <span className="absolute ltr:-left-11 inset-y-0 text-white w-6 h-6 m-auto">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" className="bi bi-exclamation-diamond" viewBox="0 0 16 16">
+                                                            <path d="M6.95.435c.58-.58 1.52-.58 2.1 0l6.515 6.516c.58.58.58 1.519 0 2.098L9.05 15.565c-.58.58-1.519.58-2.098 0L.435 9.05a1.48 1.48 0 0 1 0-2.098zm1.4.7a.495.495 0 0 0-.7 0L1.134 7.65a.495.495 0 0 0 0 .7l6.516 6.516a.495.495 0 0 0 .7 0l6.516-6.516a.495.495 0 0 0 0-.7L8.35 1.134z" />
+                                                            <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z" />
+                                                        </svg>
+                                                    </span>
+                                                    <span className="ltr:pr-2 rtl:pl-2">
+                                                        <strong className="ltr:mr-1 rtl:ml-1">Warning!</strong>You are about to send a text to{' '}
+                                                        <span className="font-bold text-danger">all your students</span>.
+                                                    </span>
+                                                </div>
+                                                </div>
+                                            ))
+                                        }
                                         <div className="p-5 pb-44 sm:flex sm:items-start sm:justify-between gap-4">
+                                            
                                             <div className="ml-1 text-xs text-gray-500 flex items-center gap-1">
                                                 <div>
                                                     <Tippy content="View All">

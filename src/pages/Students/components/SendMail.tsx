@@ -19,13 +19,14 @@ export default function SendMail({ pipeline, studioOptions, student, setShowActi
     const [emailData, setEmailData] = useState<any>(emailDataInit);
     const [emailHtml, setEmailHtml] = useState<any>('');
 
-    console.log(emailHtml)
-
+    console.log(student, 'student');
 
     useEffect(() => {
         if (pipeline) {
             setEmailData({ ...emailData, subject: pipeline?.DefaultEmailSubject, to: isPrpospect ? student?.Email : student?.email, from: studioOptions?.EmailFromAddress });
             setEmailHtml(pipeline?.DefaultEmailText);
+        } else if (student) {
+            setEmailData({ ...emailData, to: student?.email, from: studioOptions?.EmailFromAddress });
         }
     }, [pipeline]);
 
@@ -85,7 +86,7 @@ export default function SendMail({ pipeline, studioOptions, student, setShowActi
                     type="file"
                     className="form-input file:py-2 file:px-4 file:border-0 file:font-semibold p-0 file:bg-primary/90 ltr:file:mr-5 rtl:file:ml-5 file:text-white file:hover:bg-primary"
                     multiple
-                    accept="image/*,.zip,.pdf,.xls,.xlsx,.txt.doc,.docx"                    
+                    accept="image/*,.zip,.pdf,.xls,.xlsx,.txt.doc,.docx"
                 />
             </div>
 
@@ -99,9 +100,7 @@ export default function SendMail({ pipeline, studioOptions, student, setShowActi
                     >
                         Cancel
                     </button>
-                    <button type="submit" className="btn btn-primary"
-                        onClick={(e) => handleSendEmail(e)}
-                    >
+                    <button type="submit" className="btn btn-primary" onClick={(e) => handleSendEmail(e)}>
                         Send
                     </button>
                 </div>

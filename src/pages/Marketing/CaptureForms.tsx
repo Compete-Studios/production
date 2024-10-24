@@ -16,6 +16,7 @@ import IconTrashLines from '../../components/Icon/IconTrashLines';
 import ViewFormIFrame from './ViewFormIFrame';
 import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../store/themeConfigSlice';
+import IconBarChart from '../../components/Icon/IconBarChart';
 
 export default function CaptureForms() {
     const { suid }: any = UserAuth();
@@ -48,30 +49,56 @@ export default function CaptureForms() {
     };
 
     const getFromsFromFirebaseWithStudioID = async (suid: any) => {
-        const idToString = suid.toString();
-
-        if (!idToString) {
-            return;
-        }
         try {
-            const q = query(collection(db, 'forms'), where('studioID', '==', idToString));
-            const querySnapshot = await getDocs(q);
-            const forms: any = [];
-            querySnapshot.forEach((doc: any) => {
+            // Convert suid to both a string and a number for querying
+            const idAsString = suid.toString();
+            const idAsNumber = typeof suid === 'number' ? suid : parseInt(suid);
+    
+            // Check if conversion to number is NaN, and create queries based on type
+            const qString = query(collection(db, 'forms'), where('studioID', '==', idAsString));
+            const qNumber = !isNaN(idAsNumber) ? query(collection(db, 'forms'), where('studioID', '==', idAsNumber)) : null;
+    
+            // Execute the string query
+            const querySnapshotString = await getDocs(qString);
+            const forms: any[] = [];
+    
+            querySnapshotString.forEach((doc: any) => {
                 const dacData = {
                     id: doc.id,
                     ...doc.data(),
                 };
                 forms.push(dacData);
             });
+    
+            // If there's also a number variant of the ID, run that query and merge results
+            if (qNumber) {
+                const querySnapshotNumber = await getDocs(qNumber);
+                querySnapshotNumber.forEach((doc: any) => {
+                    const dacData = {
+                        id: doc.id,
+                        ...doc.data(),
+                    };
+                    // Prevent duplicates (if both string and number match the same form)
+                    if (!forms.some((form) => form.id === dacData.id)) {
+                        forms.push(dacData);
+                    }
+                });
+            }
+    
             setFBForms(forms);
-            const formsWithIDs = forms.map((form: any) => parseInt(form.oldFormID));
+    
+            // Handle form IDs
+            const formsWithIDs = forms.map((form: any) => {
+                const formID = parseInt(form.oldFormID);
+                return isNaN(formID) ? form.oldFormID : formID;
+            });
+    
             setMatchedFormIds(formsWithIDs);
         } catch (error) {
             console.error('Error getting documents: ', error);
         }
     };
-
+    
     useEffect(() => {
         setLoading(true);
         try {
@@ -207,11 +234,9 @@ export default function CaptureForms() {
                                                         <ViewFormIFrame formList={list} autoOpen={id === list.id} />
 
                                                    
-                                                        <Tippy content="Preview Form">
-                                                            <button className="text-info hover:text-blue-800" onClick={() => handlePreview(list.id)}>
-                                                                <IconEye />
+                                                            <button className="btn btn-sm btn-info hover:bg-blue-800 gap-1" onClick={() => handlePreview(list.id)}>
+                                                                <IconEye /> Preview
                                                             </button>
-                                                        </Tippy>
                                                         {/* <Tippy content="View Stats">
                                                         <Link to={`/marketing/capture-forms/stats/${list.id}`} className="text-info hover:text-blue-800 ">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-bar-chart-line" viewBox="0 0 16 16">
@@ -219,16 +244,14 @@ export default function CaptureForms() {
                                                             </svg>
                                                         </Link>
                                                         </Tippy> */}
-                                                        <Tippy content="Edit Form">
-                                                            <Link to={`/marketing/capture-forms/edit/${list.id}`} className="text-primary hover:text-emerald-800">
-                                                                <IconNotesEdit />
+                                                            <Link to={`/marketing/capture-forms/edit/${list.id}`} className="btn btn-sm btn-success hover:bg-green-800 gap-1">
+                                                                <IconNotesEdit /> Edit
+                                                            </Link><Link to={`/marketing/capture-forms/stats/${list.id}`} className="btn btn-sm btn-warning hover:bg-yellow-800 gap-1">
+                                                                <IconBarChart /> Stats
                                                             </Link>
-                                                        </Tippy>
-                                                        <Tippy content="Delete Form">
                                                             <button className="text-danger hover:text-red-800" onClick={() => handleDeleteForm(list.id)}>
                                                                 <IconTrashLines />
                                                             </button>
-                                                        </Tippy>
                                                     </td>
                                                 </tr>
                                             ))}

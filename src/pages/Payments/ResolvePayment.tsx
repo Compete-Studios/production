@@ -71,7 +71,6 @@ export default function ResolvePayment() {
     };
 
     useEffect(() => {
-        
         setCreditCardData({
             ...creditCardData,
             customerId: customerID,
@@ -137,10 +136,12 @@ export default function ResolvePayment() {
             amount: paymentIDInfo?.Amount,
             studioId: stud,
         };
-        
+
+        console.log(paymentData);
+
         try {
             const response = await runPaymentForCustomer(paymentData);
-            
+
             if (response?.Response?.Status === 'Authorized') {
                 setCreditCardData({
                     ccNumber: '',
@@ -181,9 +182,9 @@ export default function ResolvePayment() {
             notes: '',
             nextContactDate: '',
         };
-        try{
+        try {
             await addLatePayment(paymentData);
-        }catch(err){
+        } catch (err) {
             console.error(err);
         }
 
@@ -197,14 +198,14 @@ export default function ResolvePayment() {
             notes: notes,
         };
 
-        try{
+        try {
             await showAPaymentWasRetried(retryData);
-        }catch(err){
+        } catch (err) {
             console.error(err);
         }
 
         //If there's a paymentschedule attached to this payment and the user selected "Default", update the payment schedule
-        try{
+        try {
             if (paymentIDInfo.PaymentScheduleId && creditCardData.isDefault) {
                 //Get the payment schedule info
                 const paymentScheduleInfo = await getPaymentScheduleByID(paymentIDInfo.PaymentScheduleId, stud);
@@ -220,7 +221,7 @@ export default function ResolvePayment() {
                     await updatePaymentSchedule(paymentScheduleData);
                 }
             }
-        }catch(err){
+        } catch (err) {
             console.error(err);
         }
     };
@@ -249,10 +250,13 @@ export default function ResolvePayment() {
             return;
         } else {
             try {
-                const response = await addCreditCardToCustomer(creditCardData);
-              
+                const response: any = await addCreditCardToCustomer(creditCardData);
+                console.log('response', response);
                 if (response.status === 200) {
-                    runPayment(response?.cardData?.Id);
+                    await runPayment(response?.response?.cardData?.Id);
+                } else {
+                    showErrorMessage('Error adding Card');
+                    setCardLoading(false);
                 }
             } catch (error: any) {
                 if (error.response && error.response.status === 400) {
@@ -284,8 +288,6 @@ export default function ResolvePayment() {
             setLoading(false);
         }, 1000);
     }, []);
-
-    
 
     return (
         <>

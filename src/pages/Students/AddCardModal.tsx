@@ -96,8 +96,7 @@ export default function AddCardModal({ student, paySimpleID, cards, update, setU
     const handleAddCreditCard = async () => {
         console.log(creditCardData)
         try {
-            const response = await addCreditCardToCustomer(creditCardData);
-            console.log(response)
+            const response = await addCreditCardToCustomer(creditCardData);          
             if (response.status === 200) {
                 setCreditCardData({
                     ccNumber: '',

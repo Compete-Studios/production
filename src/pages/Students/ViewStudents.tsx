@@ -8,6 +8,8 @@ import { Link } from 'react-router-dom';
 import { convertPhone, hashTheID } from '../../functions/shared';
 import IconUserPlus from '../../components/Icon/IconUserPlus';
 import IconPlus from '../../components/Icon/IconPlus';
+import EmailClassModal from '../Marketing/EmailClassModal';
+import SendBulkText from '../Marketing/SendBulkText';
 
 const ViewStudents = () => {
     const { suid, students }: any = UserAuth();
@@ -78,7 +80,20 @@ const ViewStudents = () => {
         });
     };
 
- 
+    const [bulkRecipientsForText, setBulkRecipientsForText] = useState<any>([]);
+
+    const handleSetBulk = (studentNumbers: any) => {
+        let bulkRecipients: any = [];
+        studentNumbers.map((d: any) => {
+            bulkRecipients.push({ phoneNumber: d.Phone, name: d.Name, type: 'student', email: d.email });
+        });
+        setBulkRecipientsForText(bulkRecipients);
+    };
+
+    useEffect(() => {
+        handleSetBulk(students);
+    }, [students]);
+
     return (
         <div>
             {showLoading && (
@@ -99,14 +114,20 @@ const ViewStudents = () => {
                     {/* <p>*Students with a highlighted background need to renew payments.</p> */}
                 </div>
                 <div className="flex sm:flex-row flex-col sm:items-center sm:gap-3 gap-4 w-full sm:w-auto">
-                    <div className="flex gap-3">
-                        <Link to="/students/add-student" type="button" className="btn btn-primary"
-                        >
+                    <div>
+                        <EmailClassModal recipients={bulkRecipientsForText} type={"all"} />
+                    </div>
+                    <div className="w-full">
+                        <SendBulkText isButton={true} recipients={bulkRecipientsForText} displayAll={false} type={"all"} />
+                    </div>
+
+                    <div className="w-full">
+                        <Link to="/students/add-student" type="button" className="btn btn-primary w-full">
                             <IconUserPlus className="ltr:mr-2 rtl:ml-2" />
                             Add Student
                         </Link>
                     </div>
-                    <div className="relative">
+                    <div className="relative w-full">
                         <input type="text" placeholder="Search Students" className="form-input py-2 ltr:pr-11 rtl:pl-11 peer" value={search} onChange={(e) => setSearch(e.target.value)} />
                         <button type="button" className="absolute ltr:right-[11px] rtl:left-[11px] top-1/2 -translate-y-1/2 peer-focus:text-primary">
                             <IconSearch className="mx-auto" />
@@ -166,9 +187,6 @@ const ViewStudents = () => {
                         </div>
                     </div>
                 )}
-            </div>
-            <div className='mt-4 flex items-center gap-x-2'>
-                <Link to={`/marketing/create-news-letter/0/students`}  className='btn btn-info'>Email this List</Link>
             </div>
         </div>
     );

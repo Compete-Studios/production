@@ -580,9 +580,33 @@ export const addStaffIDSToClass = async (classId, staffIds) => {
     }
 };
 
+export const updateStaffIDStoClass = async (classId, staffIds) => {
+    const data = {
+        classId,
+        staffIds,
+    };
+    try {
+        const response = await fetchData('staff-access/updateStaffIDStoClass', 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const loadStudioRooms = async (studioId) => {
     try {
         const response = await fetchData(`class-access/getRoomsByStudioId/${studioId}`, 'get');
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getRoomByRoomId = async (roomId) => {
+    try {
+        const response = await fetchData(`class-access/getRoomByRoomId/${roomId}`, 'get');
         return response;
     } catch (error) {
         console.error(error);
@@ -623,6 +647,17 @@ export const dropRank = async (rankId) => {
 export const updateStudentRank = async (data) => {
     try {
         const response = await fetchData(`ranks/updateStudentsRank`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const dropStudentFromRank = async (studentId, rankId) => {
+    console.log('dropStudentFromRank', studentId, rankId);
+    try {
+        const response = await fetchData(`ranks/dropStudentFromRank/${studentId}/${rankId}`, 'get');
         return response;
     } catch (error) {
         console.error(error);
@@ -674,6 +709,36 @@ export const getStudentsInScheduleByPipelineStepFromArrayOfSteps = async (data) 
 export const addPPStepToDailySchedule = async (data) => {
     try {
         const response = await fetchData(`daily-schedule-tools/addPPStepToDailySchedule`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const removePPStepFromDailySchedule = async (data) => {
+    try {
+        const response = await fetchData(`daily-schedule-tools/removePPStepFromDailySchedule`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const removeSPStepFromDailySchedule = async (data) => {
+    try {
+        const response = await fetchData(`daily-schedule-tools/removeSPStepFromDailySchedule`, 'post', data);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const addSPStepToDailySchedule = async (data) => {
+    try {
+        const response = await fetchData(`daily-schedule-tools/addSPStepToDailySchedule`, 'post', data);
         return response;
     } catch (error) {
         console.error(error);
@@ -1050,8 +1115,6 @@ export const updateStaffActivity = async (staffId, activityLevel) => {
     }
 };
 
-
-
 export const updateStaffMember = async (data) => {
     try {
         const response = await fetchData(`staff-access/updateStaffMember`, 'post', data);
@@ -1082,6 +1145,17 @@ export const updateStudioInDB = async (studioId, studioData) => {
     }
 };
 
+export const updateStudioOptionsPicture = async (studioData) => {
+    try {
+        const response = await fetchData(`studio-access/updateStudioOptionsPicture`, 'post', studioData);
+        return response;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+
 export const updateClassByClassId = async (classData) => {
     try {
         const response = await fetchData(`class-access/updateClassByClassId`, 'post', classData);
@@ -1096,6 +1170,16 @@ export const updateClassAndSchedule = async (data) => {
     try {
         const response = await fetchData(`class-access/updateClassAndSchedule`, 'post', data);
         return { response, status: 200 };
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const dropClassScheduleByScheduleId = async (scheduleId) => {
+    try {
+        const response = await fetchData(`class-access/dropClassScheduleByScheduleId/${scheduleId}`, 'get');
+        return response;
     } catch (error) {
         console.error(error);
         throw error;
@@ -1402,7 +1486,7 @@ export const getCountOfActiveProspects = async (studioId) => {
         console.error(error);
         throw error;
     }
-}
+};
 
 export const getStudentNameByPhone = async (phone, studioID) => {
     try {
@@ -1816,3 +1900,5 @@ export const updateSteps = async (data) => {
         }
     }
 };
+
+

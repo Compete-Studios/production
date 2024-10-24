@@ -2,9 +2,12 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../../store';
 import { setPageTitle } from '../../store/themeConfigSlice';
+import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Fragment, Suspense, useEffect, useState } from 'react';
 import IconPencilPaper from '../../components/Icon/IconPencilPaper';
 import IconCalendar from '../../components/Icon/IconCalendar';
+import Flatpickr from 'react-flatpickr';
+import 'flatpickr/dist/flatpickr.css';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import IconHorizontalDots from '../../components/Icon/IconHorizontalDots';
@@ -31,8 +34,8 @@ import {
 import AddNoteModal from './AddNoteModal';
 import IconPlus from '../../components/Icon/IconPlus';
 import StudentsQuickPay from './StudentsQuickPay';
-import { convertPhone, hashTheID, showMessage, showWarningMessage, unHashTheID } from '../../functions/shared';
-import { formatDate } from '@fullcalendar/core';
+import { convertPhone, formatDateForStudentEdit, hashTheID, showMessage, showWarningMessage, unHashTheID } from '../../functions/shared';
+
 import { getAllCustomerPaymentAccounts } from '../../functions/payments';
 import UpdateContactPopUp from './UpdateContactPopUp';
 import UpdateAdditionalPopUp from './UpdateAdditionalPopUp';
@@ -54,6 +57,11 @@ import ViewPaymentMethods from './ViewPaymentMethods';
 import BillingInfoUpdate from './components/BillingInfoUpdate';
 import Hashids from 'hashids';
 import ViewActivePaymentSchedules from './ViewActivePaymentSchedules';
+import IconUser from '../../components/Icon/IconUser';
+import StudentProfilePic from './StudentCards/StudentProfilePic';
+import { formatWithTimeZone, handleGetTimeZoneOfUser } from '../../functions/dates';
+import IconMail from '../../components/Icon/IconMail';
+import StudentBillingDetails from './StudentCards/StudentBillingDetails';
 
 interface UpdateValues {
     [key: string]: any;
@@ -81,14 +89,13 @@ const updateValuesInit = {
 
 const ViewStudent = () => {
     const { suid, marketingSources, pipelineSteps, studioOptions, studioInfo }: any = UserAuth();
-    const [billingLoading, setBillingLoading] = useState<boolean>(true);
+
     const [updateClasses, setUpdateClasses] = useState<boolean>(false);
-    const [paymentsLoading, setPaymentsLoading] = useState<boolean>(true);
+
     const [toUpdate, setToUpdate] = useState<UpdateValues>(updateValuesInit);
     const [update, setUpdate] = useState<boolean>(false);
     const [student, setStudent] = useState<any>({});
-    const [paySimpleInfo, setPaySimpleInfo] = useState<any>({});
-    const [billingInfo, setBillingInfo] = useState<any>({});
+
     const [updateNotes, setUpdateNotes] = useState(false);
     const [barcode, setBarcode] = useState<any>(null);
     const [displayedSource, setDisplayedSource] = useState<any>(null);
@@ -96,13 +103,12 @@ const ViewStudent = () => {
     const [programs, setPrograms] = useState<any>([]);
     const [waitingLists, setWaitingLists] = useState<any>([]);
     const [rank, setRank] = useState<any>(null);
-    const [hasCards, setHasCards] = useState<boolean>(false);
-    const [paymentSchedules, setPaymentSchedules] = useState<any>([]);
-    const [selectedIndex, setSelectedIndex] = useState(1);
+
+    const [selectedIndex, setSelectedIndex] = useState(0);
     const [pipeline, setPipeline] = useState<any>([]);
-    const [updateBilling, setUpdateBilling] = useState<boolean>(false);
-    const [updated, setUpdated] = useState<boolean>(false);
-    const hashids = new Hashids();
+
+    const [loadingPic, setLoadingPic] = useState<boolean>(true);
+
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Profile'));
@@ -112,35 +118,6 @@ const ViewStudent = () => {
 
     const navigate = useNavigate();
 
-    const handleGoToPayments = () => {
-        const newID = parseInt(student?.Student_id) * parseInt(suid);
-        navigate(`/students/${newID}/finish-billing-setup-options`);
-    };
-
-    const handleGoToPaymentSchedules = () => {
-        const newID = parseInt(student?.Student_id) * parseInt(suid);
-        navigate(`/students/${newID}/add-payment-schedules`);
-    };
-
-    const getPaySimpleInformation = async (studentID: any) => {
-        try {
-            const response = await getStudentBillingAccounts(studentID);
-            if (response.recordset.length > 0) {
-                setPaySimpleInfo(response.recordset[0].PaysimpleCustomerId);
-                getAllCustomerPaymentAccounts(response.recordset[0]?.PaysimpleCustomerId, suid).then((response) => {
-                    if (response?.Response?.CreditCardAccounts?.length > 0 || response?.Response?.AchAccounts?.length > 0) {
-                        setHasCards(true);
-                    } else {
-                        setHasCards(false);
-                    }
-                });
-            } else {
-                setPaySimpleInfo(null);
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    };
     useEffect(() => {
         const pipeliner = pipelineSteps.find((step: any) => step.PipelineStepId === parseInt(student?.StudentPipelineStatus));
         setPipeline(pipeliner);
@@ -198,29 +175,6 @@ const ViewStudent = () => {
         }
     };
 
-    const getBillingInfo = async (paySimpleID: any, studioId: any) => {
-        try {
-            if (paySimpleID && suid) {
-                const customerIdResponse = await getPaysimpleCustomerIdFromStudentId(paySimpleInfo, studioId);
-                console.timeLog('customerIdResponse', customerIdResponse);
-                if (customerIdResponse?.Response) {
-                    setBillingInfo(customerIdResponse?.Response);
-                    console.log('BILLING INFO', customerIdResponse?.Response);
-                    setBillingLoading(false);
-                } else {
-                    setBillingInfo(null);
-                    setBillingLoading(false);
-                }
-            } else {
-                setBillingInfo(null);
-                setBillingLoading(false);
-            }
-        } catch {
-            console.log('error');
-            setBillingLoading(false);
-        }
-    };
-
     const handleUpdateByColumn = async (column: string) => {
         const data = {
             studentId: unHashTheID(uid),
@@ -236,36 +190,65 @@ const ViewStudent = () => {
         }
     };
 
-    const getPaymentSchedules = async (paySimpleID: any, studioId: any) => {
-        setPaymentSchedules([]);
-        setPaymentsLoading(true);
+    const handleUpdateNextContactDate = async (column: string) => {
+        const data = {
+            studentId: unHashTheID(uid),
+            columnName: column,
+            value: student.NextContactDate ? formatDateForStudentEdit(student.NextContactDate) : null,
+        };
         try {
-            if (paySimpleID && suid) {
-                const customerIdResponse = await getPaymentSchedulesForCustomer(paySimpleInfo, studioId);
-                if (customerIdResponse?.Response) {
-                    const schedules = customerIdResponse?.Response;
-                    for (let i = 0; i < schedules.length; i++) {
-                        getPaymentScheduleByID(schedules[i].Id, studioId).then((res) => {
-                            setPaymentSchedules((prev: any) => {
-                                return [...prev, res.Response];
-                            });
-                            setPaymentsLoading(false);
-                        });
-                        if (i === schedules.length - 1) {
-                            setPaymentsLoading(false);
-                        }
-                    }
-                } else {
-                    setPaymentSchedules([]);
-                    setPaymentsLoading(false);
-                }
-            } else {
-                setPaymentSchedules([]);
-                setPaymentsLoading(false);
-            }
-        } catch {
-            console.log('error');
-            setPaymentsLoading(false);
+            console.log(data);
+            const response = await updateStudentByColumn(data);
+            setStudent({ ...student, NextContactDate: student.NextContactDate[0] });
+            console.log(response);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    const handleUpdateFirstClassDate = async (column: string) => {
+        const data = {
+            studentId: unHashTheID(uid),
+            columnName: column,
+            value: student.FirstClassDate ? formatDateForStudentEdit(student.FirstClassDate) : null,
+        };
+        try {
+            console.log(data);
+            const response = await updateStudentByColumn(data);
+            setStudent({ ...student, FirstClassDate: student.FirstClassDate[0] });
+            console.log(response);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const handleUpdateIntroContactDate = async (column: string) => {
+        const data = {
+            studentId: unHashTheID(uid),
+            columnName: column,
+            value: student.IntroDate ? formatDateForStudentEdit(student.IntroDate) : null,
+        };
+        try {
+            console.log(data);
+            const response = await updateStudentByColumn(data);
+            setStudent({ ...student, IntroDate: student.IntroDate[0] });
+            console.log(response);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    const handleUpdateBirthDate = async (column: string) => {
+        const data = {
+            studentId: unHashTheID(uid),
+            columnName: column,
+            value: student.Birthdate ? formatDateForStudentEdit(student.Birthdate) : null,
+        };
+        try {
+            console.log(data);
+            const response = await updateStudentByColumn(data);
+            setStudent({ ...student, Birthdate: student.Birthdate[0] });
+            console.log(response);
+        } catch (error) {
+            console.log(error);
         }
     };
 
@@ -317,7 +300,6 @@ const ViewStudent = () => {
             getStudentInfo(studentID).then((res) => {
                 setStudent(res);
             });
-            getPaySimpleInformation(studentID);
         } else {
             // redirect to 404
             navigate('/404');
@@ -331,11 +313,6 @@ const ViewStudent = () => {
         getWiatingListsForStudent(unHashTheID(uid));
         getProgramsForStudent(unHashTheID(uid));
     }, [uid, suid, updateClasses]);
-
-    useEffect(() => {
-        getBillingInfo(paySimpleInfo, suid);
-        getPaymentSchedules(paySimpleInfo, suid);
-    }, [paySimpleInfo, suid, updated]);
 
     const convertPhoneNumber = (phone: any) => {
         return phone?.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
@@ -352,6 +329,8 @@ const ViewStudent = () => {
     useEffect(() => {
         scrollTop();
     }, []);
+
+    console.log(student);
 
     const handleDeleteFromClass = (classID: any) => {
         showWarningMessage('Are you sure you want to remove this student from this class?', 'Remove Student From Class', 'Your student has been removed from the class')
@@ -422,23 +401,15 @@ const ViewStudent = () => {
 
     const [hasedRefID, setHasedRefID] = useState<any>(null);
 
-    const handleUpdateBilling = (e: any) => {
-        e.preventDefault();
-        setUpdateBilling(!updateBilling);
-    };
-
-    const handleTest = () => {
-        console.log('testing');
-    };
-
     useEffect(() => {
         if (!student) return;
         if (!suid) return;
         const hashedStudent = parseInt(student?.Student_id) * 548756 * parseInt(suid);
         setHasedRefID(hashedStudent);
+        if (student?.ProfilePicUrl) {
+            setLoadingPic(false);
+        }
     }, [student]);
-
-    const payHistoryIds = hashids.encode(paySimpleInfo, student?.Student_id);
 
     const reactivateStudent = async () => {
         const data = {
@@ -470,8 +441,6 @@ const ViewStudent = () => {
         navigate(`/students/add-student/${uid}`);
     };
 
-    console.log(student);
-
     return (
         <div>
             <div className="sm:flex sm:items-center sm:justify-between">
@@ -495,231 +464,32 @@ const ViewStudent = () => {
             </div>
             <div className="lg:flex lg:items-start gap-4 mt-4">
                 {/* CONTACT INFO */}
-                <div className="hidden lg:block panel p-0 lg:min-w-80 lg:max-w-96 divide-y divide-y-zinc-600 ">
-                    <div className="flex items-start justify-between mb-5 p-4">
-                        <div>
-                            <div className="font-semibold  text-2xl">
-                                {student?.First_Name} {student?.Last_Name}
-                            </div>
-                            <p className="font-normal text-sm">{student?.email}</p>
-                            <p className="font-normal text-sm">{convertPhoneNumber(student?.Phone)}</p>
-                            <p className="font-normal text-sm">{convertPhoneNumber(student?.Phone2)}</p>
-                            <div>
-                                <p className={`font-normal text-md mt-4 ${student?.activity ? 'text-success' : 'text-danger'}`}>{student?.activity ? 'Active' : 'Inactive'}</p>
-                                {/* {!student?.activity && (
-                                    <button
-                                        className="mt-2 px-4 py-2 bg-red-600 text-white text-xl font-semibold rounded-lg shadow-lg hover:bg-red-700 focus:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-600 transition-all duration-300 ease-in-out"
-                                        onClick={() => {
-                                            reactivateStudent();
-                                        }}
-                                    >
-                                        Reactivate Student
-                                    </button>
-                                )} */}
-                            </div>
-                            {toUpdate?.nextContactDate ? (
-                                <div className="flex items-center gap-1">
-                                    <input
-                                        type="date"
-                                        className="form-input h-7"
-                                        value={student?.NextContactDate}                                        
-                                        onChange={(e) => setStudent({ ...student, NextContactDate: e.target.value })}
-                                    />
-                                    <button
-                                        className="btn btn-sm btn-info"
-                                        onClick={() => {
-                                            setToUpdate({ ...toUpdate, nextContactDate: false });
-                                            handleUpdateByColumn('NextContactDate');
-                                        }}
-                                    >
-                                        Save
-                                    </button>
-                                </div>
-                            ) : (
-                                <p className={`font-normal flex items-end gap-1 text-xs ${!student?.NextContactDate && "text-danger"}`}>
-                                    Next Contact Date: {student?.NextContactDate ? formatDate(student?.NextContactDate) : 'No contact set'}{' '}
-                                    <span>
-                                        <button onClick={() => setToUpdate({ ...toUpdate, nextContactDate: true })}>
-                                            <IconEdit className="w-3 h-3 text-info" fill={true} />
-                                        </button>
-                                    </span>
-                                </p>
-                            )}
-                            <p className="font-normal text-xs ">Created: {formatDate(student?.EntryDate)}</p>
-                            <p className={`font-normal text-xs ${rank ? 'text-success' : 'text-danger'}`}>Rank: {rank ? rank : 'No rank set'}</p>
-                            {update ? (
-                                <div className="flex items-center gap-1">
-                                    <input type="text" className="form-input h-7" value={barcode} placeholder="Enter Barcode" onChange={(e) => setBarcode(e.target.value)} />
-                                    <button
-                                        className="btn btn-sm btn-info"
-                                        onClick={(e: any) => {
-                                            handleUpdateBarcode(e);
-                                        }}
-                                    >
-                                        Save
-                                    </button>
-                                </div>
-                            ) : (
-                                <p className={`font-normal flex items-end gap-1 text-xs ${barcode ? 'text-success' : 'text-danger'}`}>
-                                    Barcode ID: {barcode ? barcode : 'No barcode set'}{' '}
-                                    <span>
-                                        <button onClick={() => setUpdate(true)}>
-                                            <IconEdit className="w-3 h-3 text-info" fill={true} />
-                                        </button>
-                                    </span>
-                                </p>
-                            )}
 
-                            <p className={`font-normal text-xs`}>
-                                Pipeline Step: <span className={`font-normal text-xs ${pipeline?.StepName ? 'text-success' : 'text-danger'}`}>{pipeline?.StepName}</span>
-                            </p>
-                        </div>
-                    </div>
-                    <div className="p-4">
-                        <button
-                            className="text-zinc-500 mt-2 underline hover:text-info"
-                            onClick={() => {
-                                setSelectedIndex(4);
-                            }}
-                        >
-                            Classes
-                        </button>
-                        <div className="font-bold flex flex-wrap">{classes.length > 0 ? classes.map((c: any) => c.Name).join(', ') : 'No classes'}</div>
-                        <button
-                            className="text-zinc-500 mt-2 underline hover:text-info"
-                            onClick={() => {
-                                setSelectedIndex(5);
-                            }}
-                        >
-                            Active Pay Schedules
-                        </button>
-                        <div className="">
-                            {paymentSchedules.map((data: any, index: any) => {
-                                return (
-                                    <>
-                                        {' '}
-                                        {data?.EndDate !== data?.StartDate && data.ScheduleStatus === 'Active' && (
-                                            <div key={index} className="flex items-center text-xs gap-2 mt-2">
-                                                <div className={`${data.ScheduleStatus === 'Active' ? 'text-success' : 'text-danger'}`}>{data.ScheduleStatus}</div>
-                                                <div className="font-bold">${parseInt(data?.PaymentAmount)?.toFixed(2)}</div>
-                                                <div>
-                                                    {formatDate(data?.StartDate)} - {formatDate(data?.EndDate)}
-                                                </div>
-                                            </div>
-                                        )}
-                                    </>
-                                );
-                            })}
-                        </div>
-                    </div>
-                    <div className="">
-                        <StudentsQuickPay student={student} suid={suid} />
-                        <button className="uppercase font-lg font-bold w-full hover:bg-success-light p-4 text-left" onClick={() => navigate(`/students/invoice/${hasedRefID}`)}>
-                            Invoice
-                        </button>
-                        <SendQuickEmail student={student} name="Student" pipeline={pipeline} />
-                        <SendQuickText student={student} name="Student" pipeline={pipeline} />
-                        <SendQuickWaiver student={student} prospect={false} />
-                        <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left" onClick={(e: any) => handleClone(e)}>Clone Student</button>
-                        {student?.activity ? (
-                            <DeleteStudent
-                                student={student}
-                                billingInfo={paySimpleInfo}
-                                paymentSchedules={paymentSchedules}
-                                classes={classes}
-                                programs={programs}
-                                waitingLists={waitingLists}
-                                onStudentUpdate={handleStudentUpdate}
-                            />
-                        ) : (
-                            <button
-                                className="uppercase font-lg font-bold w-full hover:bg-danger-light p-4 text-left"
-                                onClick={() => {
-                                    reactivateStudent();
-                                }}
-                            >
-                                Reactivate Student
-                            </button>
-                        )}
-                    </div>
-                </div>
                 <div className="lg:w-full lg:mt-0 mt-8">
                     <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
-                        <Tab.List className="flex flex-wrap">
+                        <Tab.List className="flex flex-wrap  border-b border-zinc-300">
                             <Tab as={Fragment}>
                                 {({ selected }) => (
                                     <button
-                                        className={`${selected ? 'text-info !outline-none before:!w-full' : ''
-                                            } relative -mb-[1px] flex lg:hidden  items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full `}
+                                        className={`${
+                                            selected ? 'text-info !outline-none before:!w-full' : ''
+                                        } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="w-5 h-5 ltr:mr-2 rtl:ml-2" viewBox="0 0 16 16">
                                             <path d="M5 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4m4-2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5M9 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4A.5.5 0 0 1 9 8m1 2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5" />
                                             <path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zM1 4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H8.96q.04-.245.04-.5C9 10.567 7.21 9 5 9c-2.086 0-3.8 1.398-3.984 3.181A1 1 0 0 1 1 12z" />
                                         </svg>
-                                        Student Card
+                                        Student Info
                                     </button>
                                 )}
                             </Tab>
+
                             <Tab as={Fragment}>
                                 {({ selected }) => (
                                     <button
-                                        className={`${selected ? 'text-info !outline-none before:!w-full' : ''
-                                            } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="w-5 h-5 ltr:mr-2 rtl:ml-2" viewBox="0 0 16 16">
-                                            <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z" />
-                                            <path d="M3 5.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M3 8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 8m0 2.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5" />
-                                        </svg>
-                                        Notes
-                                    </button>
-                                )}
-                            </Tab>
-                            <Tab as={Fragment}>
-                                {({ selected }) => (
-                                    <button
-                                        className={`${selected ? 'text-info !outline-none before:!w-full' : ''
-                                            } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="w-5 h-5 ltr:mr-2 rtl:ml-2" viewBox="0 0 16 16">
-                                            <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z" />
-                                            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0" />
-                                        </svg>
-                                        Student Details
-                                    </button>
-                                )}
-                            </Tab>
-                            <Tab as={Fragment}>
-                                {({ selected }) => (
-                                    <button
-                                        className={`${selected ? 'text-info !outline-none before:!w-full' : ''
-                                            } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="w-5 h-5 ltr:mr-2 rtl:ml-2" viewBox="0 0 16 16">
-                                            <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2z" />
-                                        </svg>
-                                        Pipeline Status
-                                    </button>
-                                )}
-                            </Tab>
-                            <Tab as={Fragment}>
-                                {({ selected }) => (
-                                    <button
-                                        className={`${selected ? 'text-info !outline-none before:!w-full' : ''
-                                            } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="w-5 h-5 ltr:mr-2 rtl:ml-2" viewBox="0 0 16 16">
-                                            <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm-5 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5z" />
-                                            <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z" />
-                                        </svg>
-                                        Classes
-                                    </button>
-                                )}
-                            </Tab>
-                            <Tab as={Fragment}>
-                                {({ selected }) => (
-                                    <button
-                                        className={`${selected ? 'text-info !outline-none before:!w-full' : ''
-                                            } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
+                                        className={`${
+                                            selected ? 'text-info !outline-none before:!w-full' : ''
+                                        } relative -mb-[1px] flex items-center p-5 py-3 before:absolute before:bottom-0 before:left-0 before:right-0 before:m-auto before:inline-block before:h-[1px] before:w-0 before:bg-info before:transition-all before:duration-700 hover:text-info hover:before:w-full`}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="w-5 h-5 ltr:mr-2 rtl:ml-2" viewBox="0 0 16 16">
                                             <path d="M14 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" />
@@ -733,97 +503,135 @@ const ViewStudent = () => {
 
                         <Tab.Panels>
                             <Tab.Panel>
-                                <div className="lg:hidden block panel p-0 lg:min-w-80 lg:max-w-96 divide-y divide-y-zinc-600 ">
-                                    <div className="flex items-start justify-between mb-5 p-4">
+                                <div className="grid sm:grid-cols-8 grid-cols-1 gap-4 mt-4">
+                                    {/* STUDENT CARD */}
+                                    <div className="panel p-0 xl:col-span-2 md:col-span-3 h-full flex flex-col justify-between">
+                                        {/* ProfilePic */}
                                         <div>
-                                            <div className="font-semibold  text-2xl">
-                                                {student?.First_Name} {student?.Last_Name}
-                                            </div>
-                                            <p className="font-normal text-sm">{student?.email}</p>
-                                            <p className="font-normal text-sm">{convertPhoneNumber(student?.Phone)}</p>
-                                            <p className="font-normal text-sm">{convertPhoneNumber(student?.Phone2)}</p>
+                                            <StudentProfilePic student={student} setStudent={setStudent} />
 
-                                            <p className={`font-normal text-md mt-4 ${student?.activity ? 'text-success' : 'text-danger'}`}>{student?.activity ? 'Active' : 'Inactive'}</p>
-                                            <p className="font-normal text-xs ">Next Contact Date: {formatDate(student?.NextContactDate)}</p>
-                                            <p className="font-normal text-xs ">Created: {formatDate(student?.EntryDate)}</p>
-                                            <p className={`font-normal text-xs ${rank ? 'text-success' : 'text-danger'}`}>Rank: {rank ? rank : 'No rank set'}</p>
-                                            <p className={`font-normal text-xs ${barcode ? 'text-success' : 'text-danger'}`}>Barcode ID: {barcode ? barcode : 'No barcode set'}</p>
-                                            <p className={`font-normal text-xs`}>
-                                                Pipeline Step: <span className={`font-normal text-xs ${pipeline?.StepName ? 'text-success' : 'text-danger'}`}>{pipeline?.StepName}</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="p-4">
-                                        <div className="text-zinc-500 underline">Studio</div>
-                                        <div className="font-bold">{studioInfo?.Studio_Name}</div>
-                                        <div className="text-zinc-500 mt-2 underline">Classes</div>
-                                        <div className="font-bold flex flex-wrap">{classes.length > 0 ? classes.map((c: any) => c.Name).join(', ') : 'No classes'}</div>
-                                        <div className="text-zinc-500 mt-2 underline">Active Pay Schedules</div>
-                                        <div className="">
-                                            {paymentSchedules.map((data: any, index: any) => {
-                                                return (
-                                                    <>
-                                                        {' '}
-                                                        {data?.EndDate !== data?.StartDate && data.ScheduleStatus === 'Active' && (
-                                                            <div key={index} className="flex items-center text-xs gap-2 mt-2">
-                                                                <div className={`${data.ScheduleStatus === 'Active' ? 'text-success' : 'text-danger'}`}>{data.ScheduleStatus}</div>
-                                                                <div className="font-bold">${parseInt(data?.PaymentAmount)?.toFixed(2)}</div>
-                                                                <div>
-                                                                    {formatDate(data?.StartDate)} - {formatDate(data?.EndDate)}
-                                                                </div>
-                                                            </div>
+                                            <div className="flex items-start justify-between p-4">
+                                                <div>
+                                                    <div className="font-bold text-2xl flex items-center gap-1">
+                                                        {student?.First_Name} {student?.Last_Name}{' '}
+                                                        <p className={`  ${student?.activity ? 'badge bg-success' : 'badge bg-danger'}`}>{student?.activity ? 'Active' : 'Inactive'}</p>
+                                                    </div>
+                                                    <p className="font-semibold ">{student?.email}</p>
+                                                    <p className="font-semibold ">{convertPhoneNumber(student?.Phone)}</p>
+                                                    <p className="font-semibold">{convertPhoneNumber(student?.Phone2)}</p>
+                                                    <div className="mt-2">
+                                                        {!student?.activity && (
+                                                            <button
+                                                                className="btn btn-sm btn-danger mb-4"
+                                                                onClick={() => {
+                                                                    reactivateStudent();
+                                                                }}
+                                                            >
+                                                                Reactivate Student
+                                                            </button>
                                                         )}
-                                                    </>
-                                                );
-                                            })}
+                                                    </div>
+                                                    <div className="flex items-center gap-2 mb-4">
+                                                        <p className="font-bold ">Age:</p>
+                                                        <p>{new Date().getFullYear() - new Date(student?.Birthdate).getFullYear()} </p>
+                                                    </div>
+                                                    {toUpdate?.nextContactDate ? (
+                                                        <div className="flex items-center gap-1">
+                                                            <Flatpickr
+                                                                value={student.NextContactDate}
+                                                                className="form-input h-7"
+                                                                options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                                                onChange={(date: any) => setStudent({ ...student, NextContactDate: date })}
+                                                            />
+                                                            <button
+                                                                className="btn btn-sm btn-danger"
+                                                                onClick={() => {
+                                                                    setStudent({ ...student, NextContactDate: null });
+                                                                    handleUpdateByColumn('NextContactDate');
+                                                                }}
+                                                            >
+                                                                Clear
+                                                            </button>
+                                                            <button
+                                                                className="btn btn-sm btn-info"
+                                                                onClick={() => {
+                                                                    setToUpdate({ ...toUpdate, nextContactDate: false });
+                                                                    handleUpdateNextContactDate('NextContactDate');
+                                                                }}
+                                                            >
+                                                                Save
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <p className={`font-normal flex items-end gap-1 text-sm `}>
+                                                            Next Contact Date:{' '}
+                                                            <span className={`${!student?.NextContactDate && 'text-danger'}`}>
+                                                                {student?.NextContactDate ? formatWithTimeZone(student?.NextContactDate, handleGetTimeZoneOfUser()) : 'No contact set'}{' '}
+                                                            </span>
+                                                            <span>
+                                                                <button onClick={() => setToUpdate({ ...toUpdate, nextContactDate: true })}>
+                                                                    <IconEdit className="w-3 h-3 text-info" fill={true} />
+                                                                </button>
+                                                            </span>
+                                                        </p>
+                                                    )}
+                                                    <p className={`font-normal text-sm `}>
+                                                        Rank: <span className={`${rank ? 'text-success' : 'text-danger'}`}>{rank ? rank : 'No rank set'}</span>
+                                                    </p>
+                                                    {update ? (
+                                                        <div className="flex items-center gap-1">
+                                                            <input type="text" className="form-input h-7" value={barcode} placeholder="Enter Barcode" onChange={(e) => setBarcode(e.target.value)} />
+                                                            <button
+                                                                className="btn btn-sm btn-info"
+                                                                onClick={(e: any) => {
+                                                                    handleUpdateBarcode(e);
+                                                                }}
+                                                            >
+                                                                Save
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <p className={`font-normal flex items-end gap-1 text-sm `}>
+                                                            Barcode ID: <span className={`${barcode ? 'text-success' : 'text-danger'}`}>{barcode ? barcode : 'No barcode set'} </span>
+                                                            <span>
+                                                                <button onClick={() => setUpdate(true)}>
+                                                                    <IconEdit className="w-3 h-3 text-info" fill={true} />
+                                                                </button>
+                                                            </span>
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-3 justify-center p-4 py-6 ">
+                                            <SendQuickEmail student={student} name="Student" pipeline={pipeline} />
+                                            <SendQuickText student={student} name="Student" pipeline={pipeline} />
+                                            <StudentsQuickPay student={student} suid={suid} />
+                                            <Tippy content="Send Invoice">
+                                                <button className="btn btn-dark w-10 h-10 p-0 rounded-full" onClick={() => navigate(`/students/invoice/${hasedRefID}`)}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-receipt" viewBox="0 0 16 16">
+                                                        <path d="M1.92.506a.5.5 0 0 1 .434.14L3 1.293l.646-.647a.5.5 0 0 1 .708 0L5 1.293l.646-.647a.5.5 0 0 1 .708 0L7 1.293l.646-.647a.5.5 0 0 1 .708 0L9 1.293l.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .801.13l.5 1A.5.5 0 0 1 15 2v12a.5.5 0 0 1-.053.224l-.5 1a.5.5 0 0 1-.8.13L13 14.707l-.646.647a.5.5 0 0 1-.708 0L11 14.707l-.646.647a.5.5 0 0 1-.708 0L9 14.707l-.646.647a.5.5 0 0 1-.708 0L7 14.707l-.646.647a.5.5 0 0 1-.708 0L5 14.707l-.646.647a.5.5 0 0 1-.708 0L3 14.707l-.646.647a.5.5 0 0 1-.801-.13l-.5-1A.5.5 0 0 1 1 14V2a.5.5 0 0 1 .053-.224l.5-1a.5.5 0 0 1 .367-.27m.217 1.338L2 2.118v11.764l.137.274.51-.51a.5.5 0 0 1 .707 0l.646.647.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.509.509.137-.274V2.118l-.137-.274-.51.51a.5.5 0 0 1-.707 0L12 1.707l-.646.647a.5.5 0 0 1-.708 0L10 1.707l-.646.647a.5.5 0 0 1-.708 0L8 1.707l-.646.647a.5.5 0 0 1-.708 0L6 1.707l-.646.647a.5.5 0 0 1-.708 0L4 1.707l-.646.647a.5.5 0 0 1-.708 0z" />
+                                                        <path d="M3 4.5a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5m8-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5" />
+                                                    </svg>
+                                                </button>
+                                            </Tippy>
                                         </div>
                                     </div>
-                                    <div className="">
-                                        <StudentsQuickPay student={student} suid={suid} />
-                                        <button className="uppercase font-lg font-bold w-full hover:bg-success-light p-4 text-left" onClick={() => navigate(`/students/invoice/${hasedRefID}`)}>
-                                            Invoice
-                                        </button>
-                                        <SendQuickEmail student={student} name="Student" pipeline={pipeline} />
-                                        <SendQuickText student={student} name="Student" pipeline={pipeline} />
-                                        <SendQuickWaiver student={student} prospect={false} />
-                                        <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left">Clone Student</button>
-                                        {student?.activity ? (
-                                            <DeleteStudent
-                                                student={student}
-                                                billingInfo={paySimpleInfo}
-                                                paymentSchedules={paymentSchedules}
-                                                classes={classes}
-                                                programs={programs}
-                                                waitingLists={waitingLists}
-                                                onStudentUpdate={handleStudentUpdate}
-                                            />
-                                        ) : (
-                                            <button
-                                                className="uppercase font-lg font-bold w-full hover:bg-danger-light p-4 text-left"
-                                                onClick={() => {
-                                                    reactivateStudent();
-                                                }}
-                                            >
-                                                Reactivate Student
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-                            </Tab.Panel>
-                            <Tab.Panel>
-                                <div className="pt-5">
                                     {/* NOTES */}
+                                    <div className="panel p-0 md:col-span-5 xl:col-span-4">
+                                        <div className="flex rounded-t-lg items-center justify-between gap-4 p-5 bg-zinc-100">
+                                            <h3 className="font-bold">Notes</h3>
+                                            <div className="flex items-center gap-4">
+                                                <div className="flex">
+                                                    {!updateNotes && (
+                                                        <button className="text-danger ml-auto" onClick={() => handleUpdateNotes()}>
+                                                            Update All Notes
+                                                        </button>
+                                                    )}
+                                                </div>
 
-                                    <div className="col-span-full">
-                                        <div className="flex items-center justify-end gap-4 mb-5">
-                                            <div className="flex">
-                                                {!updateNotes && (
-                                                    <button className="text-danger ml-auto" onClick={() => handleUpdateNotes()}>
-                                                        Update All Notes
-                                                    </button>
-                                                )}
+                                                {!updateNotes && <AddNoteModal student={student} setStudent={setStudent} />}
                                             </div>
-                                            {!updateNotes && <AddNoteModal student={student} setStudent={setStudent} />}
                                         </div>
                                         {updateNotes && (
                                             <div className="flex items-center p-3.5 rounded text-danger bg-danger-light dark:bg-danger-dark-light">
@@ -838,7 +646,7 @@ const ViewStudent = () => {
                                         )}
 
                                         {updateNotes ? (
-                                            <div className="border border-[#ebedf2] bg-white rounded dark:bg-[#1b2e4b] dark:border-0 mt-4">
+                                            <div className="border border-[#ebedf2] bg-white rounded dark:bg-[#1b2e4b] dark:border-0 ">
                                                 <div className="p-4">
                                                     <textarea
                                                         className="w-full border-0 focus:ring-0 focus:outline-none dark:bg-[#1b2e4b] dark:text-white-dark"
@@ -849,7 +657,7 @@ const ViewStudent = () => {
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div className="border border-[#ebedf2] bg-white rounded dark:bg-[#1b2e4b] dark:border-0">
+                                            <PerfectScrollbar className="rounded-b-lg max-h-[470px]">
                                                 <div className="p-4">
                                                     {student?.notes?.split('\n').map((note: any, index: any) =>
                                                         // Check if the line starts with '#'
@@ -876,21 +684,178 @@ const ViewStudent = () => {
                                                         ) : null
                                                     )}
                                                 </div>
-                                            </div>
+                                            </PerfectScrollbar>
                                         )}
                                         {updateNotes && (
-                                            <button className=" mt-4 btn btn-primary ml-auto" onClick={() => handleSaveNotes()}>
-                                                Save Notes
+                                            <div className="p-4">
+                                                <button className="btn btn-primary ml-auto" onClick={() => handleSaveNotes()}>
+                                                    Save Notes
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                    {/* PIPELINE STEPS */}
+                                    <div className="panel p-0 xl:col-span-2 xl:row-span-2 md:col-span-4">
+                                        <div className="flex items-center justify-between gap-4 p-5 bg-zinc-100 rounded-t-lg">
+                                            <h3 className="font-bold">Pipeline Step</h3>
+                                            {toUpdate?.StudentPipelineStatus && (
+                                                <button
+                                                    className="btn btn-primary "
+                                                    onClick={() => {
+                                                        setToUpdate({ ...toUpdate, StudentPipelineStatus: false });
+                                                        handleUpdateByColumn('StudentPipelineStatus');
+                                                    }}
+                                                >
+                                                    Update
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div className="p-4">
+                                            {pipelineSteps?.map((step: any) => {
+                                                return (
+                                                    <label key={step.PipelineStepId} htmlFor={step.PipelineStepId} className="flex items-center cursor-pointer hover:bg-gray-100 p-1 sm:basis-1/2">
+                                                        <input
+                                                            type="radio"
+                                                            name="pipeline"
+                                                            className="form-radio"
+                                                            value={parseInt(student?.StudentPipelineStatus)}
+                                                            checked={parseInt(student?.StudentPipelineStatus) === step.PipelineStepId}
+                                                            onChange={() => {
+                                                                setStudent({ ...student, StudentPipelineStatus: step.PipelineStepId });
+                                                                setToUpdate({ ...toUpdate, StudentPipelineStatus: true });
+                                                            }}
+                                                        />
+                                                        <span>{step.StepName}</span>
+                                                    </label>
+                                                );
+                                            })}
+                                            <label htmlFor="completed" className="flex items-center cursor-pointer hover:bg-gray-100 p-1">
+                                                <input
+                                                    type="radio"
+                                                    name="pipeline"
+                                                    className="form-radio"
+                                                    value={parseInt(student?.StudentPipelineStatus)}
+                                                    checked={parseInt(student?.StudentPipelineStatus) === 0}
+                                                    onChange={() => {
+                                                        setStudent({ ...student, StudentPipelineStatus: 0 });
+                                                        setToUpdate({ ...toUpdate, StudentPipelineStatus: true });
+                                                    }}
+                                                />
+                                                <span>No Status/Ignore</span>
+                                            </label>
+                                        </div>
+
+                                        {toUpdate?.StudentPipelineStatus && (
+                                            <button
+                                                className="mt-4 btn btn-primary "
+                                                onClick={() => {
+                                                    setToUpdate({ ...toUpdate, StudentPipelineStatus: false });
+                                                    handleUpdateByColumn('StudentPipelineStatus');
+                                                }}
+                                            >
+                                                Save
                                             </button>
                                         )}
                                     </div>
-                                </div>
-                            </Tab.Panel>
-                            <Tab.Panel>
-                                <div className="active pt-5">
-                                    {/* ADDITIONAL INFO */}
-                                    <div className="panel">
-                                        <div className="grid grid-cols-3 gap-6">
+                                    {/* SCHEDULE AND CLASSES */}
+                                    <div className="panel p-0  xl:col-span-3 md:col-span-4">
+                                        <div className="flex items-center justify-between gap-4 p-5 bg-zinc-100 rounded-t-lg">
+                                            <h5 className="font-bold">Schedule and Classes</h5>
+                                        </div>
+                                        <div className="table-responsive mb-5">
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Classes</th>
+                                                        <th className="text-center">
+                                                            <AddStudentToClass student={student} alreadyIn={classes} updateClasses={updateClasses} setUpdateClasses={setUpdateClasses} />
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {classes?.map((classItem: any, index: any) => {
+                                                        return (
+                                                            <tr key={index} className="hover:bg-dark-light ">
+                                                                <td>
+                                                                    <div className="whitespace-nowrap">{classItem?.Name}</div>
+                                                                </td>
+
+                                                                <td className="flex">
+                                                                    <button className="btn btn-danger btn-sm ml-auto" onClick={() => handleDeleteFromClass(classItem?.ClassId)}>
+                                                                        Remove
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div className="table-responsive mb-5">
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Programs</th>
+                                                        <th className="text-center">
+                                                            <AddStudentToProgram student={student} alreadyIn={programs} updateClasses={updateClasses} setUpdateClasses={setUpdateClasses} />
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {programs?.map((programItem: any, index: any) => {
+                                                        return (
+                                                            <tr key={index} className="hover:bg-zinc-100 ">
+                                                                <td>
+                                                                    <div className="whitespace-nowrap">{programItem?.Name}</div>
+                                                                </td>
+
+                                                                <td className="flex">
+                                                                    <button className="btn btn-danger btn-sm ml-auto" onClick={() => handleDeleteFromProgram(programItem?.ProgramId)}>
+                                                                        Remove
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div className="table-responsive mb-5">
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Waiting Lists</th>
+                                                        <th className="text-center">
+                                                            <AddStudentToWaitingList student={student} alreadyIn={waitingLists} updateClasses={updateClasses} setUpdateClasses={setUpdateClasses} />
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {waitingLists?.map((listItem: any, index: any) => {
+                                                        return (
+                                                            <tr key={index} className="hover:bg-zinc-100 ">
+                                                                <td>
+                                                                    <div className="whitespace-nowrap">{listItem?.Title}</div>
+                                                                </td>
+
+                                                                <td className="flex">
+                                                                    <button className="btn btn-danger btn-sm ml-auto" onClick={() => handleRemoveFromList(listItem?.WaitingListId)}>
+                                                                        Remove
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    {/* DETAILS */}
+                                    <div className="panel md:col-span-4 xl:col-span-3 p-0 md:row-span-2 md:row-start-2">
+                                        <div className="flex items-center justify-between gap-4 p-5 bg-zinc-100 rounded-t-lg">
+                                            <h3 className="font-bold">Student Details</h3>
+                                        </div>
+                                        <div className="grid grid-cols-3 gap-6 p-4">
                                             <p className="font-bold">First Name:</p>
                                             {toUpdate?.First_Name ? (
                                                 <input type="text" className="form-input" value={student?.First_Name} onChange={(e) => setStudent({ ...student, First_Name: e.target.value })} />
@@ -1128,27 +1093,38 @@ const ViewStudent = () => {
                                             )}
                                             <p className="font-bold ">Next Contact Date:</p>
                                             {toUpdate?.nextContactDate ? (
-                                                <input
-                                                    type="date"
-                                                    className="form-input"
-                                                    value={student?.NextContactDate}
-                                                    onChange={(e) => setStudent({ ...student, NextContactDate: e.target.value })}
+                                                <Flatpickr
+                                                    value={student.NextContactDate}
+                                                    className="form-input h-7"
+                                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                                    onChange={(date: any) => setStudent({ ...student, NextContactDate: date })}
                                                 />
                                             ) : (
                                                 <p className={`font-normal ${!student?.NextContactDate && 'text-danger'}`}>
-                                                    {student?.NextContactDate ? formatDate(student?.NextContactDate) : 'No Contact Date Set'}
+                                                    {student?.NextContactDate ? formatWithTimeZone(student?.NextContactDate, handleGetTimeZoneOfUser()) : 'No contact set'}{' '}
                                                 </p>
                                             )}
                                             {toUpdate?.nextContactDate ? (
-                                                <button
-                                                    className="ml-auto text-info hover:text-blue-900"
-                                                    onClick={() => {
-                                                        setToUpdate({ ...toUpdate, nextContactDate: false });
-                                                        handleUpdateByColumn('NextContactDate');
-                                                    }}
-                                                >
-                                                    Save
-                                                </button>
+                                                <div className="flex items-center gap-2">
+                                                    <button
+                                                        className="btn btn-sm btn-danger"
+                                                        onClick={() => {
+                                                            setStudent({ ...student, NextContactDate: null });
+                                                            handleUpdateByColumn('NextContactDate');
+                                                        }}
+                                                    >
+                                                        Clear
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-sm btn-info hover:bg-blue-900"
+                                                        onClick={() => {
+                                                            setToUpdate({ ...toUpdate, nextContactDate: false });
+                                                            handleUpdateNextContactDate('NextContactDate');
+                                                        }}
+                                                    >
+                                                        Save
+                                                    </button>
+                                                </div>
                                             ) : (
                                                 <button className="ml-auto text-info hover:text-blue-900" onClick={() => setToUpdate({ ...toUpdate, nextContactDate: true })}>
                                                     <IconEdit className="w-4 h-4" />
@@ -1156,20 +1132,38 @@ const ViewStudent = () => {
                                             )}
                                             <p className="font-bold ">Intro Date:</p>
                                             {toUpdate?.IntroDate ? (
-                                                <input type="date" className="form-input" value={student?.IntroDate} onChange={(e) => setStudent({ ...student, IntroDate: e.target.value })} />
+                                                <Flatpickr
+                                                    value={student.IntroDate}
+                                                    className="form-input h-7"
+                                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                                    onChange={(date: any) => setStudent({ ...student, IntroDate: date })}
+                                                />
                                             ) : (
-                                                <p className={`font-normal ${!student?.IntroDate && 'text-danger'}`}>{student?.IntroDate ? formatDate(student?.IntroDate) : 'No Intro Date Set'}</p>
+                                                <p className={`font-normal ${!student?.IntroDate && 'text-danger'}`}>
+                                                    {student?.IntroDate ? formatWithTimeZone(student?.IntroDate, handleGetTimeZoneOfUser()) : 'No Intro Date set'}
+                                                </p>
                                             )}
                                             {toUpdate?.IntroDate ? (
-                                                <button
-                                                    className="ml-auto text-info hover:text-blue-900"
-                                                    onClick={() => {
-                                                        setToUpdate({ ...toUpdate, IntroDate: false });
-                                                        handleUpdateByColumn('IntroDate');
-                                                    }}
-                                                >
-                                                    Save
-                                                </button>
+                                                <div className="flex items-center gap-2">
+                                                    <button
+                                                        className="btn btn-sm btn-danger"
+                                                        onClick={() => {
+                                                            setStudent({ ...student, IntroDate: null });
+                                                            handleUpdateByColumn('IntroDate');
+                                                        }}
+                                                    >
+                                                        Clear
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-sm btn-info hover:bg-blue-900"
+                                                        onClick={() => {
+                                                            setToUpdate({ ...toUpdate, IntroDate: false });
+                                                            handleUpdateIntroContactDate('IntroDate');
+                                                        }}
+                                                    >
+                                                        Save
+                                                    </button>
+                                                </div>
                                             ) : (
                                                 <button className="ml-auto text-info hover:text-blue-900" onClick={() => setToUpdate({ ...toUpdate, IntroDate: true })}>
                                                     <IconEdit className="w-4 h-4" />
@@ -1177,20 +1171,39 @@ const ViewStudent = () => {
                                             )}
                                             <p className="font-bold ">Birthday:</p>
                                             {toUpdate?.Birthdate ? (
-                                                <input type="date" className="form-input" value={student?.Birthdate} onChange={(e) => setStudent({ ...student, Birthdate: e.target.value })} />
+                                                <Flatpickr
+                                                    value={student.Birthdate}
+                                                    className="form-input h-7"
+                                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                                    onChange={(date: any) => setStudent({ ...student, Birthdate: date })}
+                                                />
                                             ) : (
-                                                <p className={`font-normal ${!student?.Birthdate && 'text-danger'}`}>{student?.Birthdate ? formatDate(student?.Birthdate) : 'No Birthdate Set'}</p>
+                                                <p className={`font-normal ${!student?.Birthdate && 'text-danger'}`}>
+                                                    {' '}
+                                                    {student?.Birthdate ? formatWithTimeZone(student?.Birthdate, handleGetTimeZoneOfUser()) : 'No Intro Date set'}
+                                                </p>
                                             )}
                                             {toUpdate?.Birthdate ? (
-                                                <button
-                                                    className="ml-auto text-info hover:text-blue-900"
-                                                    onClick={() => {
-                                                        setToUpdate({ ...toUpdate, Birthdate: false });
-                                                        handleUpdateByColumn('Birthdate');
-                                                    }}
-                                                >
-                                                    Save
-                                                </button>
+                                                <div className="flex items-center gap-2">
+                                                    <button
+                                                        className="btn btn-sm btn-danger"
+                                                        onClick={() => {
+                                                            setStudent({ ...student, Birthdate: null });
+                                                            handleUpdateByColumn('Birthdate');
+                                                        }}
+                                                    >
+                                                        Clear
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-sm btn-info hover:bg-blue-900"
+                                                        onClick={() => {
+                                                            setToUpdate({ ...toUpdate, Birthdate: false });
+                                                            handleUpdateBirthDate('Birthdate');
+                                                        }}
+                                                    >
+                                                        Save
+                                                    </button>
+                                                </div>
                                             ) : (
                                                 <button className="ml-auto text-info hover:text-blue-900" onClick={() => setToUpdate({ ...toUpdate, Birthdate: true })}>
                                                     <IconEdit className="w-4 h-4" />
@@ -1232,29 +1245,45 @@ const ViewStudent = () => {
                                             )}
                                             <p className="font-bold ">First Class Date:</p>
                                             {toUpdate?.FirstClassDate ? (
-                                                <input
-                                                    type="date"
-                                                    className="form-input"
-                                                    value={student?.FirstClassDate}
-                                                    onChange={(e) => setStudent({ ...student, FirstClassDate: e.target.value })}
+                                                <Flatpickr
+                                                    value={student.FirstClassDate}
+                                                    className="form-input h-7"
+                                                    options={{ dateFormat: 'm-d-Y', position: 'auto right' }}
+                                                    onChange={(date: any) => setStudent({ ...student, FirstClassDate: date })}
                                                 />
                                             ) : (
                                                 <p className={`font-normal ${!student?.FirstClassDate && 'text-danger'}`}>
-                                                    {student?.FirstClassDate ? formatDate(student?.FirstClassDate) : 'No First Class Date Set'}
+                                                    {student?.FirstClassDate ? formatWithTimeZone(student?.FirstClassDate, handleGetTimeZoneOfUser()) : 'No First Class Date set'}
                                                 </p>
                                             )}
                                             {toUpdate?.FirstClassDate ? (
+                                                <div className="flex items-center gap-2 ml-auto">
+                                                    <button
+                                                        className="btn btn-sm btn-danger"
+                                                        onClick={() => {
+                                                            setStudent({ ...student, FirstClassDate: null });
+                                                            handleUpdateByColumn('FirstClassDate');
+                                                        }}
+                                                    >
+                                                        Clear
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-sm btn-info hover:bg-blue-900"
+                                                        onClick={() => {
+                                                            setToUpdate({ ...toUpdate, FirstClassDate: false });
+                                                            handleUpdateFirstClassDate('FirstClassDate');
+                                                        }}
+                                                    >
+                                                        Save
+                                                    </button>
+                                                </div>
+                                            ) : (
                                                 <button
                                                     className="ml-auto text-info hover:text-blue-900"
                                                     onClick={() => {
-                                                        setToUpdate({ ...toUpdate, FirstClassDate: false });
-                                                        handleUpdateByColumn('FirstClassDate');
+                                                        setToUpdate({ ...toUpdate, FirstClassDate: true });
                                                     }}
                                                 >
-                                                    Save
-                                                </button>
-                                            ) : (
-                                                <button className="ml-auto text-info hover:text-blue-900" onClick={() => setToUpdate({ ...toUpdate, FirstClassDate: true })}>
                                                     <IconEdit className="w-4 h-4" />
                                                 </button>
                                             )}
@@ -1262,304 +1291,40 @@ const ViewStudent = () => {
                                     </div>
                                 </div>
                             </Tab.Panel>
+
                             <Tab.Panel>
-                                <div className="active pt-5 panel">
-                                    <div className="sm:flex sm:flex-wrap sm:flex-row">
-                                        {pipelineSteps?.map((step: any) => {
-                                            return (
-                                                <label
-                                                    key={step.PipelineStepId}
-                                                    htmlFor={step.PipelineStepId}
-                                                    className="flex items-center cursor-pointer hover:bg-gray-100 p-1 sm:basis-1/2"
-                                                >
-                                                    <input
-                                                        type="radio"
-                                                        name="pipeline"
-                                                        className="form-radio"
-                                                        value={parseInt(student?.StudentPipelineStatus)}
-                                                        checked={parseInt(student?.StudentPipelineStatus) === step.PipelineStepId}
-                                                        onChange={() => {
-                                                            setStudent({ ...student, StudentPipelineStatus: step.PipelineStepId });
-                                                            setToUpdate({ ...toUpdate, StudentPipelineStatus: true });
-                                                        }}
-                                                    />
-                                                    <span>{step.StepName}</span>
-                                                </label>
-                                            );
-                                        })}
-                                        <label htmlFor="completed" className="flex items-center cursor-pointer hover:bg-gray-100 p-1">
-                                            <input
-                                                type="radio"
-                                                name="pipeline"
-                                                className="form-radio"
-                                                value={parseInt(student?.StudentPipelineStatus)}
-                                                checked={parseInt(student?.StudentPipelineStatus) === 0}
-                                                onChange={() => {
-                                                    setStudent({ ...student, StudentPipelineStatus: 0 });
-                                                    setToUpdate({ ...toUpdate, StudentPipelineStatus: true });
-                                                }}
-                                            />
-                                            <span>No Status/Ignore</span>
-                                        </label>
-                                    </div>
-                                    {toUpdate?.StudentPipelineStatus && (
-                                        <button
-                                            className="mt-4 btn btn-primary "
-                                            onClick={() => {
-                                                setToUpdate({ ...toUpdate, StudentPipelineStatus: false });
-                                                handleUpdateByColumn('StudentPipelineStatus');
-                                            }}
-                                        >
-                                            Save
-                                        </button>
-                                    )}
-                                </div>
-                            </Tab.Panel>
-                            <Tab.Panel>
-                                <div className="pt-5">
-                                    {/* SCHEDULE */}
-                                    <div className="panel lg:col-span-1 xl:col-span-2 ">
-                                        <div className="flex items-center justify-between mb-5">
-                                            <h5 className="font-semibold text-lg dark:text-white-light">Schedule and Classes</h5>
-                                        </div>
-                                        <div className="table-responsive mb-5">
-                                            <table>
-                                                <thead>
-                                                    <tr>
-                                                        <th>Classes</th>
-                                                        <th className="text-center">
-                                                            <AddStudentToClass student={student} alreadyIn={classes} updateClasses={updateClasses} setUpdateClasses={setUpdateClasses} />
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {classes?.map((classItem: any, index: any) => {
-                                                        return (
-                                                            <tr key={index} className="hover:bg-dark-light ">
-                                                                <td>
-                                                                    <div className="whitespace-nowrap">{classItem?.Name}</div>
-                                                                </td>
-
-                                                                <td className="flex">
-                                                                    <button className="btn btn-danger btn-sm ml-auto" onClick={() => handleDeleteFromClass(classItem?.ClassId)}>
-                                                                        Remove
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                        );
-                                                    })}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <div className="table-responsive mb-5">
-                                            <table>
-                                                <thead>
-                                                    <tr>
-                                                        <th>Programs</th>
-                                                        <th className="text-center">
-                                                            <AddStudentToProgram student={student} alreadyIn={programs} updateClasses={updateClasses} setUpdateClasses={setUpdateClasses} />
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {programs?.map((programItem: any, index: any) => {
-                                                        return (
-                                                            <tr key={index} className="hover:bg-zinc-100 ">
-                                                                <td>
-                                                                    <div className="whitespace-nowrap">{programItem?.Name}</div>
-                                                                </td>
-
-                                                                <td className="flex">
-                                                                    <button className="btn btn-danger btn-sm ml-auto" onClick={() => handleDeleteFromProgram(programItem?.ProgramId)}>
-                                                                        Remove
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                        );
-                                                    })}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <div className="table-responsive mb-5">
-                                            <table>
-                                                <thead>
-                                                    <tr>
-                                                        <th>Waiting Lists</th>
-                                                        <th className="text-center">
-                                                            <AddStudentToWaitingList student={student} alreadyIn={waitingLists} updateClasses={updateClasses} setUpdateClasses={setUpdateClasses} />
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {waitingLists?.map((listItem: any, index: any) => {
-                                                        return (
-                                                            <tr key={index} className="hover:bg-zinc-100 ">
-                                                                <td>
-                                                                    <div className="whitespace-nowrap">{listItem?.Title}</div>
-                                                                </td>
-
-                                                                <td className="flex">
-                                                                    <button className="btn btn-danger btn-sm ml-auto" onClick={() => handleRemoveFromList(listItem?.WaitingListId)}>
-                                                                        Remove
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                        );
-                                                    })}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Tab.Panel>
-                            <Tab.Panel>
-                                <div className="pt-5 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 2xl:grid-cols-3 xl:grid-cols-1 gap-4">
-                                    {/* BILLING INFO */}
-                                    <div>
-                                        <div className="panel p-0">
-                                            <div className="flex items-center justify-between p-5">
-                                                <h5 className="font-semibold text-lg dark:text-white-light">Billing Info</h5>
-                                                {updateBilling ? (
-                                                    <Tippy content="Update Billing Info">
-                                                        <button className="ltr:ml-auto rtl:mr-auto text-danger hover:text-red-700 p-2 " onClick={(e: any) => handleUpdateBilling(e)}>
-                                                            Discard
-                                                        </button>
-                                                    </Tippy>
-                                                ) : (
-                                                    <Tippy content="Update Billing Info">
-                                                        <button className="ltr:ml-auto rtl:mr-auto text-info hover:text-blue-700 p-2 rounded-full" onClick={(e: any) => handleUpdateBilling(e)}>
-                                                            <IconPencilPaper />
-                                                        </button>
-                                                    </Tippy>
-                                                )}
-                                            </div>
-                                            {billingLoading ? (
-                                                <div className="flex items-center justify-center h-56">
-                                                    <span className="animate-spin border-4 border-primary border-l-transparent rounded-full w-10 h-10 inline-block align-middle m-auto mb-10"></span>
-                                                </div>
-                                            ) : (
-                                                <div>
-                                                    {!billingInfo || Object?.keys(billingInfo)?.length === 0 ? (
-                                                        <div className="flex items-center justify-center h-56">
-                                                            <div className="text-center">
-                                                                <div className="text-center text-gray-400">No billing information found</div>
-                                                                <button type="button" className="btn btn-info mx-auto mt-4" onClick={() => handleGoToPayments()}>
-                                                                    <IconPlus /> Add Billing Info
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    ) : (
-                                                        <>
-                                                            <BillingInfoUpdate billingInfo={billingInfo} updateBilling={updateBilling} setUpdateBilling={setUpdateBilling} />
-                                                            <ul className="mt-7 ">
-                                                                <li>
-                                                                    <ViewPaymentMethods payID={paySimpleInfo} />
-                                                                </li>
-                                                                <li>
-                                                                    <AddCardModal inStudent={true} paySimpleID={paySimpleInfo} />
-                                                                </li>
-                                                                <li>
-                                                                    <AddBankModal inStudent={true} />
-                                                                </li>
-                                                                <li>
-                                                                    <button
-                                                                        className="uppercase font-lg font-bold w-full hover:bg-success-light p-4 text-left flex items-center gap-3 whitespace-nowrap"
-                                                                        onClick={handleGoToPaymentSchedules}
-                                                                    >
-                                                                        <IconPlus /> Add Payment Schedule
-                                                                    </button>
-                                                                </li>
-                                                                <li>
-                                                                    <AddStudentToBillingAccountModal inStudent={true}
-                                                                        billingAccountId={billingInfo?.Id} update={update} setUpdate={setUpdate}
-                                                                    />
-                                                                </li>
-                                                            </ul>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                    {/* ACTIVE PAYMENT SCHEDULES */}
-                                    <div className="col-span-2 row-span-full">
-                                        {paymentsLoading ? (
-                                            <div className="panel">
-                                                <div className="flex items-center justify-center h-24">
-                                                    <span className="animate-spin border-4 border-primary border-l-transparent rounded-full w-10 h-10 inline-block align-middle m-auto"></span>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="panel">
-                                                <div className="mb-5 flex items-center justify-between">
-                                                    <h5 className="font-semibold text-lg dark:text-white-light">Payment Schedules</h5>
-
-                                                    <div>
-                                                        <Link to={`/students/view-payment-history/${payHistoryIds}`} className="btn btn-danger btn-sm gap-x-2">
-                                                            <IconCalendar /> View Payment History
-                                                        </Link>
-                                                    </div>
-                                                </div>
-
-                                                {!hasCards ? (
-                                                    <div className="flex items-center justify-center h-56">
-                                                        <div className="text-center">
-                                                            <div className="text-center text-gray-400">No billing information found</div>
-                                                            <button type="button" className="btn btn-info mx-auto mt-4" onClick={() => handleGoToPayments()}>
-                                                                Add Billing Account First
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <>
-                                                        <div className="table-responsive ">
-                                                            <table>
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Amount</th>
-                                                                        <th>First Payment Date</th>
-                                                                        <th>End Date</th>
-                                                                        <th>Status</th>
-                                                                        <th className="text-center">View/Edit</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    {paymentSchedules.map((data: any, index: any) => {
-                                                                        return (
-                                                                            <tr key={index}>
-                                                                                <td className="font-bold">${parseInt(data?.PaymentAmount)?.toFixed(2)}</td>
-                                                                                <td>
-                                                                                    <div className="whitespace-nowrap">{formatDate(data?.StartDate)}</div>
-                                                                                </td>
-                                                                                <td>{formatDate(data?.EndDate)}</td>
-                                                                                <td>
-                                                                                    <span
-                                                                                        className={`badge whitespace-nowrap ${data.ScheduleStatus === 'Active' ? 'badge-outline-primary' : 'badge-outline-danger'
-                                                                                            }`}
-                                                                                    >
-                                                                                        {data.ScheduleStatus}
-                                                                                    </span>
-                                                                                </td>
-                                                                                <td className="text-center flex items-center justify-center">
-                                                                                    <ViewActivePaymentSchedules student={student} paymentInfo={data} setUpdated={setUpdated} updated={updated} />
-                                                                                </td>
-                                                                            </tr>
-                                                                        );
-                                                                    })}
-                                                                </tbody>
-                                                            </table>
-                                                            <div className="flex mt-4 items-center justify-end"></div>
-                                                        </div>
-                                                    </>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
+                                <StudentBillingDetails student={student} />
                             </Tab.Panel>
                         </Tab.Panels>
                     </Tab.Group>
                 </div>
+            </div>
+
+            <div className="">
+                <SendQuickWaiver student={student} prospect={false} />
+                <button className="uppercase font-lg font-bold w-full hover:bg-yellow-100 p-4 text-left" onClick={(e: any) => handleClone(e)}>
+                    Clone Student
+                </button>
+                {/* {student?.activity ? (
+                    <DeleteStudent
+                        student={student}
+                        billingInfo={paySimpleInfo}
+                        paymentSchedules={paymentSchedules}
+                        classes={classes}
+                        programs={programs}
+                        waitingLists={waitingLists}
+                        onStudentUpdate={handleStudentUpdate}
+                    />
+                ) : (
+                    <button
+                        className="uppercase font-lg font-bold w-full hover:bg-danger-light p-4 text-left"
+                        onClick={() => {
+                            reactivateStudent();
+                        }}
+                    >
+                        Reactivate Student
+                    </button>
+                )} */}
             </div>
         </div>
     );

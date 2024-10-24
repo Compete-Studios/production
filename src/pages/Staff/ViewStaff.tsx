@@ -15,6 +15,9 @@ import 'tippy.js/dist/tippy.css';
 import { showWarningMessage } from '../../functions/shared';
 import { getStaffByStudioId, updateStaffActivity } from '../../functions/api';
 import IconBolt from '../../components/Icon/IconBolt';
+import IconEye from '../../components/Icon/IconEye';
+import EmailAllStaff from './EmailAllStaff';
+import SendBulkText from '../Marketing/SendBulkText';
 
 const ViewStaff = () => {
     const { staff, suid, update, setUpdate }: any = UserAuth();
@@ -29,6 +32,7 @@ const ViewStaff = () => {
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[1]);
+    const [bulkRecipientsForText, setBulkRecipientsForText] = useState([]);
 
     const [inactiveStaff, setInactiveStaff] = useState([]);
     const [showInactive, setShowInactive] = useState(true);
@@ -139,6 +143,18 @@ const ViewStaff = () => {
             });
     };
 
+    const handleSetBulk = (staffNumbers: any) => {
+        let bulkRecipients: any = [];
+        staffNumbers.map((d: any) => {
+            bulkRecipients.push({ phoneNumber: d.Phone, name: d.Name, type: 'staff', email: d.email });
+        });
+        setBulkRecipientsForText(bulkRecipients);
+    };
+
+    useEffect(() => {
+        handleSetBulk(staff);
+    }, [staff]);
+
     return (
         <>
             <div className="panel px-0 border-white-light dark:border-[#1b2e4b]">
@@ -148,11 +164,15 @@ const ViewStaff = () => {
                             <h2 className="text-xl">Staff</h2>
                             <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                         </div>
-                        <div className="flex staff-center gap-2 ltr:ml-auto rtl:mr-auto">
-                            <Link to="/staff/add-staff" className="btn btn-primary gap-1">
-                                <IconPlus />
-                                Add Staff
-                            </Link>
+                        <div className="ml-auto flex items-center gap-2">
+                            <EmailAllStaff recipients={bulkRecipientsForText} />
+                            <SendBulkText isButton={true} recipients={bulkRecipientsForText} displayAll={false} />
+                            <div className="flex staff-center gap-2 ltr:ml-auto rtl:mr-auto">
+                                <Link to="/staff/add-staff" className="btn btn-primary gap-1">
+                                    <IconPlus />
+                                    Add Staff
+                                </Link>
+                            </div>
                         </div>
                     </div>
                     <div className="p-5 flex">
@@ -204,12 +224,12 @@ const ViewStaff = () => {
                                     textAlignment: 'center',
                                     render: ({ StaffId, FirstName, ActivityLevel }: any) => (
                                         <div className="flex gap-4 staff-center w-max mx-auto">
-                                            <Tippy content="View Staff Member">
-                                                <button className="flex text-primary hover:text-emerald-800" onClick={() => handleHashAndGo(StaffId)}>
-                                                    <IconEdit className="w-4.5 h-4.5" />
+                                            <Tippy content="View/Edit Staff Member">
+                                                <button className="flex text-info hover:text-blue-800" onClick={() => handleHashAndGo(StaffId)}>
+                                                    <IconEye className="w-5 h-5" />
                                                 </button>
                                             </Tippy>
-                                            <ViewStaffMember staffID={StaffId} />
+                                            {/* <ViewStaffMember staffID={StaffId} /> */}
                                             {/* <NavLink to="" className="flex"> */}
                                             {ActivityLevel === 1 ? (
                                                 <Tippy content="Deactivate Staff Member">

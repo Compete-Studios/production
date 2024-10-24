@@ -57,7 +57,7 @@ export default function LatePaymentPipeline() {
             // }
             
         }
-    }, []);
+    }, [latePayementPipeline]);
 
     const handleDeleteStep = (prosid: any) => {
         showWarningMessage('Are you sure you want to delete this late pipeline step?', 'Remove Pipeline Step', 'Your Pipeline Step has been removed successfully')

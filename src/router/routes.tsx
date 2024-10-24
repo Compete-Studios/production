@@ -411,7 +411,7 @@ const routes = [
         element: <AddRoom />,
     },
     {
-        path: '/classes/edit-room',
+        path: '/classes/edit-room/:rmID',
         element: <EditRoom />,
     },
     {

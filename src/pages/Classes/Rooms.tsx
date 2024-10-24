@@ -7,6 +7,7 @@ import { dropRoom, loadStudioRooms } from '../../functions/api';
 import IconEdit from '../../components/Icon/IconEdit';
 import AddRoom from './AddRoom';
 import { showWarningMessage } from '../../functions/shared';
+import { Link } from 'react-router-dom';
 
 export default function Rooms() {
     const { suid }: any = UserAuth();
@@ -75,9 +76,11 @@ export default function Rooms() {
 
                                     <td className="text-center ">
                                         <Tippy content="Edit">
+                                            <Link to={`/classes/edit-room/${data.RoomId}` }>
                                             <button type="button" className="p-2 text-primary hover:text-emerald-800">
                                                 <IconEdit />
-                                            </button>
+                                                </button>
+                                            </Link>
                                         </Tippy>
                                         <Tippy content="Delete">
                                             <button type="button" className="p-2 text-danger hover:text-red-700" onClick={() => handleDeleteRoome(data.RoomId)}>
